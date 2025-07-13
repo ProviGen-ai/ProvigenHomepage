@@ -7,15 +7,28 @@ const Features = () => {
     <>
       <section
         id="features"
-        className="bg-primary/[.03] py-16 md:py-20 lg:py-28"
+        className="bg-primary/[.03]"
+        style={{ paddingTop: '20vh', paddingBottom: '10vh' }}
       >
-        <div className="container">
+        <div className="w-full max-w-[80%] md:max-w-7xl mx-auto px-2 md:px-4">
           <SectionTitle
-            title="We build the digital bioinformatician."
-            paragraph="Currently, biotech laboratories often share a single bioinformatician, slowing down researchers in their work. Recognizing this challenge, we at ProviGen have set ourselves the goal of eliminating this bottleneck. To achieve this, we are building a cloud platform for open-source biotech tools, making these tools easily accessible via an AI-driven natural language interface."
+            title="We turn robotic biolabs into closed-loop systems."
+            paragraph={
+              <>
+                Deploying and optimizing protocols on laboratory robots still demands months of manual debugging. 
+                <br />
+                To address this, we use active learning techniques to shorten optimization timelines from months to weeks.
+                <br />
+                Our platform connects to equipment, reads sensor data to auto-debug workflows, and runs continuous loops of:
+                <br /><br />
+                <span className="font-bold text-logo-blue">design</span> &nbsp;-&nbsp; <span className="font-bold text-logo-green">experiment</span> &nbsp;-&nbsp; <span className="font-bold text-logo-blue">analyze</span> &nbsp;-&nbsp; <span className="font-bold text-logo-green">adapt</span>
+              </>
+            }
+            paragraphWidth="1000px"
+            mb="24vh"
             center
           />
-          <div className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-3 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-x-12 gap-y-14 md:grid-cols-3 lg:grid-cols-3 px-6">
             {featuresData.map((feature) => (
               <SingleFeature key={feature.id} feature={feature} />
             ))}

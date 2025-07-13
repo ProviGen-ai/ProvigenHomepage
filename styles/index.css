@@ -32,3 +32,18 @@
     @apply opacity-100;
   }
 }
+
+@layer utilities {
+  @keyframes scroll-infinite {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-196%);
+    }
+  }
+  
+  .animate-scroll-infinite {
+    animation: scroll-infinite 20s linear infinite;
+  }
+}

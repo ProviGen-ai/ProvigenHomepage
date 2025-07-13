@@ -3,7 +3,7 @@ import { Feature } from "@/types/feature";
 const SingleFeature = ({ feature }: { feature: Feature }) => {
   const { iconPath, title, paragraph } = feature;
   return (
-    <div className="w-full">
+    <div className="w-full px-0 md:px-8">
       <div className="wow fadeInUp" data-wow-delay=".15s">
         <div>
           <img
@@ -15,7 +15,7 @@ const SingleFeature = ({ feature }: { feature: Feature }) => {
         <h3 className="mb-5 text-xl font-bold text-black sm:text-2xl lg:text-xl xl:text-2xl">
           {title}
         </h3>
-        <p className="pr-[10px] text-base font-medium leading-relaxed text-body-color-dark">
+        <p className="pr-[10px] text-base font-medium leading-relaxed text-body-color-dark min-h-[120px]">
           {paragraph}
         </p>
       </div>

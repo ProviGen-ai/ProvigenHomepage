@@ -67,9 +67,9 @@ const Header = () => {
       >
         <div className="container">
           <div className="relative -mx-4 flex items-center justify-between">
-            <div className="w-60 max-w-full px-4 xl:mr-12">
+            <div className="w-80 max-w-full px-4 xl:mr-12">
               <Link
-                href="/"
+                href="https://provigen.ai/"
                 className={`header-logo block w-full ${
                   sticky ? "py-0 lg:py-0" : "py-0"
                 } `}
@@ -77,8 +77,8 @@ const Header = () => {
                 <Image
                   src="/images/logo/provigenLogoTransparent.png"
                   alt="logo"
-                  width={140}
-                  height={30}
+                  width={400}
+                  height={80}
                   className="w-full dark:hidden"
                 />
                 

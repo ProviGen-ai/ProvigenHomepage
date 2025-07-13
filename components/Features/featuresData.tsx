@@ -4,23 +4,23 @@ const featuresData: Feature[] = [
   {
     id: 1,
     iconPath: "/images/features/setup_time.png",
-    title: "No Setup Time",
+    title: "Rapid Protocol Deployment",
     paragraph:
-      "Save time on setup by accessing bioinformatics tools like AlphaFold2 directly through our cloud platform.",
+      "Save time on getting new automation protocols to work. Optimize them from low to high performance in a fraction of time.",
   },
   {
     id: 1,
     iconPath: "/images/features/learning_curve.png",
     title: "Improved Accessibility",
     paragraph:
-      "Familiarize yourself with how to use the tools with the help of our digital assistant. It can also help you decide which tool is suitable for the task at hand.",
+      "Access complex automation through natural language. Visualize and validate protocols through simulations before deploying on real hardware.",
   },
   {
     id: 1,
     iconPath: "/images/features/easy_interpret.png",
-    title: "Output easy to interpret",
+    title: "Focus on What Matters",
     paragraph:
-      "Achieve research results faster by interacting with the output of tools via natural language. For example, you can ask questions about what certain parameters mean or how to interpret the results.",
+      "Automatically determine which experiment to run next for maximal knowledge gain. Anomaly detection automatically flags unusual outcomes so you don't have to sift through mountains of data.",
   }
 ];
 export default featuresData;

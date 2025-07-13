@@ -15,19 +15,19 @@ const Hero = () => {
     <>
     <section
         id="home"
-        className="relative overflow-hidden h-s"
+        className="relative overflow-hidden h-screen"
       >
-      <div className="w-full h-[80vh] grid">
+      <div className="w-full h-screen flex items-center">
       <video
         autoPlay
         muted
         loop
         playsInline
-        className="object-cover absolute w-full h-[80vh] z-0 opacity-20"
+        className="object-cover absolute w-full h-screen z-0 opacity-20"
       >
       <source src={backgroundVideo} type="video/mp4"/>
       </video>
-          <div className="container align-middle mt-auto mb-auto z-1 pt-4 relative">
+          <div className="container z-1 pt-32 sm:pt-28 md:pt-20 pb-8 relative w-full">
           
             <div className="-mx-4 flex flex-wrap">
             
@@ -42,7 +42,7 @@ const Hero = () => {
                   <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-black to-blue">Accelerating</span> <span className="italic">research in</span> <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-black to-blue">biotechnology</span>
                   </h1>
                   <p className="mb-12 text-base font-medium !leading-relaxed text-body-color-dark  sm:text-lg md:text-xl">
-                  We build an AI-based, interactive lab assistant to unlock the full potential of bioinformatics tools in biotech research.
+                  We build the <span className="text-logo-blue">Autopilot</span> for <span className="text-logo-green">self-optimizing</span> robotic biolabs.
                   </p>
                   <div className="flex flex-col items-center justify-center space-y-2 sm:flex-row sm:space-x-4 sm:space-y-0">
                     <button

@@ -22,6 +22,8 @@ module.exports = {
       primary: "#4A6CF7",
       yellow: "#FBB040",
       blue:"#2563eb",
+      "logo-blue": "#05A2E6",
+      "logo-green": "#057119",
       "body-color": "#959CB1",
       "body-color-dark": "#6c7793",
     },
