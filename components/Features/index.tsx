@@ -28,9 +28,11 @@ const Features = () => {
             mb="24vh"
             center
           />
-          <div className="grid grid-cols-1 gap-x-12 gap-y-14 md:grid-cols-3 lg:grid-cols-3 px-6">
-            {featuresData.map((feature) => (
-              <SingleFeature key={feature.id} feature={feature} />
+          <div className="grid grid-cols-1 gap-x-12 gap-y-14 md:grid-cols-3 lg:grid-cols-3 px-4">
+            {featuresData.map((feature, index) => (
+              <div key={feature.id} className={index === 1 ? "md:ml-5" : ""}>
+                <SingleFeature feature={feature} />
+              </div>
             ))}
           </div>
         </div>
