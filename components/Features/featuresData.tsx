@@ -9,14 +9,14 @@ const featuresData: Feature[] = [
       "Save time on getting new automation protocols to work. Optimize them from low to high performance in a fraction of time.",
   },
   {
-    id: 1,
+    id: 2,
     iconPath: "/images/features/learning_curve.png",
     title: "Improved Accessibility",
     paragraph:
       "Access complex automation through natural language. Visualize and validate protocols through simulations before deploying on real hardware.",
   },
   {
-    id: 1,
+    id: 3,
     iconPath: "/images/features/easy_interpret.png",
     title: "Focus on What Matters",
     paragraph:

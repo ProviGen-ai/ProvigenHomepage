@@ -15,17 +15,23 @@ const brandsData: Brand[] = [
     image: "/images/logo/tumVenture_logo.png",
     secondImage: "/images/logo/FAB.png",
   },
-  {
-    id: 3,
-    name: "BioM",
-    href: "https://www.bio-m.org/en.html",
-    image: "/images/logo/BioM.png",
-  },
+  // {
+  //   id: 3,
+  //   name: "BioM",
+  //   href: "https://www.bio-m.org/en.html",
+  //   image: "/images/logo/BioM.png",
+  // },
   {
     id: 4,
     name: "iGEM Startups",
     href: "https://startups.igem.org/",
     image: "/images/logo/iGEM_Startups.png",
+  },
+  {
+    id: 6,
+    name: "AI Nation",
+    href: "https://www.ai-nation.de/",
+    image: "/images/logo/AI_Nation.svg",
   },
   {
     id: 5,

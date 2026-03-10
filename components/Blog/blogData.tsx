@@ -3,45 +3,45 @@ import { Blog } from "@/types/blog";
 const blogData: Blog[] = [
   {
     id: 1,
-    title: "Best UI components for modern websites",
+    title: "The Future of Automated Biolabs",
     paragraph:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit amet dictum neque, laoreet dolor.",
+      "Exploring how AI and robotics are transforming biological research and drug discovery processes.",
     image: "/images/blog/blog-01.jpg",
     author: {
-      name: "Samuyl Joshi",
+      name: "Provigen Team",
       image: "/images/blog/author-01.png",
-      designation: "Graphic Designer",
+      designation: "Research & Development",
     },
-    tags: ["creative"],
-    publishDate: "2025",
+    tags: ["technology"],
+    publishDate: "2024",
   },
   {
     id: 2,
-    title: "9 simple ways to improve your design skills",
+    title: "Self-Optimizing Systems in Biotech",
     paragraph:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit amet dictum neque, laoreet dolor.",
+      "How machine learning enables laboratories to continuously improve their experimental protocols.",
     image: "/images/blog/blog-02.jpg",
     author: {
-      name: "Musharof Chy",
+      name: "Provigen Team",
       image: "/images/blog/author-02.png",
-      designation: "Content Writer",
+      designation: "AI Research",
     },
-    tags: ["computer"],
-    publishDate: "2025",
+    tags: ["research"],
+    publishDate: "2024",
   },
   {
     id: 3,
-    title: "Tips to quickly improve your coding speed.",
+    title: "Accelerating Drug Discovery with Automation",
     paragraph:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit amet dictum neque, laoreet dolor.",
+      "The impact of robotic automation on reducing time-to-market for new therapeutics.",
     image: "/images/blog/blog-03.jpg",
     author: {
-      name: "Lethium Deo",
+      name: "Provigen Team",
       image: "/images/blog/author-03.png",
-      designation: "Graphic Designer",
+      designation: "Industry Insights",
     },
-    tags: ["design"],
-    publishDate: "2025",
+    tags: ["industry"],
+    publishDate: "2024",
   },
 ];
 export default blogData;

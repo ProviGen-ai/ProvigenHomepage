@@ -1,20 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
-  webpack(config, { isServer }) {
-    const prefix = config.assetPrefix ?? config.basePath ?? '';
+  turbopack: {},
+  webpack(config) {
     config.module.rules.push({
       test: /\.mp4$/,
-      use: [{
-        loader: 'file-loader',
-        options: {
-          publicPath: `${prefix}/_next/static/media/`,
-          outputPath: `${isServer ? '../' : ''}static/media/`,
-          name: '[name].[hash].[ext]',
-        },
-      }],
+      type: 'asset/resource',
+      generator: {
+        filename: 'static/media/[name].[hash][ext]',
+      },
     });
 
     return config;

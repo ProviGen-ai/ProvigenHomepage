@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link"
 import backgroundVideo from "public/videos/network.mp4"
 
 
@@ -44,12 +43,18 @@ const Hero = () => {
                   <p className="mb-12 text-base font-medium !leading-relaxed text-body-color-dark  sm:text-lg md:text-xl">
                   We build the <span className="text-logo-blue">Autopilot</span> for <span className="text-logo-green">self-optimizing</span> robotic biolabs.
                   </p>
-                  <div className="flex flex-col items-center justify-center space-y-2 sm:flex-row sm:space-x-4 sm:space-y-0">
+                  <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+                    <a
+                      href="/#contact"
+                      className="inline-block rounded-md bg-primary py-4 px-8 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80"
+                    >
+                      Contact Us
+                    </a>
                     <button
-                      className="rounded-md bg-blue/80 py-4 px-8 text-base font-semibold text-black duration-300 ease-in-out hover:bg-blue/50"
+                      className="rounded-md bg-transparent border-2 border-black/20 py-4 px-8 text-base font-semibold text-black duration-300 ease-in-out hover:border-black/40 hover:bg-black/5"
                       onClick={scrollToFeatures}
                     >
-                      Learn more
+                      Learn More
                     </button>
                   </div>
                 </div>

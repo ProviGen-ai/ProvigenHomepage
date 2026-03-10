@@ -126,11 +126,14 @@ const Header = () => {
                           >
                             {menuItem.title}
                           </button>
-                        ) : (
-                          <>
-                            
-                          </>
-                        )}
+                        ) : menuItem.path ? (
+                          <Link
+                            href={menuItem.path}
+                            className={`flex py-2 text-base text-dark group-hover:text-primary   lg:mr-0 lg:inline-flex lg:py-6 lg:px-0`}
+                          >
+                            {menuItem.title}
+                          </Link>
+                        ) : null}
                       </li>
                     ))}
                   </ul>
