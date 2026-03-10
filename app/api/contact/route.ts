@@ -20,7 +20,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Send inquiry to Provigen
+    // Send inquiry to ProviGen
     await resend.emails.send({
       from: "Contact Form <noreply@provigen.ai>",
       to: "contact@provigen.ai",
@@ -31,10 +31,10 @@ export async function POST(req: Request) {
 
     // Send confirmation to the sender
     await resend.emails.send({
-      from: "Provigen <noreply@provigen.ai>",
+      from: "ProviGen <noreply@provigen.ai>",
       to: email,
-      subject: "We received your message — Provigen",
-      text: `Hi,\n\nThank you for reaching out to Provigen! We have received your message and will get back to you within 24 hours during business days.\n\nHere is a copy of your inquiry:\n\n${message}\n\nBest regards,\nThe Provigen Team\nhttps://provigen.ai`,
+      subject: "We received your message - ProviGen",
+      text: `Hi,\n\nThank you for reaching out to ProviGen! We have received your message and will get back to you within 24 hours during business days.\n\nHere is a copy of your inquiry:\n\n${message}\n\nBest regards,\nThe ProviGen Team\nhttps://provigen.ai`,
     });
 
     return NextResponse.json({ success: true });
