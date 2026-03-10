@@ -1,49 +1,68 @@
-import Breadcrumb from "@/components/Common/Breadcrumb";
+"use client";
+
+import { DoESimulation } from "@/components/Demo/DoESimulation";
+import { ConvergenceComparison } from "@/components/Demo/ConvergenceComparison";
 
 export default function DemoPage() {
   return (
-    <>
-
-      <section className="pb-[120px] pt-[120px]">
-        <div className="container">
-          <div className="mx-auto max-w-4xl">
-            <div className="wow fadeInUp mb-12 text-center" data-wow-delay=".1s">
-              <h2 className="mb-4 text-3xl font-bold !leading-tight text-black sm:text-4xl md:text-[45px]">
-                Interactive Demo
-              </h2>
-              <p className="text-base !leading-relaxed text-body-color-dark md:text-lg">
-                Our interactive demo platform will be available here soon.
-              </p>
-            </div>
-
-            <div className="wow fadeInUp rounded-lg bg-white p-8 shadow-lg sm:p-12" data-wow-delay=".15s">
-              <div className="text-center text-body-color-dark">
-                <p className="mb-6">
-                  We're building an interactive demonstration of our platform. Check back soon to explore:
-                </p>
-                <ul className="mx-auto max-w-2xl space-y-3 text-left">
-                  <li>• Automated workflow design</li>
-                  <li>• Real-time protocol optimization</li>
-                  <li>• AI-driven experimental planning</li>
-                  <li>• Robotic lab simulation</li>
-                </ul>
-              </div>
-
-              <div className="mt-12 text-center">
-                <p className="mb-6 text-base text-body-color-dark">
-                  Interested in seeing a live demonstration?
-                </p>
-                <a
-                  href="/#contact"
-                  className="inline-block rounded-md bg-primary py-4 px-8 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80"
-                >
-                  Contact Us
-                </a>
-              </div>
-            </div>
-          </div>
+    <section className="pb-[120px] pt-[150px]">
+      <div className="container">
+        {/* Page header */}
+        <div className="mx-auto max-w-4xl mb-16 text-center">
+          <h1 className="mb-4 text-3xl font-bold !leading-tight text-black sm:text-4xl md:text-[45px]">
+            Interactive Demo
+          </h1>
+          <p className="text-base !leading-relaxed text-body-color-dark md:text-lg">
+            Explore how Bayesian Optimization outperforms traditional Design of
+            Experiments by finding optimal conditions with fewer experiments.
+            Results vary between runs due to random initialization.
+          </p>
         </div>
-      </section>
-    </>
+
+        {/* 2D DoE Simulation */}
+        <div className="mb-16">
+          <div className="mb-6 max-w-3xl">
+            <h2 className="text-2xl font-bold text-black mb-2">
+              2D Optimization Landscape
+            </h2>
+            <p className="text-body-color-dark">
+              Watch how Bayesian Optimization selects sample points compared to
+              space-filling Design of Experiments. The pre-rendered plot on the
+              left shows the true optimization landscape which would be unknown
+              in a real-world setting.
+            </p>
+          </div>
+          <DoESimulation height={600} />
+        </div>
+
+        {/* N-D Convergence Comparison */}
+        <div className="mb-16">
+          <div className="mb-6 max-w-3xl">
+            <h2 className="text-2xl font-bold text-black mb-2">
+              High-Dimensional Convergence
+            </h2>
+            <p className="text-body-color-dark">
+              Compare convergence rates in N-dimensional parameter spaces. As
+              dimensionality increases, the advantage of Bayesian Optimization
+              over traditional sampling becomes more pronounced.
+            </p>
+          </div>
+          <ConvergenceComparison height={500} />
+        </div>
+
+        {/* CTA section */}
+        <div className="text-center mt-12">
+          <p className="mb-6 text-base text-body-color-dark">
+            Ready to optimize your laboratory workflows?
+          </p>
+          <a
+            href="/#contact"
+            className="inline-block rounded-md bg-primary py-4 px-8 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80"
+          >
+            Contact Us
+          </a>
+        </div>
+      </div>
+    </section>
   );
 }

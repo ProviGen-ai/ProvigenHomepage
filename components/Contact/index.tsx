@@ -5,15 +5,28 @@ const Contact = () => {
   const [formData, setFormData] = useState({
     email: "",
     message: "",
+    website: "", // honeypot field
   });
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Create mailto link with form data
-    const mailtoLink = `mailto:contact@provigen.ai?subject=Inquiry from ${formData.email}&body=${encodeURIComponent(
-      `From: ${formData.email}\n\nMessage:\n${formData.message}`
-    )}`;
-    window.location.href = mailtoLink;
+    setStatus("sending");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) throw new Error("Failed to send");
+
+      setStatus("sent");
+      setFormData({ email: "", message: "", website: "" });
+    } catch {
+      setStatus("error");
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -41,6 +54,20 @@ const Contact = () => {
 
         <div className="rounded-lg bg-white p-8 shadow-lg sm:p-12 mb-8">
           <form onSubmit={handleSubmit}>
+            {/* Honeypot field - hidden from real users */}
+            <div className="absolute opacity-0 top-0 left-0 h-0 w-0 -z-10" aria-hidden="true">
+              <label htmlFor="website">Website</label>
+              <input
+                type="text"
+                id="website"
+                name="website"
+                value={formData.website}
+                onChange={handleChange}
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </div>
+
             <div className="mb-6">
               <label htmlFor="email" className="block mb-2 text-sm font-medium text-black">
                 Your Email
@@ -73,13 +100,20 @@ const Contact = () => {
               />
             </div>
 
-            <div className="flex justify-center">
+            <div className="flex flex-col items-center gap-4">
               <button
                 type="submit"
-                className="inline-block rounded-md bg-primary py-4 px-8 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80"
+                disabled={status === "sending"}
+                className="inline-block rounded-md bg-primary py-4 px-8 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80 disabled:opacity-50"
               >
-                Send Message
+                {status === "sending" ? "Sending..." : "Send Message"}
               </button>
+              {status === "sent" && (
+                <p className="text-green-600 font-medium">Message sent successfully!</p>
+              )}
+              {status === "error" && (
+                <p className="text-red-600 font-medium">Failed to send. Please try again.</p>
+              )}
             </div>
           </form>
 

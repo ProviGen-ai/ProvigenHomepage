@@ -11,22 +11,6 @@ module.exports = {
       center: true,
       padding: "1rem",
     },
-    colors: {
-      current: "currentColor",
-      transparent: "transparent",
-      white: "#FFFFFF",
-      black: "#090E34",
-      dark: "#1D2144",
-      green: "#15803d",
-      darkgreen: "#113939",
-      primary: "#4A6CF7",
-      yellow: "#FBB040",
-      blue:"#2563eb",
-      "logo-blue": "#05A2E6",
-      "logo-green": "#057119",
-      "body-color": "#959CB1",
-      "body-color-dark": "#6c7793",
-    },
     screens: {
       xs: "280px",
       // => @media (min-width: 450px) { ... }
@@ -47,6 +31,22 @@ module.exports = {
       // => @media (min-width: 1400px) { ... }
     },
     extend: {
+      colors: {
+        current: "currentColor",
+        transparent: "transparent",
+        white: "#FFFFFF",
+        black: "#090E34",
+        dark: "#1D2144",
+        green: "#15803d",
+        darkgreen: "#113939",
+        primary: "#4A6CF7",
+        yellow: "#FBB040",
+        blue: "#2563eb",
+        "logo-blue": "#05A2E6",
+        "logo-green": "#057119",
+        "body-color": "#959CB1",
+        "body-color-dark": "#6c7793",
+      },
       boxShadow: {
         signUp: "0px 5px 10px rgba(4, 10, 34, 0.2)",
         one: "0px 2px 3px rgba(7, 7, 77, 0.05)",
