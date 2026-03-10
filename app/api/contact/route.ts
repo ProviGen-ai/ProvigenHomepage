@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
     // Send inquiry to Provigen
     await resend.emails.send({
-      from: "Contact Form <onboarding@resend.dev>",
+      from: "Contact Form <noreply@provigen.ai>",
       to: "contact@provigen.ai",
       replyTo: email,
       subject: `Contact form inquiry from ${email}`,
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 
     // Send confirmation to the sender
     await resend.emails.send({
-      from: "Provigen <onboarding@resend.dev>",
+      from: "Provigen <noreply@provigen.ai>",
       to: email,
       subject: "We received your message — Provigen",
       text: `Hi,\n\nThank you for reaching out to Provigen! We have received your message and will get back to you within 24 hours during business days.\n\nHere is a copy of your inquiry:\n\n${message}\n\nBest regards,\nThe Provigen Team\nhttps://provigen.ai`,
