@@ -40,7 +40,7 @@ const Header = () => {
   const pathname = usePathname()
 
   useEffect(() => {
-    console.log(pathname)
+    setNavbarOpen(false);
   }, [pathname])
 
   const scrollToElement = (elementId) => {
@@ -53,7 +53,7 @@ const Header = () => {
         else {
           router.push('/');
         }
-        setNavbarOpen(!navbarOpen);
+        setNavbarOpen(false);
   };
 
   return (

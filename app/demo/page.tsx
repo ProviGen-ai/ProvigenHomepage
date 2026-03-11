@@ -6,7 +6,7 @@ import { ConvergenceComparison } from "@/components/Demo/ConvergenceComparison";
 export default function DemoPage() {
   return (
     <section className="pb-[120px] pt-[150px]">
-      <div className="container">
+      <div className="container min-w-[700px]">
         {/* Page header */}
         <div className="mx-auto max-w-4xl mb-16 text-center">
           <h1 className="mb-4 text-3xl font-bold !leading-tight text-black sm:text-4xl md:text-[45px]">

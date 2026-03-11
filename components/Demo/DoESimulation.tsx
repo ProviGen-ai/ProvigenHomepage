@@ -49,7 +49,7 @@ const TEST_FUNCTIONS = {
   },
   rastrigin: {
     name: 'Rastrigin Function',
-    description: 'Highly multi-modal with regular pattern',
+    description: 'Highly multi-modal with many local minima',
     domain: { x: [-5.12, 5.12], y: [-5.12, 5.12] },
     globalMin: { value: 0, locations: [[0, 0]] },
     formula: (x: number, y: number) => {
@@ -524,7 +524,7 @@ export function DoESimulation({ darkMode = false, height = 600 }: DoESimulationP
             ]}
             layout={{
               autosize: true,
-              height: height * 0.6,
+              height: height * 0.54,
               margin: { l: 0, r: 0, t: 0, b: 0 },
               scene: {
                 xaxis: { title: 'X', gridcolor: darkMode ? '#334155' : '#e2e8f0' },
@@ -556,7 +556,7 @@ export function DoESimulation({ darkMode = false, height = 600 }: DoESimulationP
               className={`flex items-center justify-center rounded-lg border ${
                 darkMode ? 'bg-slate-800 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-600'
               }`}
-              style={{ height: height * 0.6 }}
+              style={{ height: height * 0.54 }}
             >
               <p className="text-sm">Acquire at least 2 samples to view GP model prediction</p>
             </div>
@@ -607,7 +607,7 @@ export function DoESimulation({ darkMode = false, height = 600 }: DoESimulationP
               ].filter(Boolean)}
               layout={{
                 autosize: true,
-                height: height * 0.6,
+                height: height * 0.54,
                 margin: { l: 0, r: 0, t: 0, b: 0 },
                 scene: {
                   xaxis: { title: 'X', gridcolor: darkMode ? '#334155' : '#e2e8f0' },
@@ -671,7 +671,7 @@ export function DoESimulation({ darkMode = false, height = 600 }: DoESimulationP
           ]}
           layout={{
             autosize: true,
-            height: 300,
+            height: 250,
             margin: { l: 60, r: 40, t: 20, b: 60 },
             xaxis: {
               title: 'Number of Samples',
@@ -704,7 +704,7 @@ export function DoESimulation({ darkMode = false, height = 600 }: DoESimulationP
 
       {/* Statistics */}
       {(doeSamples.length > 0 || bayesianSamples.length > 0) && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-0">
           <div className={`p-4 rounded-lg border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
             <div className={`text-xs font-medium mb-1 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
               DoE Best Value

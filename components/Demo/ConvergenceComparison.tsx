@@ -48,7 +48,7 @@ const TEST_FUNCTIONS_ND = {
   },
   ackley: {
     name: 'Ackley Function',
-    description: 'Complex landscape with single global minimum',
+    description: 'Highly multi-modal with single global minimum',
     globalMin: 0,
     formula: (x: number[]) => {
       const n = x.length;
@@ -256,7 +256,7 @@ export function ConvergenceComparison({ darkMode = false, height = 500 }: Conver
               <option value="sobol">Sobol Sequence</option>
             </select>
             <p className={`text-xs mt-1 ${darkMode ? 'text-slate-500' : 'text-slate-600'}`}>
-              {doeMethod === 'lhs' ? 'Random sampling' : 'Quasi-random'}
+              {doeMethod === 'lhs' ? 'Space-filling grid sampling' : 'Quasi-random low-discrepancy'}
             </p>
           </div>
 
