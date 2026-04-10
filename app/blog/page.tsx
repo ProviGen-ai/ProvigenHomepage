@@ -1,59 +1,83 @@
-export default function BlogPage() {
-  const blogPosts = [
-    {
-      id: 1,
-      title: "The Future of Automated Biolabs",
-      date: "January 15, 2024",
-      author: "Provigen Team",
-      excerpt: "Exploring how AI and robotics are transforming biological research and drug discovery processes. We discuss the latest advances in laboratory automation and how they're accelerating scientific breakthroughs.",
-      content: "Coming soon...",
-    },
-    {
-      id: 2,
-      title: "Self-Optimizing Systems in Biotech",
-      date: "January 10, 2024",
-      author: "Provigen Team",
-      excerpt: "How machine learning enables laboratories to continuously improve their experimental protocols. Self-optimization is the key to unlocking unprecedented efficiency in modern biotech research.",
-      content: "Coming soon...",
-    },
-    {
-      id: 3,
-      title: "Accelerating Drug Discovery with Automation",
-      date: "January 5, 2024",
-      author: "Provigen Team",
-      excerpt: "The impact of robotic automation on reducing time-to-market for new therapeutics. From target identification to clinical trials, automation is revolutionizing every step of the drug development pipeline.",
-      content: "Coming soon...",
-    },
-  ];
+import Link from "next/link";
+import type { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Blog | ProviGen",
+  description:
+    "Insights on AI-driven experimental optimization, laboratory automation, and closed-loop learning.",
+};
+
+const blogPosts = [
+  {
+    id: 1,
+    slug: "closed-loop-optimization",
+    title: "Closed-Loop Experimental Campaigns in Practice",
+    date: "April 10, 2025",
+    author: "ProviGen Team",
+    excerpt:
+      "A practical walkthrough of active learning campaigns across assay optimization, therapeutic protein engineering with delayed in vivo data, and cell culture media optimization.",
+  },
+  // Hidden until ready:
+  // {
+  //   id: 2,
+  //   slug: null,
+  //   title: "Self-Optimizing Systems in Biotech",
+  //   date: "Coming soon",
+  //   author: "ProviGen Team",
+  //   excerpt:
+  //     "How machine learning enables laboratories to continuously improve their experimental protocols.",
+  // },
+  // {
+  //   id: 3,
+  //   slug: null,
+  //   title: "Accelerating Drug Discovery with Automation",
+  //   date: "Coming soon",
+  //   author: "ProviGen Team",
+  //   excerpt:
+  //     "The impact of robotic automation on reducing time-to-market for new therapeutics.",
+  // },
+];
+
+export default function BlogPage() {
   return (
-    <>
-      <section className="pb-[120px] pt-[180px]">
-        <div className="container max-w-4xl mx-auto px-8">
-          {blogPosts.map((post, index) => (
-            <article
-              key={post.id}
-              className={`${index !== 0 ? 'mt-24 pt-24 border-t border-gray-200' : ''}`}
-            >
-              <div className="mb-8">
-                <div className="flex items-center gap-3 text-sm text-body-color-dark mb-4">
-                  <time>{post.date}</time>
-                  <span>•</span>
-                  <span>{post.author}</span>
-                </div>
-                <h2 className="text-4xl font-bold text-black sm:text-5xl leading-tight">
-                  {post.title}
-                </h2>
-              </div>
-              <div className="prose prose-lg max-w-none">
-                <p className="text-lg leading-relaxed text-body-color-dark">
-                  {post.excerpt}
-                </p>
-              </div>
-            </article>
-          ))}
+    <div className="min-h-screen bg-[#faf9f7]">
+      <section className="pb-24 pt-[160px]">
+        <div className="max-w-5xl ml-[8%] md:ml-[12%] pr-4 md:pr-12">
+          <h1 className="font-serif text-3xl md:text-4xl font-normal text-[#090E34] mb-12">
+            Blog
+          </h1>
+
+          <div>
+            {blogPosts.map((post, index) => {
+              const card = (
+                <article
+                  key={post.id}
+                  className={`py-8 ${index !== 0 ? "border-t border-[#d4d2cd]" : ""}`}
+                >
+                  <div className="font-mono text-xs text-[#6c7793] mb-2 tracking-wide">
+                    {post.date}
+                  </div>
+                  <h2 className="font-serif text-xl sm:text-2xl font-normal text-[#090E34] mb-2 leading-snug">
+                    {post.title}
+                  </h2>
+                  <p className="font-serif text-sm text-[#6c7793] leading-relaxed max-w-2xl">
+                    {post.excerpt}
+                  </p>
+                </article>
+              );
+
+              if (post.slug) {
+                return (
+                  <Link key={post.id} href={`/blog/${post.slug}`} className="block hover:bg-[#f3f1ee] -mx-4 px-4 rounded-md transition-colors">
+                    {card}
+                  </Link>
+                );
+              }
+              return card;
+            })}
+          </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

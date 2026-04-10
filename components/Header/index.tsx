@@ -44,14 +44,12 @@ const Header = () => {
   }, [pathname])
 
   const scrollToElement = (elementId) => {
-        
-        // scroll does not work, because nextJs does not seem to support events here?!
-        if(pathname == '/'){
+        if(pathname === '/'){
           const element = document.getElementById(elementId);
-          element.scrollIntoView({ behavior: 'smooth' });
+          element?.scrollIntoView({ behavior: 'smooth' });
         }
         else {
-          router.push('/');
+          router.push(`/#${elementId}`);
         }
         setNavbarOpen(false);
   };

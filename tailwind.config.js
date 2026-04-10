@@ -30,6 +30,10 @@ module.exports = {
       "2xl": "1400px",
       // => @media (min-width: 1400px) { ... }
     },
+    fontFamily: {
+      serif: ['"Source Serif 4"', "Georgia", "serif"],
+      mono: ['"IBM Plex Mono"', "Menlo", "monospace"],
+    },
     extend: {
       colors: {
         current: "currentColor",
