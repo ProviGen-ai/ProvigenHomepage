@@ -306,24 +306,75 @@ export default function BlogPost() {
                 These are characterized through an initial panel of assays:
                 binding, potency, stability. Even before any
                 in vivo work has started, the model learns something useful.
-                It may find that a region of sequence space is consistently
-                hard to manufacture, or that certain variants show a favorable
+                It may find that a region of the design space consistently
+                lacks stability, or that certain candidates show a favorable
                 potency-stability tradeoff.
               </p>
             </div>
 
-            {/* Compound variations visual */}
+            {/* Candidate prediction across iterations */}
             <figure className="my-12">
-              <div className="rounded-lg overflow-hidden bg-white border border-[#e8e6e1] shadow-sm p-6">
-                {/* TODO: add compound variations image from slides */}
-                <div className="h-48 flex items-center justify-center text-[#959CB1] font-mono text-sm">
-                  [Placeholder: compound variation predictions]
-                </div>
+              <div className="relative rounded-lg overflow-hidden bg-white border border-[#e8e6e1] shadow-sm p-6">
+                <Image
+                  src="/images/blog/candidate_prediction.png"
+                  alt="Candidate prediction effect across four iterations"
+                  width={2520}
+                  height={871}
+                  className="w-full block"
+                />
+                {/* Legend overlay (absolute-positioned SVG foreground) */}
+                <svg
+                  viewBox="0 0 130 60"
+                  className="absolute bottom-4 left-10 md:left-14 w-24 md:w-28 pointer-events-none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <defs>
+                    <filter id="dotShadow" x="-30%" y="-30%" width="160%" height="160%">
+                      <feGaussianBlur in="SourceAlpha" stdDeviation="0.5" />
+                      <feOffset dx="0.3" dy="0.5" result="offset" />
+                      <feComponentTransfer>
+                        <feFuncA type="linear" slope="0.4" />
+                      </feComponentTransfer>
+                      <feMerge>
+                        <feMergeNode />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                  </defs>
+                  {/* Legend box */}
+                  <rect
+                    x="2"
+                    y="2"
+                    width="100"
+                    height="52"
+                    rx="4"
+                    fill="white"
+                    fillOpacity="0.85"
+                    stroke="#d4d2cd"
+                    strokeWidth="0.6"
+                  />
+                  {/* Dots with subtle shadow */}
+                  <g filter="url(#dotShadow)">
+                    <circle cx="32" cy="18" r="5" fill="#c4372e" />
+                    <circle cx="52" cy="18" r="5" fill="#e89f4f" />
+                    <circle cx="72" cy="18" r="5" fill="#316e28" />
+                  </g>
+                  <text
+                    x="52"
+                    y="40"
+                    textAnchor="middle"
+                    fill="#4a5068"
+                    fontSize="10"
+                    fontFamily="Source Serif 4, Georgia, serif"
+                  >
+                    Prediction quality
+                  </text>
+                </svg>
               </div>
               <figcaption className="mt-3 font-mono text-xs text-[#6c7793] leading-relaxed">
-                The system learns which molecular properties predict downstream
-                performance, allowing it to propose better candidates each
-                round.
+                Each column shows the candidates proposed in a given
+                iteration, ranked by predicted effect. Strong candidates
+                tend to emerge within a few rounds.
               </figcaption>
             </figure>
 
@@ -353,56 +404,69 @@ export default function BlogPost() {
               <p>
                 Media formulation is rarely about one magic ingredient.
                 Performance typically emerges from interactions between
-                nutrients, supplements, growth factors, seeding densities, and
+                basal media, supplements, growth factors, cytokines, and
                 timing decisions. Even with just a handful of variables, the
                 number of possible combinations is far too large to screen
-                exhaustively.
+                exhaustively, and formulations are often constrained (for
+                example, the fractions of a blend must sum to one).
               </p>
 
               <p>
                 A closed-loop campaign starts broad: the first round covers a
-                wide range of media and process conditions, each run with
-                replicates. As results come in, the system collects whatever
-                evidence is available, from cell counts and viability to
-                process traces and environmental conditions, and updates its
-                model without waiting for every candidate to be fully
-                characterized.
+                wide range of compositions, each run with replicates. As
+                results come in, the system collects whatever evidence is
+                available, from cell counts and viability to process traces
+                and environmental conditions, and updates its model without
+                waiting for every candidate to be fully characterized.
               </p>
 
               <p>
                 The next set of conditions balances candidates likely to
-                improve growth or phenotype against ones that would resolve
-                open questions about interactions. For example, whether a
-                growth factor is only beneficial above a certain basal nutrient
-                level, or whether a feeding schedule changes the effect of
-                another supplement.
-              </p>
-
-              <p>
-                Over successive rounds, the campaign builds up a picture of
-                the formulation space. You learn that supplement A only helps
-                above a certain glucose level, that the feeding schedule
-                matters more than basal composition, that a growth factor
-                can be halved without losing viability. That understanding
-                is what makes a process transferable and reliable at scale.
+                improve the target outcome against ones that would resolve
+                open questions about interactions. For example, whether two
+                basal media compensate for each other when blended, or
+                whether a cytokine only helps when paired with another.
               </p>
             </div>
 
-            {/* Media formulation search region visual */}
+            {/* Media formulation response surface */}
             <figure className="my-12">
               <div className="rounded-lg overflow-hidden bg-white border border-[#e8e6e1] shadow-sm p-6">
-                {/* TODO: add response surface / shrinking search region visual */}
-                <div className="h-48 flex items-center justify-center text-[#959CB1] font-mono text-sm">
-                  [Placeholder: search region narrowing over rounds]
-                </div>
+                <Image
+                  src="/images/blog/media-response-surface-pbmc-v4.png"
+                  alt="Response surface for human PBMC viability after 72 hours ex vivo as a function of DMEM and RPMI-1640 medium fractions, fit to data from a published closed-loop media optimization campaign"
+                  width={1400}
+                  height={920}
+                  className="w-full"
+                />
               </div>
               <figcaption className="mt-3 font-mono text-xs text-[#6c7793] leading-relaxed">
-                Over successive rounds, the campaign narrows from broad
-                exploration toward a well-characterized operating region.
+                Viability of human peripheral blood mononuclear cells (PBMCs)
+                after 72 hours <em>ex vivo</em>, as a function of DMEM and
+                RPMI-1640 fractions in a four-component media blend. At each
+                point, the remaining fraction (100% &minus; DMEM &minus;
+                RPMI-1640) is split evenly between the other two media,
+                X-VIVO 15 and AR5. Surface reconstructed from the published
+                closed-loop campaign in Narayanan et&nbsp;al. (2025).
+                <sup>
+                  <a href="#fn2" className="text-[#6c7793] hover:text-[#090E34] no-underline">[2]</a>
+                </sup>
+                {" "}The optimal blend reached 75&ndash;80% viability versus
+                around 60% for any single commercial medium, and was found
+                in 24 experiments across four rounds.
               </figcaption>
             </figure>
 
             <div className="prose-blog">
+              <p>
+                Over successive rounds, the campaign builds up a picture of
+                the formulation space. You learn that a specific blend of
+                commercial media outperforms any single one, that a cytokine
+                cocktail preserves the balance of cell subpopulations better
+                than standard mixes, or that a growth factor can be halved
+                without losing viability. That understanding is what makes a
+                protocol transferable and reliable at scale.
+              </p>
               {/* ---- What counts as a sample? ---- */}
               <h2>What counts as a sample?</h2>
 
@@ -543,6 +607,33 @@ export default function BlogPost() {
                   . The figure illustrates Gaussian process-based Bayesian
                   optimization with a parallel expected improvement acquisition
                   function.
+                </p>
+                <p id="fn2">
+                  [2] Response surface fit via Gaussian process regression to
+                  24 experimental points from the PBMC media-blending study
+                  in Narayanan et&nbsp;al.,{" "}
+                  <a
+                    href="https://www.nature.com/articles/s41467-025-61113-5"
+                    className="underline decoration-dotted underline-offset-2 hover:text-[#090E34]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    &ldquo;Accelerating cell culture media development using
+                    Bayesian optimization-based iterative experimental
+                    design,&rdquo; Nat. Commun. 2025
+                  </a>
+                  , which reports 3&ndash;30&times; higher sample efficiency
+                  than classical Design of Experiments across both PBMC and
+                  recombinant-protein campaigns. Source data:{" "}
+                  <a
+                    href="https://doi.org/10.6084/m9.figshare.27715134"
+                    className="underline decoration-dotted underline-offset-2 hover:text-[#090E34]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    figshare 27715134
+                  </a>
+                  .
                 </p>
               </div>
             </footer>
