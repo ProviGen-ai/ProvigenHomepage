@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
+import TimelineGraphic from "./TimelineGraphic";
 
 const sections = [
   { id: "assay-optimization", label: "Assay optimization" },
-  { id: "protein-engineering", label: "Protein engineering" },
-  { id: "media-optimization", label: "Media optimization" },
+  { id: "protein-engineering", label: "Therapeutic design" },
+  { id: "media-optimization", label: "Media formulation" },
 ];
 
 export default function BlogPost() {
@@ -100,12 +101,10 @@ export default function BlogPost() {
             <div className="prose-blog">
               <p>
                 Most experimental work in the life sciences already follows a
-                campaign pattern. A team runs an initial set of experiments,
-                looks at the results, discusses what to try next, and runs
-                again. Whether the goal is making an assay more robust, finding
-                a better therapeutic candidate, or improving a cell culture
-                process, the structure is the same: repeated rounds of
-                experiments, each one informed by the last. But the learning
+                campaign pattern. Whether the goal is making an assay more
+                robust, finding a better therapeutic candidate, or improving a
+                cell culture process, teams run rounds of experiments, look at
+                the results, and decide what to try next. But the learning
                 between rounds usually lives in notebooks, spreadsheets, and
                 the scientists&apos; heads. The campaign exists, but the
                 feedback loop is still largely manual.
@@ -113,15 +112,27 @@ export default function BlogPost() {
 
               <p>
                 That becomes a real limitation when the relevant evidence does
-                not arrive all at once. Some signals are available immediately
-                from the assay itself. Others come from process metadata, device
-                logs, environmental conditions, or additional analytical methods
-                like mass spectrometry. Still others, like in vivo readouts, may
-                only appear much later and only for a subset of candidates.
-                Integrating all of that into the next decision is exactly
-                where a systematic approach becomes essential.
+                not arrive all at once. Some signals are available within hours.
+                Others take days, weeks, or months. At any given point in a
+                campaign, the next decision has to be made on incomplete
+                information.
               </p>
+            </div>
 
+            {/* Visual: evidence arriving over time */}
+            <figure className="my-12">
+              <div className="rounded-lg overflow-hidden bg-white border border-[#e8e6e1] shadow-sm">
+                <TimelineGraphic />
+              </div>
+              <figcaption className="mt-3 font-mono text-xs text-[#6c7793] leading-relaxed">
+                QC signals may be immediate, assay results follow shortly
+                after, and downstream data like analytics or in vivo readouts
+                can lag by weeks or months. Decisions have to be made at every
+                stage regardless.
+              </figcaption>
+            </figure>
+
+            <div className="prose-blog">
               <p>
                 Closed-loop learning makes that feedback loop explicit. After and even during
                 each round, the system updates its understanding of what looks
@@ -143,8 +154,8 @@ export default function BlogPost() {
               <ol>
                 <li>Run a batch of candidates.</li>
                 <li>
-                  Collect whatever evidence becomes available, from primary
-                  assay outcomes to process context and auxiliary signals.
+                  Collect whatever evidence becomes available, from assay
+                  readouts to QC data, device logs, or characterization results.
                 </li>
                 <li>
                   Update the model using both current observations and
@@ -157,7 +168,8 @@ export default function BlogPost() {
               </ol>
 
               <p>
-                That last part matters. The system does not only ask{" "}
+                This is where it gets interesting. The system does not only
+                ask{" "}
                 <em>where do I expect the best result?</em> It also asks{" "}
                 <em>where am I still most uncertain?</em> and{" "}
                 <em>
@@ -167,7 +179,10 @@ export default function BlogPost() {
                 rather than static. Early rounds are often broader, mapping the
                 space and revealing where outcomes are sensitive to certain
                 variables. Later rounds become more selective, focusing on the
-                regions that matter most for the decision at hand.
+                regions that matter most for the decision at hand. And
+                crucially, the campaign does not pause while waiting for slower
+                data. It keeps moving with what it has and refines its
+                understanding as delayed signals come in.
               </p>
             </div>
 
@@ -182,18 +197,17 @@ export default function BlogPost() {
                 />
               </div>
               <figcaption className="mt-3 font-mono text-xs text-[#6c7793] leading-relaxed">
-                A simplified view of uncertainty-aware experiment selection. The
-                blue curve is the model&apos;s belief about the objective; the
-                shaded region represents uncertainty. After each observation the
-                model updates and selects the next query by balancing expected
-                improvement against remaining uncertainty. Real campaigns are
-                higher-dimensional and noisier, but the same logic
-                applies.&thinsp;
-                <sup>
-                  <a href="#fn1" className="text-[#6c7793] hover:text-[#090E34] no-underline">
-                    [1]
-                  </a>
-                </sup>
+                A simplified view of uncertainty-aware experiment
+                selection<sup><a href="#fn1" className="text-[#6c7793] hover:text-[#090E34] no-underline">[1]</a></sup>. The blue curve is the model&apos;s belief about the
+                objective; the shaded region represents uncertainty. After each
+                observation the model updates and selects the next query by
+                balancing expected improvement against remaining uncertainty.
+                Real campaigns are higher-dimensional and noisier, but the same
+                logic applies. For higher-dimensional cases, see our{" "}
+                <a href="/demo" className="text-[#4A6CF7] hover:text-[#3451c7]">
+                  interactive demo
+                </a>
+                .
               </figcaption>
             </figure>
 
@@ -211,227 +225,184 @@ export default function BlogPost() {
                 concentrating effort where it matters most.
               </p>
 
-              <p>
-                This principle looks different across workflows. The three
-                stories below show how the same engine drives campaigns in assay
-                development, protein engineering, and media optimization, and
-                how each one handles the particular data realities of that
-                domain.
-              </p>
-
               {/* ---- Story 1: Assay Optimization ---- */}
               <h2 id="assay-optimization">
-                Turning assay troubleshooting into a learning campaign
+                Assay optimization
               </h2>
 
               <p>
                 An assay can be functional without being ready for routine use.
-                Maybe the signal window is acceptable on good days, but CV is
-                too high, edge effects appear unpredictably, or the protocol
-                becomes fragile when scaled across plates. In many labs, the
-                response is familiar: tweak one variable, rerun, inspect the
-                result, and repeat. It works, but the path through parameter
-                space is driven by intuition rather than by systematic evidence.
+                Coefficient of variation (CV) is too high, edge effects
+                appear unpredictably, or the
+                protocol becomes fragile at scale. The usual fix is manual
+                tweaking: adjust one variable, rerun, inspect, repeat.
               </p>
 
               <p>
-                In a closed-loop campaign, the team begins by defining which
-                parameters may be adjusted: reagent concentrations, dispense
-                volumes, mixing intensity, incubation times, temperatures, wash
-                settings, readout timing, or plate handling steps. They also
-                define what &ldquo;better&rdquo; means: lower CV, higher
-                Z&prime;, stable signal separation, acceptable runtime, or
-                lower reagent cost. That last one matters more than it may
-                seem: finding a condition that delivers good signal with low
-                variance at reduced reagent concentrations can translate into
-                significant cost savings when the assay runs at scale.
+                In a closed-loop campaign, the team defines which parameters
+                may vary and what &ldquo;better&rdquo; means: lower CV, higher
+                Z&prime;, stable signal separation, or lower reagent cost.
+                That last one matters more than it may seem: a protocol that
+                delivers reliable results at lower cost per plate can save
+                significant budget when the assay runs at scale.
               </p>
+            </div>
 
+            {/* Plate heatmap */}
+            <figure className="my-12 flex flex-col items-center">
+              <div className="rounded-lg overflow-hidden bg-white border border-[#e8e6e1] shadow-sm max-w-md">
+                <Image
+                  src="/images/blog/plate-heatmap.png"
+                  alt="384-well plate heatmap showing spatial variation across wells, with edge effects visible in the upper-left corner"
+                  width={770}
+                  height={600}
+                  className="w-full"
+                />
+              </div>
+              <figcaption className="mt-3 font-mono text-xs text-[#6c7793] leading-relaxed">
+                A 384-well plate readout showing spatial variation across
+                positions. Patterns like edge effects or regional drift are
+                exactly what condition-level metrics capture and what the
+                campaign learns to account for.
+              </figcaption>
+            </figure>
+
+            <div className="prose-blog">
               <p>
-                The system selects an initial batch of assay conditions to test.
                 Each candidate is not a single well but a full assay condition
-                executed with a structured layout of controls and replicates on
-                a plate. That matters because the objective is not a raw signal
-                value from one well. It is reproducibility and spatial
-                stability across the plate.
+                with controls and replicates across a plate. A single well
+                cannot tell you whether CV is acceptable, whether edge effects
+                are under control, or whether the signal remains consistent across
+                well positions. Those are plate-level properties, and they require
+                plate-level evaluation.
               </p>
 
               <p>
-                Once the first plates are run, the system does not only ingest
-                the assay readout. It can also incorporate execution context that
-                may explain why one run behaved differently from another:
-                dispense timing, shaker behavior, liquid handling traces, module
-                temperatures, environmental conditions, or additional QC
-                signals. That matters because robustness problems often show up
-                first as patterns in the broader execution data before they are
-                obvious in the final assay summary.
+                Beyond the assay results, the system can incorporate
+                execution context: dispense timing, shaker behavior,
+                temperature drift, plate position effects, or environmental
+                conditions. Over successive rounds, this reveals whether
+                robustness problems are driven by the protocol itself or by
+                specific execution patterns. The result is a clearer picture
+                of why certain conditions fail and what operating ranges are
+                safe to rely on.
               </p>
 
-              <p>
-                After that first round, the model updates its estimate of which
-                regions of parameter space look promising and which parts remain
-                uncertain. The next round is chosen accordingly. Some conditions
-                are close variations around the best performers so far. Others
-                are selected because the model is still uncertain there and
-                believes more information would be valuable.
-              </p>
-
-              <p>
-                As the campaign progresses, the behavior changes. Early rounds
-                are broader and meant to map the space. Later rounds become more
-                targeted, focusing on a narrower incubation window or a tighter
-                reagent concentration range where the model sees the best
-                tradeoff between robustness and signal quality. Eventually, the
-                campaign converges on a protocol region that is both strong and
-                stable. The output is not just &ldquo;this one setting worked
-                once,&rdquo; but a better-characterized operating window with
-                evidence that it is robust across repeated execution.
-              </p>
-
-              {/* ---- Story 2: Protein Engineering ---- */}
+              {/* ---- Story 2: Therapeutic Design ---- */}
               <h2 id="protein-engineering">
-                Selecting protein candidates while downstream data is still
-                pending
+                Therapeutic design
               </h2>
 
               <p>
-                Protein engineering rarely suffers from too little data overall.
-                The harder problem is that the most meaningful data often arrives
-                last. Expression, binding, and stability can be measured
-                quickly. In vivo readouts may take weeks, months, or even
-                years. The practical question
-                is how to keep learning while the most important evidence is
-                still on the way.
+                In therapeutics design, the bottleneck is rarely lack of data.
+                It is that the most meaningful data often arrives last.
+                Binding, potency, and stability can be measured in vitro,
+                while in vivo readouts may take weeks, months, or even years.
               </p>
 
               <p>
-                In a closed-loop campaign, the team defines the candidate space:
-                sequence variants, domain combinations, linker choices,
-                formulation options, or other design variables. The objectives
-                span multiple properties, from potency and stability to ease
-                of manufacturing and eventually in vivo performance.
+                A closed-loop campaign starts with a broad first batch of
+                candidates covering diverse regions of the design space.
+                These are characterized through an initial panel of assays:
+                binding, potency, stability. Even before any
+                in vivo work has started, the model learns something useful.
+                It may find that a region of sequence space is consistently
+                hard to manufacture, or that certain variants show a favorable
+                potency-stability tradeoff.
               </p>
+            </div>
 
+            {/* Compound variations visual */}
+            <figure className="my-12">
+              <div className="rounded-lg overflow-hidden bg-white border border-[#e8e6e1] shadow-sm p-6">
+                {/* TODO: add compound variations image from slides */}
+                <div className="h-48 flex items-center justify-center text-[#959CB1] font-mono text-sm">
+                  [Placeholder: compound variation predictions]
+                </div>
+              </div>
+              <figcaption className="mt-3 font-mono text-xs text-[#6c7793] leading-relaxed">
+                The system learns which molecular properties predict downstream
+                performance, allowing it to propose better candidates each
+                round.
+              </figcaption>
+            </figure>
+
+            <div className="prose-blog">
               <p>
-                The first batch of candidates is deliberately broad, covering
-                diverse regions of the design space. These candidates are
-                expressed, purified, and characterized through an initial
-                panel of assays covering expression, binding, potency, and
-                stability.
+                A subset of candidates then advances into more expensive
+                downstream studies, including in vivo work. The campaign does
+                not pause. It keeps learning from the faster assay layers
+                while delayed data is pending.
               </p>
-
               <p>
-                Once these early results come back, the model updates. At this
-                point, the system has already learned something useful even
-                before any in vivo work has started. It may recognize that a
-                particular region of sequence space is consistently hard to
-                manufacture, or that certain variants produce a favorable
-                potency-stability tradeoff. The next batch is therefore chosen
-                more intelligently than the first.
+                When in vivo results eventually arrive, they are linked back
+                to the same candidates that already have characterization data.
+                Now the model can do something much more valuable than marking
+                winners and losers: it starts learning which early signals
+                actually predict downstream performance and which ones were
+                misleading. Future candidate selection shifts accordingly,
+                guided less by proxy performance alone and more by the
+                patterns that genuinely translate.
               </p>
 
-              <p>
-                A subset of candidates is then advanced into more expensive
-                downstream studies, including in vivo mouse work. The campaign
-                does not stop and wait passively. It continues learning from the
-                faster assay layers while delayed data is pending.
-              </p>
-
-              <p>
-                Weeks later, in vivo results begin to arrive. Those results are
-                linked back to the same candidate variants that have already
-                accumulated earlier characterization data. Now the model can
-                do something much more valuable than simply marking winners and
-                losers. It can start learning which early proxy signals actually
-                predict downstream in vivo performance and which ones were
-                misleading.
-              </p>
-
-              <p>
-                That changes later rounds materially. Before in vivo feedback,
-                the model is guided mainly by fast proxy signals. After enough
-                downstream data has been observed, it becomes much better
-                calibrated toward the outcomes that matter most clinically.
-                Candidate selection becomes more informed because the model is
-                no longer just optimizing for strong proxy performance. It is
-                learning which proxy profiles tend to translate into actual
-                downstream success.
-              </p>
-
-              <p>
-                Over the life of the campaign, a progression typically emerges:
-                early rounds explore broadly using fast, high-throughput assays;
-                the middle phase selectively advances promising candidates into
-                expensive downstream studies; later rounds generate candidates
-                increasingly shaped by the learned relationship between early
-                proxy data and delayed in vivo truth.
-              </p>
-
-              {/* ---- Story 3: Media Optimization ---- */}
+              {/* ---- Story 3: Media Formulation ---- */}
               <h2 id="media-optimization">
-                Navigating media interactions without exhaustive screening
+                Media formulation
               </h2>
 
               <p>
-                Media optimization is rarely about one magic ingredient. More
-                often, performance emerges from interactions between nutrients,
-                supplements, growth factors, seeding densities, and timing
-                decisions. That is why brute-force screening becomes impractical
-                so quickly: the space grows combinatorially long before the
-                biology becomes easy to interpret.
+                Media formulation is rarely about one magic ingredient.
+                Performance typically emerges from interactions between
+                nutrients, supplements, growth factors, seeding densities, and
+                timing decisions. Even with just a handful of variables, the
+                number of possible combinations is far too large to screen
+                exhaustively.
               </p>
 
               <p>
-                In a closed-loop campaign, the team defines which levers are
-                adjustable: basal media composition, supplement concentrations,
-                cytokines or growth factors, feeding schedules, seeding density,
-                timing of media exchanges, or culture duration. The objective
-                might be higher viable cell density, better phenotype retention,
-                improved differentiation efficiency, stronger productivity, or
-                some weighted combination of these.
+                A closed-loop campaign starts broad: the first round covers a
+                wide range of media and process conditions, each run with
+                replicates. As results come in, the system collects whatever
+                evidence is available, from cell counts and viability to
+                process traces and environmental conditions, and updates its
+                model without waiting for every candidate to be fully
+                characterized.
               </p>
 
               <p>
-                The first round samples a broad range of media and process
-                conditions. Each candidate condition is run with replicates,
-                often across a plate-based or small-scale format. At this stage,
-                the goal is not only to find a few good conditions but to map
-                how sensitive the cells are to different regions of the
-                formulation and process space.
+                The next set of conditions balances candidates likely to
+                improve growth or phenotype against ones that would resolve
+                open questions about interactions. For example, whether a
+                growth factor is only beneficial above a certain basal nutrient
+                level, or whether a feeding schedule changes the effect of
+                another supplement.
               </p>
 
               <p>
-                As the first batch runs and results come in, the system
-                collects whatever evidence is available, from cell counts and
-                viability to process traces and environmental conditions. Not every
-                candidate needs to be fully characterized for the campaign to
-                improve. The system updates on what it has and refines its
-                search as more data comes in.
+                Over successive rounds, the campaign builds up a picture of
+                the formulation space. You learn that supplement A only helps
+                above a certain glucose level, that the feeding schedule
+                matters more than basal composition, that a growth factor
+                can be halved without losing viability. That understanding
+                is what makes a process transferable and reliable at scale.
               </p>
+            </div>
 
-              <p>
-                The model then proposes the next set of conditions, balancing
-                candidates likely to improve growth or phenotype against ones
-                that would resolve open questions about interactions, for
-                example whether a growth
-                factor is only beneficial above a certain basal nutrient level,
-                or whether a feeding schedule changes the effect of another
-                supplement.
-              </p>
+            {/* Media formulation search region visual */}
+            <figure className="my-12">
+              <div className="rounded-lg overflow-hidden bg-white border border-[#e8e6e1] shadow-sm p-6">
+                {/* TODO: add response surface / shrinking search region visual */}
+                <div className="h-48 flex items-center justify-center text-[#959CB1] font-mono text-sm">
+                  [Placeholder: search region narrowing over rounds]
+                </div>
+              </div>
+              <figcaption className="mt-3 font-mono text-xs text-[#6c7793] leading-relaxed">
+                Over successive rounds, the campaign narrows from broad
+                exploration toward a well-characterized operating region.
+              </figcaption>
+            </figure>
 
-              <p>
-                As the campaign continues, the search narrows toward a smaller
-                operational region. Rather than concluding with one single
-                &ldquo;best media,&rdquo; the useful endpoint is often a more
-                robust understanding of the response surface: which ingredients
-                matter most, which interactions are real, what the acceptable
-                operating ranges are, and which conditions deliver stable
-                performance across repeats. That is especially valuable in real
-                process development, because the goal is usually not just peak
-                performance under one lucky condition, but a formulation space
-                that is both strong and reliable.
-              </p>
-
+            <div className="prose-blog">
               {/* ---- What counts as a sample? ---- */}
               <h2>What counts as a sample?</h2>
 
@@ -443,7 +414,7 @@ export default function BlogPost() {
 
               <p>
                 In assay optimization, that may be a full assay condition
-                summarized across a plate layout. In protein engineering, it is
+                summarized across a plate layout. In therapeutic design, it is
                 often a candidate variant or variant-condition pair. In media
                 optimization, it is typically one media or process condition
                 evaluated with replicates.
@@ -466,7 +437,7 @@ export default function BlogPost() {
                       Application
                     </th>
                     <th className="py-3 pr-4 font-medium text-[#6c7793] uppercase tracking-wider text-xs">
-                      Decision variable
+                      What varies
                     </th>
                     <th className="py-3 pr-4 font-medium text-[#6c7793] uppercase tracking-wider text-xs">
                       One sample
@@ -479,15 +450,15 @@ export default function BlogPost() {
                 <tbody className="text-[#090E34]">
                   <tr className="border-b border-[#e8e6e1]">
                     <td className="py-3 pr-4">Assay optimization</td>
-                    <td className="py-3 pr-4">Assay recipe</td>
+                    <td className="py-3 pr-4">Timing, concentrations, volumes, plate handling</td>
                     <td className="py-3 pr-4">Condition at plate level</td>
                     <td className="py-3">
                       Well readouts, replicates, device logs, environmental data
                     </td>
                   </tr>
                   <tr className="border-b border-[#e8e6e1]">
-                    <td className="py-3 pr-4">Protein engineering</td>
-                    <td className="py-3 pr-4">Variant or variant-condition</td>
+                    <td className="py-3 pr-4">Therapeutic design</td>
+                    <td className="py-3 pr-4">Sequence, structure, modifications</td>
                     <td className="py-3 pr-4">
                       Candidate with multi-stage data
                     </td>
@@ -496,8 +467,8 @@ export default function BlogPost() {
                     </td>
                   </tr>
                   <tr>
-                    <td className="py-3 pr-4">Media optimization</td>
-                    <td className="py-3 pr-4">Media / process condition</td>
+                    <td className="py-3 pr-4">Media formulation</td>
+                    <td className="py-3 pr-4">Composition, supplements, feeding schedule</td>
                     <td className="py-3 pr-4">Condition with replicates</td>
                     <td className="py-3">
                       Replicate wells/flasks, time-course, metabolic readouts
@@ -527,7 +498,7 @@ export default function BlogPost() {
                 system handles the rest, from designing the next round of
                 experiments to programming the screening hardware and
                 collecting the results. The complexity lives underneath. It
-                surfaces as better decisions, faster convergence, and fewer
+                surfaces as better decisions, faster results, and fewer
                 wasted experiments.
               </p>
 

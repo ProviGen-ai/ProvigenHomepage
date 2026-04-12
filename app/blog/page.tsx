@@ -15,7 +15,7 @@ const blogPosts = [
     date: "April 10, 2025",
     author: "ProviGen Team",
     excerpt:
-      "A practical walkthrough of active learning campaigns across assay optimization, therapeutic protein engineering with delayed in vivo data, and cell culture media optimization.",
+      "A practical walkthrough of active learning campaigns across assay optimization, therapeutic design, and media formulation.",
   },
   // Hidden until ready:
   // {

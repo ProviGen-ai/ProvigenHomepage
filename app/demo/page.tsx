@@ -27,9 +27,12 @@ export default function DemoPage() {
             </h2>
             <p className="text-body-color-dark">
               Watch how Bayesian Optimization selects sample points compared to
-              space-filling Design of Experiments. The pre-rendered plot on the
-              left shows the true optimization landscape which would be unknown
-              in a real-world setting.
+              space-filling Design of Experiments. The plot on the left shows
+              the true optimization landscape, which would be unknown in a
+              real-world setting. The plot on the right shows the model&apos;s
+              approximation, which is built from scratch and refined with each
+              new sample. As more points are added, the approximation
+              converges toward the true surface.
             </p>
           </div>
           <DoESimulation height={600} />
