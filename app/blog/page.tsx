@@ -1,42 +1,12 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { blogPosts } from "./posts";
 
 export const metadata: Metadata = {
   title: "Blog | ProviGen",
   description:
     "Insights on AI-driven experimental optimization, laboratory automation, and closed-loop learning.",
 };
-
-const blogPosts = [
-  {
-    id: 1,
-    slug: "closed-loop-optimization",
-    title: "Closed-Loop Experimental Campaigns in Practice",
-    date: "April 10, 2025",
-    author: "ProviGen Team",
-    excerpt:
-      "A practical walkthrough of active learning campaigns across assay optimization, therapeutic design, and media formulation.",
-  },
-  // Hidden until ready:
-  // {
-  //   id: 2,
-  //   slug: null,
-  //   title: "Self-Optimizing Systems in Biotech",
-  //   date: "Coming soon",
-  //   author: "ProviGen Team",
-  //   excerpt:
-  //     "How machine learning enables laboratories to continuously improve their experimental protocols.",
-  // },
-  // {
-  //   id: 3,
-  //   slug: null,
-  //   title: "Accelerating Drug Discovery with Automation",
-  //   date: "Coming soon",
-  //   author: "ProviGen Team",
-  //   excerpt:
-  //     "The impact of robotic automation on reducing time-to-market for new therapeutics.",
-  // },
-];
 
 export default function BlogPage() {
   return (

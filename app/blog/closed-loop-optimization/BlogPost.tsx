@@ -3,6 +3,9 @@
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import TimelineGraphic from "./TimelineGraphic";
+import { postsBySlug } from "../posts";
+
+const post = postsBySlug["closed-loop-optimization"];
 
 const sections = [
   { id: "assay-optimization", label: "Assay optimization" },
@@ -54,7 +57,7 @@ export default function BlogPost() {
             </h1>
             <div className="grid md:grid-cols-[120px_1fr] gap-x-6 gap-y-1 font-mono text-sm text-[#090E34]">
               <span className="text-[#6c7793]">Published</span>
-              <span>April 13, 2026</span>
+              <span>{post.date}</span>
               <span className="text-[#6c7793]">Authors</span>
               <span>ProviGen Team</span>
               <span className="text-[#6c7793]">Contact</span>
