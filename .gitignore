@@ -30,3 +30,18 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# claude code
+.claude/
+
+# local archives / scratch
+frontend.zip
+
+# typescript build info
+tsconfig.tsbuildinfo
+
+# blog working images (not used in published posts)
+public/images/blog/gaussian_vis_*.PNG
+public/images/blog/media-cytokine-composition.png
+public/images/blog/media-response-surface-pbmc-v3.png
+public/images/blog/media-response-surface-v2.png
