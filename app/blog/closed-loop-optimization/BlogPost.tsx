@@ -142,8 +142,10 @@ export default function BlogPost() {
                 promising, what remains uncertain, and which next experiments
                 are most worth running. It does not require every candidate to
                 be fully characterized before it can learn. It works with the
-                evidence available now and refines its understanding as the
-                missing pieces arrive later.
+                evidence available now, refines its understanding as the
+                missing pieces arrive later, and proposes the next batch of
+                experiments or directly drives them on available automation
+                hardware.
               </p>
 
               {/* ---- The core loop ---- */}
@@ -155,7 +157,12 @@ export default function BlogPost() {
               </p>
 
               <ol>
-                <li>Run a batch of candidates.</li>
+                <li>
+                  Run a batch of candidates.
+                  <sup>
+                    <a href="#fn1" className="text-[#6c7793] hover:text-[#090E34] no-underline">[1]</a>
+                  </sup>
+                </li>
                 <li>
                   Collect whatever evidence becomes available, from assay
                   readouts to QC data, device logs, or characterization results.
@@ -201,7 +208,7 @@ export default function BlogPost() {
               </div>
               <figcaption className="mt-3 font-mono text-xs text-[#6c7793] leading-relaxed">
                 A simplified view of uncertainty-aware experiment
-                selection<sup><a href="#fn1" className="text-[#6c7793] hover:text-[#090E34] no-underline">[1]</a></sup>. The blue curve is the model&apos;s belief about the
+                selection<sup><a href="#fn2" className="text-[#6c7793] hover:text-[#090E34] no-underline">[2]</a></sup>. The blue curve is the model&apos;s belief about the
                 objective; the shaded region represents uncertainty. After each
                 observation the model updates and selects the next query by
                 balancing expected improvement against remaining uncertainty.
@@ -216,16 +223,41 @@ export default function BlogPost() {
 
             <div className="prose-blog">
               <p>
-                In practice, this approach is remarkably sample-efficient. For
-                many real-world problems, strong results can be achieved within
-                80 to 100 evaluated candidates. To put that in perspective: a
-                design space with just ten adjustable parameters at three levels
-                each contains nearly 60,000 possible combinations. A full
-                factorial design would need to test all of them. Classical
-                Design of Experiments methods reduce that, but still scale
-                poorly as dimensions grow. An active learning campaign can
-                navigate the same space in a fraction of the experiments by
-                concentrating effort where it matters most.
+                In practice, active learning is remarkably sample-efficient.
+                For many real-world problems, strong results can be achieved
+                within 80 to 100 evaluated candidates. A design space with
+                ten parameters at three levels each contains nearly 60,000
+                combinations, far too many to test exhaustively. Three
+                families of methods address this:
+              </p>
+              <ul>
+                <li>
+                  <strong>Design of Experiments (DoE)</strong> picks a
+                  structured subset of conditions up front, often a few
+                  hundred runs, giving controlled coverage and statistical
+                  rigor that vastly outperforms unstructured manual
+                  exploration.
+                </li>
+                <li>
+                  <strong>Bayesian optimization</strong> can be seen as an
+                  iterative form of DoE: instead of fixing the full plan in
+                  advance, it updates a model after each round and proposes
+                  the next conditions, which makes it more sample-efficient
+                  on a single, well-defined objective.
+                </li>
+                <li>
+                  <strong>Active learning</strong> generalizes this further.
+                  It integrates a broader range of machine learning
+                  techniques, handles delayed and heterogeneous data types in
+                  the same campaign, and can learn from less explicit goal
+                  definitions, for example a target described in natural
+                  language or an example of a desired outcome rather than a
+                  hand-written scoring function.
+                </li>
+              </ul>
+              <p>
+                ProviGenAI focuses on this last category, combining active
+                learning with end-to-end campaign execution.
               </p>
 
               {/* ---- Story 1: Assay Optimization ---- */}
@@ -452,7 +484,7 @@ export default function BlogPost() {
                 X-VIVO 15 and AR5. Surface reconstructed from the published
                 closed-loop campaign in Narayanan et&nbsp;al. (2025).
                 <sup>
-                  <a href="#fn2" className="text-[#6c7793] hover:text-[#090E34] no-underline">[2]</a>
+                  <a href="#fn3" className="text-[#6c7793] hover:text-[#090E34] no-underline">[3]</a>
                 </sup>
                 {" "}The optimal blend reached 75&ndash;80% viability versus
                 around 60% for any single commercial medium, and was found
@@ -550,23 +582,24 @@ export default function BlogPost() {
               <hr />
 
               <p>
-                Our active learning system goes beyond classical Bayesian
-                optimization. Where a standard approach would treat each assay
-                result as an independent number, our system learns how
-                different data sources relate to each other and to the outcomes
-                that matter. That is what allows it to make useful decisions
-                even when some signals are missing, delayed by months, or
-                structurally different from each other.
+                Our active learning system is built for cases where standard
+                Bayesian optimization struggles: multiple objectives,
+                heterogeneous data sources (assay readouts, QC, analytics, in
+                vivo), and signals that arrive on very different timescales.
+                It learns how those sources relate to each other and to the
+                outcomes that matter, which is what allows it to make useful
+                decisions even when some signals are missing, delayed by
+                months, or structurally different from each other.
               </p>
 
               <p>
                 From the user&apos;s perspective, the experience is
                 straightforward: define what you want to achieve, and the
                 system handles the rest, from designing the next round of
-                experiments to programming the screening hardware and
-                collecting the results. The complexity lives underneath. It
-                surfaces as better decisions, faster results, and fewer
-                wasted experiments.
+                experiments to programming the screening hardware, driving
+                execution, and collecting the results. The complexity lives
+                underneath. It surfaces as better decisions, faster results,
+                and fewer wasted experiments.
               </p>
 
               <p>
@@ -580,7 +613,25 @@ export default function BlogPost() {
             <footer className="mt-20 pt-8 border-t border-[#e8e6e1]">
               <div className="font-mono text-xs text-[#6c7793] leading-relaxed space-y-2">
                 <p id="fn1">
-                  [1] Animation by{" "}
+                  [1] In a fully closed-loop setup, running a batch means
+                  generating the protocols, scheduling the instruments, and
+                  capturing the resulting data automatically. This works with
+                  any instrumentation that supports programmatic control,
+                  including liquid handlers, plate readers, and incubators,
+                  whether driven through vendor APIs, a scheduling layer, or
+                  open-source frameworks like{" "}
+                  <a
+                    href="https://github.com/PyLabRobot/pylabrobot"
+                    className="underline decoration-dotted underline-offset-2 hover:text-[#090E34]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    PyLabRobot
+                  </a>
+                  .
+                </p>
+                <p id="fn2">
+                  [2] Animation by{" "}
                   <a
                     href="https://commons.wikimedia.org/w/index.php?title=User:AnotherSamWilson"
                     className="underline decoration-dotted underline-offset-2 hover:text-[#090E34]"
@@ -611,8 +662,8 @@ export default function BlogPost() {
                   optimization with a parallel expected improvement acquisition
                   function.
                 </p>
-                <p id="fn2">
-                  [2] Response surface fit via Gaussian process regression to
+                <p id="fn3">
+                  [3] Response surface fit via Gaussian process regression to
                   24 experimental points from the PBMC media-blending study
                   in Narayanan et&nbsp;al.,{" "}
                   <a

@@ -41,7 +41,7 @@ const Hero = () => {
                   <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-black to-blue">Accelerating</span> <span className="italic">research in</span> <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-black to-blue">biotechnology</span>
                   </h1>
                   <p className="mb-12 text-base font-medium !leading-relaxed text-body-color-dark  sm:text-lg md:text-xl">
-                  We build the <span className="text-logo-blue">Autopilot</span> for <span className="text-logo-green">self-optimizing</span> robotic biolabs.
+                  We build the <span className="text-logo-blue">control layer</span> for <span className="text-logo-green">life science</span>.
                   </p>
                   <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
                     <a
