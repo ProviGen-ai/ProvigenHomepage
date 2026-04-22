@@ -29,6 +29,9 @@ module.exports = {
 
       "2xl": "1400px",
       // => @media (min-width: 1400px) { ... }
+
+      "3xl": "1600px",
+      // => @media (min-width: 1600px) { ... }
     },
     fontFamily: {
       serif: ['"Source Serif 4"', "Georgia", "serif"],

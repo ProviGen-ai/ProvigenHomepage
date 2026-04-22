@@ -9,17 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "eslint": "9.17.0",
+    "eslint": "^9.39.4",
     "eslint-config-next": "16.0.10",
     "file-loader": "6.2.0",
     "framer-motion": "^12.35.2",
     "lucide-react": "^0.577.0",
-    "next": "16.0.10",
+    "next": "^16.2.3",
     "next-themes": "^0.2.1",
     "plotly.js": "^3.4.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.47.0",
+    "react-markdown": "^10.1.0",
     "react-modal-video": "^2.0.0",
     "react-plotly.js": "^2.6.0",
     "resend": "^6.9.3"

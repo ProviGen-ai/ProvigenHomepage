@@ -6,11 +6,106 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Workshop markdown prose styling */
+.prose-workshop p { margin-bottom: 0.5em; }
+.prose-workshop p:last-child { margin-bottom: 0; }
+.prose-workshop strong { font-weight: 600; }
+.prose-workshop ul { padding-left: 1.25em; margin-bottom: 0.5em; list-style-type: disc; }
+.prose-workshop ol { padding-left: 1.25em; margin-bottom: 0.5em; list-style-type: decimal; }
+.prose-workshop li { margin-bottom: 0.15em; }
+.prose-workshop h1, .prose-workshop h2, .prose-workshop h3,
+.prose-workshop h4, .prose-workshop h5, .prose-workshop h6 {
+  font-weight: 700;
+  margin-top: 0.75em;
+  margin-bottom: 0.25em;
+}
+.prose-workshop h1 { font-size: 1.1em; }
+.prose-workshop h2 { font-size: 1.05em; }
+.prose-workshop h3 { font-size: 1em; }
+.prose-workshop code {
+  font-size: 0.85em;
+  background: rgba(0,0,0,0.05);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+:is(.dark) .prose-workshop code {
+  background: rgba(255,255,255,0.1);
+}
+
+/* On 3xl+ screens, break results grid out to fill viewport minus margins */
+@media (min-width: 1600px) {
+  :root {
+    --workshop-results-margin: 80px; /* adjust this to control left/right spacing */
+  }
+  .workshop-results-grid {
+    width: calc(100vw - var(--workshop-results-margin) * 2);
+    max-width: calc(100vw - var(--workshop-results-margin) * 2);
+    margin-left: calc(-1 * (100vw - var(--workshop-results-margin) * 2 - 100%) / 2) !important;
+    margin-right: calc(-1 * (100vw - var(--workshop-results-margin) * 2 - 100%) / 2) !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
+/* Workshop page: disable overscroll bounce */
+html:has(body.workshop-page),
+body.workshop-page {
+  overscroll-behavior: none;
+}
+
+/* Workshop page: hide footer, reduce bottom spacing */
+body.workshop-page footer {
+  display: none !important;
+}
+body.workshop-page section.pb-\[120px\] {
+  padding-bottom: 1rem !important;
+}
+
 @layer base {
   body {
     font-family: "Inter", sans-serif;
     src: url(/fonts/proxima-nova/400-regular.woff) format("woff");
   }
+}
+
+/* Subtle scrollbar for workshop textarea */
+.workshop-textarea {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+.workshop-textarea:hover {
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+:is(.dark) .workshop-textarea:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+.workshop-textarea::-webkit-scrollbar {
+  width: 6px;
+}
+.workshop-textarea::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+}
+.workshop-textarea:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+.workshop-textarea:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+:is(.dark) .workshop-textarea:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+:is(.dark) .workshop-textarea:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+.workshop-textarea::-webkit-scrollbar-button {
+  display: none;
+  height: 0;
+  width: 0;
+}
+.workshop-textarea::-webkit-scrollbar-track {
+  margin-top: 12px;
+  margin-bottom: 4px;
 }
 
 @layer components {
