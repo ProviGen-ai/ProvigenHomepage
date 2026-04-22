@@ -112,6 +112,7 @@ export default function Workshop() {
   const [prompt, setPrompt] = useState("");
   const [bestModel, setBestModel] = useState<string | null>(null);
   const [isFollowUp, setIsFollowUp] = useState(false);
+  const [chatSummary, setChatSummary] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [panelsVisible, setPanelsVisible] = useState(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -161,18 +162,20 @@ export default function Workshop() {
   const hasResults = latestResponses.length > 0;
 
   // Configurable scroll settings
-  const SCROLL_DELAY_MS = 1000; // delay before scrolling (wait for text to stream)
+  const SCROLL_DELAY_MS = 800; // delay before scrolling (wait for text to stream)
   const SCROLL_OFFSET_VH = 5;  // offset from top as % of viewport height
 
-  const scrollToResults = useCallback(() => {
-    setTimeout(() => {
-      const el = resultsRef.current;
-      if (!el) return;
-      const offset = window.innerHeight * (SCROLL_OFFSET_VH / 100);
-      const y = el.getBoundingClientRect().top + window.pageYOffset - offset;
-      window.scrollTo({ top: y, behavior: "smooth" });
-    }, SCROLL_DELAY_MS);
+  const scrollToResultsImmediate = useCallback(() => {
+    const el = resultsRef.current;
+    if (!el) return;
+    const offset = window.innerHeight * (SCROLL_OFFSET_VH / 100);
+    const y = el.getBoundingClientRect().top + window.pageYOffset - offset;
+    window.scrollTo({ top: y, behavior: "smooth" });
   }, []);
+
+  const scrollToResults = useCallback(() => {
+    setTimeout(scrollToResultsImmediate, SCROLL_DELAY_MS);
+  }, [scrollToResultsImmediate]);
 
   const runTask = useCallback(
     async (taskId: string | null, taskPrompt: string, displayPrompt: string, mode: "example" | "custom", followUp: boolean) => {
@@ -211,6 +214,16 @@ export default function Workshop() {
         setBestModel(null);
         setIsFollowUp(true);
         scrollToResults();
+
+        // Fetch 3-word summary in background
+        fetch(apiUrl("/summarize"), {
+          method: "POST",
+          headers: apiHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify({ prompt: displayPrompt }),
+        })
+          .then((r) => r.json())
+          .then((d) => { if (d.summary) setChatSummary(d.summary); })
+          .catch(() => {});
       } catch (e: any) {
         setLatestResponses([{
           model_id: "error",
@@ -292,16 +305,31 @@ export default function Workshop() {
     let finalPrompt = prompt;
 
     if (isFollowUp && latestResponses.length > 0) {
-      const prevAnswers = latestResponses
-        .filter((r) => r.text && !r.error)
-        .map((r) => `[${r.display_name}]: ${r.text}`)
-        .join("\n\n");
+      // Build context from full conversation history, not just the last turn
+      const contextParts: string[] = [];
+      const firstModelId = latestResponses[0]?.model_id;
+      const history = modelExchanges[firstModelId] || [];
+      for (const ex of history) {
+        contextParts.push(`Question: ${ex.prompt}`);
+        if (ex.text) {
+          // Include the answer from whichever model had it
+          const allAnswers = latestResponses
+            .map((r) => {
+              const modelHistory = modelExchanges[r.model_id] || [];
+              const matching = modelHistory.find((h) => h.prompt === ex.prompt);
+              return matching?.text ? `[${r.display_name}]: ${matching.text}` : null;
+            })
+            .filter(Boolean)
+            .join("\n\n");
+          if (allAnswers) contextParts.push(`Answers:\n${allAnswers}`);
+        }
+      }
       finalPrompt =
-        `Previous question: ${latestPrompt}\n\n` +
-        `Previous answers:\n${prevAnswers}\n\n` +
+        `Conversation history:\n${contextParts.join("\n\n")}\n\n` +
         `Follow-up question: ${userPrompt}`;
     }
 
+    setPrompt("");
     const matchedTask = tasks.find((t) => t.prompt === prompt);
     runTask(matchedTask?.id || null, finalPrompt, userPrompt, matchedTask ? "example" : "custom", isFollowUp);
   };
@@ -327,15 +355,87 @@ export default function Workshop() {
 
   const handleBestAnswer = useCallback(
     async (modelId: string) => {
-      if (!latestRunId) return;
-      setBestModel(modelId);
-      await fetch(apiUrl("/best-answer"), {
-        method: "POST",
-        headers: apiHeaders({ "Content-Type": "application/json" }),
-        body: JSON.stringify({ run_id: latestRunId, winner_model_id: modelId, session_id: getSessionId() }),
-      }).catch(() => {});
+      if (!latestRunId || !conversationId) return;
+      if (bestModel === modelId) {
+        // Toggle off — remove best answer
+        setBestModel(null);
+        await fetch(apiUrl("/best-answer"), {
+          method: "POST",
+          headers: apiHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify({ conversation_id: conversationId, run_id: latestRunId, winner_model_id: "", session_id: getSessionId() }),
+        }).catch(() => {});
+      } else {
+        setBestModel(modelId);
+        await fetch(apiUrl("/best-answer"), {
+          method: "POST",
+          headers: apiHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify({ conversation_id: conversationId, run_id: latestRunId, winner_model_id: modelId, session_id: getSessionId() }),
+        }).catch(() => {});
+      }
     },
-    [latestRunId],
+    [latestRunId, conversationId, bestModel],
+  );
+
+  const renderPromptInput = () => (
+    <div className="mx-auto max-w-3xl mb-4">
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm focus-within:border-primary focus-within:shadow-md transition-all">
+        <textarea
+          ref={textareaRef}
+          className="workshop-textarea w-full resize-none rounded-t-2xl bg-transparent px-5 pt-5 pb-3 text-base text-black dark:text-white placeholder:text-gray-400 focus:outline-none overflow-hidden"
+          style={{ minHeight: "48px", visibility: mounted ? "visible" : "hidden" }}
+          placeholder="Ask a biomedical question..."
+          rows={1}
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        <div className="flex items-center justify-between px-3 pb-3">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                const id = window.prompt("Enter session ID to load:");
+                if (id) loadConversation(id.trim());
+              }}
+              className="flex items-center gap-1.5 rounded-lg py-1.5 px-2.5 text-xs text-gray-400 hover:text-body-color hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+              title="Load a previous session"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Load session</span>
+            </button>
+
+            {/* Follow-up toggle — only show when there are results */}
+            {hasResults && (
+              <button
+                onClick={() => setIsFollowUp(!isFollowUp)}
+                className={`flex items-center gap-1.5 rounded-lg py-1.5 px-2.5 text-xs transition-all ${
+                  isFollowUp
+                    ? "bg-primary/10 text-primary border border-primary/30"
+                    : "text-gray-400 hover:text-body-color hover:bg-gray-50 dark:hover:bg-gray-700"
+                }`}
+                title={isFollowUp ? "Will include previous answers as context" : "Click to ask a follow-up question"}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
+                <span>Follow-up</span>
+              </button>
+            )}
+          </div>
+          <button
+            onClick={handleSubmit}
+            disabled={mounted ? (loading || prompt.trim().length === 0) : undefined}
+            className="rounded-xl bg-primary p-2.5 text-white transition-all hover:bg-primary/80 disabled:opacity-30 disabled:cursor-not-allowed"
+            title="Send to all models"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14m-7-7l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 
   return (
@@ -361,91 +461,33 @@ export default function Workshop() {
           </p>
         </div>
 
-        {/* Prompt input area — always at top */}
-        <div className="mx-auto max-w-3xl mb-4">
-          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm focus-within:border-primary focus-within:shadow-md transition-all">
-            <textarea
-              ref={textareaRef}
-              className="workshop-textarea w-full resize-none rounded-t-2xl bg-transparent px-5 pt-5 pb-3 text-base text-black dark:text-white placeholder:text-gray-400 focus:outline-none overflow-hidden"
-              style={{ minHeight: "48px", visibility: mounted ? "visible" : "hidden" }}
-              placeholder="Ask a biomedical question..."
-              rows={1}
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-            <div className="flex items-center justify-between px-3 pb-3">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => {
-                    const id = window.prompt("Enter session ID to load:");
-                    if (id) loadConversation(id.trim());
-                  }}
-                  className="flex items-center gap-1.5 rounded-lg py-1.5 px-2.5 text-xs text-gray-400 hover:text-body-color hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
-                  title="Load a previous session"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>Load session</span>
-                </button>
-
-                {/* Follow-up toggle — only show when there are results */}
-                {hasResults && (
-                  <button
-                    onClick={() => setIsFollowUp(!isFollowUp)}
-                    className={`flex items-center gap-1.5 rounded-lg py-1.5 px-2.5 text-xs transition-all ${
-                      isFollowUp
-                        ? "bg-primary/10 text-primary border border-primary/30"
-                        : "text-gray-400 hover:text-body-color hover:bg-gray-50 dark:hover:bg-gray-700"
-                    }`}
-                    title={isFollowUp ? "Will include previous answers as context" : "Click to ask a follow-up question"}
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                    </svg>
-                    <span>Follow-up</span>
-                  </button>
-                )}
-              </div>
-              <button
-                onClick={handleSubmit}
-                disabled={mounted ? (loading || prompt.trim().length === 0) : undefined}
-                className="rounded-xl bg-primary p-2.5 text-white transition-all hover:bg-primary/80 disabled:opacity-30 disabled:cursor-not-allowed"
-                title="Send to all models"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14m-7-7l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
+        {/* Prompt input area — at top before first results, below results after */}
+        {!hasResults && renderPromptInput()}
 
         {/* Suggestion cards — always visible */}
-        <div className="mx-auto max-w-3xl mb-12 grid grid-cols-3 gap-3">
-          {tasks.map((task) => {
-            const Icon = TASK_ICONS[task.id] || TrialIcon;
-            return (
-              <button
-                key={task.id}
-                onClick={() => handleSuggestionClick(task)}
-                disabled={loading}
-                className="group flex flex-col items-start gap-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 text-left hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all disabled:opacity-50 h-full"
-              >
-                <span className="text-gray-400 group-hover:text-primary transition-colors">
-                  <Icon />
-                </span>
-                <span className="text-sm font-semibold text-black dark:text-white leading-snug">
-                  {task.title}
-                </span>
-                <span className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
-                  {task.description}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+        <div className={`mx-auto max-w-3xl ${hasResults ? "mb-6" : "mb-12"} grid grid-cols-3 gap-3`}>
+            {tasks.map((task) => {
+              const Icon = TASK_ICONS[task.id] || TrialIcon;
+              return (
+                <button
+                  key={task.id}
+                  onClick={() => handleSuggestionClick(task)}
+                  disabled={loading}
+                  className="group flex flex-col items-start gap-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 text-left hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all disabled:opacity-50 h-full"
+                >
+                  <span className="text-gray-400 group-hover:text-primary transition-colors">
+                    <Icon />
+                  </span>
+                  <span className="text-sm font-semibold text-black dark:text-white leading-snug">
+                    {task.title}
+                  </span>
+                  <span className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+                    {task.description}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
         {/* Inline session panel for small screens */}
         {conversationId && (
@@ -480,41 +522,24 @@ export default function Workshop() {
             <div className="workshop-results-grid grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4 -mx-4 px-4 xl:-mx-32 xl:px-32">
               {latestResponses.map((resp) => (
                 <OutputCard
-                  key={`${resp.model_id}-${latestRunId}`}
+                  key={resp.model_id}
                   exchanges={modelExchanges[resp.model_id] || []}
                   latestResponse={resp}
                   isNew={isNewResult}
                   isLoading={loading}
                   isBest={bestModel === resp.model_id}
+                  chatSummary={chatSummary}
                   onVote={(vote) => handleVote(resp.model_id, vote)}
                   onSelectBest={() => handleBestAnswer(resp.model_id)}
+                  onScrollToResults={scrollToResultsImmediate}
                 />
               ))}
             </div>
 
-            {/* Best answer selector */}
-            {latestResponses.some((r) => !r.error) && (
-              <div className="workshop-results-grid flex flex-wrap items-center justify-center gap-3 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                <span className="text-sm font-medium text-black dark:text-white">
-                  Best answer for this task:
-                </span>
-                {latestResponses
-                  .filter((r) => !r.error)
-                  .map((r) => (
-                    <button
-                      key={r.model_id}
-                      onClick={() => handleBestAnswer(r.model_id)}
-                      className={`rounded-md py-2 px-4 text-sm font-medium transition-all ${
-                        bestModel === r.model_id
-                          ? "bg-primary text-white"
-                          : "bg-white dark:bg-gray-700 text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:border-primary"
-                      }`}
-                    >
-                      {r.display_name}
-                    </button>
-                  ))}
-              </div>
-            )}
+            {/* Prompt input — below results for follow-up questions */}
+            <div className="mt-6">
+              {renderPromptInput()}
+            </div>
           </div>
         )}
 

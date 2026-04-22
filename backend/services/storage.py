@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 import json
+import os
 import sqlite3
 import uuid
 from pathlib import Path
 
-DB_DIR = Path(__file__).resolve().parent.parent / "db"
+# Allow overriding DB path for Modal volume persistence
+DB_DIR = Path(os.getenv("WORKSHOP_DB_DIR", str(Path(__file__).resolve().parent.parent / "db")))
 DB_PATH = DB_DIR / "app.db"
-SCHEMA_PATH = DB_DIR / "schema.sql"
+SCHEMA_PATH = Path(__file__).resolve().parent.parent / "db" / "schema.sql"
 
 
 def get_connection() -> sqlite3.Connection:
@@ -144,9 +146,14 @@ def store_vote(run_id: str, model_id: str, vote: str | None, session_id: str | N
     conn.close()
 
 
-def store_best_answer(run_id: str, winner_model_id: str, session_id: str | None = None):
-    ba_id = str(uuid.uuid4())
+def store_best_answer(conversation_id: str, run_id: str, winner_model_id: str, session_id: str | None = None):
     conn = get_connection()
+    # Remove any previous best-answer for this conversation (upsert per conversation)
+    conn.execute(
+        "DELETE FROM best_answers WHERE run_id IN (SELECT id FROM runs WHERE conversation_id = ?)",
+        (conversation_id,),
+    )
+    ba_id = str(uuid.uuid4())
     conn.execute(
         "INSERT INTO best_answers (id, run_id, winner_model_id, session_id) VALUES (?, ?, ?, ?)",
         (ba_id, run_id, winner_model_id, session_id),
@@ -154,6 +161,16 @@ def store_best_answer(run_id: str, winner_model_id: str, session_id: str | None 
     conn.commit()
     conn.close()
     return ba_id
+
+
+def clear_best_answer(conversation_id: str):
+    conn = get_connection()
+    conn.execute(
+        "DELETE FROM best_answers WHERE run_id IN (SELECT id FROM runs WHERE conversation_id = ?)",
+        (conversation_id,),
+    )
+    conn.commit()
+    conn.close()
 
 
 def store_bioreason_run(example_id: str, raw_output: str, clean_summary: str, meta: dict):
@@ -262,6 +279,61 @@ def get_detailed_stats() -> dict:
             for r in recent_runs
         ],
     }
+
+
+def get_all_runs() -> list:
+    """Return every run with its responses, votes, and best-answer info."""
+    conn = get_connection()
+    cutoff = _get_stats_cutoff()
+    time_filter = f"WHERE r.created_at > '{cutoff}'" if cutoff else ""
+
+    runs = conn.execute(
+        f"SELECT r.id, r.task_id, r.prompt, r.mode, r.created_at, r.conversation_id "
+        f"FROM runs r {time_filter} "
+        f"ORDER BY r.created_at DESC"
+    ).fetchall()
+
+    result = []
+    for run in runs:
+        responses = conn.execute(
+            "SELECT model_id, display_name, text, latency_ms, error "
+            "FROM responses WHERE run_id = ?",
+            (run["id"],),
+        ).fetchall()
+
+        votes = conn.execute(
+            "SELECT model_id, vote FROM votes WHERE run_id = ?",
+            (run["id"],),
+        ).fetchall()
+
+        best = conn.execute(
+            "SELECT winner_model_id FROM best_answers WHERE run_id = ?",
+            (run["id"],),
+        ).fetchone()
+
+        result.append({
+            "id": run["id"],
+            "task_id": run["task_id"],
+            "prompt": run["prompt"],
+            "mode": run["mode"],
+            "created_at": run["created_at"],
+            "conversation_id": run["conversation_id"],
+            "responses": [
+                {
+                    "model_id": r["model_id"],
+                    "display_name": r["display_name"],
+                    "text": r["text"],
+                    "latency_ms": r["latency_ms"],
+                    "error": r["error"],
+                }
+                for r in responses
+            ],
+            "votes": {v["model_id"]: v["vote"] for v in votes},
+            "best_model": best["winner_model_id"] if best else None,
+        })
+
+    conn.close()
+    return result
 
 
 def clear_statistics():

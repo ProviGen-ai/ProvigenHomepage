@@ -21,7 +21,7 @@ def call(prompt: str) -> dict:
         response = client.chat.completions.create(
             model=MODEL,
             messages=messages,
-            max_completion_tokens=2048,
+            max_completion_tokens=4096,
             temperature=0.3,
         )
         latency_ms = int((time.time() - start) * 1000)

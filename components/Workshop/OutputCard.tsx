@@ -16,11 +16,13 @@ interface Props {
   isBest: boolean;
   isNew?: boolean;
   isLoading?: boolean;
+  chatSummary?: string | null;
   onVote: (vote: "up" | "down" | "none") => void;
   onSelectBest: () => void;
+  onScrollToResults?: () => void;
 }
 
-export default function OutputCard({ exchanges, latestResponse, isBest, isNew = false, isLoading = false, onVote, onSelectBest }: Props) {
+export default function OutputCard({ exchanges, latestResponse, isBest, isNew = false, isLoading = false, chatSummary, onVote, onSelectBest, onScrollToResults }: Props) {
   const [voted, setVoted] = useState<"up" | "down" | null>(null);
   const [showReasoning, setShowReasoning] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -30,26 +32,41 @@ export default function OutputCard({ exchanges, latestResponse, isBest, isNew = 
   const [displayedChars, setDisplayedChars] = useState(shouldAnimate ? 0 : fullText.length);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const prevResponseRef = useRef(latestResponse);
 
   useEffect(() => {
-    if (!shouldAnimate) {
-      setDisplayedChars(fullText.length);
+    // Detect when a new response arrives (not just initial mount)
+    const isNewResponse = prevResponseRef.current !== latestResponse;
+    prevResponseRef.current = latestResponse;
+
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    const text = latestResponse.text || "";
+    const animate = isNew && text.length > 0;
+
+    if (!animate) {
+      setDisplayedChars(text.length);
       return;
     }
+
+    // Reset vote state on new response
+    if (isNewResponse) setVoted(null);
+
+    setDisplayedChars(0);
     const tickInterval = 16;
-    const charsPerTick = Math.max(1, Math.ceil(fullText.length / 180));
+    const charsPerTick = Math.max(1, Math.ceil(text.length / 180));
     intervalRef.current = setInterval(() => {
       setDisplayedChars((prev) => {
-        if (prev >= fullText.length) {
+        if (prev >= text.length) {
           if (intervalRef.current) clearInterval(intervalRef.current);
-          return fullText.length;
+          return text.length;
         }
-        return Math.min(prev + charsPerTick, fullText.length);
+        return Math.min(prev + charsPerTick, text.length);
       });
     }, tickInterval);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [latestResponse]);
 
   // Auto-scroll to bottom of content area when streaming
   useEffect(() => {
@@ -114,6 +131,32 @@ export default function OutputCard({ exchanges, latestResponse, isBest, isNew = 
         </span>
       </div>
 
+      {/* Chat summary + history toggle */}
+      {(chatSummary || hasHistory) && (
+        <div className="flex items-center justify-between -mt-1.5 mb-2">
+          {chatSummary ? (
+            <p className="text-[11px] text-gray-400 italic capitalize">{chatSummary}</p>
+          ) : <span />}
+          {hasHistory && (
+            <button
+              onClick={() => {
+                const opening = !showHistory;
+                setShowHistory(opening);
+                if (opening) {
+                  setTimeout(() => {
+                    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+                    if (onScrollToResults) onScrollToResults();
+                  }, 50);
+                }
+              }}
+              className="text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
+            >
+              {showHistory ? "Hide history" : `History (${exchanges.length})`}
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Error state */}
       {latestResponse.error && (
         <div className="rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 mb-3">
@@ -123,19 +166,9 @@ export default function OutputCard({ exchanges, latestResponse, isBest, isNew = 
         </div>
       )}
 
-      {/* History toggle */}
-      {hasHistory && (
-        <button
-          onClick={() => setShowHistory(!showHistory)}
-          className="text-xs font-medium text-primary hover:text-primary/80 transition-colors mb-3 text-left"
-        >
-          {showHistory ? "Hide history" : `Show history (${exchanges.length} exchanges)`}
-        </button>
-      )}
-
       {/* Single scrollable content area */}
       {(fullText || showHistory) && (
-        <div ref={scrollRef} className="mb-3 flex-1 max-h-[420px] overflow-y-auto workshop-textarea">
+        <div ref={scrollRef} className="mb-3 flex-1 max-h-[420px] overflow-y-auto workshop-textarea pt-3 pr-1">
           {/* Previous exchanges — only shown when history is expanded */}
           {showHistory && previousExchanges.map((ex, i) => (
             <div key={i} className="mb-4">
@@ -227,7 +260,7 @@ export default function OutputCard({ exchanges, latestResponse, isBest, isNew = 
 
       {/* Voting — always rendered to prevent layout shift */}
       {!latestResponse.error && (
-        <div className="flex items-center gap-2 pt-3 border-t border-gray-100 dark:border-gray-700 mt-auto">
+        <div className="relative flex items-center gap-2 pt-3 border-t border-gray-100 dark:border-gray-700 mt-auto">
           <button
             onClick={() => handleVote("up")}
             disabled={isStreaming}
@@ -262,16 +295,24 @@ export default function OutputCard({ exchanges, latestResponse, isBest, isNew = 
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3" />
             </svg>
           </button>
-          {isLoading ? (
+          {/* Best Answer button — absolutely centered, always visible */}
+          <button
+            onClick={onSelectBest}
+            disabled={isLoading || isStreaming}
+            className={`absolute left-1/2 -translate-x-1/2 rounded-full py-1.5 px-5 text-xs font-medium transition-all ${
+              isBest
+                ? "bg-primary/80 text-white shadow-sm"
+                : "border border-gray-200 dark:border-gray-600 text-gray-400 hover:border-primary/80 hover:text-primary/80"
+            } ${isLoading || isStreaming ? "opacity-40 cursor-default" : ""}`}
+          >
+            Best Answer
+          </button>
+          {isLoading && (
             <span className="ml-auto flex items-center gap-1.5 text-xs text-gray-400">
               <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary border-r-transparent" />
               Thinking…
             </span>
-          ) : isBest ? (
-            <span className="ml-auto text-xs font-semibold text-primary">
-              Best Answer
-            </span>
-          ) : null}
+          )}
         </div>
       )}
     </div>

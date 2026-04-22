@@ -4,30 +4,47 @@ A guided workshop demo for comparing biomedical reasoning models. Participants c
 
 ## Architecture
 
+### Local development
 ```
 ┌─────────────────────┐     ┌─────────────────────────┐
 │  Next.js Frontend   │────▶│   FastAPI Backend (:8000)│
 │  /workshop (hidden) │     │                         │
-└─────────────────────┘     │  ┌─ openai_adapter ────▶ OpenAI API (GPT-5.4)
-                            │  ├─ txgemma_adapter ───▶ Modal vLLM endpoint
-                            │  ├─ biomni_adapter ────▶ Biomni local service
-                            │  └─ bioreason_adapter ─▶ BioReason-Pro (optional)
+│  localhost:3000      │     │  ┌─ GPT-5.4 ──────────▶ OpenAI API
+                            │  ├─ TxGemma ───────────▶ (disabled locally)
+                            │  └─ Biomni ────────────▶ (disabled locally)
                             │                         │
                             │  SQLite (db/app.db)     │
                             └─────────────────────────┘
+```
+
+### Production (Vercel + Modal)
+```
+┌─────────────────────┐     ┌──────────────────────────────────────┐
+│  Vercel (Next.js)   │     │  Modal App ("biomedical-workshop")   │
+│  provigen.ai        │     │                                      │
+│                     │     │  backend()  ←── CPU web endpoint     │
+│  /workshop ─────────┼────▶│    ├─ GPT-5.4 ──────▶ OpenAI API    │
+│  /workshop-results  │     │    ├─ TxGemma ──────▶ internal call  │
+│                     │     │    └─ Biomni ───────▶ internal call   │
+│  proxy.ts injects   │     │                                      │
+│  X-Workshop-Secret  │     │  TxGemmaModel() ←── A100 80GB GPU   │
+│  header             │     │  biomni_predict() ←── CPU (stub)     │
+└─────────────────────┘     │                                      │
+                            │  Modal Volume: SQLite persistence    │
+                            └──────────────────────────────────────┘
 ```
 
 ## Project Structure
 
 ```
 backend/
-  main.py                 # FastAPI app
+  main.py                 # FastAPI app (local dev entry point)
   requirements.txt        # Python deps
   .env.example            # Env var template
   adapters/
     openai_adapter.py     # GPT-5.4 via OpenAI API
-    txgemma_adapter.py    # TxGemma via Modal vLLM
-    biomni_adapter.py     # Biomni via local service
+    txgemma_adapter.py    # TxGemma via Modal vLLM (local dev)
+    biomni_adapter.py     # Biomni via local service (local dev)
     bioreason_adapter.py  # BioReason-Pro (optional)
   services/
     storage.py            # SQLite persistence
@@ -39,14 +56,15 @@ backend/
     app.db                # Created at startup
 
 modal/
-  txgemma_vllm.py         # Modal app for TxGemma vLLM serving
-  README_modal.md         # Modal deployment guide
+  app.py                  # Unified Modal app (backend + TxGemma + Biomni)
 
 app/workshop/page.tsx     # Hidden workshop page (Next.js route)
+app/workshop-results/     # Admin results page
 components/Workshop/      # React components
+proxy.ts                  # Next.js proxy (injects auth header)
 
 scripts/
-  dev.sh                  # Start both frontend + backend
+  dev.sh                  # Start both frontend + backend locally
 ```
 
 ## Local Development Setup
@@ -60,69 +78,11 @@ conda activate provigenDemo-env
 pip install -r backend/requirements.txt
 
 # Copy and configure env vars
-cp backend/.env.example backend/.env
-# Edit backend/.env with your keys
+cp backend/.env.example .env
+# Edit .env with your OpenAI API key
 ```
 
-### 2. Configure OpenAI API Key
-
-Set `OPENAI_API_KEY` in `backend/.env` or export it:
-```bash
-export OPENAI_API_KEY=sk-...
-```
-
-### 3. Deploy TxGemma-27B-Chat on Modal
-
-```bash
-# Install Modal CLI
-pip install modal
-
-# Authenticate
-modal token new
-
-# Deploy
-modal deploy modal/txgemma_vllm.py
-```
-
-After deployment, copy the endpoint URL and set:
-```bash
-export TXGEMMA_BASE_URL="https://YOUR_WORKSPACE--txgemma-vllm-serve.modal.run/v1"
-```
-
-See [modal/README_modal.md](modal/README_modal.md) for full details.
-
-### 4. Set Up Biomni
-
-Clone and set up the official Biomni repo:
-```bash
-git clone https://github.com/snap-stanford/biomni.git
-cd biomni
-# Follow their setup instructions
-# Run as a local service on port 8001
-```
-
-If Biomni has dependency conflicts with the main backend, run it in a separate conda env and expose it as a local HTTP service. The adapter expects a POST endpoint at `$BIOMNI_SERVICE_URL/predict` that accepts `{"prompt": "..."}` and returns `{"answer": "...", "reasoning": "..."}`.
-
-To disable Biomni temporarily:
-```bash
-export BIOMNI_ENABLED=false
-```
-
-### 5. Enable/Disable BioReason-Pro
-
-BioReason-Pro is disabled by default. To enable:
-```bash
-export BIOREASON_ENABLED=true
-export BIOREASON_SERVICE_URL=http://localhost:8002
-```
-
-Set up from the official repo: https://github.com/bowang-lab/BioReason-Pro
-
-### 6. Initialize SQLite
-
-The database is created automatically when the backend starts. No manual setup needed. The schema lives in `backend/db/schema.sql` and is applied on startup.
-
-### 7. Run Everything Locally
+### 2. Run Locally
 
 **Option A: Dev script**
 ```bash
@@ -132,41 +92,173 @@ bash scripts/dev.sh
 **Option B: Manual**
 ```bash
 # Terminal 1: Backend
-conda activate provigenDemo-env
 uvicorn backend.main:app --reload --port 8000
 
 # Terminal 2: Frontend
 npm run dev
 ```
 
-Then visit: **http://localhost:3000/workshop**
+Visit: **http://localhost:3000/workshop**
+
+Locally, only GPT-5.4 will return real answers. TxGemma and Biomni will show disabled/error states unless you configure their endpoints.
+
+## Production Deployment (Vercel + Modal)
+
+The production setup runs the frontend on Vercel and the entire backend (API + models) on Modal.
+
+### 1. Install Modal CLI
+
+```bash
+pip install modal
+modal setup
+```
+
+`modal setup` opens your browser to authenticate the CLI with your Modal account.
+
+### 2. Create Modal Secrets
+
+Store your API keys as a Modal secret (one-time):
+
+```bash
+source .env && modal secret create workshop-secrets \
+    OPENAI_API_KEY=$OPENAI_API_KEY \
+    WORKSHOP_SECRET=$WORKSHOP_SECRET \
+    WORKSHOP_ADMIN_PASSWORD=$WORKSHOP_ADMIN_PASSWORD
+```
+
+### 3. Deploy to Modal
+
+```bash
+modal deploy modal/app.py
+```
+
+This deploys three components in one Modal app:
+- **`backend()`** — FastAPI web endpoint (CPU)
+- **`TxGemmaModel`** — vLLM on A100 80GB (auto-scales, 5min idle timeout)
+- **`biomni_predict()`** — Biomni stub (CPU)
+
+The first deploy takes longer as it downloads TxGemma weights (~50GB) and bakes them into the image. Subsequent deploys reuse the cached image.
+
+After deployment, Modal prints the endpoint URL:
+```
+https://YOUR_WORKSPACE--biomedical-workshop-backend.modal.run
+```
+
+### 4. Configure Vercel
+
+In your Vercel project settings, add these environment variables:
+
+| Variable | Value |
+|----------|-------|
+| `WORKSHOP_API_URL` | `https://YOUR_WORKSPACE--biomedical-workshop-backend.modal.run` |
+| `WORKSHOP_SECRET` | Same value you used in Modal secrets |
+
+**How the request flow works:**
+1. User visits `provigen.ai/workshop` and submits a prompt
+2. Next.js frontend calls `/workshop-api/run-task`
+3. `next.config.js` rewrites `/workshop-api/*` to `$WORKSHOP_API_URL/api/*`
+4. `proxy.ts` intercepts the request and injects the `X-Workshop-Secret` header
+5. Modal backend receives the request, calls GPT-5.4 (OpenAI API), TxGemma (internal GPU function), and Biomni (internal function) in parallel
+6. Results are stored in SQLite on a Modal Volume and returned to the frontend
+
+### 5. Updating the Deployment
+
+Any change to backend code, adapters, prompts, or Modal config requires a redeploy:
+
+```bash
+modal deploy modal/app.py
+```
+
+This is fast for code-only changes — Modal reuses the cached container images and only re-uploads the mounted backend code. Image rebuilds (e.g., adding new pip packages) take longer.
+
+Frontend changes deploy automatically via Vercel on `git push`.
+
+**What triggers an image rebuild vs. a fast redeploy:**
+
+| Change | Rebuild? | Notes |
+|--------|----------|-------|
+| Backend Python code (`backend/`) | No — fast, uses mount | Just re-uploads files |
+| `modal/app.py` config changes | No — fast | Unless image definition changes |
+| New pip dependency | Yes — slow | Rebuilds `backend_image` |
+| TxGemma model change | Yes — very slow | Re-downloads model weights |
+
+### 6. Integrating Biomni
+
+Biomni is currently a stub. To integrate the real model:
+
+1. **Create a Biomni image** in `modal/app.py` with its dependencies:
+   ```python
+   biomni_image = (
+       modal.Image.debian_slim(python_version="3.11")
+       .pip_install("biomni", "torch", ...)  # actual deps from biomni repo
+       .run_commands("python -c 'import biomni; ...'")  # download weights
+   )
+   ```
+
+2. **Replace the `biomni_predict` stub** with real inference:
+   ```python
+   @app.function(image=biomni_image, gpu=modal.gpu.A100(...), timeout=180)
+   def biomni_predict(prompt: str) -> dict:
+       # actual biomni inference
+       ...
+   ```
+
+3. **Set `BIOMNI_ENABLED=true`** in your Modal secret:
+   ```bash
+   modal secret create workshop-secrets \
+       OPENAI_API_KEY=$OPENAI_API_KEY \
+       WORKSHOP_SECRET=$WORKSHOP_SECRET \
+       WORKSHOP_ADMIN_PASSWORD=$WORKSHOP_ADMIN_PASSWORD \
+       BIOMNI_ENABLED=true
+   ```
+
+4. **Redeploy:**
+   ```bash
+   modal deploy modal/app.py
+   ```
+
+No frontend changes needed — the backend calls Biomni internally via `biomni_predict.remote()`, and the frontend already handles Biomni responses.
+
+### 7. Stopping the Deployment
+
+```bash
+# Stop all containers (app auto-restarts on next request)
+modal app stop biomedical-workshop
+
+# Fully remove the app (requires modal deploy to bring back)
+modal app delete biomedical-workshop
+```
+
+Containers also auto-stop after 30 minutes of inactivity. No cost while idle.
 
 ## Environment Variables
 
+### Local development (`.env`)
+
 | Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `OPENAI_API_KEY` | — | Yes | OpenAI API key for GPT-5.4 |
+| `OPENAI_API_KEY` | — | Yes | OpenAI API key |
 | `OPENAI_MODEL` | `gpt-5.4` | No | OpenAI model name |
-| `TXGEMMA_BASE_URL` | `http://localhost:8000/v1` | Yes | Modal vLLM endpoint URL |
-| `TXGEMMA_MODEL` | `google/txgemma-27b-chat` | No | Model name for vLLM |
-| `BIOMNI_ENABLED` | `true` | No | Enable/disable Biomni |
-| `BIOMNI_SERVICE_URL` | `http://localhost:8001` | If enabled | Biomni service URL |
+| `TXGEMMA_BASE_URL` | — | No | Modal vLLM endpoint (local dev only) |
+| `BIOMNI_ENABLED` | `false` | No | Enable/disable Biomni |
 | `BIOREASON_ENABLED` | `false` | No | Enable/disable BioReason-Pro |
-| `BIOREASON_SERVICE_URL` | `http://localhost:8002` | If enabled | BioReason-Pro service URL |
-| `NEXT_PUBLIC_WORKSHOP_API_URL` | `http://localhost:8000` | No | Frontend API base URL |
-| `WORKSHOP_API_URL` | `http://localhost:8000` | No | Next.js rewrite target |
+| `WORKSHOP_SECRET` | `dev-secret` | No | Shared secret for backend auth |
+| `WORKSHOP_ADMIN_PASSWORD` | `admin` | No | Admin page password |
 
-## Deployment
+### Vercel
 
-For production deployment:
+| Variable | Description |
+|----------|-------------|
+| `WORKSHOP_API_URL` | Modal backend URL |
+| `WORKSHOP_SECRET` | Must match Modal secret |
 
-1. Deploy the FastAPI backend (e.g., on a VM, Railway, or Fly.io)
-2. Set `WORKSHOP_API_URL` in the Next.js environment to point to the backend
-3. Deploy TxGemma on Modal (already done if following dev setup)
-4. Deploy Biomni as a service accessible to the backend
-5. Deploy the Next.js frontend on Vercel (existing setup)
+### Modal (via `workshop-secrets`)
 
-The workshop page is hidden — it's not linked in navigation. Access via direct URL only.
+| Variable | Description |
+|----------|-------------|
+| `OPENAI_API_KEY` | OpenAI API key |
+| `WORKSHOP_SECRET` | Shared secret for backend auth |
+| `WORKSHOP_ADMIN_PASSWORD` | Admin page password |
 
 ## API Endpoints
 
@@ -177,5 +269,20 @@ The workshop page is hidden — it's not linked in navigation. Access via direct
 | `POST` | `/api/run-task` | Run prompt across all models |
 | `POST` | `/api/vote` | Submit thumbs up/down |
 | `POST` | `/api/best-answer` | Select best answer |
+| `POST` | `/api/summarize` | 3-word chat summary (GPT-4.1-mini) |
 | `GET` | `/api/leaderboard` | Aggregate stats |
+| `GET` | `/api/conversation/{id}` | Load conversation history |
+| `POST` | `/api/conversation` | Create new conversation |
+| `POST` | `/api/admin/verify` | Verify admin password |
+| `POST` | `/api/admin/stats` | Detailed statistics |
+| `POST` | `/api/admin/history` | Full question history |
+| `POST` | `/api/admin/clear-statistics` | Reset statistics |
+| `POST` | `/api/admin/clear-conversations` | Delete all data |
 | `POST` | `/api/bioreason/run-example` | Run BioReason-Pro example |
+
+## Notes
+
+- The workshop page is hidden — not linked in navigation, access via direct URL only
+- SQLite on Modal uses a persistent Volume (`workshop-db`); data survives container restarts
+- TxGemma containers auto-scale to zero after 5 minutes of inactivity to save costs
+- The admin page at `/workshop-results` is also hidden and password-protected

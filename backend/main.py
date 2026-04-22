@@ -17,11 +17,13 @@ from starlette.responses import JSONResponse
 from .adapters import biomni_adapter, bioreason_adapter, openai_adapter, txgemma_adapter
 from .services.ranking import compute_leaderboard
 from .services.storage import (
+    clear_best_answer,
     clear_conversations,
     clear_statistics,
     conversation_exists,
     create_conversation,
     create_run,
+    get_all_runs,
     get_conversation_history,
     get_detailed_stats,
     init_db,
@@ -84,6 +86,7 @@ class VoteRequest(BaseModel):
 
 
 class BestAnswerRequest(BaseModel):
+    conversation_id: str
     run_id: str
     winner_model_id: str
     session_id: Optional[str] = None
@@ -192,8 +195,36 @@ def vote(req: VoteRequest):
 
 @app.post("/api/best-answer")
 def best_answer(req: BestAnswerRequest):
-    store_best_answer(req.run_id, req.winner_model_id, req.session_id)
+    if req.winner_model_id:
+        store_best_answer(req.conversation_id, req.run_id, req.winner_model_id, req.session_id)
+    else:
+        clear_best_answer(req.conversation_id)
     return {"ok": True}
+
+
+class SummarizeRequest(BaseModel):
+    prompt: str
+
+
+@app.post("/api/summarize")
+def summarize(req: SummarizeRequest):
+    """Generate a 3-word summary of the conversation topic using GPT-5.4-mini."""
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        response = client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[
+                {"role": "system", "content": "Summarize the user's biomedical question in exactly 3 words. No punctuation."},
+                {"role": "user", "content": req.prompt[:500]},
+            ],
+            max_tokens=10,
+            temperature=0,
+        )
+        summary = response.choices[0].message.content.strip()
+        return {"summary": summary}
+    except Exception as e:
+        return {"summary": None, "error": str(e)}
 
 
 @app.get("/api/leaderboard")
@@ -246,6 +277,13 @@ def admin_stats(req: AdminAction):
     if req.password != ADMIN_PASSWORD:
         raise HTTPException(403, "Invalid password")
     return get_detailed_stats()
+
+
+@app.post("/api/admin/history")
+def admin_history(req: AdminAction):
+    if req.password != ADMIN_PASSWORD:
+        raise HTTPException(403, "Invalid password")
+    return {"runs": get_all_runs()}
 
 
 @app.post("/api/admin/clear-statistics")
