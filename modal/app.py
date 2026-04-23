@@ -164,7 +164,7 @@ class TxGemmaModel:
 
         self.llm = LLM(
             model=TXGEMMA_MODEL,
-            max_model_len=16384,
+            max_model_len=8192,
             dtype="auto",
             trust_remote_code=True,
             gpu_memory_utilization=0.90,
@@ -177,7 +177,7 @@ class TxGemmaModel:
         from vllm import SamplingParams
         from transformers import AutoTokenizer
 
-        MAX_CTX = 16384
+        MAX_CTX = 8192
         RESERVED_OUTPUT = 512  # minimum output tokens to keep
 
         start = time.time()
@@ -744,7 +744,7 @@ def backend():
             # Estimate ~4 chars per token; leave room for 6144 output tokens
             full_input = txgemma_system + "\n\n" + prompt
             est_tokens = len(full_input) // 4
-            max_input_tokens = 16384 - 6144  # ~10k for input
+            max_input_tokens = 8192 - 6144  # ~2k for input, rest for output
             if est_tokens > max_input_tokens:
                 print(f"[TxGemma] Prompt too long ({token_count} tokens > {max_input_tokens}), summarizing...")
                 prompt = _summarize_for_txgemma(prompt)
