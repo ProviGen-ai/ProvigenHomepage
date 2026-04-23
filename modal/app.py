@@ -98,8 +98,10 @@ def _format_markdown_headers(text: str) -> str:
 
 app = modal.App("biomedical-workshop")
 db_volume = modal.Volume.from_name("workshop-db", create_if_missing=True)
+compile_cache_volume = modal.Volume.from_name("txgemma-compile-cache", create_if_missing=True)
 
 DB_MOUNT_PATH = "/data/db"
+COMPILE_CACHE_PATH = "/root/.cache/vllm"
 
 # ---------------------------------------------------------------------------
 # Images
@@ -155,20 +157,40 @@ txgemma_image = (
     timeout=900,
     scaledown_window=1800,
     secrets=[modal.Secret.from_name("huggingface")],
+    volumes={COMPILE_CACHE_PATH: compile_cache_volume},
 )
-@modal.concurrent(max_inputs=1)
+@modal.concurrent(max_inputs=2)
 class TxGemmaModel:
     @modal.enter()
     def setup(self):
+        import os
         from vllm import LLM
 
-        self.llm = LLM(
-            model=TXGEMMA_MODEL,
-            max_model_len=8192,
-            dtype="auto",
-            trust_remote_code=True,
-            gpu_memory_utilization=0.90,
-        )
+        # Check if torch compile cache exists from a previous run
+        cache_dir = os.path.join(COMPILE_CACHE_PATH, "torch_compile_cache")
+        has_cache = os.path.isdir(cache_dir) and len(os.listdir(cache_dir)) > 0
+
+        if has_cache:
+            print("[TxGemma] Compile cache found — using compiled mode (fast from cache)")
+            self.llm = LLM(
+                model=TXGEMMA_MODEL,
+                max_model_len=8192,
+                dtype="auto",
+                trust_remote_code=True,
+                gpu_memory_utilization=0.90,
+            )
+        else:
+            print("[TxGemma] No compile cache — using eager mode for fast startup")
+            self.llm = LLM(
+                model=TXGEMMA_MODEL,
+                max_model_len=8192,
+                dtype="auto",
+                trust_remote_code=True,
+                gpu_memory_utilization=0.90,
+                enforce_eager=True,
+            )
+
+        self._needs_recompile = not has_cache
 
     @modal.method()
     def chat(self, messages: list[dict], max_tokens: int = 6144, temperature: float = 0.3) -> dict:
@@ -202,6 +224,32 @@ class TxGemmaModel:
 
             latency_ms = int((time.time() - start) * 1000)
             print(f"[TxGemma] {latency_ms}ms | {len(text)} chars\n{text}")
+
+            # After first successful inference in eager mode, recompile in background
+            # to populate the cache volume for faster subsequent cold starts
+            if self._needs_recompile:
+                self._needs_recompile = False
+                import threading
+                def _background_recompile():
+                    try:
+                        import torch
+                        print("[TxGemma] Background: recompiling with torch.compile to populate cache...")
+                        del self.llm
+                        torch.cuda.empty_cache()
+                        from vllm import LLM as _LLM
+                        self.llm = _LLM(
+                            model=TXGEMMA_MODEL,
+                            max_model_len=8192,
+                            dtype="auto",
+                            trust_remote_code=True,
+                            gpu_memory_utilization=0.90,
+                        )
+                        compile_cache_volume.commit()
+                        print("[TxGemma] Background: compile cache saved to volume")
+                    except Exception as ex:
+                        print(f"[TxGemma] Background recompile failed: {ex}")
+                threading.Thread(target=_background_recompile, daemon=True).start()
+
             return {
                 "model_id": "txgemma-27b-chat",
                 "display_name": "TxGemma-27B-Chat",
