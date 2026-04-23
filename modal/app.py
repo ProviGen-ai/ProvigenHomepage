@@ -191,6 +191,7 @@ class TxGemmaModel:
             )
 
         self._needs_recompile = not has_cache
+        self._swapping = False  # True during model swap — rejects requests so Modal routes elsewhere
 
     @modal.method()
     def chat(self, messages: list[dict], max_tokens: int = 6144, temperature: float = 0.3) -> dict:
@@ -204,6 +205,10 @@ class TxGemmaModel:
 
         start = time.time()
         try:
+            # During model swap, reject requests so Modal routes to another container
+            if self._swapping:
+                raise RuntimeError("TxGemma is upgrading to compiled mode — retrying on another container")
+
             tokenizer = AutoTokenizer.from_pretrained(TXGEMMA_MODEL)
             prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
@@ -234,10 +239,6 @@ class TxGemmaModel:
                     try:
                         import torch, subprocess
                         print("[TxGemma] Background: compiling in subprocess to populate cache...")
-                        # Run compilation in a separate process so it doesn't interfere
-                        # with the current eager model serving requests.
-                        # The subprocess loads the model, torch.compile runs and saves
-                        # to the cache dir, then exits — freeing all GPU memory.
                         result = subprocess.run(
                             ["python", "-c", f"""
 import os
@@ -257,10 +258,31 @@ print("[TxGemma] Subprocess: compile complete, cache generated")
                         print(f"[TxGemma] Subprocess stdout: {result.stdout[-500:]}")
                         if result.returncode != 0:
                             print(f"[TxGemma] Subprocess stderr: {result.stderr[-500:]}")
-                        else:
-                            compile_cache_volume.commit()
-                            print("[TxGemma] Background: compile cache saved to volume")
+                            return
+
+                        compile_cache_volume.commit()
+                        print("[TxGemma] Cache saved. Swapping to compiled model...")
+
+                        # Reject new requests during swap — Modal routes them elsewhere
+                        self._swapping = True
+                        import time as _t
+                        _t.sleep(2)  # brief pause to let in-flight requests finish
+
+                        # Swap: delete eager model, load compiled from cache
+                        del self.llm
+                        torch.cuda.empty_cache()
+                        from vllm import LLM as _LLM
+                        self.llm = _LLM(
+                            model=TXGEMMA_MODEL,
+                            max_model_len=8192,
+                            dtype="auto",
+                            trust_remote_code=True,
+                            gpu_memory_utilization=0.90,
+                        )
+                        self._swapping = False
+                        print("[TxGemma] Swap complete — now serving compiled model")
                     except Exception as ex:
+                        self._swapping = False
                         print(f"[TxGemma] Background recompile failed: {ex}")
                 threading.Thread(target=_background_recompile, daemon=True).start()
 
