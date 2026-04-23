@@ -643,6 +643,7 @@ export default function WorkshopResults() {
             </div>
 
           {/* Stress Test */}
+          <div className="mt-8" />
           <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
             <div className="p-5 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
               <div>
