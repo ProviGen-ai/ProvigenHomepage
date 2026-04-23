@@ -746,7 +746,7 @@ def backend():
             est_tokens = len(full_input) // 4
             max_input_tokens = 8192 - 6144  # ~2k for input, rest for output
             if est_tokens > max_input_tokens:
-                print(f"[TxGemma] Prompt too long ({token_count} tokens > {max_input_tokens}), summarizing...")
+                print(f"[TxGemma] Prompt too long (~{est_tokens} tokens > {max_input_tokens}), summarizing...")
                 prompt = _summarize_for_txgemma(prompt)
 
             messages = [{"role": "user", "content": txgemma_system + "\n\n" + prompt}]
