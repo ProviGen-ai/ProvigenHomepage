@@ -68,6 +68,17 @@ export default function WorkshopResults() {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [expandedRun, setExpandedRun] = useState<string | null>(null);
 
+  // Stress test state
+  const [stressRunning, setStressRunning] = useState(false);
+  const [stressResults, setStressResults] = useState<Array<{
+    request: number;
+    model_id: string;
+    status: "pending" | "success" | "error" | "timeout";
+    latency_ms: number;
+    error?: string;
+    textLength?: number;
+  }>>([]);
+
   const loadStats = useCallback(async (pw: string) => {
     try {
       const resp = await fetch(apiUrl("/admin/stats"), {
@@ -147,6 +158,131 @@ export default function WorkshopResults() {
     } catch (e: any) {
       setActionResult(`Error: ${e.message}`);
     }
+  };
+
+  const runStressTest = async () => {
+    const NUM_REQUESTS = 10;
+    const TIMEOUT_MS = 180000; // 3 minutes per request
+    const TEST_PROMPTS = [
+      "What is the central dogma of molecular biology?",
+      "Explain the mechanism of action of PD-1 inhibitors.",
+      "What are the key biomarkers in NSCLC?",
+      "Describe CRISPR-Cas9 gene editing.",
+      "What is tumor mutational burden?",
+      "Explain the Wnt signaling pathway.",
+      "What are CAR-T cells?",
+      "Describe the p53 tumor suppressor.",
+      "What is spatial transcriptomics?",
+      "Explain immune checkpoint therapy.",
+    ];
+
+    setStressRunning(true);
+    const models = ["gpt-5.4", "txgemma-27b-chat", "biomni"];
+    const initial = Array.from({ length: NUM_REQUESTS }, (_, i) =>
+      models.map((m) => ({ request: i + 1, model_id: m, status: "pending" as const, latency_ms: 0 }))
+    ).flat();
+    setStressResults(initial);
+
+    // Fire all 10 requests in rapid succession
+    const promises = Array.from({ length: NUM_REQUESTS }, async (_, i) => {
+      const prompt = TEST_PROMPTS[i % TEST_PROMPTS.length];
+      const start = Date.now();
+
+      try {
+        // Start a run
+        const startResp = await fetch(apiUrl("/start-run"), {
+          method: "POST",
+          headers: apiHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify({ task_id: null, prompt, mode: "custom", conversation_id: null }),
+        });
+        if (!startResp.ok) throw new Error(`start-run failed: ${startResp.status}`);
+        const { run_id, prompt: resolvedPrompt } = await startResp.json();
+
+        // Call each model
+        const modelPromises = models.map(async (modelId) => {
+          const mStart = Date.now();
+          try {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+            const resp = await fetch(apiUrl("/run-model"), {
+              method: "POST",
+              headers: apiHeaders({ "Content-Type": "application/json" }),
+              body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
+              signal: controller.signal,
+            });
+            clearTimeout(timer);
+
+            const mLatency = Date.now() - mStart;
+
+            if (!resp.ok) {
+              setStressResults((prev) => prev.map((r) =>
+                r.request === i + 1 && r.model_id === modelId
+                  ? { ...r, status: "error", latency_ms: mLatency, error: `HTTP ${resp.status}` }
+                  : r
+              ));
+              return;
+            }
+
+            const data = await resp.json();
+            // For Biomni, poll until done
+            if (modelId === "biomni" && (!data.text || data.status === "running")) {
+              for (let p = 0; p < 60; p++) {
+                await new Promise((r) => setTimeout(r, 5000));
+                const pollResp = await fetch(apiUrl("/poll-biomni"), {
+                  method: "POST",
+                  headers: apiHeaders({ "Content-Type": "application/json" }),
+                  body: JSON.stringify({ run_id }),
+                });
+                if (!pollResp.ok) continue;
+                const pollData = await pollResp.json();
+                if (pollData.status === "done") {
+                  const finalLatency = Date.now() - mStart;
+                  setStressResults((prev) => prev.map((r) =>
+                    r.request === i + 1 && r.model_id === modelId
+                      ? { ...r, status: pollData.error ? "error" : "success", latency_ms: finalLatency, textLength: pollData.text?.length || 0, error: pollData.error || undefined }
+                      : r
+                  ));
+                  return;
+                }
+              }
+              setStressResults((prev) => prev.map((r) =>
+                r.request === i + 1 && r.model_id === modelId
+                  ? { ...r, status: "timeout", latency_ms: Date.now() - mStart }
+                  : r
+              ));
+              return;
+            }
+
+            setStressResults((prev) => prev.map((r) =>
+              r.request === i + 1 && r.model_id === modelId
+                ? { ...r, status: data.error ? "error" : "success", latency_ms: mLatency, textLength: data.text?.length || 0, error: data.error || undefined }
+                : r
+            ));
+          } catch (e: any) {
+            setStressResults((prev) => prev.map((r) =>
+              r.request === i + 1 && r.model_id === modelId
+                ? { ...r, status: e.name === "AbortError" ? "timeout" : "error", latency_ms: Date.now() - mStart, error: e.message }
+                : r
+            ));
+          }
+        });
+
+        await Promise.allSettled(modelPromises);
+      } catch (e: any) {
+        // Mark all models for this request as error
+        models.forEach((m) => {
+          setStressResults((prev) => prev.map((r) =>
+            r.request === i + 1 && r.model_id === m
+              ? { ...r, status: "error", latency_ms: Date.now() - start, error: e.message }
+              : r
+          ));
+        });
+      }
+    });
+
+    await Promise.allSettled(promises);
+    setStressRunning(false);
   };
 
   if (!authed) {
@@ -505,6 +641,116 @@ export default function WorkshopResults() {
                 </div>
               )}
             </div>
+
+          {/* Stress Test */}
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
+            <div className="p-5 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+              <div>
+                <h2 className="text-base font-semibold text-black dark:text-white">Stress Test</h2>
+                <p className="text-xs text-body-color mt-0.5">Send 10 requests in rapid succession, track results per model</p>
+              </div>
+              <button
+                onClick={runStressTest}
+                disabled={stressRunning}
+                className="rounded-lg bg-primary py-2 px-4 text-sm font-semibold text-white hover:bg-primary/80 disabled:opacity-40 transition-all"
+              >
+                {stressRunning ? "Running..." : "Run Stress Test"}
+              </button>
+            </div>
+
+            {stressResults.length > 0 && (
+              <div className="p-5">
+                {/* Summary */}
+                {!stressRunning && (
+                  <div className="grid grid-cols-3 gap-4 mb-5">
+                    {MODEL_ORDER.map((modelId) => {
+                      const modelResults = stressResults.filter((r) => r.model_id === modelId);
+                      const successes = modelResults.filter((r) => r.status === "success").length;
+                      const errors = modelResults.filter((r) => r.status === "error").length;
+                      const timeouts = modelResults.filter((r) => r.status === "timeout").length;
+                      const avgLatency = successes > 0
+                        ? Math.round(modelResults.filter((r) => r.status === "success").reduce((a, r) => a + r.latency_ms, 0) / successes)
+                        : 0;
+                      return (
+                        <div key={modelId} className="rounded-lg border border-gray-100 dark:border-gray-700 p-3">
+                          <h3 className="text-sm font-semibold text-black dark:text-white mb-2">{DISPLAY_NAMES[modelId] || modelId}</h3>
+                          <div className="space-y-1 text-xs">
+                            <div className="flex justify-between">
+                              <span className="text-green-600">Success</span>
+                              <span className="font-semibold text-green-600">{successes}/10</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-red-500">Errors</span>
+                              <span className="font-semibold text-red-500">{errors}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-yellow-500">Timeouts</span>
+                              <span className="font-semibold text-yellow-500">{timeouts}</span>
+                            </div>
+                            {avgLatency > 0 && (
+                              <div className="flex justify-between pt-1 border-t border-gray-100 dark:border-gray-700">
+                                <span className="text-body-color">Avg latency</span>
+                                <span className="font-semibold text-black dark:text-white">{(avgLatency / 1000).toFixed(1)}s</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Per-request results table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-gray-100 dark:border-gray-700">
+                        <th className="text-left py-2 px-2 text-body-color font-medium">#</th>
+                        {MODEL_ORDER.map((m) => (
+                          <th key={m} className="text-left py-2 px-2 text-body-color font-medium">{DISPLAY_NAMES[m]}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Array.from({ length: 10 }, (_, i) => (
+                        <tr key={i} className="border-b border-gray-50 dark:border-gray-800">
+                          <td className="py-2 px-2 text-body-color font-medium">{i + 1}</td>
+                          {MODEL_ORDER.map((modelId) => {
+                            const r = stressResults.find((sr) => sr.request === i + 1 && sr.model_id === modelId);
+                            if (!r) return <td key={modelId} className="py-2 px-2">—</td>;
+                            return (
+                              <td key={modelId} className="py-2 px-2">
+                                {r.status === "pending" && (
+                                  <span className="inline-flex items-center gap-1 text-gray-400">
+                                    <span className="inline-block h-2.5 w-2.5 animate-spin rounded-full border border-gray-300 border-r-transparent" />
+                                    waiting
+                                  </span>
+                                )}
+                                {r.status === "success" && (
+                                  <span className="text-green-600">
+                                    {(r.latency_ms / 1000).toFixed(1)}s
+                                    {r.textLength ? ` (${r.textLength} chars)` : ""}
+                                  </span>
+                                )}
+                                {r.status === "error" && (
+                                  <span className="text-red-500" title={r.error}>
+                                    error{r.error ? `: ${r.error.slice(0, 30)}` : ""}
+                                  </span>
+                                )}
+                                {r.status === "timeout" && (
+                                  <span className="text-yellow-500">timeout</span>
+                                )}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
 
           </>
         )}
