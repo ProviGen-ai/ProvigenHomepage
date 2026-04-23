@@ -185,8 +185,12 @@ export default function Workshop() {
       setBestModel(null);
       setIsNewResult(false);
       setLatestPrompt(displayPrompt);
-      // Show placeholder cards immediately
-      setLatestResponses(PLACEHOLDER_RESPONSES);
+      // Keep current responses visible while loading — only replace per-card when new result arrives
+      setLatestResponses((prev) =>
+        prev.length > 0
+          ? prev.map((p) => ({ ...p, _pending: true } as any))
+          : PLACEHOLDER_RESPONSES
+      );
       scrollToResults();
 
       // Fetch 3-word summary in background
@@ -631,7 +635,7 @@ export default function Workshop() {
                   exchanges={modelExchanges[resp.model_id] || []}
                   latestResponse={resp}
                   isNew={isNewResult}
-                  isLoading={resp.text === null && resp.error === null}
+                  isLoading={(resp.text === null && resp.error === null) || !!(resp as any)._pending || (resp as any).status === "running"}
                   isBest={bestModel === resp.model_id}
                   chatSummary={chatSummary}
                   onVote={(vote) => handleVote(resp.model_id, vote)}

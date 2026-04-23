@@ -141,7 +141,7 @@ class TxGemmaModel:
 
         self.llm = LLM(
             model=TXGEMMA_MODEL,
-            max_model_len=8192,
+            max_model_len=16384,
             dtype="auto",
             trust_remote_code=True,
             gpu_memory_utilization=0.90,
@@ -154,12 +154,26 @@ class TxGemmaModel:
         from vllm import SamplingParams
         from transformers import AutoTokenizer
 
+        MAX_CTX = 16384
+        RESERVED_OUTPUT = 512  # minimum output tokens to keep
+
         start = time.time()
         try:
             tokenizer = AutoTokenizer.from_pretrained(TXGEMMA_MODEL)
             prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
-            params = SamplingParams(max_tokens=max_tokens, temperature=temperature)
+            # Count input tokens and cap output to fit context window
+            input_ids = tokenizer.encode(prompt)
+            input_len = len(input_ids)
+            available = MAX_CTX - input_len
+            if available < RESERVED_OUTPUT:
+                # Shouldn't happen (call_txgemma summarizes upstream), but safety fallback
+                available = RESERVED_OUTPUT
+                print(f"[TxGemma] WARNING: input {input_len} tokens exceeds budget, capping output to {available}")
+            effective_max_tokens = min(max_tokens, available)
+            print(f"[TxGemma] Input: {input_len} tokens, max_output: {effective_max_tokens}")
+
+            params = SamplingParams(max_tokens=effective_max_tokens, temperature=temperature)
             outputs = self.llm.generate([prompt], params)
             text = outputs[0].outputs[0].text
 
@@ -401,8 +415,6 @@ def biomni_predict(prompt: str, run_id: str = "") -> dict:
                         })
                 else:
                     # No solution yet — show full text of all AI messages with light cleanup
-                    # (don't use _clean_biomni_output here — it strips checklists/execute blocks
-                    # which are the entire content of intermediate messages)
                     def _light_clean(msg_text: str) -> str:
                         t = msg_text.strip()
                         # Remove Ai/Human Message headers
@@ -412,14 +424,35 @@ def biomni_predict(prompt: str, run_id: str = "") -> dict:
                         t = _re.sub(r'<observation>.*?</observation>', '', t, flags=_re.DOTALL)
                         # Remove XML tags but keep content
                         t = _re.sub(r'</?(?:solution|execute|observation|final)>', '', t)
+                        # Normalize checklist markers: [✓] → [x], [ ] stays
+                        t = _re.sub(r'\[✓\]', '[x]', t)
+                        t = _re.sub(r'\[✗\]', '[ ]', t)
+                        # Ensure each numbered checklist item starts on its own line
+                        t = _re.sub(r'(?<!\n)(\d+\.\s*\[[ x]\])', r'\n\1', t)
+                        # Ensure a blank line before the first checklist item (separate from narrative)
+                        t = _re.sub(r'([^\n])\n(\d+\.\s*\[[ x]\])', r'\1\n\n\2', t, count=1)
                         # Collapse excessive whitespace
                         t = _re.sub(r'\n{3,}', '\n\n', t)
                         return t.strip()
 
-                    full_text = "\n\n".join(
-                        _light_clean(msg) for msg in ai_msgs
-                        if _light_clean(msg)
-                    )
+                    cleaned_msgs = [_light_clean(msg) for msg in ai_msgs]
+                    cleaned_msgs = [m for m in cleaned_msgs if m]
+
+                    # Deduplicate checklist blocks: extract the last occurrence of any
+                    # numbered checklist and remove earlier duplicates
+                    if cleaned_msgs:
+                        combined = "\n\n".join(cleaned_msgs)
+                        # Find all checklist blocks (consecutive numbered lines with [ ] or [x])
+                        checklist_pattern = r'((?:^[ \t]*\d+\.\s*\[[ x]\][^\n]*\n?)+)'
+                        checklists = _re.findall(checklist_pattern, combined, _re.MULTILINE)
+                        if len(checklists) > 1:
+                            # Keep only the last (most up-to-date) checklist, remove earlier ones
+                            for cl in checklists[:-1]:
+                                combined = combined.replace(cl, '', 1)
+                            combined = _re.sub(r'\n{3,}', '\n\n', combined)
+                        full_text = combined.strip()
+                    else:
+                        full_text = ""
                     if full_text and full_text != self._last_text:
                         self._last_text = full_text
                         _write_intermediate({
@@ -634,20 +667,55 @@ def backend():
                 "meta": {},
             }
 
+    def _summarize_for_txgemma(prompt: str, max_tokens: int = 2000) -> str:
+        """Use GPT-4.1-mini to summarize a long prompt so it fits TxGemma's context."""
+        from openai import OpenAI as _OAI
+        client = _OAI(api_key=os.getenv("OPENAI_API_KEY"))
+        response = client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[
+                {"role": "system", "content": (
+                    "You are a scientific assistant. The user's prompt (which may include conversation history) "
+                    "is too long for a downstream model with limited context. Summarize it into a single, "
+                    "self-contained prompt that preserves the latest question and all essential context from "
+                    "prior exchanges. Keep scientific detail. Do not answer the question — just condense the prompt."
+                )},
+                {"role": "user", "content": prompt},
+            ],
+            max_tokens=max_tokens,
+            temperature=0,
+        )
+        summary = response.choices[0].message.content.strip()
+        print(f"[TxGemma] Summarized prompt from {len(prompt)} to {len(summary)} chars via GPT-4.1-mini")
+        return summary
+
     def call_txgemma(prompt: str) -> dict:
         """Call TxGemma via Modal internal function. Merges system prompt into user message since TxGemma doesn't support system role."""
         import time as _time
         start = _time.time()
         try:
-            raw_messages = build_messages(prompt)
-            # TxGemma doesn't support system role — use a custom prompt (skip the concise system prompt)
+            # TxGemma doesn't support system role — use a custom prompt
             txgemma_system = (
                 "You are an expert biomedical scientist. Provide a thorough, detailed, and complete answer. "
                 "Cover all relevant aspects of the question with scientific depth. "
                 "Use structured formatting with headers and bullet points. "
+                "Be specific and concrete — cite specific genes, pathways, drugs, mechanisms, trial names, "
+                "or data points rather than generic statements. Avoid vague filler conclusions like "
+                "'more research is needed' or 'the field is rapidly evolving'. "
+                "Every sentence should contain a specific fact, comparison, or actionable insight. "
                 "Do not truncate your answer. You have no tool access, no search, and no internet. "
                 "Answer solely from your training knowledge."
             )
+
+            # Check if prompt is too long for TxGemma's context and summarize if needed
+            # Estimate ~4 chars per token; leave room for 6144 output tokens
+            full_input = txgemma_system + "\n\n" + prompt
+            est_tokens = len(full_input) // 4
+            max_input_tokens = 16384 - 6144  # ~10k for input
+            if est_tokens > max_input_tokens:
+                print(f"[TxGemma] Prompt too long ({token_count} tokens > {max_input_tokens}), summarizing...")
+                prompt = _summarize_for_txgemma(prompt)
+
             messages = [{"role": "user", "content": txgemma_system + "\n\n" + prompt}]
             result = txgemma_model.chat.remote(messages, max_tokens=6144, temperature=0.3)
             return result
