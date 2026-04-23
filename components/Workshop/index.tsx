@@ -219,9 +219,32 @@ export default function Workshop() {
         if (convId) setConversationId(convId);
         setLatestRunId(run_id);
 
-        // Step 2: Call each model in parallel — each returns independently
-        const modelIds = ["gpt-5.4", "txgemma-27b-chat", "biomni"];
-        const modelPromises = modelIds.map(async (modelId) => {
+        // Helper: update a model's card when result arrives
+        const onModelResult = (r: ModelResponse) => {
+          setLatestResponses((prev) =>
+            prev.map((p) => p.model_id === r.model_id ? r : p)
+          );
+          // Only add to exchanges if we have a final result (not intermediate)
+          if ((r as any).status !== "running") {
+            setModelExchanges((prev) => {
+              const next = { ...prev };
+              const existing = next[r.model_id] || [];
+              // Avoid duplicates
+              if (!existing.some((e) => e.prompt === displayPrompt)) {
+                next[r.model_id] = [
+                  ...existing,
+                  { prompt: displayPrompt, text: r.text, latency_ms: r.latency_ms, isFollowUp: followUp },
+                ];
+              }
+              return next;
+            });
+          }
+          setIsNewResult(true);
+        };
+
+        // Step 2: Call GPT and TxGemma directly, Biomni async with polling
+        const syncModels = ["gpt-5.4", "txgemma-27b-chat"];
+        const syncPromises = syncModels.map(async (modelId) => {
           try {
             const resp = await fetch(apiUrl("/run-model"), {
               method: "POST",
@@ -238,27 +261,54 @@ export default function Workshop() {
           }
         });
 
-        // As each model finishes, update its card
-        for (const promise of modelPromises) {
-          promise.then((r: ModelResponse) => {
-            setLatestResponses((prev) =>
-              prev.map((p) => p.model_id === r.model_id ? r : p)
-            );
-            setModelExchanges((prev) => {
-              const next = { ...prev };
-              const existing = next[r.model_id] || [];
-              next[r.model_id] = [
-                ...existing,
-                { prompt: displayPrompt, text: r.text, latency_ms: r.latency_ms, isFollowUp: followUp },
-              ];
-              return next;
-            });
-            setIsNewResult(true);
-          });
+        // Fire sync model results as they arrive
+        for (const promise of syncPromises) {
+          promise.then(onModelResult);
         }
 
-        // Wait for all to finish before marking loading as done
-        await Promise.allSettled(modelPromises);
+        // Start Biomni async
+        fetch(apiUrl("/run-model"), {
+          method: "POST",
+          headers: apiHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify({ run_id, model_id: "biomni", prompt: resolvedPrompt }),
+        }).catch(() => {});
+
+        // Poll Biomni every 5 seconds until done
+        const pollBiomni = async (): Promise<void> => {
+          const POLL_INTERVAL = 5000;
+          const MAX_POLLS = 120; // 10 minutes max
+          for (let i = 0; i < MAX_POLLS; i++) {
+            await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
+            try {
+              const resp = await fetch(apiUrl("/poll-biomni"), {
+                method: "POST",
+                headers: apiHeaders({ "Content-Type": "application/json" }),
+                body: JSON.stringify({ run_id }),
+              });
+              if (!resp.ok) continue;
+              const data = await resp.json();
+              if (data.text) {
+                // Update card with intermediate or final result
+                onModelResult(data as ModelResponse);
+              }
+              if (data.status === "done") return;
+            } catch { /* retry */ }
+          }
+          // Timed out
+          onModelResult({
+            model_id: "biomni",
+            display_name: "Biomni",
+            text: null,
+            latency_ms: 0,
+            error: "Biomni timed out after 10 minutes",
+            meta: {},
+          });
+        };
+
+        const biomniPromise = pollBiomni();
+
+        // Wait for all to finish
+        await Promise.allSettled([...syncPromises, biomniPromise]);
         setIsFollowUp(true);
       } catch (e: any) {
         // Set error on any placeholder cards that haven't received a response yet
@@ -572,7 +622,7 @@ export default function Workshop() {
                   exchanges={modelExchanges[resp.model_id] || []}
                   latestResponse={resp}
                   isNew={isNewResult}
-                  isLoading={loading}
+                  isLoading={resp.text === null && resp.error === null}
                   isBest={bestModel === resp.model_id}
                   chatSummary={chatSummary}
                   onVote={(vote) => handleVote(resp.model_id, vote)}

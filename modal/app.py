@@ -63,6 +63,9 @@ class RunModelRequest(BaseModel):
     model_id: str
     prompt: str
 
+class PollBiomniRequest(BaseModel):
+    run_id: str
+
 class AdminAction(BaseModel):
     password: str
 
@@ -126,7 +129,7 @@ txgemma_image = (
 @app.cls(
     image=txgemma_image,
     gpu="A100-80GB",
-    timeout=600,
+    timeout=900,
     scaledown_window=1800,
     secrets=[modal.Secret.from_name("huggingface")],
 )
@@ -138,14 +141,14 @@ class TxGemmaModel:
 
         self.llm = LLM(
             model=TXGEMMA_MODEL,
-            max_model_len=4096,
+            max_model_len=8192,
             dtype="auto",
             trust_remote_code=True,
             gpu_memory_utilization=0.90,
         )
 
     @modal.method()
-    def chat(self, messages: list[dict], max_tokens: int = 2048, temperature: float = 0.3) -> dict:
+    def chat(self, messages: list[dict], max_tokens: int = 6144, temperature: float = 0.3) -> dict:
         """Run chat completion and return a plain dict."""
         import time
         from vllm import SamplingParams
@@ -199,6 +202,7 @@ biomni_image = (
         "tqdm",
         "biopython",
         "PyPDF2",
+        "beautifulsoup4",
     )
     .env({"PYTHONPATH": "/root"})
     .run_commands(
@@ -208,52 +212,272 @@ biomni_image = (
 )
 
 
+biomni_volume = modal.Volume.from_name("biomni-data", create_if_missing=True)
+BIOMNI_DATA_PATH = "/opt/biomni_runtime"
+
 @app.function(
     image=biomni_image,
     secrets=[modal.Secret.from_name("workshop-secrets")],
-    timeout=300,
+    volumes={BIOMNI_DATA_PATH: biomni_volume},
+    timeout=600,
     scaledown_window=1800,
 )
-def biomni_predict(prompt: str) -> dict:
+def biomni_predict(prompt: str, run_id: str = "") -> dict:
     """Run Biomni agent — uses OpenAI API via langchain, no local GPU needed."""
     import os
+    import sys
     import time
+    import types
+
+    # Patch anthropic dependencies to use OpenAI instead (we don't have an Anthropic key)
+    if "anthropic" not in sys.modules:
+        from openai import OpenAI as _OpenAI
+
+        class _FakeAnthropicMessage:
+            def __init__(self, text):
+                self.content = [types.SimpleNamespace(text=text)]
+
+        class _FakeAnthropic:
+            """Routes Anthropic API calls to OpenAI GPT-4.1-mini instead."""
+            def __init__(self, api_key=None, **kwargs):
+                self._client = _OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+            class messages:
+                pass
+
+            def __getattr__(self, name):
+                if name == "messages":
+                    return self
+                raise AttributeError(name)
+
+            def create(self, model=None, system=None, max_tokens=1000, messages=None, **kwargs):
+                print(f"[Biomni] Rerouting Anthropic call to GPT-4.1-mini")
+                oai_messages = []
+                if system:
+                    oai_messages.append({"role": "system", "content": system})
+                if messages:
+                    oai_messages.extend(messages)
+                resp = self._client.chat.completions.create(
+                    model="gpt-4.1-mini",
+                    messages=oai_messages,
+                    max_tokens=max_tokens,
+                )
+                return _FakeAnthropicMessage(resp.choices[0].message.content)
+
+        mock_anthropic = types.ModuleType("anthropic")
+        mock_anthropic.Anthropic = _FakeAnthropic
+        sys.modules["anthropic"] = mock_anthropic
+
+    if "langchain_anthropic" not in sys.modules:
+        from langchain_openai import ChatOpenAI as _ChatOpenAI
+
+        class _FakeChatAnthropic(_ChatOpenAI):
+            """Routes langchain ChatAnthropic to ChatOpenAI with GPT-4.1-mini."""
+            def __init__(self, *args, **kwargs):
+                print(f"[Biomni] Rerouting ChatAnthropic to GPT-4.1-mini")
+                kwargs.pop("model", None)
+                kwargs.pop("max_tokens", None)
+                super().__init__(model="gpt-4.1-mini", *args, **kwargs)
+
+        mock_lc_anthropic = types.ModuleType("langchain_anthropic")
+        mock_lc_anthropic.ChatAnthropic = _FakeChatAnthropic
+        sys.modules["langchain_anthropic"] = mock_lc_anthropic
+
+    def _clean_biomni_output(raw) -> str:
+        """Extract clean text from Biomni's raw agent output."""
+        import re
+
+        # Handle tuple/list results — take the last element (usually the final solution)
+        if isinstance(raw, (list, tuple)):
+            raw = raw[-1] if raw else ""
+        text = str(raw)
+
+        # Unescape literal \n if present (repr-style strings)
+        if "\\n" in text and "\n" not in text:
+            text = text.replace("\\n", "\n")
+
+        # Extract content from last <solution> block if present
+        solution_matches = re.findall(r'<solution>(.*?)</solution>', text, re.DOTALL)
+        if solution_matches:
+            text = solution_matches[-1].strip()
+
+        # Remove "Thinking and reasoning:" preamble (everything before first real content)
+        text = re.sub(r'^Thinking and reasoning:.*?\n\n', '', text, flags=re.DOTALL)
+
+        # Remove "A proposed answer:" line
+        text = re.sub(r'^A proposed answer:\s*\n?', '', text, flags=re.MULTILINE)
+
+        # Remove all checklist blocks: "1. [✓] ..." or "1. [ ] ..."
+        text = re.sub(r'(?:^|\n)\d+\.\s*\[[ ✓✗xX.]*\].*(?:\n|$)', '\n', text)
+
+        # Remove "Updated plan:" headers
+        text = re.sub(r'Updated plan:\s*\n?', '', text)
+
+        # Remove Human/Ai Message headers
+        text = re.sub(r'={5,}\s*(Human|Ai)\s*Message\s*={5,}', '', text)
+
+        # Remove <execute>...</execute> blocks
+        text = re.sub(r'<execute>.*?</execute>', '', text, flags=re.DOTALL)
+        # Remove <observation>...</observation> blocks
+        text = re.sub(r'<observation>.*?</observation>', '', text, flags=re.DOTALL)
+        # Remove remaining <solution> or </solution> tags
+        text = re.sub(r'</?solution>', '', text)
+
+        # Clean up excessive whitespace
+        text = re.sub(r'\n{3,}', '\n\n', text)
+        # Remove leading/trailing whitespace on each line
+        text = '\n'.join(line.rstrip() for line in text.split('\n'))
+
+        return text.strip()
+
+    # Copy baked-in data to volume if not already there (first run only)
+    biomni_marker = os.path.join(BIOMNI_DATA_PATH, "biomni_data", "data_lake", "omim.parquet")
+    if not os.path.exists(biomni_marker):
+        import shutil
+        src = "/opt/biomni/biomni_data"
+        dst = os.path.join(BIOMNI_DATA_PATH, "biomni_data")
+        if os.path.isdir(src):
+            print("[Biomni] Copying baked-in data to volume...")
+            shutil.copytree(src, dst, dirs_exist_ok=True)
+            biomni_volume.commit()
+            print("[Biomni] Data copied to volume.")
+
+    import re as _re
+    import io
+    import threading
+
+    # Storage for intermediate results (written by stdout monitor, read by poll endpoint)
+    _intermediate_file = os.path.join(BIOMNI_DATA_PATH, f".biomni_intermediate_{run_id}.json")
+    _final_file = os.path.join(BIOMNI_DATA_PATH, f".biomni_final_{run_id}.json")
+
+    def _write_intermediate(data: dict):
+        """Write intermediate result to volume for polling."""
+        import json as _j
+        try:
+            with open(_intermediate_file, "w") as f:
+                _j.dump(data, f)
+            biomni_volume.commit()
+        except Exception:
+            pass
+
+    class _SolutionCapture(io.TextIOBase):
+        """Captures stdout and extracts <solution> blocks as intermediate results."""
+        def __init__(self, original_stdout):
+            self._original = original_stdout
+            self._buffer = ""
+            self._solutions_found = 0
+            self._start = time.time()
+
+        def write(self, text):
+            self._original.write(text)
+            self._buffer += text
+            # Check for new <solution> blocks
+            solutions = _re.findall(r'<solution>(.*?)</solution>', self._buffer, _re.DOTALL)
+            if len(solutions) > self._solutions_found:
+                self._solutions_found = len(solutions)
+                latest = _clean_biomni_output(solutions[-1])
+                if latest and run_id:
+                    latency_ms = int((time.time() - self._start) * 1000)
+                    _write_intermediate({
+                        "model_id": "biomni",
+                        "display_name": "Biomni",
+                        "text": latest,
+                        "latency_ms": latency_ms,
+                        "error": None,
+                        "status": "running",
+                        "meta": {},
+                    })
+            return len(text)
+
+        def flush(self):
+            self._original.flush()
 
     start = time.time()
+    # Write initial "running" status
+    if run_id:
+        _write_intermediate({
+            "model_id": "biomni",
+            "display_name": "Biomni",
+            "text": None,
+            "latency_ms": 0,
+            "error": None,
+            "status": "running",
+            "meta": {},
+        })
+
     try:
         from biomni.agent import A1
 
+        # Capture stdout to extract intermediate solutions
+        capture = _SolutionCapture(sys.stdout)
+        sys.stdout = capture
+
         agent = A1(
-            path="/opt/biomni",
+            path=BIOMNI_DATA_PATH,
             llm="gpt-5.4",
         )
-        result = agent.go(prompt)
+        # Persist any files downloaded during init to volume
+        biomni_volume.commit()
+        print("[Biomni] Agent initialized, data committed to volume.")
+
+        augmented_prompt = prompt + "\n\nPlease provide a concise, well-structured answer. Avoid excessive detail."
+        result = agent.go(augmented_prompt)
+
+        sys.stdout = capture._original
         latency_ms = int((time.time() - start) * 1000)
+        biomni_volume.commit()
 
-        # Extract text from result (may be string or dict)
+        # Extract and clean the text
         if isinstance(result, dict):
-            text = result.get("answer", result.get("output", str(result)))
+            raw = result.get("answer", result.get("output", str(result)))
         else:
-            text = str(result)
+            raw = str(result)
+        text = _clean_biomni_output(raw)
 
-        return {
+        final = {
             "model_id": "biomni",
             "display_name": "Biomni",
             "text": text,
             "latency_ms": latency_ms,
             "error": None,
+            "status": "done",
             "meta": {},
         }
+        # Write final result for polling
+        if run_id:
+            import json as _j
+            with open(_final_file, "w") as f:
+                _j.dump(final, f)
+            # Clean up intermediate file
+            try:
+                os.remove(_intermediate_file)
+            except OSError:
+                pass
+            biomni_volume.commit()
+
+        return final
     except Exception as e:
+        sys.stdout = sys.__stdout__
         latency_ms = int((time.time() - start) * 1000)
-        return {
+        final = {
             "model_id": "biomni",
             "display_name": "Biomni",
             "text": None,
             "latency_ms": latency_ms,
             "error": str(e),
+            "status": "done",
             "meta": {},
         }
+        if run_id:
+            import json as _j
+            with open(_final_file, "w") as f:
+                _j.dump(final, f)
+            try:
+                os.remove(_intermediate_file)
+            except OSError:
+                pass
+            biomni_volume.commit()
+        return final
 
 
 # ---------------------------------------------------------------------------
@@ -262,7 +486,7 @@ def biomni_predict(prompt: str) -> dict:
 
 @app.function(
     image=backend_image,
-    volumes={DB_MOUNT_PATH: db_volume},
+    volumes={DB_MOUNT_PATH: db_volume, BIOMNI_DATA_PATH: biomni_volume},
     secrets=[modal.Secret.from_name("workshop-secrets")],
     timeout=300,
     scaledown_window=1800,
@@ -381,16 +605,16 @@ def backend():
         start = _time.time()
         try:
             raw_messages = build_messages(prompt)
-            # TxGemma doesn't support system role — merge into user message
-            system_text = ""
-            user_text = ""
-            for m in raw_messages:
-                if m["role"] == "system":
-                    system_text += m["content"] + "\n\n"
-                else:
-                    user_text += m["content"]
-            messages = [{"role": "user", "content": system_text + user_text}]
-            result = txgemma_model.chat.remote(messages, max_tokens=2048, temperature=0.3)
+            # TxGemma doesn't support system role — use a custom prompt (skip the concise system prompt)
+            txgemma_system = (
+                "You are an expert biomedical scientist. Provide a thorough, detailed, and complete answer. "
+                "Cover all relevant aspects of the question with scientific depth. "
+                "Use structured formatting with headers and bullet points. "
+                "Do not truncate your answer. You have no tool access, no search, and no internet. "
+                "Answer solely from your training knowledge."
+            )
+            messages = [{"role": "user", "content": txgemma_system + "\n\n" + prompt}]
+            result = txgemma_model.chat.remote(messages, max_tokens=6144, temperature=0.3)
             return result
         except Exception as e:
             latency_ms = int((_time.time() - start) * 1000)
@@ -403,29 +627,14 @@ def backend():
                 "meta": {},
             }
 
-    def call_biomni(prompt: str) -> dict:
-        """Call Biomni via Modal internal function."""
+    def call_biomni_async(prompt: str, run_id: str) -> None:
+        """Fire-and-forget Biomni via Modal spawn. Results written to volume for polling."""
         if not BIOMNI_ENABLED:
-            return {
-                "model_id": "biomni",
-                "display_name": "Biomni",
-                "text": None,
-                "latency_ms": 0,
-                "error": "Biomni is disabled",
-                "meta": {},
-            }
+            return
         try:
-            result = biomni_predict.remote(prompt)
-            return result
+            biomni_predict.spawn(prompt, run_id=run_id)
         except Exception as e:
-            return {
-                "model_id": "biomni",
-                "display_name": "Biomni",
-                "text": None,
-                "latency_ms": 0,
-                "error": str(e),
-                "meta": {},
-            }
+            print(f"[Biomni] Failed to spawn: {e}")
 
     # --- Routes ---
 
@@ -481,11 +690,33 @@ def backend():
 
     @web_app.post("/api/run-model")
     def run_model(req: RunModelRequest):
-        """Run a single model and return its result."""
+        """Run a single model and return its result. Biomni runs async (use /api/poll-biomni)."""
+        # Biomni is handled async — spawn and return immediately
+        if req.model_id == "biomni":
+            if not BIOMNI_ENABLED:
+                return {
+                    "model_id": "biomni",
+                    "display_name": "Biomni",
+                    "text": None,
+                    "latency_ms": 0,
+                    "error": "Biomni is disabled",
+                    "status": "done",
+                    "meta": {},
+                }
+            call_biomni_async(req.prompt, req.run_id)
+            return {
+                "model_id": "biomni",
+                "display_name": "Biomni",
+                "text": None,
+                "latency_ms": 0,
+                "error": None,
+                "status": "running",
+                "meta": {},
+            }
+
         model_fns = {
             "gpt-5.4": call_gpt,
             "txgemma-27b-chat": call_txgemma,
-            "biomni": call_biomni,
         }
         fn = model_fns.get(req.model_id)
         if not fn:
@@ -514,6 +745,54 @@ def backend():
         )
         db_volume.commit()
         return result
+
+    @web_app.post("/api/poll-biomni")
+    def poll_biomni(req: PollBiomniRequest):
+        """Poll for Biomni intermediate or final results."""
+        import json as _j
+
+        biomni_volume.reload()
+
+        # Check for final result first
+        final_file = os.path.join(BIOMNI_DATA_PATH, f".biomni_final_{req.run_id}.json")
+        if os.path.exists(final_file):
+            with open(final_file) as f:
+                result = _j.load(f)
+            # Store final result in DB
+            store_response(
+                run_id=req.run_id,
+                model_id=result["model_id"],
+                display_name=result["display_name"],
+                text=result.get("text"),
+                latency_ms=result.get("latency_ms"),
+                error=result.get("error"),
+                meta=result.get("meta"),
+            )
+            db_volume.commit()
+            # Clean up files
+            try:
+                os.remove(final_file)
+                biomni_volume.commit()
+            except OSError:
+                pass
+            return result
+
+        # Check for intermediate result
+        intermediate_file = os.path.join(BIOMNI_DATA_PATH, f".biomni_intermediate_{req.run_id}.json")
+        if os.path.exists(intermediate_file):
+            with open(intermediate_file) as f:
+                return _j.load(f)
+
+        # No result yet
+        return {
+            "model_id": "biomni",
+            "display_name": "Biomni",
+            "text": None,
+            "latency_ms": 0,
+            "error": None,
+            "status": "running",
+            "meta": {},
+        }
 
     @web_app.post("/api/vote")
     def vote(req: VoteRequest):

@@ -9,19 +9,24 @@
 /* Workshop markdown prose styling */
 .prose-workshop p { margin-bottom: 0.5em; }
 .prose-workshop p:last-child { margin-bottom: 0; }
-.prose-workshop strong { font-weight: 600; }
-.prose-workshop ul { padding-left: 1.25em; margin-bottom: 0.5em; list-style-type: disc; }
-.prose-workshop ol { padding-left: 1.25em; margin-bottom: 0.5em; list-style-type: decimal; }
+.prose-workshop strong { font-weight: 700; color: inherit; }
+.prose-workshop ul { padding-left: 1.5em; margin-bottom: 0.5em; list-style-type: disc; }
+.prose-workshop ul ul { list-style-type: circle; }
+.prose-workshop ul ul ul { list-style-type: square; }
+.prose-workshop ol { padding-left: 1.5em; margin-bottom: 0.5em; list-style-type: decimal; }
+.prose-workshop ol ol { list-style-type: lower-alpha; }
 .prose-workshop li { margin-bottom: 0.15em; }
+.prose-workshop li > p { margin-bottom: 0.25em; }
 .prose-workshop h1, .prose-workshop h2, .prose-workshop h3,
 .prose-workshop h4, .prose-workshop h5, .prose-workshop h6 {
   font-weight: 700;
   margin-top: 0.75em;
   margin-bottom: 0.25em;
 }
-.prose-workshop h1 { font-size: 1.1em; }
-.prose-workshop h2 { font-size: 1.05em; }
-.prose-workshop h3 { font-size: 1em; }
+.prose-workshop h1 { font-size: 1.15em; }
+.prose-workshop h2 { font-size: 1.1em; }
+.prose-workshop h3 { font-size: 1.05em; }
+.prose-workshop h4 { font-size: 1em; }
 .prose-workshop code {
   font-size: 0.85em;
   background: rgba(0,0,0,0.05);

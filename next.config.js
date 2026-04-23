@@ -5,7 +5,7 @@ const nextConfig = {
     keepAlive: true,
   },
   experimental: {
-    proxyTimeout: 300000, // 5 minutes for long-running model calls
+    proxyTimeout: 900000, // 15 minutes for long-running model calls (TxGemma cold start)
   },
   async rewrites() {
     return [
