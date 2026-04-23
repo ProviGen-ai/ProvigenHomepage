@@ -106,6 +106,7 @@ export default function Workshop() {
   const [loading, setLoading] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [bestModel, setBestModel] = useState<string | null>(null);
+  const [sessionLoaded, setSessionLoaded] = useState(false);
   const [isFollowUp, setIsFollowUp] = useState(false);
   const [chatSummary, setChatSummary] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -384,6 +385,8 @@ export default function Workshop() {
       setLatestRunId(lastRunId);
       setLatestPrompt(lastPrompt);
       setIsNewResult(false);
+      // Enable follow-up mode if there's history to build on
+      if (Object.keys(exchanges).length > 0) setIsFollowUp(true);
       return true;
     } catch {
       return false;
@@ -501,17 +504,33 @@ export default function Workshop() {
         <div className="flex items-center justify-between px-3 pb-3">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => {
+              onClick={async () => {
                 const id = window.prompt("Enter session ID to load:");
-                if (id) loadConversation(id.trim());
+                if (id) {
+                  const ok = await loadConversation(id.trim());
+                  if (ok) {
+                    setSessionLoaded(true);
+                    setTimeout(() => setSessionLoaded(false), 10000);
+                  }
+                }
               }}
-              className="flex items-center gap-1.5 rounded-lg py-1.5 px-2.5 text-xs text-gray-400 hover:text-body-color hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+              className={`flex items-center gap-1.5 rounded-lg py-1.5 px-2.5 text-xs transition-all ${
+                sessionLoaded
+                  ? "text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400"
+                  : "text-gray-400 hover:text-body-color hover:bg-gray-50 dark:hover:bg-gray-700"
+              }`}
               title="Load a previous session"
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Load session</span>
+              {sessionLoaded ? (
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
+              <span>{sessionLoaded ? "Session loaded!" : "Load session"}</span>
             </button>
 
             {/* Follow-up toggle — only show when there are results */}

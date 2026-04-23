@@ -70,6 +70,29 @@ class AdminAction(BaseModel):
     password: str
 
 # ---------------------------------------------------------------------------
+# Shared text formatting
+# ---------------------------------------------------------------------------
+
+def _format_markdown_headers(text: str) -> str:
+    """Bold standalone header-like lines that aren't already bolded."""
+    import re
+    # Skip lines already wrapped in **...**
+    # Bold numbered section titles: "1. Study design and preprocessing"
+    text = re.sub(
+        r'^(?!\*\*)(\d+\.\s+[A-Z][^\n]{5,80})$',
+        r'**\1**',
+        text, flags=re.MULTILINE
+    )
+    # Bold title-case lines ending with colon: "Key biological signals:"
+    # Use [ \t] instead of \s to avoid matching across newlines
+    text = re.sub(
+        r'^(?!\*\*)([A-Z][A-Za-z \t,/\-()]{5,80}:)[ \t]*$',
+        r'**\1**',
+        text, flags=re.MULTILINE
+    )
+    return text
+
+# ---------------------------------------------------------------------------
 # Modal App & Volume
 # ---------------------------------------------------------------------------
 
@@ -175,7 +198,7 @@ class TxGemmaModel:
 
             params = SamplingParams(max_tokens=effective_max_tokens, temperature=temperature)
             outputs = self.llm.generate([prompt], params)
-            text = outputs[0].outputs[0].text
+            text = _format_markdown_headers(outputs[0].outputs[0].text)
 
             latency_ms = int((time.time() - start) * 1000)
             print(f"[TxGemma] {latency_ms}ms | {len(text)} chars\n{text}")
@@ -341,6 +364,11 @@ def biomni_predict(prompt: str, run_id: str = "") -> dict:
         # Remove remaining XML-style tags
         text = re.sub(r'</?(?:solution|execute|observation|final)>', '', text)
 
+        # Convert bullet characters to markdown dashes
+        text = re.sub(r'^[ \t]*[•◦▪][ \t]*', '- ', text, flags=re.MULTILINE)
+
+        text = _format_markdown_headers(text)
+
         # Clean up excessive whitespace
         text = re.sub(r'\n{3,}', '\n\n', text)
         # Remove leading/trailing whitespace on each line
@@ -438,8 +466,7 @@ def biomni_predict(prompt: str, run_id: str = "") -> dict:
                     cleaned_msgs = [_light_clean(msg) for msg in ai_msgs]
                     cleaned_msgs = [m for m in cleaned_msgs if m]
 
-                    # Deduplicate checklist blocks: extract the last occurrence of any
-                    # numbered checklist and remove earlier duplicates
+                    # Deduplicate checklist blocks and renumber from 1
                     if cleaned_msgs:
                         combined = "\n\n".join(cleaned_msgs)
                         # Find all checklist blocks (consecutive numbered lines with [ ] or [x])
@@ -450,6 +477,12 @@ def biomni_predict(prompt: str, run_id: str = "") -> dict:
                             for cl in checklists[:-1]:
                                 combined = combined.replace(cl, '', 1)
                             combined = _re.sub(r'\n{3,}', '\n\n', combined)
+                        # Renumber checklist items starting from 1
+                        counter = [0]
+                        def _renumber(m):
+                            counter[0] += 1
+                            return f"{counter[0]}. [{m.group(1)}]"
+                        combined = _re.sub(r'\d+\.\s*\[([ x])\]', _renumber, combined)
                         full_text = combined.strip()
                     else:
                         full_text = ""
@@ -651,7 +684,7 @@ def backend():
             return {
                 "model_id": "gpt-5.4",
                 "display_name": "GPT-5.4",
-                "text": response.choices[0].message.content,
+                "text": _format_markdown_headers(response.choices[0].message.content or ""),
                 "latency_ms": latency_ms,
                 "error": None,
                 "meta": {},
