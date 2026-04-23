@@ -237,40 +237,18 @@ class TxGemmaModel:
                 import threading
                 def _background_recompile():
                     try:
-                        import torch, subprocess
-                        print("[TxGemma] Background: compiling in subprocess to populate cache...")
-                        result = subprocess.run(
-                            ["python", "-c", f"""
-import os
-os.environ.setdefault("VLLM_USAGE_SOURCE", "production")
-from vllm import LLM
-llm = LLM(
-    model="{TXGEMMA_MODEL}",
-    max_model_len=8192,
-    dtype="auto",
-    trust_remote_code=True,
-    gpu_memory_utilization=0.45,
-)
-print("[TxGemma] Subprocess: compile complete, cache generated")
-"""],
-                            capture_output=True, text=True, timeout=300,
-                        )
-                        print(f"[TxGemma] Subprocess stdout: {result.stdout[-500:]}")
-                        if result.returncode != 0:
-                            print(f"[TxGemma] Subprocess stderr: {result.stderr[-500:]}")
-                            return
-
-                        compile_cache_volume.commit()
-                        print("[TxGemma] Cache saved. Swapping to compiled model...")
+                        import torch
+                        import time as _t
 
                         # Reject new requests during swap — Modal routes them elsewhere
                         self._swapping = True
-                        import time as _t
                         _t.sleep(2)  # brief pause to let in-flight requests finish
 
-                        # Swap: delete eager model, load compiled from cache
+                        print("[TxGemma] Swapping: deleting eager model...")
                         del self.llm
                         torch.cuda.empty_cache()
+
+                        print("[TxGemma] Swapping: loading compiled model (generates cache)...")
                         from vllm import LLM as _LLM
                         self.llm = _LLM(
                             model=TXGEMMA_MODEL,
@@ -279,11 +257,12 @@ print("[TxGemma] Subprocess: compile complete, cache generated")
                             trust_remote_code=True,
                             gpu_memory_utilization=0.90,
                         )
+                        compile_cache_volume.commit()
                         self._swapping = False
-                        print("[TxGemma] Swap complete — now serving compiled model")
+                        print("[TxGemma] Swap complete — serving compiled model, cache saved to volume")
                     except Exception as ex:
                         self._swapping = False
-                        print(f"[TxGemma] Background recompile failed: {ex}")
+                        print(f"[TxGemma] Swap failed: {ex}")
                 threading.Thread(target=_background_recompile, daemon=True).start()
 
             return {
