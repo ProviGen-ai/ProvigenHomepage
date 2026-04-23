@@ -156,7 +156,7 @@ txgemma_image = (
     scaledown_window=1800,
     secrets=[modal.Secret.from_name("huggingface")],
 )
-@modal.concurrent(max_inputs=100)
+@modal.concurrent(max_inputs=4)
 class TxGemmaModel:
     @modal.enter()
     def setup(self):
