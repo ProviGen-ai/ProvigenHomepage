@@ -249,21 +249,45 @@ export default function Workshop() {
 
         // Step 2: Call GPT and TxGemma directly, Biomni async with polling
         const syncModels = ["gpt-5.4", "txgemma-27b-chat"];
+        const MAX_RETRIES = 3;
+        const RETRY_DELAY = 15000; // 15 seconds between retries
         const syncPromises = syncModels.map(async (modelId) => {
-          try {
-            const resp = await fetch(apiUrl("/run-model"), {
-              method: "POST",
-              headers: apiHeaders({ "Content-Type": "application/json" }),
-              body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
-            });
-            if (!resp.ok) {
-              const errText = await resp.text().catch(() => resp.statusText);
-              return { model_id: modelId, display_name: modelId, text: null, latency_ms: 0, error: `Error ${resp.status}: ${errText}`, meta: {} } as ModelResponse;
+          for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+            try {
+              const resp = await fetch(apiUrl("/run-model"), {
+                method: "POST",
+                headers: apiHeaders({ "Content-Type": "application/json" }),
+                body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
+              });
+              if (resp.status === 502 && attempt < MAX_RETRIES) {
+                // Container cold-starting — show warming message and retry
+                const displayName = modelId === "txgemma-27b-chat" ? "TxGemma-27B-Chat" : modelId;
+                onModelResult({
+                  model_id: modelId,
+                  display_name: displayName,
+                  text: `*${displayName} is warming up after standby, retrying... (attempt ${attempt + 2}/${MAX_RETRIES + 1})*`,
+                  latency_ms: 0,
+                  error: null,
+                  meta: {},
+                  status: "running",
+                } as any);
+                await new Promise((r) => setTimeout(r, RETRY_DELAY));
+                continue;
+              }
+              if (!resp.ok) {
+                const errText = await resp.text().catch(() => resp.statusText);
+                return { model_id: modelId, display_name: modelId, text: null, latency_ms: 0, error: `Error ${resp.status}: ${errText}`, meta: {} } as ModelResponse;
+              }
+              return await resp.json() as ModelResponse;
+            } catch (e: any) {
+              if (attempt < MAX_RETRIES) {
+                await new Promise((r) => setTimeout(r, RETRY_DELAY));
+                continue;
+              }
+              return { model_id: modelId, display_name: modelId, text: null, latency_ms: 0, error: e.message, meta: {} } as ModelResponse;
             }
-            return await resp.json() as ModelResponse;
-          } catch (e: any) {
-            return { model_id: modelId, display_name: modelId, text: null, latency_ms: 0, error: e.message, meta: {} } as ModelResponse;
           }
+          return { model_id: modelId, display_name: modelId, text: null, latency_ms: 0, error: "Failed after retries", meta: {} } as ModelResponse;
         });
 
         // Fire sync model results as they arrive
