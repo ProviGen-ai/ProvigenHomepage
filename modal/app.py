@@ -301,17 +301,21 @@ def biomni_predict(prompt: str, run_id: str = "") -> dict:
         if solution_matches:
             text = solution_matches[-1].strip()
 
-        # Remove "Thinking and reasoning:" preamble (everything before first real content)
-        text = re.sub(r'^Thinking and reasoning:.*?\n\n', '', text, flags=re.DOTALL)
+        # Remove reasoning preamble
+        text = re.sub(r'^(?:Thinking and reasoning|Reasoning):.*?\n\n', '', text, flags=re.DOTALL)
 
         # Remove "A proposed answer:" line
         text = re.sub(r'^A proposed answer:\s*\n?', '', text, flags=re.MULTILINE)
 
-        # Remove all checklist blocks: "1. [✓] ..." or "1. [ ] ..."
-        text = re.sub(r'(?:^|\n)\d+\.\s*\[[ ✓✗xX.]*\].*(?:\n|$)', '\n', text)
+        # Remove all checklist lines — numbered or unnumbered, any bracket content
+        # Matches: "1. [ ] task", "1. [✓] task (completed)", "[ ] task", etc.
+        text = re.sub(r'^[ \t]*\d*\.?\s*\[[ ✓✗xX.]*\][^\n]*(?:\(completed\))?[ \t]*$', '', text, flags=re.MULTILINE)
 
         # Remove "Updated plan:" headers
-        text = re.sub(r'Updated plan:\s*\n?', '', text)
+        text = re.sub(r'^Updated plan:\s*$', '', text, flags=re.MULTILINE)
+
+        # Remove "Proceeding with step..." lines
+        text = re.sub(r'^Proceeding with (?:step|Step).*$', '', text, flags=re.MULTILINE)
 
         # Remove Human/Ai Message headers
         text = re.sub(r'={5,}\s*(Human|Ai)\s*Message\s*={5,}', '', text)
@@ -320,8 +324,8 @@ def biomni_predict(prompt: str, run_id: str = "") -> dict:
         text = re.sub(r'<execute>.*?</execute>', '', text, flags=re.DOTALL)
         # Remove <observation>...</observation> blocks
         text = re.sub(r'<observation>.*?</observation>', '', text, flags=re.DOTALL)
-        # Remove remaining <solution> or </solution> tags
-        text = re.sub(r'</?solution>', '', text)
+        # Remove remaining XML-style tags
+        text = re.sub(r'</?(?:solution|execute|observation|final)>', '', text)
 
         # Clean up excessive whitespace
         text = re.sub(r'\n{3,}', '\n\n', text)
@@ -344,49 +348,89 @@ def biomni_predict(prompt: str, run_id: str = "") -> dict:
 
     import re as _re
     import io
-    import threading
+    import json as _json_mod
 
-    # Storage for intermediate results (written by stdout monitor, read by poll endpoint)
-    _intermediate_file = os.path.join(BIOMNI_DATA_PATH, f".biomni_intermediate_{run_id}.json")
-    _final_file = os.path.join(BIOMNI_DATA_PATH, f".biomni_final_{run_id}.json")
+    # Use a Modal Dict for cross-container communication (shared key-value store)
+    biomni_dict = modal.Dict.from_name("biomni-status", create_if_missing=True)
 
     def _write_intermediate(data: dict):
-        """Write intermediate result to volume for polling."""
-        import json as _j
+        """Write intermediate result to shared dict for polling."""
         try:
-            with open(_intermediate_file, "w") as f:
-                _j.dump(data, f)
-            biomni_volume.commit()
-        except Exception:
-            pass
+            biomni_dict[run_id] = _json_mod.dumps(data)
+        except Exception as ex:
+            print(f"[Biomni] Failed to write intermediate: {ex}")
 
     class _SolutionCapture(io.TextIOBase):
-        """Captures stdout and extracts <solution> blocks as intermediate results."""
+        """Captures stdout and extracts intermediate progress from Biomni's multi-step agent."""
         def __init__(self, original_stdout):
             self._original = original_stdout
             self._buffer = ""
-            self._solutions_found = 0
+            self._ai_messages_seen = 0
+            self._last_text = ""
             self._start = time.time()
 
         def write(self, text):
             self._original.write(text)
             self._buffer += text
-            # Check for new <solution> blocks
-            solutions = _re.findall(r'<solution>(.*?)</solution>', self._buffer, _re.DOTALL)
-            if len(solutions) > self._solutions_found:
-                self._solutions_found = len(solutions)
-                latest = _clean_biomni_output(solutions[-1])
-                if latest and run_id:
-                    latency_ms = int((time.time() - self._start) * 1000)
-                    _write_intermediate({
-                        "model_id": "biomni",
-                        "display_name": "Biomni",
-                        "text": latest,
-                        "latency_ms": latency_ms,
-                        "error": None,
-                        "status": "running",
-                        "meta": {},
-                    })
+
+            if not run_id:
+                return len(text)
+
+            # Count Ai Message blocks as progress steps
+            ai_msgs = _re.findall(r'={10,}\s*Ai\s*Message\s*={10,}(.*?)(?=={10,}\s*(?:Human|Ai)\s*Message|<execute>|$)', self._buffer, _re.DOTALL)
+            if len(ai_msgs) > self._ai_messages_seen:
+                self._ai_messages_seen = len(ai_msgs)
+
+                # Check for <solution> blocks first
+                solutions = _re.findall(r'<solution>(.*?)</solution>', self._buffer, _re.DOTALL)
+
+                latency_ms = int((time.time() - self._start) * 1000)
+
+                if solutions:
+                    # Got a solution — show cleaned content
+                    cleaned = _clean_biomni_output(solutions[-1])
+                    if cleaned:
+                        _write_intermediate({
+                            "model_id": "biomni",
+                            "display_name": "Biomni",
+                            "text": cleaned,
+                            "latency_ms": latency_ms,
+                            "error": None,
+                            "status": "running",
+                            "meta": {"step": self._ai_messages_seen},
+                        })
+                else:
+                    # No solution yet — show full text of all AI messages with light cleanup
+                    # (don't use _clean_biomni_output here — it strips checklists/execute blocks
+                    # which are the entire content of intermediate messages)
+                    def _light_clean(msg_text: str) -> str:
+                        t = msg_text.strip()
+                        # Remove Ai/Human Message headers
+                        t = _re.sub(r'={5,}\s*(Human|Ai)\s*Message\s*={5,}', '', t)
+                        # Remove <execute>...</execute> and <observation>...</observation> blocks
+                        t = _re.sub(r'<execute>.*?</execute>', '', t, flags=_re.DOTALL)
+                        t = _re.sub(r'<observation>.*?</observation>', '', t, flags=_re.DOTALL)
+                        # Remove XML tags but keep content
+                        t = _re.sub(r'</?(?:solution|execute|observation|final)>', '', t)
+                        # Collapse excessive whitespace
+                        t = _re.sub(r'\n{3,}', '\n\n', t)
+                        return t.strip()
+
+                    full_text = "\n\n".join(
+                        _light_clean(msg) for msg in ai_msgs
+                        if _light_clean(msg)
+                    )
+                    if full_text and full_text != self._last_text:
+                        self._last_text = full_text
+                        _write_intermediate({
+                            "model_id": "biomni",
+                            "display_name": "Biomni",
+                            "text": f"*Biomni is working (step {self._ai_messages_seen})...*\n\n{full_text}",
+                            "latency_ms": latency_ms,
+                            "error": None,
+                            "status": "running",
+                            "meta": {"step": self._ai_messages_seen},
+                        })
             return len(text)
 
         def flush(self):
@@ -433,6 +477,10 @@ def biomni_predict(prompt: str, run_id: str = "") -> dict:
         else:
             raw = str(result)
         text = _clean_biomni_output(raw)
+        if not text:
+            # Fallback: if parser returned empty, use raw (truncated)
+            text = str(raw)[:8000]
+            print(f"[Biomni] Parser returned empty, using raw text ({len(text)} chars)")
 
         final = {
             "model_id": "biomni",
@@ -445,15 +493,8 @@ def biomni_predict(prompt: str, run_id: str = "") -> dict:
         }
         # Write final result for polling
         if run_id:
-            import json as _j
-            with open(_final_file, "w") as f:
-                _j.dump(final, f)
-            # Clean up intermediate file
-            try:
-                os.remove(_intermediate_file)
-            except OSError:
-                pass
-            biomni_volume.commit()
+            _write_intermediate(final)
+            print(f"[Biomni] Final result written to dict: {len(text)} chars")
 
         return final
     except Exception as e:
@@ -469,14 +510,8 @@ def biomni_predict(prompt: str, run_id: str = "") -> dict:
             "meta": {},
         }
         if run_id:
-            import json as _j
-            with open(_final_file, "w") as f:
-                _j.dump(final, f)
-            try:
-                os.remove(_intermediate_file)
-            except OSError:
-                pass
-            biomni_volume.commit()
+            _write_intermediate(final)
+            print(f"[Biomni] Error result written to dict: {e}")
         return final
 
 
@@ -734,31 +769,7 @@ def backend():
                 "meta": {},
             }
 
-        store_response(
-            run_id=req.run_id,
-            model_id=result["model_id"],
-            display_name=result["display_name"],
-            text=result.get("text"),
-            latency_ms=result.get("latency_ms"),
-            error=result.get("error"),
-            meta=result.get("meta"),
-        )
-        db_volume.commit()
-        return result
-
-    @web_app.post("/api/poll-biomni")
-    def poll_biomni(req: PollBiomniRequest):
-        """Poll for Biomni intermediate or final results."""
-        import json as _j
-
-        biomni_volume.reload()
-
-        # Check for final result first
-        final_file = os.path.join(BIOMNI_DATA_PATH, f".biomni_final_{req.run_id}.json")
-        if os.path.exists(final_file):
-            with open(final_file) as f:
-                result = _j.load(f)
-            # Store final result in DB
+        try:
             store_response(
                 run_id=req.run_id,
                 model_id=result["model_id"],
@@ -769,30 +780,54 @@ def backend():
                 meta=result.get("meta"),
             )
             db_volume.commit()
-            # Clean up files
-            try:
-                os.remove(final_file)
-                biomni_volume.commit()
-            except OSError:
-                pass
+        except Exception as db_err:
+            print(f"[run-model] DB storage failed (non-fatal): {db_err}")
+        return result
+
+    @web_app.post("/api/poll-biomni")
+    def poll_biomni(req: PollBiomniRequest):
+        """Poll for Biomni intermediate or final results."""
+        import json as _j
+
+        biomni_dict = modal.Dict.from_name("biomni-status", create_if_missing=True)
+
+        try:
+            raw = biomni_dict[req.run_id]
+            result = _j.loads(raw)
+
+            # If done, store in DB and clean up
+            if result.get("status") == "done":
+                try:
+                    store_response(
+                        run_id=req.run_id,
+                        model_id=result["model_id"],
+                        display_name=result["display_name"],
+                        text=result.get("text"),
+                        latency_ms=result.get("latency_ms"),
+                        error=result.get("error"),
+                        meta=result.get("meta"),
+                    )
+                    db_volume.commit()
+                except Exception as db_err:
+                    print(f"[poll-biomni] DB storage failed (non-fatal): {db_err}")
+                # Clean up dict entry
+                try:
+                    del biomni_dict[req.run_id]
+                except Exception:
+                    pass
+
             return result
-
-        # Check for intermediate result
-        intermediate_file = os.path.join(BIOMNI_DATA_PATH, f".biomni_intermediate_{req.run_id}.json")
-        if os.path.exists(intermediate_file):
-            with open(intermediate_file) as f:
-                return _j.load(f)
-
-        # No result yet
-        return {
-            "model_id": "biomni",
-            "display_name": "Biomni",
-            "text": None,
-            "latency_ms": 0,
-            "error": None,
-            "status": "running",
-            "meta": {},
-        }
+        except KeyError:
+            # No result yet
+            return {
+                "model_id": "biomni",
+                "display_name": "Biomni",
+                "text": None,
+                "latency_ms": 0,
+                "error": None,
+                "status": "running",
+                "meta": {},
+            }
 
     @web_app.post("/api/vote")
     def vote(req: VoteRequest):

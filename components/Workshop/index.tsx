@@ -277,6 +277,7 @@ export default function Workshop() {
         const pollBiomni = async (): Promise<void> => {
           const POLL_INTERVAL = 5000;
           const MAX_POLLS = 120; // 10 minutes max
+          let lastText = "";
           for (let i = 0; i < MAX_POLLS; i++) {
             await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
             try {
@@ -287,11 +288,19 @@ export default function Workshop() {
               });
               if (!resp.ok) continue;
               const data = await resp.json();
-              if (data.text) {
-                // Update card with intermediate or final result
+              // Only update card when content has actually changed or grown
+              const newText = data.text || "";
+              if (data.status === "done") {
                 onModelResult(data as ModelResponse);
+                return;
               }
-              if (data.status === "done") return;
+              if (newText && newText !== lastText) {
+                // Keep the longer text if the new one is a subset (avoid erasing progress)
+                if (newText.length >= lastText.length || !lastText.startsWith(newText)) {
+                  lastText = newText;
+                  onModelResult(data as ModelResponse);
+                }
+              }
             } catch { /* retry */ }
           }
           // Timed out
