@@ -232,20 +232,34 @@ class TxGemmaModel:
                 import threading
                 def _background_recompile():
                     try:
-                        import torch
-                        print("[TxGemma] Background: recompiling with torch.compile to populate cache...")
-                        del self.llm
-                        torch.cuda.empty_cache()
-                        from vllm import LLM as _LLM
-                        self.llm = _LLM(
-                            model=TXGEMMA_MODEL,
-                            max_model_len=8192,
-                            dtype="auto",
-                            trust_remote_code=True,
-                            gpu_memory_utilization=0.90,
+                        import torch, subprocess
+                        print("[TxGemma] Background: compiling in subprocess to populate cache...")
+                        # Run compilation in a separate process so it doesn't interfere
+                        # with the current eager model serving requests.
+                        # The subprocess loads the model, torch.compile runs and saves
+                        # to the cache dir, then exits — freeing all GPU memory.
+                        result = subprocess.run(
+                            ["python", "-c", f"""
+import os
+os.environ.setdefault("VLLM_USAGE_SOURCE", "production")
+from vllm import LLM
+llm = LLM(
+    model="{TXGEMMA_MODEL}",
+    max_model_len=8192,
+    dtype="auto",
+    trust_remote_code=True,
+    gpu_memory_utilization=0.45,
+)
+print("[TxGemma] Subprocess: compile complete, cache generated")
+"""],
+                            capture_output=True, text=True, timeout=300,
                         )
-                        compile_cache_volume.commit()
-                        print("[TxGemma] Background: compile cache saved to volume")
+                        print(f"[TxGemma] Subprocess stdout: {result.stdout[-500:]}")
+                        if result.returncode != 0:
+                            print(f"[TxGemma] Subprocess stderr: {result.stderr[-500:]}")
+                        else:
+                            compile_cache_volume.commit()
+                            print("[TxGemma] Background: compile cache saved to volume")
                     except Exception as ex:
                         print(f"[TxGemma] Background recompile failed: {ex}")
                 threading.Thread(target=_background_recompile, daemon=True).start()
