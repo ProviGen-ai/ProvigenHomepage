@@ -2,17 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-const IS_PROD = process.env.NODE_ENV === "production";
-
 function apiUrl(path: string): string {
-  if (IS_PROD) return `/workshop-api${path}`;
-  return `http://localhost:8000/api${path}`;
+  return `/workshop-api${path}`;
 }
 
 function apiHeaders(extra: Record<string, string> = {}): Record<string, string> {
-  const headers: Record<string, string> = { ...extra };
-  if (!IS_PROD) headers["X-Workshop-Secret"] = "dev-secret";
-  return headers;
+  return { ...extra };
 }
 
 interface Stats {

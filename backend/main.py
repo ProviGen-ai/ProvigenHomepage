@@ -78,6 +78,12 @@ class RunTaskRequest(BaseModel):
     mode: str = "custom"  # "example" | "custom"
 
 
+class RunModelRequest(BaseModel):
+    run_id: str
+    model_id: str
+    prompt: str
+
+
 class VoteRequest(BaseModel):
     run_id: str
     model_id: str
@@ -128,8 +134,8 @@ def load_conversation(conv_id: str):
     return {"conversation_id": conv_id, "history": history}
 
 
-@app.post("/api/run-task")
-def run_task(req: RunTaskRequest):
+@app.post("/api/start-run")
+def start_run(req: RunTaskRequest):
     prompt = req.prompt
     if req.mode == "example" and req.task_id:
         task = get_task(req.task_id)
@@ -138,51 +144,47 @@ def run_task(req: RunTaskRequest):
         if not prompt:
             prompt = task["prompt"]
 
-    # Create or reuse conversation
     conv_id = req.conversation_id
     if not conv_id or not conversation_exists(conv_id):
         conv_id = create_conversation()
 
     run_id = create_run(conv_id, req.task_id, prompt, req.mode)
+    return {"run_id": run_id, "conversation_id": conv_id, "prompt": prompt}
 
-    adapters = [
-        ("gpt-5.4", openai_adapter.call),
-        ("txgemma-27b-chat", txgemma_adapter.call),
-        ("biomni", biomni_adapter.call),
-    ]
 
-    responses = []
-    with ThreadPoolExecutor(max_workers=3) as executor:
-        futures = {executor.submit(fn, prompt): mid for mid, fn in adapters}
-        for future in as_completed(futures):
-            try:
-                result = future.result(timeout=180)
-            except Exception as e:
-                model_id = futures[future]
-                result = {
-                    "model_id": model_id,
-                    "display_name": model_id,
-                    "text": None,
-                    "latency_ms": 0,
-                    "error": str(e),
-                    "meta": {},
-                }
-            store_response(
-                run_id=run_id,
-                model_id=result["model_id"],
-                display_name=result["display_name"],
-                text=result.get("text"),
-                latency_ms=result.get("latency_ms"),
-                error=result.get("error"),
-                meta=result.get("meta"),
-            )
-            responses.append(result)
+@app.post("/api/run-model")
+def run_model(req: RunModelRequest):
+    model_fns = {
+        "gpt-5.4": openai_adapter.call,
+        "txgemma-27b-chat": txgemma_adapter.call,
+        "biomni": biomni_adapter.call,
+    }
+    fn = model_fns.get(req.model_id)
+    if not fn:
+        raise HTTPException(400, f"Unknown model_id: {req.model_id}")
 
-    # Sort by consistent model order
-    order = {"gpt-5.4": 0, "txgemma-27b-chat": 1, "biomni": 2}
-    responses.sort(key=lambda r: order.get(r["model_id"], 99))
+    try:
+        result = fn(req.prompt)
+    except Exception as e:
+        result = {
+            "model_id": req.model_id,
+            "display_name": req.model_id,
+            "text": None,
+            "latency_ms": 0,
+            "error": str(e),
+            "meta": {},
+        }
 
-    return {"run_id": run_id, "conversation_id": conv_id, "responses": responses}
+    store_response(
+        run_id=req.run_id,
+        model_id=result["model_id"],
+        display_name=result["display_name"],
+        text=result.get("text"),
+        latency_ms=result.get("latency_ms"),
+        error=result.get("error"),
+        meta=result.get("meta"),
+    )
+    return result
 
 
 @app.post("/api/vote")

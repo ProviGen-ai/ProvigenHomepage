@@ -77,6 +77,8 @@ const Header = () => {
                   alt="logo"
                   width={400}
                   height={80}
+                  loading="eager"
+                  priority
                   className="w-full dark:hidden"
                 />
                 

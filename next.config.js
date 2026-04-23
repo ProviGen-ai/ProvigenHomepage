@@ -1,6 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   turbopack: {},
+  httpAgentOptions: {
+    keepAlive: true,
+  },
+  experimental: {
+    proxyTimeout: 300000, // 5 minutes for long-running model calls
+  },
   async rewrites() {
     return [
       {

@@ -6,17 +6,12 @@ import BioReasonSection from "./BioReasonSection";
 import LeaderboardPanel from "./LeaderboardPanel";
 import SessionPanel from "./SessionPanel";
 
-const IS_PROD = process.env.NODE_ENV === "production";
-
 function apiUrl(path: string): string {
-  if (IS_PROD) return `/workshop-api${path}`;
-  return `http://localhost:8000/api${path}`;
+  return `/workshop-api${path}`;
 }
 
 function apiHeaders(extra: Record<string, string> = {}): Record<string, string> {
-  const headers: Record<string, string> = { ...extra };
-  if (!IS_PROD) headers["X-Workshop-Secret"] = "dev-secret";
-  return headers;
+  return { ...extra };
 }
 
 export interface TaskDef {
@@ -177,11 +172,36 @@ export default function Workshop() {
     setTimeout(scrollToResultsImmediate, SCROLL_DELAY_MS);
   }, [scrollToResultsImmediate]);
 
+  // Placeholder responses shown while waiting for real results
+  const PLACEHOLDER_RESPONSES: ModelResponse[] = [
+    { model_id: "gpt-5.4", display_name: "GPT-5.4", text: null, latency_ms: 0, error: null, meta: {} },
+    { model_id: "txgemma-27b-chat", display_name: "TxGemma-27B-Chat", text: null, latency_ms: 0, error: null, meta: {} },
+    { model_id: "biomni", display_name: "Biomni", text: null, latency_ms: 0, error: null, meta: {} },
+  ];
+
   const runTask = useCallback(
     async (taskId: string | null, taskPrompt: string, displayPrompt: string, mode: "example" | "custom", followUp: boolean) => {
       setLoading(true);
+      setBestModel(null);
+      setIsNewResult(false);
+      setLatestPrompt(displayPrompt);
+      // Show placeholder cards immediately
+      setLatestResponses(PLACEHOLDER_RESPONSES);
+      scrollToResults();
+
+      // Fetch 3-word summary in background
+      fetch(apiUrl("/summarize"), {
+        method: "POST",
+        headers: apiHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ prompt: displayPrompt }),
+      })
+        .then((r) => r.json())
+        .then((d) => { if (d.summary) setChatSummary(d.summary); })
+        .catch(() => {});
+
       try {
-        const resp = await fetch(apiUrl("/run-task"), {
+        // Step 1: Create the run (returns immediately)
+        const startResp = await fetch(apiUrl("/start-run"), {
           method: "POST",
           headers: apiHeaders({ "Content-Type": "application/json" }),
           body: JSON.stringify({
@@ -191,48 +211,74 @@ export default function Workshop() {
             mode,
           }),
         });
-        const data: RunResult = await resp.json();
-        if (data.conversation_id) setConversationId(data.conversation_id);
+        if (!startResp.ok) {
+          const errText = await startResp.text().catch(() => startResp.statusText);
+          throw new Error(`Backend error ${startResp.status}: ${errText}`);
+        }
+        const { run_id, conversation_id: convId, prompt: resolvedPrompt } = await startResp.json();
+        if (convId) setConversationId(convId);
+        setLatestRunId(run_id);
 
-        // Update per-model exchanges
-        setModelExchanges((prev) => {
-          const next = { ...prev };
-          for (const r of data.responses) {
-            const existing = next[r.model_id] || [];
-            next[r.model_id] = [
-              ...existing,
-              { prompt: displayPrompt, text: r.text, latency_ms: r.latency_ms, isFollowUp: followUp },
-            ];
+        // Step 2: Call each model in parallel — each returns independently
+        const modelIds = ["gpt-5.4", "txgemma-27b-chat", "biomni"];
+        const modelPromises = modelIds.map(async (modelId) => {
+          try {
+            const resp = await fetch(apiUrl("/run-model"), {
+              method: "POST",
+              headers: apiHeaders({ "Content-Type": "application/json" }),
+              body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
+            });
+            if (!resp.ok) {
+              const errText = await resp.text().catch(() => resp.statusText);
+              return { model_id: modelId, display_name: modelId, text: null, latency_ms: 0, error: `Error ${resp.status}: ${errText}`, meta: {} } as ModelResponse;
+            }
+            return await resp.json() as ModelResponse;
+          } catch (e: any) {
+            return { model_id: modelId, display_name: modelId, text: null, latency_ms: 0, error: e.message, meta: {} } as ModelResponse;
           }
-          return next;
         });
 
-        setLatestResponses(data.responses);
-        setLatestRunId(data.run_id);
-        setLatestPrompt(displayPrompt);
-        setIsNewResult(true);
-        setBestModel(null);
-        setIsFollowUp(true);
-        scrollToResults();
+        // As each model finishes, update its card
+        for (const promise of modelPromises) {
+          promise.then((r: ModelResponse) => {
+            setLatestResponses((prev) =>
+              prev.map((p) => p.model_id === r.model_id ? r : p)
+            );
+            setModelExchanges((prev) => {
+              const next = { ...prev };
+              const existing = next[r.model_id] || [];
+              next[r.model_id] = [
+                ...existing,
+                { prompt: displayPrompt, text: r.text, latency_ms: r.latency_ms, isFollowUp: followUp },
+              ];
+              return next;
+            });
+            setIsNewResult(true);
+          });
+        }
 
-        // Fetch 3-word summary in background
-        fetch(apiUrl("/summarize"), {
-          method: "POST",
-          headers: apiHeaders({ "Content-Type": "application/json" }),
-          body: JSON.stringify({ prompt: displayPrompt }),
-        })
-          .then((r) => r.json())
-          .then((d) => { if (d.summary) setChatSummary(d.summary); })
-          .catch(() => {});
+        // Wait for all to finish before marking loading as done
+        await Promise.allSettled(modelPromises);
+        setIsFollowUp(true);
       } catch (e: any) {
-        setLatestResponses([{
-          model_id: "error",
-          display_name: "Error",
-          text: null,
-          latency_ms: 0,
-          error: e.message || "Failed to reach backend",
-          meta: {},
-        }]);
+        // Set error on any placeholder cards that haven't received a response yet
+        const errMsg = e.message || "Failed to reach backend";
+        setLatestResponses((prev) => {
+          const updated = prev.map((p) =>
+            p.text === null && p.error === null
+              ? { ...p, error: errMsg }
+              : p
+          );
+          // If no cards at all, show a single error card
+          return updated.length > 0 ? updated : [{
+            model_id: "error",
+            display_name: "Error",
+            text: null,
+            latency_ms: 0,
+            error: errMsg,
+            meta: {},
+          }];
+        });
         setLatestPrompt(displayPrompt);
         setIsNewResult(false);
       } finally {

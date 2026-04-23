@@ -28,7 +28,16 @@ def call(prompt: str) -> dict:
         api_key="not-needed",
         base_url=BASE_URL,
     )
-    messages = build_messages(prompt)
+    raw_messages = build_messages(prompt)
+    # TxGemma doesn't support system role — merge into user message
+    system_text = ""
+    user_text = ""
+    for m in raw_messages:
+        if m["role"] == "system":
+            system_text += m["content"] + "\n\n"
+        else:
+            user_text += m["content"]
+    messages = [{"role": "user", "content": system_text + user_text}]
 
     start = time.time()
     try:

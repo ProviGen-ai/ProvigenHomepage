@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 interface LeaderboardData {
   total_runs: number;
@@ -111,23 +111,32 @@ function ToggleHeader({ open, onClick }: { open: boolean; onClick: () => void })
   );
 }
 
+const POLL_INTERVAL = 60_000; // refresh cached data every 60s
+
 export default function LeaderboardPanel({ apiUrl, apiHeaders, inline }: Props) {
   const [data, setData] = useState<LeaderboardData | null>(null);
   const [open, setOpen] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const toggle = async () => {
-    if (open) {
-      setOpen(false);
-      return;
-    }
+  const fetchData = useCallback(async () => {
     try {
       const resp = await fetch(apiUrl("/leaderboard"), { headers: apiHeaders() });
-      const d = await resp.json();
-      setData(d);
-      setOpen(true);
-    } catch {
-      setOpen(false);
-    }
+      if (resp.ok) {
+        const d = await resp.json();
+        setData(d);
+      }
+    } catch { /* ignore */ }
+  }, [apiUrl, apiHeaders]);
+
+  // Fetch on mount and poll in background
+  useEffect(() => {
+    fetchData();
+    intervalRef.current = setInterval(fetchData, POLL_INTERVAL);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [fetchData]);
+
+  const toggle = () => {
+    setOpen(!open);
   };
 
   // Inline variant: rendered in-flow at the bottom of the page on small screens
