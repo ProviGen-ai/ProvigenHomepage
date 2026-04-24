@@ -256,24 +256,9 @@ export default function Workshop() {
         const syncPromises = syncModels.map(async (modelId) => {
           const displayName = modelId === "txgemma-27b-chat" ? "TxGemma-27B-Chat" : modelId;
 
-          // Single fetch attempt that resolves or rejects
-          const controllers: AbortController[] = [];
-          const makeRequest = async (): Promise<Response> => {
-            const ctrl = new AbortController();
-            controllers.push(ctrl);
-            return fetch(apiUrl("/run-model"), {
-              method: "POST",
-              headers: apiHeaders({ "Content-Type": "application/json" }),
-              body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
-              signal: ctrl.signal,
-            });
-          };
-          // Cancel all in-flight requests (loser gets aborted → backend frees GPU)
-          const abortAll = () => controllers.forEach((c) => c.abort());
-
-          // Parse a successful response
+          // Parse a response — returns ModelResponse, null for 502, or throws
           const parseResponse = async (resp: Response): Promise<ModelResponse | null> => {
-            if (resp.status === 502) return null; // signal to retry
+            if (resp.status === 502) return null;
             if (!resp.ok) {
               const errText = await resp.text().catch(() => resp.statusText);
               return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: `Error ${resp.status}: ${errText}`, meta: {} } as ModelResponse;
@@ -283,6 +268,20 @@ export default function Workshop() {
 
           // Retry loop — only retries on 502 (backend never received it)
           for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+            // Fresh controllers per attempt so retries don't carry stale state
+            const controllers: AbortController[] = [];
+            const makeRequest = (): Promise<Response> => {
+              const ctrl = new AbortController();
+              controllers.push(ctrl);
+              return fetch(apiUrl("/run-model"), {
+                method: "POST",
+                headers: apiHeaders({ "Content-Type": "application/json" }),
+                body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
+                signal: ctrl.signal,
+              });
+            };
+            const abortAll = () => controllers.forEach((c) => c.abort());
+
             try {
               // Show "still working" after 30s
               const longWaitTimer = setTimeout(() => {
@@ -297,23 +296,27 @@ export default function Workshop() {
                 } as any);
               }, LONG_WAIT_MS);
 
-              // Race: original request vs timeout-triggered second request
-              // First valid response wins — greedy strategy
+              // Race: original vs backup request fired after TIMEOUT_MS
+              // First valid response wins, loser is aborted to free GPU
               const result = await new Promise<ModelResponse>((resolve, reject) => {
                 let settled = false;
                 const settle = (r: ModelResponse) => { if (!settled) { settled = true; abortAll(); resolve(r); } };
+                const fail = (e: Error) => { if (!settled) { settled = true; abortAll(); reject(e); } };
 
                 // Original request
                 makeRequest()
                   .then((resp) => parseResponse(resp))
                   .then((parsed) => {
                     if (parsed) { settle(parsed); return; }
-                    // 502 — let it fall through to reject so retry loop continues
-                    if (!settled) { settled = true; reject(new Error("502")); }
+                    // 502 — reject so retry loop continues
+                    fail(new Error("502"));
                   })
-                  .catch((e) => { if (!settled) { settled = true; reject(e); } });
+                  .catch((e) => {
+                    if (e.name === "AbortError") return; // aborted by winner, ignore
+                    fail(e);
+                  });
 
-                // After TIMEOUT_MS, fire a competing request (original keeps running)
+                // After TIMEOUT_MS, fire a competing backup request
                 setTimeout(() => {
                   if (settled) return;
                   onModelResult({
@@ -327,8 +330,15 @@ export default function Workshop() {
                   } as any);
                   makeRequest()
                     .then((resp) => parseResponse(resp))
-                    .then((parsed) => { if (parsed) settle(parsed); })
-                    .catch(() => {}); // backup failed, still waiting on original
+                    .then((parsed) => {
+                      if (parsed) { settle(parsed); return; }
+                      // Backup also got 502 — reject
+                      fail(new Error("502"));
+                    })
+                    .catch((e) => {
+                      if (e.name === "AbortError") return;
+                      fail(e);
+                    });
                 }, TIMEOUT_MS);
               });
 
