@@ -170,7 +170,7 @@ export default function WorkshopResults() {
 
   const runStressTest = async (mode: "raw" | "cold-start") => {
     const NUM_REQUESTS = 10;
-    const TIMEOUT_MS = 180000; // 3 minutes per request
+    const TIMEOUT_MS = 300000; // 5 minutes per request
     const MAX_RETRIES = mode === "cold-start" ? 3 : 0;
     const RETRY_DELAY = 15000; // 15s between retries
     const TEST_PROMPTS = [
