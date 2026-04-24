@@ -141,7 +141,7 @@ txgemma_image = (
         "huggingface_hub>=0.27.0",
         "bitsandbytes>=0.45.0",
     )
-    .env({"VLLM_USE_V1": "0"})
+    .env({"VLLM_ENABLE_V1_MULTIPROCESSING": "0"})
 )
 
 
@@ -250,7 +250,8 @@ class TxGemmaModel:
             MAX_CTX = 8192
             RESERVED_OUTPUT = 512
 
-            input_ids = self._tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True)
+            prompt_text = self._tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+            input_ids = self._tokenizer.encode(prompt_text)
             input_len = len(input_ids)
             available = MAX_CTX - input_len
             if available < RESERVED_OUTPUT:
@@ -265,10 +266,9 @@ class TxGemmaModel:
             self._request_counter += 1
             request_id = f"txgemma-{self._request_counter}-{uuid.uuid4().hex[:8]}"
 
-            # Pass TokensPrompt instead of raw string to avoid deprecation warning
             final_output = None
             try:
-                async for output in self.engine.generate({"prompt_token_ids": input_ids}, params, request_id):
+                async for output in self.engine.generate(prompt_text, params, request_id):
                     final_output = output
             except asyncio.CancelledError:
                 # Frontend disconnected or Modal cancelled — stop generating
@@ -354,7 +354,9 @@ class TxGemmaModel:
             }
         except Exception as e:
             latency_ms = int((time.time() - start) * 1000)
-            print(f"[TxGemma] ERROR {latency_ms}ms | {e}")
+            import traceback
+            print(f"[TxGemma] ERROR {latency_ms}ms | {type(e).__name__}: {e}")
+            traceback.print_exc()
             return {
                 "model_id": "txgemma-27b-chat",
                 "display_name": "TxGemma-27B-Chat",
