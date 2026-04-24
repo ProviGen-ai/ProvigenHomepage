@@ -6,10 +6,17 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   safelist: [
-    "bg-green-100", "bg-green-900/30", "text-green-700", "text-green-400",
-    "bg-red-100", "bg-red-900/30", "text-red-700", "text-red-400",
+    // Thumbs up (green)
+    "bg-green-100", "bg-green-50", "text-green-700", "text-green-400", "text-green-600",
+    "dark:bg-green-900/30", "dark:text-green-400",
+    "hover:text-green-600", "hover:bg-green-50", "dark:hover:bg-green-900/20",
+    // Thumbs down (red)
+    "bg-red-100", "bg-red-50", "text-red-700", "text-red-400",
+    "dark:bg-red-900/30", "dark:text-red-400",
+    "hover:text-red-600", "hover:bg-red-50", "dark:hover:bg-red-900/20",
+    // Stress test
     "bg-yellow-500", "hover:bg-yellow-600", "text-yellow-500",
-    "bg-green-50", "bg-red-50",
+    "text-blue-500",
   ],
   darkMode: "class",
   theme: {
