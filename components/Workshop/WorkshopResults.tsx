@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 function apiUrl(path: string): string {
   return `/workshop-api${path}`;
@@ -71,6 +71,7 @@ export default function WorkshopResults() {
   // Stress test state
   const [stressRunning, setStressRunning] = useState(false);
   const [stressMode, setStressMode] = useState<"raw" | "cold-start">("raw");
+  const stressAbortRef = useRef<AbortController | null>(null);
   const [stressResults, setStressResults] = useState<Array<{
     request: number;
     model_id: string;
@@ -180,6 +181,8 @@ export default function WorkshopResults() {
       "Explain immune checkpoint therapy.",
     ];
 
+    const abortController = new AbortController();
+    stressAbortRef.current = abortController;
     setStressRunning(true);
     setStressMode(mode);
     const models = ["gpt-5.4", "txgemma-27b-chat", "biomni"];
@@ -194,10 +197,12 @@ export default function WorkshopResults() {
       const start = Date.now();
 
       try {
+        if (abortController.signal.aborted) return;
         const startResp = await fetch(apiUrl("/start-run"), {
           method: "POST",
           headers: apiHeaders({ "Content-Type": "application/json" }),
           body: JSON.stringify({ task_id: null, prompt, mode: "custom", conversation_id: null }),
+          signal: abortController.signal,
         });
         if (!startResp.ok) throw new Error(`start-run failed: ${startResp.status}`);
         const { run_id, prompt: resolvedPrompt } = await startResp.json();
@@ -207,9 +212,11 @@ export default function WorkshopResults() {
           let retries = 0;
 
           for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+            if (abortController.signal.aborted) return;
             try {
               const controller = new AbortController();
               const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+              abortController.signal.addEventListener("abort", () => controller.abort(), { once: true });
 
               const resp = await fetch(apiUrl("/run-model"), {
                 method: "POST",
@@ -305,6 +312,19 @@ export default function WorkshopResults() {
     });
 
     await Promise.allSettled(promises);
+    stressAbortRef.current = null;
+    setStressRunning(false);
+  };
+
+  const cancelStressTest = () => {
+    if (stressAbortRef.current) {
+      stressAbortRef.current.abort();
+      stressAbortRef.current = null;
+    }
+    // Mark remaining pending results as cancelled
+    setStressResults((prev) => prev.map((r) =>
+      r.status === "pending" ? { ...r, status: "error" as const, error: "Cancelled" } : r
+    ));
     setStressRunning(false);
   };
 
@@ -688,6 +708,14 @@ export default function WorkshopResults() {
                 >
                   {stressRunning && stressMode === "cold-start" ? "Running..." : "Cold Start (retry)"}
                 </button>
+                {stressRunning && (
+                  <button
+                    onClick={cancelStressTest}
+                    className="rounded-lg border-2 border-red-500 bg-transparent py-2 px-4 text-sm font-semibold text-red-500 hover:bg-red-500 hover:text-white transition-all"
+                  >
+                    Cancel
+                  </button>
+                )}
               </div>
             </div>
 
