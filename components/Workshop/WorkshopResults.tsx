@@ -684,7 +684,7 @@ export default function WorkshopResults() {
                 <button
                   onClick={() => runStressTest("cold-start")}
                   disabled={stressRunning}
-                  className="rounded-lg bg-yellow-500 py-2 px-4 text-sm font-semibold text-white hover:bg-yellow-600 disabled:opacity-40 transition-all"
+                  className="rounded-lg border-2 border-primary bg-transparent py-2 px-4 text-sm font-semibold text-primary hover:bg-primary hover:text-white disabled:opacity-40 transition-all"
                 >
                   {stressRunning && stressMode === "cold-start" ? "Running..." : "Cold Start (retry)"}
                 </button>
