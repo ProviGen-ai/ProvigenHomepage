@@ -159,7 +159,7 @@ txgemma_image = (
         TXGEMMA_WEIGHTS_PATH: txgemma_weights_volume,
     },
 )
-@modal.concurrent(max_inputs=2)
+@modal.concurrent(max_inputs=1)
 class TxGemmaModel:
     @modal.enter()
     def setup(self):
