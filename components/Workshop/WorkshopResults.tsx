@@ -258,26 +258,34 @@ export default function WorkshopResults() {
               }
 
               const data = await resp.json();
-              // For Biomni, poll until done
-              if (modelId === "biomni" && (!data.text || data.status === "running")) {
-                for (let p = 0; p < 60; p++) {
+              // For async models (Biomni, TxGemma), poll until done
+              const POLL_ENDPOINTS: Record<string, string> = {
+                "biomni": "/poll-biomni",
+                "txgemma-27b-chat": "/poll-txgemma",
+              };
+              const pollEndpoint = POLL_ENDPOINTS[modelId];
+              if (pollEndpoint && (!data.text || data.status === "running")) {
+                for (let p = 0; p < 120; p++) {
+                  if (abortController.signal.aborted) return;
                   await new Promise((r) => setTimeout(r, 5000));
-                  const pollResp = await fetch(apiUrl("/poll-biomni"), {
-                    method: "POST",
-                    headers: apiHeaders({ "Content-Type": "application/json" }),
-                    body: JSON.stringify({ run_id }),
-                  });
-                  if (!pollResp.ok) continue;
-                  const pollData = await pollResp.json();
-                  if (pollData.status === "done") {
-                    const finalLatency = Date.now() - mStart;
-                    setStressResults((prev) => prev.map((r) =>
-                      r.request === i + 1 && r.model_id === modelId
-                        ? { ...r, status: pollData.error ? "error" : "success", latency_ms: finalLatency, textLength: pollData.text?.length || 0, retries, error: pollData.error || undefined }
-                        : r
-                    ));
-                    return;
-                  }
+                  try {
+                    const pollResp = await fetch(apiUrl(pollEndpoint), {
+                      method: "POST",
+                      headers: apiHeaders({ "Content-Type": "application/json" }),
+                      body: JSON.stringify({ run_id }),
+                    });
+                    if (!pollResp.ok) continue;
+                    const pollData = await pollResp.json();
+                    if (pollData.status === "done") {
+                      const finalLatency = Date.now() - mStart;
+                      setStressResults((prev) => prev.map((r) =>
+                        r.request === i + 1 && r.model_id === modelId
+                          ? { ...r, status: pollData.error ? "error" : "success", latency_ms: finalLatency, textLength: pollData.text?.length || 0, retries, error: pollData.error || undefined }
+                          : r
+                      ));
+                      return;
+                    }
+                  } catch { /* poll retry */ }
                 }
                 setStressResults((prev) => prev.map((r) =>
                   r.request === i + 1 && r.model_id === modelId
