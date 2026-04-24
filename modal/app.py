@@ -135,6 +135,7 @@ txgemma_image = (
         "torch>=2.5.0",
         "transformers>=4.48.0",
         "huggingface_hub>=0.27.0",
+        "bitsandbytes>=0.45.0",
     )
     .env({"HF_HUB_ENABLE_HF_TRANSFER": "1"})
     .run_commands(
@@ -161,14 +162,15 @@ class TxGemmaModel:
     def setup(self):
         from vllm import LLM
 
-        # Eager mode: ~46s cold start, ~20 tok/s inference
-        # Compiled mode would be ~26 tok/s but adds 60s to cold start
-        # and can't swap at runtime (GPU memory not freed by Python GC)
-        print("[TxGemma] Starting in eager mode")
+        # 8-bit quantized: ~27 GiB instead of 51 GiB, loads ~2x faster
+        # Eager mode: skips torch.compile for fast cold start
+        print("[TxGemma] Starting in 8-bit quantized eager mode")
         self.llm = LLM(
             model=TXGEMMA_MODEL,
             max_model_len=8192,
-            dtype="auto",
+            quantization="bitsandbytes",
+            load_format="bitsandbytes",
+            dtype="half",
             trust_remote_code=True,
             gpu_memory_utilization=0.90,
             enforce_eager=True,
