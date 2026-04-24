@@ -210,11 +210,15 @@ export default function WorkshopResults() {
         const modelPromises = models.map(async (modelId) => {
           const mStart = Date.now();
           let retries = 0;
+          let prevController: AbortController | null = null;
 
           for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
             if (abortController.signal.aborted) return;
             try {
+              // Abort previous attempt before retrying
+              if (prevController) prevController.abort();
               const controller = new AbortController();
+              prevController = controller;
               const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
               abortController.signal.addEventListener("abort", () => controller.abort(), { once: true });
 

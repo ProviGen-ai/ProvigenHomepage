@@ -252,12 +252,18 @@ export default function Workshop() {
         const MAX_RETRIES = 3;
         const RETRY_DELAY = 15000; // 15 seconds between retries
         const syncPromises = syncModels.map(async (modelId) => {
+          let controller: AbortController | null = null;
           for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
             try {
+              // Abort previous attempt before retrying
+              if (controller) controller.abort();
+              controller = new AbortController();
+
               const resp = await fetch(apiUrl("/run-model"), {
                 method: "POST",
                 headers: apiHeaders({ "Content-Type": "application/json" }),
                 body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
+                signal: controller.signal,
               });
               if (resp.status === 502 && attempt < MAX_RETRIES) {
                 // Container cold-starting — show warming message and retry
@@ -280,6 +286,7 @@ export default function Workshop() {
               }
               return await resp.json() as ModelResponse;
             } catch (e: any) {
+              if (e.name === "AbortError") continue; // aborted by retry, not a real error
               if (attempt < MAX_RETRIES) {
                 await new Promise((r) => setTimeout(r, RETRY_DELAY));
                 continue;
