@@ -247,8 +247,7 @@ class TxGemmaModel:
             MAX_CTX = 8192
             RESERVED_OUTPUT = 512
 
-            prompt = self._tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-            input_ids = self._tokenizer.encode(prompt)
+            input_ids = self._tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True)
             input_len = len(input_ids)
             available = MAX_CTX - input_len
             if available < RESERVED_OUTPUT:
@@ -263,8 +262,9 @@ class TxGemmaModel:
             self._request_counter += 1
             request_id = f"txgemma-{self._request_counter}-{uuid.uuid4().hex[:8]}"
 
+            # Pass TokensPrompt instead of raw string to avoid deprecation warning
             final_output = None
-            async for output in self.engine.generate(prompt, params, request_id):
+            async for output in self.engine.generate({"prompt_token_ids": input_ids}, params, request_id):
                 final_output = output
 
             raw_text = final_output.outputs[0].text
