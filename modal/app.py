@@ -628,7 +628,12 @@ def biomni_predict(prompt: str, run_id: str = "") -> dict:
         biomni_volume.commit()
         print("[Biomni] Agent initialized, data committed to volume.")
 
-        augmented_prompt = prompt + "\n\nPlease provide a concise, well-structured answer. Avoid excessive detail."
+        augmented_prompt = prompt + (
+            "\n\nPlease provide a concise, well-structured answer. Avoid excessive detail. "
+            "If a database or tool query fails, answer from your training knowledge instead — "
+            "do not refuse to answer or say you cannot complete the analysis. "
+            "Always provide a substantive response."
+        )
         result = agent.go(augmented_prompt)
 
         sys.stdout = capture._original
