@@ -178,7 +178,7 @@ class TxGemmaModel:
                 max_model_len=8192,
                 quantization="bitsandbytes",
                 load_format="bitsandbytes",
-                dtype="half",
+                dtype="bfloat16",
                 trust_remote_code=True,
                 gpu_memory_utilization=0.90,
             )
@@ -191,7 +191,7 @@ class TxGemmaModel:
                 max_model_len=8192,
                 quantization="bitsandbytes",
                 load_format="bitsandbytes",
-                dtype="half",
+                dtype="bfloat16",
                 trust_remote_code=True,
                 gpu_memory_utilization=0.45,  # half GPU — leave room for compiled model
                 enforce_eager=True,
@@ -253,7 +253,7 @@ class TxGemmaModel:
                             max_model_len=8192,
                             quantization="bitsandbytes",
                             load_format="bitsandbytes",
-                            dtype="half",
+                            dtype="bfloat16",
                             trust_remote_code=True,
                             gpu_memory_utilization=0.45,
                         )
