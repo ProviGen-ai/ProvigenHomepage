@@ -823,7 +823,7 @@ def backend():
                 prompt = _summarize_for_txgemma(prompt)
 
             messages = [{"role": "user", "content": txgemma_system + "\n\n" + prompt}]
-            result = txgemma_model.chat.remote(messages, max_tokens=6144, temperature=0.3)
+            result = txgemma_model.chat.remote(messages, max_tokens=7680, temperature=0.3)
             return result
         except Exception as e:
             latency_ms = int((_time.time() - start) * 1000)
