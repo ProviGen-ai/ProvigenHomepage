@@ -809,7 +809,8 @@ def backend():
                 "or data points rather than generic statements. Avoid vague filler conclusions like "
                 "'more research is needed' or 'the field is rapidly evolving'. "
                 "Every sentence should contain a specific fact, comparison, or actionable insight. "
-                "Do not truncate your answer. You have no tool access, no search, and no internet. "
+                "If your answer is getting long, finish your current point and provide a brief conclusion "
+                "rather than stopping mid-sentence. You have no tool access, no search, and no internet. "
                 "Answer solely from your training knowledge."
             )
 
