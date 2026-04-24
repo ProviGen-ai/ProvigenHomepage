@@ -252,14 +252,39 @@ export default function Workshop() {
         const MAX_RETRIES = 3;
         const RETRY_DELAY = 15000; // 15 seconds between retries
         const LONG_WAIT_MS = 30000; // show "still working" after 30s
-        const TIMEOUT_MS = 300000; // 5 minutes hard timeout — then retry
+        const TIMEOUT_MS = 300000; // 5 minutes — fire a competing request
         const syncPromises = syncModels.map(async (modelId) => {
           const displayName = modelId === "txgemma-27b-chat" ? "TxGemma-27B-Chat" : modelId;
+
+          // Single fetch attempt that resolves or rejects
+          const controllers: AbortController[] = [];
+          const makeRequest = async (): Promise<Response> => {
+            const ctrl = new AbortController();
+            controllers.push(ctrl);
+            return fetch(apiUrl("/run-model"), {
+              method: "POST",
+              headers: apiHeaders({ "Content-Type": "application/json" }),
+              body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
+              signal: ctrl.signal,
+            });
+          };
+          // Cancel all in-flight requests (loser gets aborted → backend frees GPU)
+          const abortAll = () => controllers.forEach((c) => c.abort());
+
+          // Parse a successful response
+          const parseResponse = async (resp: Response): Promise<ModelResponse | null> => {
+            if (resp.status === 502) return null; // signal to retry
+            if (!resp.ok) {
+              const errText = await resp.text().catch(() => resp.statusText);
+              return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: `Error ${resp.status}: ${errText}`, meta: {} } as ModelResponse;
+            }
+            return await resp.json() as ModelResponse;
+          };
+
+          // Retry loop — only retries on 502 (backend never received it)
           for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
             try {
-              const controller = new AbortController();
-
-              // Show "still working" message after LONG_WAIT_MS
+              // Show "still working" after 30s
               const longWaitTimer = setTimeout(() => {
                 onModelResult({
                   model_id: modelId,
@@ -272,21 +297,45 @@ export default function Workshop() {
                 } as any);
               }, LONG_WAIT_MS);
 
-              // Hard timeout at 5 minutes — abort and retry
-              const timeoutTimer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+              // Race: original request vs timeout-triggered second request
+              // First valid response wins — greedy strategy
+              const result = await new Promise<ModelResponse>((resolve, reject) => {
+                let settled = false;
+                const settle = (r: ModelResponse) => { if (!settled) { settled = true; abortAll(); resolve(r); } };
 
-              const resp = await fetch(apiUrl("/run-model"), {
-                method: "POST",
-                headers: apiHeaders({ "Content-Type": "application/json" }),
-                body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
-                signal: controller.signal,
+                // Original request
+                makeRequest()
+                  .then((resp) => parseResponse(resp))
+                  .then((parsed) => {
+                    if (parsed) { settle(parsed); return; }
+                    // 502 — let it fall through to reject so retry loop continues
+                    if (!settled) { settled = true; reject(new Error("502")); }
+                  })
+                  .catch((e) => { if (!settled) { settled = true; reject(e); } });
+
+                // After TIMEOUT_MS, fire a competing request (original keeps running)
+                setTimeout(() => {
+                  if (settled) return;
+                  onModelResult({
+                    model_id: modelId,
+                    display_name: displayName,
+                    text: `*${displayName} is taking longer than expected, sending backup request...*`,
+                    latency_ms: 0,
+                    error: null,
+                    meta: {},
+                    status: "running",
+                  } as any);
+                  makeRequest()
+                    .then((resp) => parseResponse(resp))
+                    .then((parsed) => { if (parsed) settle(parsed); })
+                    .catch(() => {}); // backup failed, still waiting on original
+                }, TIMEOUT_MS);
               });
-              clearTimeout(longWaitTimer);
-              clearTimeout(timeoutTimer);
 
-              if (resp.status === 502 && attempt < MAX_RETRIES) {
-                // 502 = Modal proxy couldn't reach a container (cold start).
-                // The backend never received this request, so retry is safe.
+              clearTimeout(longWaitTimer);
+              return result;
+            } catch (e: any) {
+              if (e.message === "502" && attempt < MAX_RETRIES) {
                 onModelResult({
                   model_id: modelId,
                   display_name: displayName,
@@ -299,27 +348,7 @@ export default function Workshop() {
                 await new Promise((r) => setTimeout(r, RETRY_DELAY));
                 continue;
               }
-              if (!resp.ok) {
-                const errText = await resp.text().catch(() => resp.statusText);
-                return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: `Error ${resp.status}: ${errText}`, meta: {} } as ModelResponse;
-              }
-              return await resp.json() as ModelResponse;
-            } catch (e: any) {
-              if (e.name === "AbortError" && attempt < MAX_RETRIES) {
-                // 5-minute timeout — retry since the request likely died
-                onModelResult({
-                  model_id: modelId,
-                  display_name: displayName,
-                  text: `*${displayName} timed out, retrying... (attempt ${attempt + 2}/${MAX_RETRIES + 1})*`,
-                  latency_ms: 0,
-                  error: null,
-                  meta: {},
-                  status: "running",
-                } as any);
-                await new Promise((r) => setTimeout(r, RETRY_DELAY));
-                continue;
-              }
-              return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: e.name === "AbortError" ? "Request timed out" : e.message, meta: {} } as ModelResponse;
+              return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: e.message, meta: {} } as ModelResponse;
             }
           }
           return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: "Failed after retries", meta: {} } as ModelResponse;
