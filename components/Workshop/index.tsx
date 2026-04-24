@@ -252,22 +252,17 @@ export default function Workshop() {
         const MAX_RETRIES = 3;
         const RETRY_DELAY = 15000; // 15 seconds between retries
         const syncPromises = syncModels.map(async (modelId) => {
-          let controller: AbortController | null = null;
+          const displayName = modelId === "txgemma-27b-chat" ? "TxGemma-27B-Chat" : modelId;
           for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
             try {
-              // Abort previous attempt before retrying
-              if (controller) controller.abort();
-              controller = new AbortController();
-
               const resp = await fetch(apiUrl("/run-model"), {
                 method: "POST",
                 headers: apiHeaders({ "Content-Type": "application/json" }),
                 body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
-                signal: controller.signal,
               });
               if (resp.status === 502 && attempt < MAX_RETRIES) {
-                // Container cold-starting — show warming message and retry
-                const displayName = modelId === "txgemma-27b-chat" ? "TxGemma-27B-Chat" : modelId;
+                // 502 = Modal proxy couldn't reach a container (cold start).
+                // The backend never received this request, so retry is safe.
                 onModelResult({
                   model_id: modelId,
                   display_name: displayName,
@@ -282,19 +277,16 @@ export default function Workshop() {
               }
               if (!resp.ok) {
                 const errText = await resp.text().catch(() => resp.statusText);
-                return { model_id: modelId, display_name: modelId, text: null, latency_ms: 0, error: `Error ${resp.status}: ${errText}`, meta: {} } as ModelResponse;
+                return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: `Error ${resp.status}: ${errText}`, meta: {} } as ModelResponse;
               }
               return await resp.json() as ModelResponse;
             } catch (e: any) {
-              if (e.name === "AbortError") continue; // aborted by retry, not a real error
-              if (attempt < MAX_RETRIES) {
-                await new Promise((r) => setTimeout(r, RETRY_DELAY));
-                continue;
-              }
-              return { model_id: modelId, display_name: modelId, text: null, latency_ms: 0, error: e.message, meta: {} } as ModelResponse;
+              // Network error / timeout — the backend may still be processing,
+              // so do NOT retry (would create duplicate work). Just report the error.
+              return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: e.message, meta: {} } as ModelResponse;
             }
           }
-          return { model_id: modelId, display_name: modelId, text: null, latency_ms: 0, error: "Failed after retries", meta: {} } as ModelResponse;
+          return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: "Failed after retries", meta: {} } as ModelResponse;
         });
 
         // Fire sync model results as they arrive
