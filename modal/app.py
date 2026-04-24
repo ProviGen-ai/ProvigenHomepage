@@ -222,7 +222,10 @@ class TxGemmaModel:
     @modal.exit()
     def shutdown(self):
         if hasattr(self, "engine") and self.engine:
-            self.engine.shutdown_background_loop()
+            if hasattr(self.engine, "shutdown_background_loop"):
+                self.engine.shutdown_background_loop()
+            elif hasattr(self.engine, "shutdown"):
+                self.engine.shutdown()
             print("[TxGemma] Engine shut down")
 
     @modal.method()
@@ -320,7 +323,10 @@ class TxGemmaModel:
                         _t.sleep(1)
                         old = self.engine
                         self.engine = compiled_engine
-                        old.shutdown_background_loop()
+                        if hasattr(old, "shutdown_background_loop"):
+                            old.shutdown_background_loop()
+                        elif hasattr(old, "shutdown"):
+                            old.shutdown()
                         del old
                         import torch
                         torch.cuda.empty_cache()
