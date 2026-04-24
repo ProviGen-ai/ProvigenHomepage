@@ -268,7 +268,7 @@ class TxGemmaModel:
 
             final_output = None
             try:
-                async for output in self.engine.generate(prompt_text, params, request_id):
+                async for output in self.engine.generate({"prompt_token_ids": input_ids}, params, request_id):
                     final_output = output
             except asyncio.CancelledError:
                 # Frontend disconnected or Modal cancelled — stop generating
