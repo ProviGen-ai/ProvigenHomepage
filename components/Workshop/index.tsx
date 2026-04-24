@@ -249,119 +249,39 @@ export default function Workshop() {
 
         // Step 2: Call GPT and TxGemma directly, Biomni async with polling
         const syncModels = ["gpt-5.4", "txgemma-27b-chat"];
-        const MAX_RETRIES = 3;
-        const RETRY_DELAY = 15000; // 15 seconds between retries
         const LONG_WAIT_MS = 30000; // show "still working" after 30s
-        const TIMEOUT_MS = 300000; // 5 minutes — fire a competing request
         const syncPromises = syncModels.map(async (modelId) => {
           const displayName = modelId === "txgemma-27b-chat" ? "TxGemma-27B-Chat" : modelId;
 
-          // Parse a response — returns ModelResponse, null for 502, or throws
-          const parseResponse = async (resp: Response): Promise<ModelResponse | null> => {
-            if (resp.status === 502) return null;
+          // Show "still working" after 30s — backend handles retries internally
+          const longWaitTimer = setTimeout(() => {
+            onModelResult({
+              model_id: modelId,
+              display_name: displayName,
+              text: `*${displayName} is still working — this can take a minute on first use...*`,
+              latency_ms: 0,
+              error: null,
+              meta: {},
+              status: "running",
+            } as any);
+          }, LONG_WAIT_MS);
+
+          try {
+            const resp = await fetch(apiUrl("/run-model"), {
+              method: "POST",
+              headers: apiHeaders({ "Content-Type": "application/json" }),
+              body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
+            });
+            clearTimeout(longWaitTimer);
             if (!resp.ok) {
               const errText = await resp.text().catch(() => resp.statusText);
               return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: `Error ${resp.status}: ${errText}`, meta: {} } as ModelResponse;
             }
             return await resp.json() as ModelResponse;
-          };
-
-          // Retry loop — only retries on 502 (backend never received it)
-          for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-            // Fresh controllers per attempt so retries don't carry stale state
-            const controllers: AbortController[] = [];
-            const makeRequest = (): Promise<Response> => {
-              const ctrl = new AbortController();
-              controllers.push(ctrl);
-              return fetch(apiUrl("/run-model"), {
-                method: "POST",
-                headers: apiHeaders({ "Content-Type": "application/json" }),
-                body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
-                signal: ctrl.signal,
-              });
-            };
-            const abortAll = () => controllers.forEach((c) => c.abort());
-
-            try {
-              // Show "still working" after 30s
-              const longWaitTimer = setTimeout(() => {
-                onModelResult({
-                  model_id: modelId,
-                  display_name: displayName,
-                  text: `*${displayName} is still working — this can take a minute on first use...*`,
-                  latency_ms: 0,
-                  error: null,
-                  meta: {},
-                  status: "running",
-                } as any);
-              }, LONG_WAIT_MS);
-
-              // Race: original vs backup request fired after TIMEOUT_MS
-              // First valid response wins, loser is aborted to free GPU
-              const result = await new Promise<ModelResponse>((resolve, reject) => {
-                let settled = false;
-                const settle = (r: ModelResponse) => { if (!settled) { settled = true; abortAll(); resolve(r); } };
-                const fail = (e: Error) => { if (!settled) { settled = true; abortAll(); reject(e); } };
-
-                // Original request
-                makeRequest()
-                  .then((resp) => parseResponse(resp))
-                  .then((parsed) => {
-                    if (parsed) { settle(parsed); return; }
-                    // 502 — reject so retry loop continues
-                    fail(new Error("502"));
-                  })
-                  .catch((e) => {
-                    if (e.name === "AbortError") return; // aborted by winner, ignore
-                    fail(e);
-                  });
-
-                // After TIMEOUT_MS, fire a competing backup request
-                setTimeout(() => {
-                  if (settled) return;
-                  onModelResult({
-                    model_id: modelId,
-                    display_name: displayName,
-                    text: `*${displayName} is taking longer than expected, sending backup request...*`,
-                    latency_ms: 0,
-                    error: null,
-                    meta: {},
-                    status: "running",
-                  } as any);
-                  makeRequest()
-                    .then((resp) => parseResponse(resp))
-                    .then((parsed) => {
-                      if (parsed) { settle(parsed); return; }
-                      // Backup also got 502 — reject
-                      fail(new Error("502"));
-                    })
-                    .catch((e) => {
-                      if (e.name === "AbortError") return;
-                      fail(e);
-                    });
-                }, TIMEOUT_MS);
-              });
-
-              clearTimeout(longWaitTimer);
-              return result;
-            } catch (e: any) {
-              if (e.message === "502" && attempt < MAX_RETRIES) {
-                onModelResult({
-                  model_id: modelId,
-                  display_name: displayName,
-                  text: `*${displayName} is warming up after standby, retrying... (attempt ${attempt + 2}/${MAX_RETRIES + 1})*`,
-                  latency_ms: 0,
-                  error: null,
-                  meta: {},
-                  status: "running",
-                } as any);
-                await new Promise((r) => setTimeout(r, RETRY_DELAY));
-                continue;
-              }
-              return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: e.message, meta: {} } as ModelResponse;
-            }
+          } catch (e: any) {
+            clearTimeout(longWaitTimer);
+            return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: e.message, meta: {} } as ModelResponse;
           }
-          return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: "Failed after retries", meta: {} } as ModelResponse;
         });
 
         // Fire sync model results as they arrive
