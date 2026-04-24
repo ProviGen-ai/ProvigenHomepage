@@ -267,8 +267,14 @@ class TxGemmaModel:
 
             # Pass TokensPrompt instead of raw string to avoid deprecation warning
             final_output = None
-            async for output in self.engine.generate({"prompt_token_ids": input_ids}, params, request_id):
-                final_output = output
+            try:
+                async for output in self.engine.generate({"prompt_token_ids": input_ids}, params, request_id):
+                    final_output = output
+            except asyncio.CancelledError:
+                # Frontend disconnected or Modal cancelled — stop generating
+                await self.engine.abort(request_id)
+                print(f"[TxGemma] Request {request_id} cancelled, GPU freed")
+                raise
 
             raw_text = final_output.outputs[0].text
             finish_reason = final_output.outputs[0].finish_reason
