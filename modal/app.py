@@ -235,10 +235,35 @@ class TxGemmaModel:
 
             params = SamplingParams(max_tokens=effective_max_tokens, temperature=temperature)
             outputs = self.llm.generate([prompt], params)
-            text = _format_markdown_headers(outputs[0].outputs[0].text)
+            raw_text = outputs[0].outputs[0].text
+            finish_reason = outputs[0].outputs[0].finish_reason
+
+            # If output was cut off by token limit, ask GPT to finish the last sentence
+            if finish_reason == "length" and raw_text:
+                try:
+                    import os
+                    from openai import OpenAI as _OAI
+                    client = _OAI(api_key=os.getenv("OPENAI_API_KEY"))
+                    tail = raw_text[-500:]  # last 500 chars for context
+                    completion = client.chat.completions.create(
+                        model="gpt-4.1-mini",
+                        messages=[
+                            {"role": "system", "content": "The following text was cut off mid-sentence. Write ONLY the missing ending to complete the final sentence and add a brief concluding sentence. Nothing else."},
+                            {"role": "user", "content": tail},
+                        ],
+                        max_tokens=150,
+                        temperature=0,
+                    )
+                    ending = completion.choices[0].message.content.strip()
+                    raw_text = raw_text.rstrip() + " " + ending
+                    print(f"[TxGemma] Output hit token limit — GPT completed ending ({len(ending)} chars)")
+                except Exception as ex:
+                    print(f"[TxGemma] Failed to complete truncated output: {ex}")
+
+            text = _format_markdown_headers(raw_text)
 
             latency_ms = int((time.time() - start) * 1000)
-            print(f"[TxGemma] {latency_ms}ms | {len(text)} chars\n{text}")
+            print(f"[TxGemma] {latency_ms}ms | {len(text)} chars | finish: {finish_reason}\n{text}")
 
             # After first response, swap to compiled model in background
             if self._needs_swap:
