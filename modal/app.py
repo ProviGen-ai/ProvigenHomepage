@@ -128,8 +128,10 @@ backend_image = (
     )
 )
 
-# TxGemma image — GPU, vLLM, model weights baked in
+# TxGemma image — GPU, vLLM (weights loaded from volume, not baked into image)
 TXGEMMA_MODEL = "google/txgemma-27b-chat"
+TXGEMMA_WEIGHTS_PATH = "/data/txgemma-weights"
+txgemma_weights_volume = modal.Volume.from_name("txgemma-weights", create_if_missing=True)
 txgemma_image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install(
@@ -138,11 +140,6 @@ txgemma_image = (
         "transformers>=4.48.0",
         "huggingface_hub>=0.27.0",
         "bitsandbytes>=0.45.0",
-    )
-    .env({"HF_HUB_ENABLE_HF_TRANSFER": "1"})
-    .run_commands(
-        f'python -c "from huggingface_hub import snapshot_download; snapshot_download(\'{TXGEMMA_MODEL}\')"',
-        secrets=[modal.Secret.from_name("huggingface")],
     )
 )
 
@@ -157,7 +154,10 @@ txgemma_image = (
     timeout=900,
     scaledown_window=1800,
     secrets=[modal.Secret.from_name("huggingface")],
-    volumes={COMPILE_CACHE_PATH: compile_cache_volume},
+    volumes={
+        COMPILE_CACHE_PATH: compile_cache_volume,
+        TXGEMMA_WEIGHTS_PATH: txgemma_weights_volume,
+    },
 )
 @modal.concurrent(max_inputs=2)
 class TxGemmaModel:
@@ -166,15 +166,29 @@ class TxGemmaModel:
         import os
         from vllm import LLM
 
+        # Download weights to volume on first run
+        model_dir = os.path.join(TXGEMMA_WEIGHTS_PATH, "txgemma-27b-chat")
+        if not os.path.isdir(model_dir) or not os.listdir(model_dir):
+            print("[TxGemma] Downloading weights to volume (first run only)...")
+            from huggingface_hub import snapshot_download
+            snapshot_download(
+                TXGEMMA_MODEL,
+                local_dir=model_dir,
+                local_dir_use_symlinks=False,
+            )
+            txgemma_weights_volume.commit()
+            print("[TxGemma] Weights saved to volume")
+        else:
+            print("[TxGemma] Weights found in volume")
+
         # Check if compile cache exists from a previous container
         cache_dir = os.path.join(COMPILE_CACHE_PATH, "torch_compile_cache")
         has_cache = os.path.isdir(cache_dir) and len(os.listdir(cache_dir)) > 0
 
         if has_cache:
-            # Compiled cache available — load compiled directly (fast from cache)
             print("[TxGemma] Compile cache found — loading 8-bit compiled model from cache")
             self.llm = LLM(
-                model=TXGEMMA_MODEL,
+                model=model_dir,
                 max_model_len=8192,
                 quantization="bitsandbytes",
                 load_format="bitsandbytes",
@@ -184,16 +198,15 @@ class TxGemmaModel:
             )
             self._needs_swap = False
         else:
-            # No cache — start eager for fast cold start, swap later
             print("[TxGemma] No compile cache — starting 8-bit eager mode")
             self.llm = LLM(
-                model=TXGEMMA_MODEL,
+                model=model_dir,
                 max_model_len=8192,
                 quantization="bitsandbytes",
                 load_format="bitsandbytes",
                 dtype="bfloat16",
                 trust_remote_code=True,
-                gpu_memory_utilization=0.45,  # half GPU — leave room for compiled model
+                gpu_memory_utilization=0.45,
                 enforce_eager=True,
             )
             self._needs_swap = True
@@ -273,8 +286,10 @@ class TxGemmaModel:
                     try:
                         from vllm import LLM as _LLM
                         print("[TxGemma] Background: building compiled 8-bit model...")
+                        import os as _os
+                        model_dir = _os.path.join(TXGEMMA_WEIGHTS_PATH, "txgemma-27b-chat")
                         compiled_llm = _LLM(
-                            model=TXGEMMA_MODEL,
+                            model=model_dir,
                             max_model_len=8192,
                             quantization="bitsandbytes",
                             load_format="bitsandbytes",
