@@ -174,7 +174,6 @@ class TxGemmaModel:
             snapshot_download(
                 TXGEMMA_MODEL,
                 local_dir=model_dir,
-                local_dir_use_symlinks=False,
             )
             txgemma_weights_volume.commit()
             print("[TxGemma] Weights saved to volume")
