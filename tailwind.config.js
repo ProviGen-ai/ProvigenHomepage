@@ -8,6 +8,7 @@ module.exports = {
   safelist: [
     "bg-green-100", "bg-green-900/30", "text-green-700", "text-green-400",
     "bg-red-100", "bg-red-900/30", "text-red-700", "text-red-400",
+    "bg-yellow-500", "hover:bg-yellow-600", "text-yellow-500",
     "bg-green-50", "bg-red-50",
   ],
   darkMode: "class",
