@@ -251,15 +251,39 @@ export default function Workshop() {
         const syncModels = ["gpt-5.4", "txgemma-27b-chat"];
         const MAX_RETRIES = 3;
         const RETRY_DELAY = 15000; // 15 seconds between retries
+        const LONG_WAIT_MS = 30000; // show "still working" after 30s
+        const TIMEOUT_MS = 300000; // 5 minutes hard timeout — then retry
         const syncPromises = syncModels.map(async (modelId) => {
           const displayName = modelId === "txgemma-27b-chat" ? "TxGemma-27B-Chat" : modelId;
           for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
             try {
+              const controller = new AbortController();
+
+              // Show "still working" message after LONG_WAIT_MS
+              const longWaitTimer = setTimeout(() => {
+                onModelResult({
+                  model_id: modelId,
+                  display_name: displayName,
+                  text: `*${displayName} is still working — this can take a minute on first use...*`,
+                  latency_ms: 0,
+                  error: null,
+                  meta: {},
+                  status: "running",
+                } as any);
+              }, LONG_WAIT_MS);
+
+              // Hard timeout at 5 minutes — abort and retry
+              const timeoutTimer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
               const resp = await fetch(apiUrl("/run-model"), {
                 method: "POST",
                 headers: apiHeaders({ "Content-Type": "application/json" }),
                 body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
+                signal: controller.signal,
               });
+              clearTimeout(longWaitTimer);
+              clearTimeout(timeoutTimer);
+
               if (resp.status === 502 && attempt < MAX_RETRIES) {
                 // 502 = Modal proxy couldn't reach a container (cold start).
                 // The backend never received this request, so retry is safe.
@@ -281,9 +305,21 @@ export default function Workshop() {
               }
               return await resp.json() as ModelResponse;
             } catch (e: any) {
-              // Network error / timeout — the backend may still be processing,
-              // so do NOT retry (would create duplicate work). Just report the error.
-              return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: e.message, meta: {} } as ModelResponse;
+              if (e.name === "AbortError" && attempt < MAX_RETRIES) {
+                // 5-minute timeout — retry since the request likely died
+                onModelResult({
+                  model_id: modelId,
+                  display_name: displayName,
+                  text: `*${displayName} timed out, retrying... (attempt ${attempt + 2}/${MAX_RETRIES + 1})*`,
+                  latency_ms: 0,
+                  error: null,
+                  meta: {},
+                  status: "running",
+                } as any);
+                await new Promise((r) => setTimeout(r, RETRY_DELAY));
+                continue;
+              }
+              return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: e.name === "AbortError" ? "Request timed out" : e.message, meta: {} } as ModelResponse;
             }
           }
           return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: "Failed after retries", meta: {} } as ModelResponse;
