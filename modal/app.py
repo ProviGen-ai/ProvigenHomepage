@@ -896,57 +896,46 @@ def backend():
         return summary
 
     def call_txgemma(prompt: str) -> dict:
-        """Call TxGemma via Modal internal function. Retries internally on 502 (cold start)."""
+        """Call TxGemma via Modal internal function. .remote() waits for container — no retry needed."""
         import time as _time
         start = _time.time()
+        try:
+            # TxGemma doesn't support system role — use a custom prompt
+            txgemma_system = (
+                "You are an expert biomedical scientist. Provide a thorough, detailed, and complete answer. "
+                "Cover all relevant aspects of the question with scientific depth. "
+                "Use structured formatting with headers and bullet points. "
+                "Be specific and concrete — cite specific genes, pathways, drugs, mechanisms, trial names, "
+                "or data points rather than generic statements. Avoid vague filler conclusions like "
+                "'more research is needed' or 'the field is rapidly evolving'. "
+                "Every sentence should contain a specific fact, comparison, or actionable insight. "
+                "If your answer is getting long, finish your current point and provide a brief conclusion "
+                "rather than stopping mid-sentence. You have no tool access, no search, and no internet. "
+                "Answer solely from your training knowledge."
+            )
 
-        # TxGemma doesn't support system role — use a custom prompt
-        txgemma_system = (
-            "You are an expert biomedical scientist. Provide a thorough, detailed, and complete answer. "
-            "Cover all relevant aspects of the question with scientific depth. "
-            "Use structured formatting with headers and bullet points. "
-            "Be specific and concrete — cite specific genes, pathways, drugs, mechanisms, trial names, "
-            "or data points rather than generic statements. Avoid vague filler conclusions like "
-            "'more research is needed' or 'the field is rapidly evolving'. "
-            "Every sentence should contain a specific fact, comparison, or actionable insight. "
-            "If your answer is getting long, finish your current point and provide a brief conclusion "
-            "rather than stopping mid-sentence. You have no tool access, no search, and no internet. "
-            "Answer solely from your training knowledge."
-        )
+            # Check if prompt is too long for TxGemma's context and summarize if needed
+            # Estimate ~4 chars per token; leave room for 6144 output tokens
+            full_input = txgemma_system + "\n\n" + prompt
+            est_tokens = len(full_input) // 4
+            max_input_tokens = 8192 - 6144  # ~2k for input, rest for output
+            if est_tokens > max_input_tokens:
+                print(f"[TxGemma] Prompt too long (~{est_tokens} tokens > {max_input_tokens}), summarizing...")
+                prompt = _summarize_for_txgemma(prompt)
 
-        # Check if prompt is too long for TxGemma's context and summarize if needed
-        # Estimate ~4 chars per token; leave room for 6144 output tokens
-        full_input = txgemma_system + "\n\n" + prompt
-        est_tokens = len(full_input) // 4
-        max_input_tokens = 8192 - 6144  # ~2k for input, rest for output
-        if est_tokens > max_input_tokens:
-            print(f"[TxGemma] Prompt too long (~{est_tokens} tokens > {max_input_tokens}), summarizing...")
-            prompt = _summarize_for_txgemma(prompt)
-
-        messages = [{"role": "user", "content": txgemma_system + "\n\n" + prompt}]
-
-        MAX_RETRIES = 3
-        RETRY_DELAY = 20  # seconds between retries
-        for attempt in range(MAX_RETRIES + 1):
-            try:
-                result = txgemma_model.chat.remote(messages, max_tokens=7680, temperature=0.3)
-                return result
-            except Exception as e:
-                err_str = str(e)
-                is_502 = "502" in err_str or "Bad Gateway" in err_str
-                if is_502 and attempt < MAX_RETRIES:
-                    print(f"[TxGemma] 502 on attempt {attempt + 1}/{MAX_RETRIES + 1}, retrying in {RETRY_DELAY}s...")
-                    _time.sleep(RETRY_DELAY)
-                    continue
-                latency_ms = int((_time.time() - start) * 1000)
-                return {
-                    "model_id": "txgemma-27b-chat",
-                    "display_name": "TxGemma-27B-Chat",
-                    "text": None,
-                    "latency_ms": latency_ms,
-                    "error": err_str,
-                    "meta": {},
-                }
+            messages = [{"role": "user", "content": txgemma_system + "\n\n" + prompt}]
+            result = txgemma_model.chat.remote(messages, max_tokens=7680, temperature=0.3)
+            return result
+        except Exception as e:
+            latency_ms = int((_time.time() - start) * 1000)
+            return {
+                "model_id": "txgemma-27b-chat",
+                "display_name": "TxGemma-27B-Chat",
+                "text": None,
+                "latency_ms": latency_ms,
+                "error": str(e),
+                "meta": {},
+            }
 
     def call_biomni_async(prompt: str, run_id: str) -> None:
         """Fire-and-forget Biomni via Modal spawn. Results written to volume for polling."""
