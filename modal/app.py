@@ -614,6 +614,30 @@ def biomni_predict(prompt: str, run_id: str = "") -> dict:
         })
 
     try:
+        # Monkey-patch: fix Biomni's ClinicalTrials.gov queries that use invalid
+        # API parameters (filter.studyType is not a valid v2 API parameter)
+        import requests as _requests
+        _original_get = _requests.get
+        def _patched_get(url, *args, **kwargs):
+            if "clinicaltrials.gov" in str(url):
+                # Remove invalid filter parameters from URL
+                from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+                parsed = urlparse(url)
+                params = parse_qs(parsed.query, keep_blank_values=True)
+                invalid_keys = [k for k in params if k.startswith("filter.")]
+                if invalid_keys:
+                    for k in invalid_keys:
+                        # Convert filter.studyType to query.studyType (valid v2 param)
+                        new_key = k.replace("filter.", "query.")
+                        if new_key not in params:
+                            params[new_key] = params[k]
+                        del params[k]
+                    new_query = urlencode({k: v[0] for k, v in params.items()})
+                    url = urlunparse(parsed._replace(query=new_query))
+                    print(f"[Biomni] Patched ClinicalTrials.gov URL: removed {invalid_keys}")
+            return _original_get(url, *args, **kwargs)
+        _requests.get = _patched_get
+
         from biomni.agent import A1
 
         # Capture stdout to extract intermediate solutions
