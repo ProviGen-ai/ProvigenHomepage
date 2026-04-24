@@ -70,6 +70,7 @@ export default function WorkshopResults() {
 
   // Stress test state
   const [stressRunning, setStressRunning] = useState(false);
+  const [stressMode, setStressMode] = useState<"raw" | "cold-start">("raw");
   const [stressResults, setStressResults] = useState<Array<{
     request: number;
     model_id: string;
@@ -77,6 +78,7 @@ export default function WorkshopResults() {
     latency_ms: number;
     error?: string;
     textLength?: number;
+    retries?: number;
   }>>([]);
 
   const loadStats = useCallback(async (pw: string) => {
@@ -160,9 +162,11 @@ export default function WorkshopResults() {
     }
   };
 
-  const runStressTest = async () => {
+  const runStressTest = async (mode: "raw" | "cold-start") => {
     const NUM_REQUESTS = 10;
     const TIMEOUT_MS = 180000; // 3 minutes per request
+    const MAX_RETRIES = mode === "cold-start" ? 3 : 0;
+    const RETRY_DELAY = 15000; // 15s between retries
     const TEST_PROMPTS = [
       "What is the central dogma of molecular biology?",
       "Explain the mechanism of action of PD-1 inhibitors.",
@@ -177,9 +181,10 @@ export default function WorkshopResults() {
     ];
 
     setStressRunning(true);
+    setStressMode(mode);
     const models = ["gpt-5.4", "txgemma-27b-chat", "biomni"];
     const initial = Array.from({ length: NUM_REQUESTS }, (_, i) =>
-      models.map((m) => ({ request: i + 1, model_id: m, status: "pending" as const, latency_ms: 0 }))
+      models.map((m) => ({ request: i + 1, model_id: m, status: "pending" as const, latency_ms: 0, retries: 0 }))
     ).flat();
     setStressResults(initial);
 
@@ -189,7 +194,6 @@ export default function WorkshopResults() {
       const start = Date.now();
 
       try {
-        // Start a run
         const startResp = await fetch(apiUrl("/start-run"), {
           method: "POST",
           headers: apiHeaders({ "Content-Type": "application/json" }),
@@ -198,79 +202,98 @@ export default function WorkshopResults() {
         if (!startResp.ok) throw new Error(`start-run failed: ${startResp.status}`);
         const { run_id, prompt: resolvedPrompt } = await startResp.json();
 
-        // Call each model
         const modelPromises = models.map(async (modelId) => {
           const mStart = Date.now();
-          try {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+          let retries = 0;
 
-            const resp = await fetch(apiUrl("/run-model"), {
-              method: "POST",
-              headers: apiHeaders({ "Content-Type": "application/json" }),
-              body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
-              signal: controller.signal,
-            });
-            clearTimeout(timer);
+          for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+            try {
+              const controller = new AbortController();
+              const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
-            const mLatency = Date.now() - mStart;
+              const resp = await fetch(apiUrl("/run-model"), {
+                method: "POST",
+                headers: apiHeaders({ "Content-Type": "application/json" }),
+                body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
+                signal: controller.signal,
+              });
+              clearTimeout(timer);
 
-            if (!resp.ok) {
+              const mLatency = Date.now() - mStart;
+
+              if (resp.status === 502 && attempt < MAX_RETRIES) {
+                retries++;
+                setStressResults((prev) => prev.map((r) =>
+                  r.request === i + 1 && r.model_id === modelId
+                    ? { ...r, status: "pending", latency_ms: mLatency, retries, error: `502 at ${(mLatency / 1000).toFixed(1)}s — retrying...` }
+                    : r
+                ));
+                await new Promise((r) => setTimeout(r, RETRY_DELAY));
+                continue;
+              }
+
+              if (!resp.ok) {
+                setStressResults((prev) => prev.map((r) =>
+                  r.request === i + 1 && r.model_id === modelId
+                    ? { ...r, status: "error", latency_ms: mLatency, retries, error: `HTTP ${resp.status} at ${(mLatency / 1000).toFixed(1)}s` }
+                    : r
+                ));
+                return;
+              }
+
+              const data = await resp.json();
+              // For Biomni, poll until done
+              if (modelId === "biomni" && (!data.text || data.status === "running")) {
+                for (let p = 0; p < 60; p++) {
+                  await new Promise((r) => setTimeout(r, 5000));
+                  const pollResp = await fetch(apiUrl("/poll-biomni"), {
+                    method: "POST",
+                    headers: apiHeaders({ "Content-Type": "application/json" }),
+                    body: JSON.stringify({ run_id }),
+                  });
+                  if (!pollResp.ok) continue;
+                  const pollData = await pollResp.json();
+                  if (pollData.status === "done") {
+                    const finalLatency = Date.now() - mStart;
+                    setStressResults((prev) => prev.map((r) =>
+                      r.request === i + 1 && r.model_id === modelId
+                        ? { ...r, status: pollData.error ? "error" : "success", latency_ms: finalLatency, textLength: pollData.text?.length || 0, retries, error: pollData.error || undefined }
+                        : r
+                    ));
+                    return;
+                  }
+                }
+                setStressResults((prev) => prev.map((r) =>
+                  r.request === i + 1 && r.model_id === modelId
+                    ? { ...r, status: "timeout", latency_ms: Date.now() - mStart, retries }
+                    : r
+                ));
+                return;
+              }
+
               setStressResults((prev) => prev.map((r) =>
                 r.request === i + 1 && r.model_id === modelId
-                  ? { ...r, status: "error", latency_ms: mLatency, error: `HTTP ${resp.status}` }
+                  ? { ...r, status: data.error ? "error" : "success", latency_ms: mLatency, textLength: data.text?.length || 0, retries, error: data.error || undefined }
                   : r
               ));
-              return;
-            }
-
-            const data = await resp.json();
-            // For Biomni, poll until done
-            if (modelId === "biomni" && (!data.text || data.status === "running")) {
-              for (let p = 0; p < 60; p++) {
-                await new Promise((r) => setTimeout(r, 5000));
-                const pollResp = await fetch(apiUrl("/poll-biomni"), {
-                  method: "POST",
-                  headers: apiHeaders({ "Content-Type": "application/json" }),
-                  body: JSON.stringify({ run_id }),
-                });
-                if (!pollResp.ok) continue;
-                const pollData = await pollResp.json();
-                if (pollData.status === "done") {
-                  const finalLatency = Date.now() - mStart;
-                  setStressResults((prev) => prev.map((r) =>
-                    r.request === i + 1 && r.model_id === modelId
-                      ? { ...r, status: pollData.error ? "error" : "success", latency_ms: finalLatency, textLength: pollData.text?.length || 0, error: pollData.error || undefined }
-                      : r
-                  ));
-                  return;
-                }
+              return; // success — exit retry loop
+            } catch (e: any) {
+              if (attempt < MAX_RETRIES) {
+                retries++;
+                await new Promise((r) => setTimeout(r, RETRY_DELAY));
+                continue;
               }
               setStressResults((prev) => prev.map((r) =>
                 r.request === i + 1 && r.model_id === modelId
-                  ? { ...r, status: "timeout", latency_ms: Date.now() - mStart }
+                  ? { ...r, status: e.name === "AbortError" ? "timeout" : "error", latency_ms: Date.now() - mStart, retries, error: e.message }
                   : r
               ));
-              return;
             }
-
-            setStressResults((prev) => prev.map((r) =>
-              r.request === i + 1 && r.model_id === modelId
-                ? { ...r, status: data.error ? "error" : "success", latency_ms: mLatency, textLength: data.text?.length || 0, error: data.error || undefined }
-                : r
-            ));
-          } catch (e: any) {
-            setStressResults((prev) => prev.map((r) =>
-              r.request === i + 1 && r.model_id === modelId
-                ? { ...r, status: e.name === "AbortError" ? "timeout" : "error", latency_ms: Date.now() - mStart, error: e.message }
-                : r
-            ));
           }
         });
 
         await Promise.allSettled(modelPromises);
       } catch (e: any) {
-        // Mark all models for this request as error
         models.forEach((m) => {
           setStressResults((prev) => prev.map((r) =>
             r.request === i + 1 && r.model_id === m
@@ -650,13 +673,22 @@ export default function WorkshopResults() {
                 <h2 className="text-base font-semibold text-black dark:text-white">Stress Test</h2>
                 <p className="text-xs text-body-color mt-0.5">Send 10 requests in rapid succession, track results per model</p>
               </div>
-              <button
-                onClick={runStressTest}
-                disabled={stressRunning}
-                className="rounded-lg bg-primary py-2 px-4 text-sm font-semibold text-white hover:bg-primary/80 disabled:opacity-40 transition-all"
-              >
-                {stressRunning ? "Running..." : "Run Stress Test"}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => runStressTest("raw")}
+                  disabled={stressRunning}
+                  className="rounded-lg bg-primary py-2 px-4 text-sm font-semibold text-white hover:bg-primary/80 disabled:opacity-40 transition-all"
+                >
+                  {stressRunning && stressMode === "raw" ? "Running..." : "Raw"}
+                </button>
+                <button
+                  onClick={() => runStressTest("cold-start")}
+                  disabled={stressRunning}
+                  className="rounded-lg bg-yellow-500 py-2 px-4 text-sm font-semibold text-white hover:bg-yellow-600 disabled:opacity-40 transition-all"
+                >
+                  {stressRunning && stressMode === "cold-start" ? "Running..." : "Cold Start (retry)"}
+                </button>
+              </div>
             </div>
 
             {stressResults.length > 0 && (
@@ -669,6 +701,7 @@ export default function WorkshopResults() {
                       const successes = modelResults.filter((r) => r.status === "success").length;
                       const errors = modelResults.filter((r) => r.status === "error").length;
                       const timeouts = modelResults.filter((r) => r.status === "timeout").length;
+                      const totalRetries = modelResults.reduce((a, r) => a + (r.retries || 0), 0);
                       const avgLatency = successes > 0
                         ? Math.round(modelResults.filter((r) => r.status === "success").reduce((a, r) => a + r.latency_ms, 0) / successes)
                         : 0;
@@ -688,6 +721,12 @@ export default function WorkshopResults() {
                               <span className="text-yellow-500">Timeouts</span>
                               <span className="font-semibold text-yellow-500">{timeouts}</span>
                             </div>
+                            {totalRetries > 0 && (
+                              <div className="flex justify-between">
+                                <span className="text-blue-500">Retries</span>
+                                <span className="font-semibold text-blue-500">{totalRetries}</span>
+                              </div>
+                            )}
                             {avgLatency > 0 && (
                               <div className="flex justify-between pt-1 border-t border-gray-100 dark:border-gray-700">
                                 <span className="text-body-color">Avg latency</span>
@@ -731,15 +770,17 @@ export default function WorkshopResults() {
                                   <span className="text-green-600">
                                     {(r.latency_ms / 1000).toFixed(1)}s
                                     {r.textLength ? ` (${r.textLength} chars)` : ""}
+                                    {(r.retries || 0) > 0 && <span className="text-blue-500 ml-1">+{r.retries}r</span>}
                                   </span>
                                 )}
                                 {r.status === "error" && (
                                   <span className="text-red-500" title={r.error}>
-                                    error{r.error ? `: ${r.error.slice(0, 30)}` : ""}
+                                    {(r.latency_ms / 1000).toFixed(1)}s err{r.error ? `: ${r.error.slice(0, 25)}` : ""}
+                                    {(r.retries || 0) > 0 && <span className="text-blue-500 ml-1">+{r.retries}r</span>}
                                   </span>
                                 )}
                                 {r.status === "timeout" && (
-                                  <span className="text-yellow-500">timeout</span>
+                                  <span className="text-yellow-500">{(r.latency_ms / 1000).toFixed(1)}s timeout</span>
                                 )}
                               </td>
                             );
