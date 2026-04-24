@@ -247,78 +247,59 @@ export default function Workshop() {
           setIsNewResult(true);
         };
 
-        // Step 2: Call GPT and TxGemma directly, Biomni async with polling
-        const syncModels = ["gpt-5.4", "txgemma-27b-chat"];
-        const LONG_WAIT_MS = 30000; // show "still working" after 30s
-        const syncPromises = syncModels.map(async (modelId) => {
-          const displayName = modelId === "txgemma-27b-chat" ? "TxGemma-27B-Chat" : modelId;
-
-          // Show "still working" after 30s — backend handles retries internally
-          const longWaitTimer = setTimeout(() => {
-            onModelResult({
-              model_id: modelId,
-              display_name: displayName,
-              text: `*${displayName} is still working — this can take a minute on first use...*`,
-              latency_ms: 0,
-              error: null,
-              meta: {},
-              status: "running",
-            } as any);
-          }, LONG_WAIT_MS);
-
+        // Step 2: GPT sync, TxGemma + Biomni async with polling
+        const gptPromise = (async () => {
           try {
             const resp = await fetch(apiUrl("/run-model"), {
               method: "POST",
               headers: apiHeaders({ "Content-Type": "application/json" }),
-              body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
+              body: JSON.stringify({ run_id, model_id: "gpt-5.4", prompt: resolvedPrompt }),
             });
-            clearTimeout(longWaitTimer);
             if (!resp.ok) {
               const errText = await resp.text().catch(() => resp.statusText);
-              return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: `Error ${resp.status}: ${errText}`, meta: {} } as ModelResponse;
+              return { model_id: "gpt-5.4", display_name: "GPT-5.4", text: null, latency_ms: 0, error: `Error ${resp.status}: ${errText}`, meta: {} } as ModelResponse;
             }
             return await resp.json() as ModelResponse;
           } catch (e: any) {
-            clearTimeout(longWaitTimer);
-            return { model_id: modelId, display_name: displayName, text: null, latency_ms: 0, error: e.message, meta: {} } as ModelResponse;
+            return { model_id: "gpt-5.4", display_name: "GPT-5.4", text: null, latency_ms: 0, error: e.message, meta: {} } as ModelResponse;
           }
-        });
+        })();
+        gptPromise.then(onModelResult);
 
-        // Fire sync model results as they arrive
-        for (const promise of syncPromises) {
-          promise.then(onModelResult);
+        // Start TxGemma + Biomni async (fire-and-poll to avoid HTTP proxy timeout)
+        const asyncModels = [
+          { modelId: "txgemma-27b-chat", displayName: "TxGemma-27B-Chat", pollEndpoint: "/poll-txgemma" },
+          { modelId: "biomni", displayName: "Biomni", pollEndpoint: "/poll-biomni" },
+        ];
+        for (const { modelId } of asyncModels) {
+          fetch(apiUrl("/run-model"), {
+            method: "POST",
+            headers: apiHeaders({ "Content-Type": "application/json" }),
+            body: JSON.stringify({ run_id, model_id: modelId, prompt: resolvedPrompt }),
+          }).catch(() => {});
         }
 
-        // Start Biomni async
-        fetch(apiUrl("/run-model"), {
-          method: "POST",
-          headers: apiHeaders({ "Content-Type": "application/json" }),
-          body: JSON.stringify({ run_id, model_id: "biomni", prompt: resolvedPrompt }),
-        }).catch(() => {});
-
-        // Poll Biomni every 5 seconds until done
-        const pollBiomni = async (): Promise<void> => {
+        // Poll async models every 5 seconds until done
+        const asyncPromises = asyncModels.map(async ({ modelId, displayName, pollEndpoint }) => {
           const POLL_INTERVAL = 5000;
           const MAX_POLLS = 120; // 10 minutes max
           let lastText = "";
           for (let i = 0; i < MAX_POLLS; i++) {
             await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
             try {
-              const resp = await fetch(apiUrl("/poll-biomni"), {
+              const resp = await fetch(apiUrl(pollEndpoint), {
                 method: "POST",
                 headers: apiHeaders({ "Content-Type": "application/json" }),
                 body: JSON.stringify({ run_id }),
               });
               if (!resp.ok) continue;
               const data = await resp.json();
-              // Only update card when content has actually changed or grown
               const newText = data.text || "";
               if (data.status === "done") {
                 onModelResult(data as ModelResponse);
                 return;
               }
               if (newText && newText !== lastText) {
-                // Keep the longer text if the new one is a subset (avoid erasing progress)
                 if (newText.length >= lastText.length || !lastText.startsWith(newText)) {
                   lastText = newText;
                   onModelResult(data as ModelResponse);
@@ -326,21 +307,18 @@ export default function Workshop() {
               }
             } catch { /* retry */ }
           }
-          // Timed out
           onModelResult({
-            model_id: "biomni",
-            display_name: "Biomni",
+            model_id: modelId,
+            display_name: displayName,
             text: null,
             latency_ms: 0,
-            error: "Biomni timed out after 10 minutes",
+            error: `${displayName} timed out after 10 minutes`,
             meta: {},
           });
-        };
-
-        const biomniPromise = pollBiomni();
+        });
 
         // Wait for all to finish
-        await Promise.allSettled([...syncPromises, biomniPromise]);
+        await Promise.allSettled([gptPromise, ...asyncPromises]);
         setIsFollowUp(true);
       } catch (e: any) {
         // Set error on any placeholder cards that haven't received a response yet

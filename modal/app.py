@@ -368,6 +368,120 @@ class TxGemmaModel:
 
 
 # ---------------------------------------------------------------------------
+# TxGemma async runner (CPU — spawned, calls GPU container via .remote())
+# ---------------------------------------------------------------------------
+
+txgemma_model = TxGemmaModel()
+
+@app.function(
+    image=backend_image,
+    secrets=[modal.Secret.from_name("workshop-secrets")],
+    timeout=600,
+)
+def txgemma_predict(prompt: str, run_id: str):
+    """Spawned async: prepares prompt, calls TxGemma GPU container, writes result to shared dict."""
+    import json as _json_mod
+    import os
+    import time as _time
+
+    start = _time.time()
+    txgemma_dict = modal.Dict.from_name("txgemma-status", create_if_missing=True)
+
+    def _write_status(data: dict):
+        try:
+            txgemma_dict[run_id] = _json_mod.dumps(data)
+        except Exception as ex:
+            print(f"[TxGemma-async] Failed to write status: {ex}")
+
+    # Write initial running status
+    _write_status({
+        "model_id": "txgemma-27b-chat",
+        "display_name": "TxGemma-27B-Chat",
+        "text": "*TxGemma-27B-Chat is starting up...*",
+        "latency_ms": 0,
+        "error": None,
+        "status": "running",
+        "meta": {},
+    })
+
+    try:
+        # System prompt (TxGemma doesn't support system role)
+        txgemma_system = (
+            "You are an expert biomedical scientist. Provide a thorough, detailed, and complete answer. "
+            "Cover all relevant aspects of the question with scientific depth. "
+            "Use structured formatting with headers and bullet points. "
+            "Be specific and concrete — cite specific genes, pathways, drugs, mechanisms, trial names, "
+            "or data points rather than generic statements. Avoid vague filler conclusions like "
+            "'more research is needed' or 'the field is rapidly evolving'. "
+            "Every sentence should contain a specific fact, comparison, or actionable insight. "
+            "If your answer is getting long, finish your current point and provide a brief conclusion "
+            "rather than stopping mid-sentence. You have no tool access, no search, and no internet. "
+            "Answer solely from your training knowledge."
+        )
+
+        # Check if prompt is too long and summarize if needed
+        full_input = txgemma_system + "\n\n" + prompt
+        est_tokens = len(full_input) // 4
+        max_input_tokens = 8192 - 6144
+        if est_tokens > max_input_tokens:
+            print(f"[TxGemma-async] Prompt too long (~{est_tokens} tokens > {max_input_tokens}), summarizing...")
+            from openai import OpenAI as _OAI
+            client = _OAI(api_key=os.getenv("OPENAI_API_KEY"))
+            response = client.chat.completions.create(
+                model="gpt-4.1-mini",
+                messages=[
+                    {"role": "system", "content": (
+                        "You are a scientific assistant. The user's prompt (which may include conversation history) "
+                        "is too long for a downstream model with limited context. Summarize it into a single, "
+                        "self-contained prompt that preserves the latest question and all essential context from "
+                        "prior exchanges. Keep scientific detail. Do not answer the question — just condense the prompt."
+                    )},
+                    {"role": "user", "content": prompt},
+                ],
+                max_tokens=2000,
+                temperature=0,
+            )
+            prompt = response.choices[0].message.content.strip()
+            print(f"[TxGemma-async] Summarized to {len(prompt)} chars")
+
+        # Update status — container may be cold starting
+        elapsed = int((_time.time() - start) * 1000)
+        _write_status({
+            "model_id": "txgemma-27b-chat",
+            "display_name": "TxGemma-27B-Chat",
+            "text": "*TxGemma-27B-Chat is still working — this can take a minute on first use...*",
+            "latency_ms": elapsed,
+            "error": None,
+            "status": "running",
+            "meta": {},
+        })
+
+        messages = [{"role": "user", "content": txgemma_system + "\n\n" + prompt}]
+        result = txgemma_model.chat.remote(messages, max_tokens=7680, temperature=0.3)
+
+        # Write final result
+        result["status"] = "done"
+        _write_status(result)
+        print(f"[TxGemma-async] Done: {result.get('latency_ms')}ms, {len(result.get('text') or '')} chars")
+        return result
+
+    except Exception as e:
+        latency_ms = int((_time.time() - start) * 1000)
+        print(f"[TxGemma-async] ERROR: {e}")
+        error_result = {
+            "model_id": "txgemma-27b-chat",
+            "display_name": "TxGemma-27B-Chat",
+            "text": None,
+            "latency_ms": latency_ms,
+            "error": str(e),
+            "status": "done",
+            "meta": {},
+        }
+        _write_status(error_result)
+        return error_result
+
+
+# ---------------------------------------------------------------------------
 # Biomni inference function (stub — CPU)
 # ---------------------------------------------------------------------------
 
@@ -815,9 +929,6 @@ def backend():
     BIOREASON_ENABLED = os.getenv("BIOREASON_ENABLED", "false").lower() == "true"
     BIOMNI_ENABLED = os.getenv("BIOMNI_ENABLED", "false").lower() == "true"
 
-    # Get references to Modal functions for internal calls
-    txgemma_model = TxGemmaModel()
-
     web_app = FastAPI(title="Biomedical Reasoning Workshop")
 
     # --- Middleware ---
@@ -867,70 +978,6 @@ def backend():
             return {
                 "model_id": "gpt-5.4",
                 "display_name": "GPT-5.4",
-                "text": None,
-                "latency_ms": latency_ms,
-                "error": str(e),
-                "meta": {},
-            }
-
-    def _summarize_for_txgemma(prompt: str, max_tokens: int = 2000) -> str:
-        """Use GPT-4.1-mini to summarize a long prompt so it fits TxGemma's context."""
-        from openai import OpenAI as _OAI
-        client = _OAI(api_key=os.getenv("OPENAI_API_KEY"))
-        response = client.chat.completions.create(
-            model="gpt-4.1-mini",
-            messages=[
-                {"role": "system", "content": (
-                    "You are a scientific assistant. The user's prompt (which may include conversation history) "
-                    "is too long for a downstream model with limited context. Summarize it into a single, "
-                    "self-contained prompt that preserves the latest question and all essential context from "
-                    "prior exchanges. Keep scientific detail. Do not answer the question — just condense the prompt."
-                )},
-                {"role": "user", "content": prompt},
-            ],
-            max_tokens=max_tokens,
-            temperature=0,
-        )
-        summary = response.choices[0].message.content.strip()
-        print(f"[TxGemma] Summarized prompt from {len(prompt)} to {len(summary)} chars via GPT-4.1-mini")
-        return summary
-
-    def call_txgemma(prompt: str) -> dict:
-        """Call TxGemma via Modal internal function. .remote() waits for container — no retry needed."""
-        import time as _time
-        start = _time.time()
-        try:
-            # TxGemma doesn't support system role — use a custom prompt
-            txgemma_system = (
-                "You are an expert biomedical scientist. Provide a thorough, detailed, and complete answer. "
-                "Cover all relevant aspects of the question with scientific depth. "
-                "Use structured formatting with headers and bullet points. "
-                "Be specific and concrete — cite specific genes, pathways, drugs, mechanisms, trial names, "
-                "or data points rather than generic statements. Avoid vague filler conclusions like "
-                "'more research is needed' or 'the field is rapidly evolving'. "
-                "Every sentence should contain a specific fact, comparison, or actionable insight. "
-                "If your answer is getting long, finish your current point and provide a brief conclusion "
-                "rather than stopping mid-sentence. You have no tool access, no search, and no internet. "
-                "Answer solely from your training knowledge."
-            )
-
-            # Check if prompt is too long for TxGemma's context and summarize if needed
-            # Estimate ~4 chars per token; leave room for 6144 output tokens
-            full_input = txgemma_system + "\n\n" + prompt
-            est_tokens = len(full_input) // 4
-            max_input_tokens = 8192 - 6144  # ~2k for input, rest for output
-            if est_tokens > max_input_tokens:
-                print(f"[TxGemma] Prompt too long (~{est_tokens} tokens > {max_input_tokens}), summarizing...")
-                prompt = _summarize_for_txgemma(prompt)
-
-            messages = [{"role": "user", "content": txgemma_system + "\n\n" + prompt}]
-            result = txgemma_model.chat.remote(messages, max_tokens=7680, temperature=0.3)
-            return result
-        except Exception as e:
-            latency_ms = int((_time.time() - start) * 1000)
-            return {
-                "model_id": "txgemma-27b-chat",
-                "display_name": "TxGemma-27B-Chat",
                 "text": None,
                 "latency_ms": latency_ms,
                 "error": str(e),
@@ -1001,7 +1048,7 @@ def backend():
     @web_app.post("/api/run-model")
     def run_model(req: RunModelRequest):
         """Run a single model and return its result. Biomni runs async (use /api/poll-biomni)."""
-        # Biomni is handled async — spawn and return immediately
+        # Biomni — async spawn + poll
         if req.model_id == "biomni":
             if not BIOMNI_ENABLED:
                 return {
@@ -1024,9 +1071,25 @@ def backend():
                 "meta": {},
             }
 
+        # TxGemma — async spawn + poll (avoids HTTP proxy timeout on cold start)
+        if req.model_id == "txgemma-27b-chat":
+            try:
+                txgemma_predict.spawn(req.prompt, run_id=req.run_id)
+            except Exception as e:
+                print(f"[TxGemma] Failed to spawn: {e}")
+            return {
+                "model_id": "txgemma-27b-chat",
+                "display_name": "TxGemma-27B-Chat",
+                "text": None,
+                "latency_ms": 0,
+                "error": None,
+                "status": "running",
+                "meta": {},
+            }
+
+        # GPT-5.4 — sync (fast, no cold start issues)
         model_fns = {
             "gpt-5.4": call_gpt,
-            "txgemma-27b-chat": call_txgemma,
         }
         fn = model_fns.get(req.model_id)
         if not fn:
@@ -1097,6 +1160,49 @@ def backend():
             return {
                 "model_id": "biomni",
                 "display_name": "Biomni",
+                "text": None,
+                "latency_ms": 0,
+                "error": None,
+                "status": "running",
+                "meta": {},
+            }
+
+    @web_app.post("/api/poll-txgemma")
+    def poll_txgemma(req: PollBiomniRequest):
+        """Poll for TxGemma async results."""
+        import json as _j
+
+        txgemma_dict = modal.Dict.from_name("txgemma-status", create_if_missing=True)
+
+        try:
+            raw = txgemma_dict[req.run_id]
+            result = _j.loads(raw)
+
+            # If done, store in DB and clean up
+            if result.get("status") == "done":
+                try:
+                    store_response(
+                        run_id=req.run_id,
+                        model_id=result["model_id"],
+                        display_name=result["display_name"],
+                        text=result.get("text"),
+                        latency_ms=result.get("latency_ms"),
+                        error=result.get("error"),
+                        meta=result.get("meta"),
+                    )
+                    db_volume.commit()
+                except Exception as db_err:
+                    print(f"[poll-txgemma] DB storage failed (non-fatal): {db_err}")
+                try:
+                    del txgemma_dict[req.run_id]
+                except Exception:
+                    pass
+
+            return result
+        except KeyError:
+            return {
+                "model_id": "txgemma-27b-chat",
+                "display_name": "TxGemma-27B-Chat",
                 "text": None,
                 "latency_ms": 0,
                 "error": None,
