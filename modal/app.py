@@ -164,7 +164,7 @@ class TxGemmaModel:
     @modal.enter()
     def setup(self):
         import os
-        from vllm import LLM
+        from vllm import AsyncLLM
 
         # Download weights to volume on first run
         model_dir = os.path.join(TXGEMMA_WEIGHTS_PATH, "txgemma-27b-chat")
@@ -186,7 +186,7 @@ class TxGemmaModel:
 
         if has_cache:
             print("[TxGemma] Compile cache found — loading 8-bit compiled model from cache")
-            self.llm = LLM(
+            self.llm = AsyncLLM(
                 model=model_dir,
                 max_model_len=8192,
                 quantization="bitsandbytes",
@@ -198,7 +198,7 @@ class TxGemmaModel:
             self._needs_swap = False
         else:
             print("[TxGemma] No compile cache — starting 8-bit eager mode")
-            self.llm = LLM(
+            self.llm = AsyncLLM(
                 model=model_dir,
                 max_model_len=8192,
                 quantization="bitsandbytes",
@@ -210,13 +210,17 @@ class TxGemmaModel:
             )
             self._needs_swap = True
         self._swapping = False
+        self._request_counter = 0
 
     @modal.method()
     async def chat(self, messages: list[dict], max_tokens: int = 6144, temperature: float = 0.3) -> dict:
-        """Run chat completion and return a plain dict. Async to prevent cancellation crashes."""
+        """Run chat completion using AsyncLLM for proper V1 engine async support."""
         import asyncio
         import time
-        import functools
+        import os
+        import uuid
+        from vllm import SamplingParams
+        from transformers import AutoTokenizer
 
         start = time.time()
         try:
@@ -227,12 +231,103 @@ class TxGemmaModel:
                     if not self._swapping:
                         break
 
-            # Run sync vLLM inference in thread pool so this stays async
-            loop = asyncio.get_event_loop()
-            result = await loop.run_in_executor(
-                None, functools.partial(self._run_inference, messages, max_tokens, temperature, start)
-            )
-            return result
+            # --- Tokenize and prepare prompt (CPU-bound, fast) ---
+            MAX_CTX = 8192
+            RESERVED_OUTPUT = 512
+
+            tokenizer = AutoTokenizer.from_pretrained(TXGEMMA_MODEL)
+            prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+
+            input_ids = tokenizer.encode(prompt)
+            input_len = len(input_ids)
+            available = MAX_CTX - input_len
+            if available < RESERVED_OUTPUT:
+                available = RESERVED_OUTPUT
+                print(f"[TxGemma] WARNING: input {input_len} tokens exceeds budget, capping output to {available}")
+            effective_max_tokens = min(max_tokens, available)
+            print(f"[TxGemma] Input: {input_len} tokens, max_output: {effective_max_tokens}")
+
+            params = SamplingParams(max_tokens=effective_max_tokens, temperature=temperature)
+
+            # --- Async generate — uses V1 engine's native async path ---
+            self._request_counter += 1
+            request_id = f"txgemma-{self._request_counter}-{uuid.uuid4().hex[:8]}"
+
+            final_output = None
+            async for output in self.llm.generate(prompt, params, request_id=request_id):
+                final_output = output
+
+            raw_text = final_output.outputs[0].text
+            finish_reason = final_output.outputs[0].finish_reason
+
+            # If output was cut off by token limit, ask GPT to finish the last sentence
+            if finish_reason == "length" and raw_text:
+                try:
+                    from openai import OpenAI as _OAI
+                    client = _OAI(api_key=os.getenv("OPENAI_API_KEY"))
+                    tail = raw_text[-500:]
+                    completion = client.chat.completions.create(
+                        model="gpt-4.1-mini",
+                        messages=[
+                            {"role": "system", "content": "The following text was cut off mid-sentence. Write ONLY the missing ending to complete the final sentence and add a brief concluding sentence. Nothing else."},
+                            {"role": "user", "content": tail},
+                        ],
+                        max_tokens=150,
+                        temperature=0,
+                    )
+                    ending = completion.choices[0].message.content.strip()
+                    raw_text = raw_text.rstrip() + " " + ending
+                    print(f"[TxGemma] Output hit token limit — GPT completed ending ({len(ending)} chars)")
+                except Exception as ex:
+                    print(f"[TxGemma] Failed to complete truncated output: {ex}")
+
+            text = _format_markdown_headers(raw_text)
+
+            latency_ms = int((time.time() - start) * 1000)
+            print(f"[TxGemma] {latency_ms}ms | {len(text)} chars | finish: {finish_reason}\n{text}")
+
+            # After first response, swap to compiled model in background
+            if self._needs_swap:
+                self._needs_swap = False
+                import threading
+                def _background_swap():
+                    try:
+                        from vllm import AsyncLLM as _AsyncLLM
+                        print("[TxGemma] Background: building compiled 8-bit model...")
+                        model_dir = os.path.join(TXGEMMA_WEIGHTS_PATH, "txgemma-27b-chat")
+                        compiled_llm = _AsyncLLM(
+                            model=model_dir,
+                            max_model_len=8192,
+                            quantization="bitsandbytes",
+                            load_format="bitsandbytes",
+                            dtype="bfloat16",
+                            trust_remote_code=True,
+                            gpu_memory_utilization=0.45,
+                        )
+                        self._swapping = True
+                        import time as _t
+                        _t.sleep(1)
+                        old = self.llm
+                        self.llm = compiled_llm
+                        del old
+                        import torch
+                        torch.cuda.empty_cache()
+                        compile_cache_volume.commit()
+                        self._swapping = False
+                        print("[TxGemma] Swap complete — now serving compiled 8-bit model, cache saved")
+                    except Exception as ex:
+                        self._swapping = False
+                        print(f"[TxGemma] Background swap failed: {ex}")
+                threading.Thread(target=_background_swap, daemon=True).start()
+
+            return {
+                "model_id": "txgemma-27b-chat",
+                "display_name": "TxGemma-27B-Chat",
+                "text": text,
+                "latency_ms": latency_ms,
+                "error": None,
+                "meta": {},
+            }
         except Exception as e:
             latency_ms = int((time.time() - start) * 1000)
             print(f"[TxGemma] ERROR {latency_ms}ms | {e}")
@@ -244,102 +339,6 @@ class TxGemmaModel:
                 "error": str(e),
                 "meta": {},
             }
-
-    def _run_inference(self, messages: list[dict], max_tokens: int, temperature: float, start: float) -> dict:
-        """Sync inference — runs in thread pool."""
-        import time
-        import os
-        from vllm import SamplingParams
-        from transformers import AutoTokenizer
-
-        MAX_CTX = 8192
-        RESERVED_OUTPUT = 512
-
-        tokenizer = AutoTokenizer.from_pretrained(TXGEMMA_MODEL)
-        prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-
-        input_ids = tokenizer.encode(prompt)
-        input_len = len(input_ids)
-        available = MAX_CTX - input_len
-        if available < RESERVED_OUTPUT:
-            available = RESERVED_OUTPUT
-            print(f"[TxGemma] WARNING: input {input_len} tokens exceeds budget, capping output to {available}")
-        effective_max_tokens = min(max_tokens, available)
-        print(f"[TxGemma] Input: {input_len} tokens, max_output: {effective_max_tokens}")
-
-        params = SamplingParams(max_tokens=effective_max_tokens, temperature=temperature)
-        outputs = self.llm.generate([prompt], params)
-        raw_text = outputs[0].outputs[0].text
-        finish_reason = outputs[0].outputs[0].finish_reason
-
-        # If output was cut off by token limit, ask GPT to finish the last sentence
-        if finish_reason == "length" and raw_text:
-            try:
-                from openai import OpenAI as _OAI
-                client = _OAI(api_key=os.getenv("OPENAI_API_KEY"))
-                tail = raw_text[-500:]
-                completion = client.chat.completions.create(
-                    model="gpt-4.1-mini",
-                    messages=[
-                        {"role": "system", "content": "The following text was cut off mid-sentence. Write ONLY the missing ending to complete the final sentence and add a brief concluding sentence. Nothing else."},
-                        {"role": "user", "content": tail},
-                    ],
-                    max_tokens=150,
-                    temperature=0,
-                )
-                ending = completion.choices[0].message.content.strip()
-                raw_text = raw_text.rstrip() + " " + ending
-                print(f"[TxGemma] Output hit token limit — GPT completed ending ({len(ending)} chars)")
-            except Exception as ex:
-                print(f"[TxGemma] Failed to complete truncated output: {ex}")
-
-        text = _format_markdown_headers(raw_text)
-
-        latency_ms = int((time.time() - start) * 1000)
-        print(f"[TxGemma] {latency_ms}ms | {len(text)} chars | finish: {finish_reason}\n{text}")
-
-        # After first response, swap to compiled model in background
-        if self._needs_swap:
-            self._needs_swap = False
-            import threading
-            def _background_swap():
-                try:
-                    from vllm import LLM as _LLM
-                    print("[TxGemma] Background: building compiled 8-bit model...")
-                    model_dir = os.path.join(TXGEMMA_WEIGHTS_PATH, "txgemma-27b-chat")
-                    compiled_llm = _LLM(
-                        model=model_dir,
-                        max_model_len=8192,
-                        quantization="bitsandbytes",
-                        load_format="bitsandbytes",
-                        dtype="bfloat16",
-                        trust_remote_code=True,
-                        gpu_memory_utilization=0.45,
-                    )
-                    self._swapping = True
-                    import time as _t
-                    _t.sleep(1)
-                    old = self.llm
-                    self.llm = compiled_llm
-                    del old
-                    import torch
-                    torch.cuda.empty_cache()
-                    compile_cache_volume.commit()
-                    self._swapping = False
-                    print("[TxGemma] Swap complete — now serving compiled 8-bit model, cache saved")
-                except Exception as ex:
-                    self._swapping = False
-                    print(f"[TxGemma] Background swap failed: {ex}")
-            threading.Thread(target=_background_swap, daemon=True).start()
-
-        return {
-            "model_id": "txgemma-27b-chat",
-            "display_name": "TxGemma-27B-Chat",
-            "text": text,
-            "latency_ms": latency_ms,
-            "error": None,
-            "meta": {},
-        }
 
 
 # ---------------------------------------------------------------------------
