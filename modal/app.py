@@ -98,7 +98,9 @@ def _format_markdown_headers(text: str) -> str:
 
 app = modal.App("biomedical-workshop")
 db_volume = modal.Volume.from_name("workshop-db", create_if_missing=True)
+compile_cache_volume = modal.Volume.from_name("txgemma-compile-cache", create_if_missing=True)
 DB_MOUNT_PATH = "/data/db"
+COMPILE_CACHE_PATH = "/root/.cache/vllm"
 
 # ---------------------------------------------------------------------------
 # Images
@@ -155,26 +157,47 @@ txgemma_image = (
     timeout=900,
     scaledown_window=1800,
     secrets=[modal.Secret.from_name("huggingface")],
+    volumes={COMPILE_CACHE_PATH: compile_cache_volume},
 )
 @modal.concurrent(max_inputs=2)
 class TxGemmaModel:
     @modal.enter()
     def setup(self):
+        import os
         from vllm import LLM
 
-        # 8-bit quantized: ~27 GiB instead of 51 GiB, loads ~2x faster
-        # Eager mode: skips torch.compile for fast cold start
-        print("[TxGemma] Starting in 8-bit quantized eager mode")
-        self.llm = LLM(
-            model=TXGEMMA_MODEL,
-            max_model_len=8192,
-            quantization="bitsandbytes",
-            load_format="bitsandbytes",
-            dtype="half",
-            trust_remote_code=True,
-            gpu_memory_utilization=0.90,
-            enforce_eager=True,
-        )
+        # Check if compile cache exists from a previous container
+        cache_dir = os.path.join(COMPILE_CACHE_PATH, "torch_compile_cache")
+        has_cache = os.path.isdir(cache_dir) and len(os.listdir(cache_dir)) > 0
+
+        if has_cache:
+            # Compiled cache available — load compiled directly (fast from cache)
+            print("[TxGemma] Compile cache found — loading 8-bit compiled model from cache")
+            self.llm = LLM(
+                model=TXGEMMA_MODEL,
+                max_model_len=8192,
+                quantization="bitsandbytes",
+                load_format="bitsandbytes",
+                dtype="half",
+                trust_remote_code=True,
+                gpu_memory_utilization=0.90,
+            )
+            self._needs_swap = False
+        else:
+            # No cache — start eager for fast cold start, swap later
+            print("[TxGemma] No compile cache — starting 8-bit eager mode")
+            self.llm = LLM(
+                model=TXGEMMA_MODEL,
+                max_model_len=8192,
+                quantization="bitsandbytes",
+                load_format="bitsandbytes",
+                dtype="half",
+                trust_remote_code=True,
+                gpu_memory_utilization=0.45,  # half GPU — leave room for compiled model
+                enforce_eager=True,
+            )
+            self._needs_swap = True
+        self._swapping = False
 
     @modal.method()
     def chat(self, messages: list[dict], max_tokens: int = 6144, temperature: float = 0.3) -> dict:
@@ -188,6 +211,9 @@ class TxGemmaModel:
 
         start = time.time()
         try:
+            if self._swapping:
+                raise RuntimeError("TxGemma is upgrading to compiled mode — retry on another container")
+
             tokenizer = AutoTokenizer.from_pretrained(TXGEMMA_MODEL)
             prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
@@ -208,6 +234,41 @@ class TxGemmaModel:
 
             latency_ms = int((time.time() - start) * 1000)
             print(f"[TxGemma] {latency_ms}ms | {len(text)} chars\n{text}")
+
+            # After first response, swap to compiled model in background
+            if self._needs_swap:
+                self._needs_swap = False
+                import threading
+                def _background_swap():
+                    try:
+                        from vllm import LLM as _LLM
+                        print("[TxGemma] Background: building compiled 8-bit model...")
+                        compiled_llm = _LLM(
+                            model=TXGEMMA_MODEL,
+                            max_model_len=8192,
+                            quantization="bitsandbytes",
+                            load_format="bitsandbytes",
+                            dtype="half",
+                            trust_remote_code=True,
+                            gpu_memory_utilization=0.45,
+                        )
+                        # Swap: briefly reject requests, replace model, resume
+                        self._swapping = True
+                        import time as _t
+                        _t.sleep(1)
+                        old = self.llm
+                        self.llm = compiled_llm
+                        del old
+                        import torch
+                        torch.cuda.empty_cache()
+                        # Save compile cache to volume for future containers
+                        compile_cache_volume.commit()
+                        self._swapping = False
+                        print("[TxGemma] Swap complete — now serving compiled 8-bit model, cache saved")
+                    except Exception as ex:
+                        self._swapping = False
+                        print(f"[TxGemma] Background swap failed: {ex}")
+                threading.Thread(target=_background_swap, daemon=True).start()
 
             return {
                 "model_id": "txgemma-27b-chat",
