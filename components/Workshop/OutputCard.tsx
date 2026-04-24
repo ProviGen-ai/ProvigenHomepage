@@ -267,10 +267,11 @@ export default function OutputCard({ exchanges, latestResponse, isBest, isNew = 
             className={`rounded-md p-2 text-sm transition-colors ${
               isStreaming
                 ? "text-gray-200 dark:text-gray-600 cursor-default"
-                : voted === "up"
-                ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                : "text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
+                : voted !== "up"
+                ? "text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
+                : ""
             }`}
+            style={voted === "up" && !isStreaming ? { backgroundColor: "rgba(220, 252, 231, 1)", color: "rgb(21, 128, 61)" } : undefined}
             title="Thumbs up"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
