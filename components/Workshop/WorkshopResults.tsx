@@ -67,6 +67,7 @@ export default function WorkshopResults() {
   const [historyRuns, setHistoryRuns] = useState<HistoryRun[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [expandedRun, setExpandedRun] = useState<string | null>(null);
+  const [clearing, setClearing] = useState(false);
 
   // Stress test state
   const [stressRunning, setStressRunning] = useState(false);
@@ -141,6 +142,7 @@ export default function WorkshopResults() {
   }, [authed]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClear = async (action: "statistics" | "conversations") => {
+    setClearing(true);
     try {
       const resp = await fetch(apiUrl(`/admin/clear-${action}`), {
         method: "POST",
@@ -152,15 +154,18 @@ export default function WorkshopResults() {
         setActionResult(`Error: ${data.detail || "Failed"}`);
         setAuthed(false);
         setAuthError("Invalid password");
+        setClearing(false);
         return;
       }
+      await loadStats(password);
       setActionResult(`${action === "statistics" ? "Statistics" : "Conversations"} cleared successfully`);
       setConfirmAction(null);
-      loadStats(password);
+      setSettingsOpen(false);
       setTimeout(() => setActionResult(null), 3000);
     } catch (e: any) {
       setActionResult(`Error: ${e.message}`);
     }
+    setClearing(false);
   };
 
   const runStressTest = async (mode: "raw" | "cold-start") => {
@@ -446,13 +451,20 @@ export default function WorkshopResults() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleClear(confirmAction)}
-                        className="flex-1 rounded-md py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors"
+                        disabled={clearing}
+                        className="flex-1 rounded-md py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 disabled:opacity-60 transition-colors flex items-center justify-center gap-1.5"
                       >
-                        Confirm
+                        {clearing ? (
+                          <>
+                            <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-r-transparent" />
+                            Clearing...
+                          </>
+                        ) : "Confirm"}
                       </button>
                       <button
                         onClick={() => setConfirmAction(null)}
-                        className="flex-1 rounded-md py-2 text-sm font-medium text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        disabled={clearing}
+                        className="flex-1 rounded-md py-2 text-sm font-medium text-black dark:text-white border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 transition-colors"
                       >
                         Cancel
                       </button>
