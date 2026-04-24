@@ -211,8 +211,13 @@ class TxGemmaModel:
 
         start = time.time()
         try:
+            # If mid-swap, wait briefly for it to finish rather than rejecting
             if self._swapping:
-                raise RuntimeError("TxGemma is upgrading to compiled mode — retry on another container")
+                import time as _tw
+                for _ in range(10):  # wait up to 5 seconds
+                    _tw.sleep(0.5)
+                    if not self._swapping:
+                        break
 
             tokenizer = AutoTokenizer.from_pretrained(TXGEMMA_MODEL)
             prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
