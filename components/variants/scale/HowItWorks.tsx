@@ -82,11 +82,11 @@ const HowItWorks = () => {
             >
               {/* Text */}
               <div className={i % 2 === 1 ? "lg:order-2" : ""}>
-                <div className="flex items-center gap-4 mb-6">
+                <div className="flex items-center gap-6 mb-6">
                   <span className={`text-5xl font-bold ${step.color} opacity-60`}>
                     {step.number}
                   </span>
-                  <DotMatrixText text={step.title} color="#0b1f30" dotSize={3} gap={2} className="h-8" />
+                  <DotMatrixText text={step.title} color="#0b1f30" dotSize={3} gap={2} className="h-9" />
                 </div>
                 <p className="text-lg text-muted leading-relaxed">
                   {step.description}

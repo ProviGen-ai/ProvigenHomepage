@@ -65,7 +65,47 @@ const DotMatrixText = ({
   const charGap = cellSize * 1.5; // space between characters
 
   const chars = text.toUpperCase().split("");
-  const totalWidth = chars.length * (charWidth + charGap) - charGap;
+
+  // Compute actual used width per character (rightmost active column + 1)
+  const charActualCols = chars.map((char) => {
+    const pattern = CHAR_MAP[char];
+    if (!pattern) return 5;
+    let maxCol = 0;
+    for (let row = 0; row < 7; row++) {
+      for (let col = 0; col < 5; col++) {
+        if ((pattern[row] >> (4 - col)) & 1) maxCol = Math.max(maxCol, col);
+      }
+    }
+    return maxCol + 1;
+  });
+
+  // Kerning overrides for specific letter pairs (reduce gap)
+  const kernPairs: Record<string, number> = {
+    "LY": -cellSize * 0.8,
+    "SI": -cellSize * 0.5,
+    "NI": -cellSize * 0.5,
+    "DI": -cellSize * 0.5,
+    "EI": -cellSize * 0.5,
+    "AI": -cellSize * 0.5,
+    "RI": -cellSize * 0.5,
+    "IM": cellSize * 0.4,
+    "IG": cellSize * 0.4,
+    "IN": cellSize * 0.4,
+    "IZ": cellSize * 0.4,
+    "PE": -cellSize * 0.3,
+  };
+
+  // Build x offsets with tighter gaps for narrow characters
+  const offsets: number[] = [];
+  let x = 0;
+  chars.forEach((_, ci) => {
+    offsets.push(x);
+    const usedWidth = charActualCols[ci] * cellSize;
+    const pair = ci < chars.length - 1 ? chars[ci] + chars[ci + 1] : "";
+    const kern = kernPairs[pair] || 0;
+    x += usedWidth + charGap + kern;
+  });
+  const totalWidth = x - charGap;
 
   const dots: { cx: number; cy: number }[] = [];
 
@@ -73,7 +113,7 @@ const DotMatrixText = ({
     const pattern = CHAR_MAP[char];
     if (!pattern) return;
 
-    const offsetX = ci * (charWidth + charGap);
+    const offsetX = offsets[ci];
 
     for (let row = 0; row < 7; row++) {
       for (let col = 0; col < 5; col++) {
