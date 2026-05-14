@@ -62,8 +62,8 @@ const HowItWorks = () => {
             Continuous cycles of intelligent experimentation
           </h2>
           <p className="text-lg text-muted max-w-2xl mx-auto leading-relaxed">
-            Our closed-loop platform automates the entire experimental workflow — from
-            hypothesis to insight — in a fraction of the time.
+            Our closed-loop platform automates the entire experimental workflow,
+            from hypothesis to insight, in a fraction of the time.
           </p>
         </div>
 

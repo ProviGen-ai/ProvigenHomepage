@@ -37,12 +37,13 @@ const Hero = () => {
 
             <div className="flex flex-wrap gap-3 mb-10">
               {["Assay Development", "DNA Assembly", "Cell Culture"].map((app) => (
-                <span
+                <button
                   key={app}
-                  className="px-4 py-1.5 rounded-full border border-navy/15 text-sm text-navy/70 bg-white/50"
+                  onClick={() => document.getElementById("applications")?.scrollIntoView({ behavior: "smooth" })}
+                  className="px-4 py-1.5 rounded-full border border-navy/15 text-sm text-navy/70 bg-white/50 hover:border-navy/30 hover:bg-white/80 transition-all cursor-pointer"
                 >
                   {app}
-                </span>
+                </button>
               ))}
             </div>
 

@@ -36,7 +36,7 @@ const Hero = () => {
             </h1>
             <p className="text-lg lg:text-xl text-muted leading-relaxed max-w-lg mb-10">
               We turn robotic biolabs into closed-loop systems. Our AI designs,
-              runs, and learns from experiments autonomously — cutting optimization
+              runs, and learns from experiments autonomously, cutting optimization
               timelines from months to weeks.
             </p>
             <div className="flex flex-wrap gap-4">
