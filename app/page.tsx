@@ -1,10 +1,13 @@
 "use client";
 import { useEffect } from "react";
-import Brands from "@/components/Brands";
 import ScrollUp from "@/components/Common/ScrollUp";
-import Contact from "@/components/Contact";
-import Features from "@/components/Features";
 import Hero from "@/components/Hero";
+import Problem from "@/components/Problem";
+import Platform from "@/components/Platform";
+import HowItWorks from "@/components/HowItWorks";
+import Features from "@/components/Features";
+import Brands from "@/components/Brands";
+import Contact from "@/components/Contact";
 
 
 export default function Home() {
@@ -26,6 +29,9 @@ export default function Home() {
     <>
       <ScrollUp />
       <Hero />
+      <Problem />
+      <Platform />
+      <HowItWorks />
       <Features />
       <Brands />
       <Contact />
