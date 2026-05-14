@@ -4,6 +4,7 @@ import ScrollUp from "@/components/Common/ScrollUp";
 import Hero from "@/components/Hero";
 import Problem from "@/components/Problem";
 import Platform from "@/components/Platform";
+import CompoundingSection from "@/components/CompoundingSection";
 import HowItWorks from "@/components/HowItWorks";
 import Features from "@/components/Features";
 import Brands from "@/components/Brands";
@@ -12,15 +13,11 @@ import Contact from "@/components/Contact";
 
 export default function Home() {
   useEffect(() => {
-    // Handle hash scrolling on page load
     const hash = window.location.hash;
     if (hash) {
-      const elementId = hash.substring(1); // Remove the '#'
+      const elementId = hash.substring(1);
       setTimeout(() => {
-        const element = document.getElementById(elementId);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
+        document.getElementById(elementId)?.scrollIntoView({ behavior: "smooth" });
       }, 100);
     }
   }, []);
@@ -31,6 +28,7 @@ export default function Home() {
       <Hero />
       <Problem />
       <Platform />
+      <CompoundingSection />
       <HowItWorks />
       <Features />
       <Brands />

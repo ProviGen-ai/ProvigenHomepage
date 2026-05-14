@@ -8,7 +8,7 @@ const steps = [
     imagePlaceholder: {
       label: "Design Step",
       description:
-        'An abstract visualization of an AI "thinking" about experimental design. Show a network graph or decision tree overlaid on a subtle molecular structure background. Clean, minimal line art on a light cream background. The nodes could represent experiment parameters, with edges showing relationships. Color accent: ProviGen blue (#05A2E6). Style: technical illustration, not a photo. Reference: think scientific paper figure-style network diagrams, but more polished and modern — like something you\'d see in a McKinsey biotech report.',
+        'An abstract visualization of an AI "thinking" about experimental design. A network graph or decision tree overlaid on a subtle molecular structure. Clean, minimal line art on light cream. Nodes represent experiment parameters, edges show relationships. Color accent: ProviGen blue (#05A2E6). Style: technical illustration. Reference: scientific paper network diagrams, polished and modern.',
     },
   },
   {
@@ -20,7 +20,7 @@ const steps = [
     imagePlaceholder: {
       label: "Experiment Step",
       description:
-        'Close-up photography of a robotic pipette tip dispensing a bright fluorescent liquid into a microwell plate. The liquid could have a subtle green or blue glow. Dramatic shallow depth of field, with the background showing blurred lab equipment. Clean, modern aesthetic. Reference: search "robotic pipetting microplate fluorescent" — similar to imagery used by Opentrons, Hamilton Robotics, or Beckman Coulter marketing.',
+        'Close-up of a robotic pipette tip dispensing fluorescent liquid into a microwell plate. Subtle green/blue glow. Dramatic shallow depth of field with blurred lab equipment behind. Reference: Opentrons, Hamilton Robotics marketing imagery.',
     },
   },
   {
@@ -32,19 +32,19 @@ const steps = [
     imagePlaceholder: {
       label: "Analyze Step",
       description:
-        'A data visualization showing experimental results: a heatmap of a 96-well plate overlaid with a Gaussian process prediction surface. Use a blue-to-green gradient for the heatmap. Clean, chart-like aesthetic with axis labels. Could also show a real-time data stream visualization with a subtle glow effect. Reference: think of Plotly/D3.js scientific charts rendered beautifully — like the data visualizations on the Observable or Flourish websites, but with a biotech context.',
+        'A data visualization: 96-well plate heatmap overlaid with a Gaussian process prediction surface. Blue-to-green gradient. Clean chart aesthetic with axis labels. Reference: Plotly/D3.js scientific charts, Observable-style data viz.',
     },
   },
   {
     number: "04",
     title: "Adapt",
     description:
-      "The model learns from each cycle and automatically refines the next experimental batch, converging on optimal conditions with minimal runs.",
+      "The model learns from each cycle and automatically refines the next batch, converging on optimal conditions with minimal experimental runs.",
     color: "text-logo-green",
     imagePlaceholder: {
       label: "Adapt Step",
       description:
-        'A convergence plot showing iterative improvement: multiple colored lines converging toward an optimum over experiment iterations. The background should show a faint 3D optimization landscape. Clean, infographic style. The curves should show how Bayesian optimization converges faster than random search or grid search. Reference: similar to convergence comparison charts from Ax, BoTorch, or Weights & Biases experiment tracking dashboards, but more visually polished.',
+        'Convergence plot: multiple colored lines converging toward an optimum. Faint 3D optimization landscape behind. Shows Bayesian optimization converging faster than random/grid search. Reference: Ax, BoTorch, or W&B dashboards, polished infographic style.',
     },
   },
 ];
@@ -62,8 +62,8 @@ const HowItWorks = () => {
             Continuous cycles of intelligent experimentation
           </h2>
           <p className="text-lg text-muted max-w-2xl mx-auto leading-relaxed">
-            Our closed-loop platform automates the entire experimental workflow — from
-            hypothesis to insight — in a fraction of the time.
+            Each loop through the cycle builds on everything learned before,
+            compounding insights and accelerating convergence.
           </p>
         </div>
 
@@ -72,14 +72,12 @@ const HowItWorks = () => {
           {steps.map((step, i) => (
             <div
               key={step.number}
-              className={`grid lg:grid-cols-2 gap-16 lg:gap-24 items-center ${
-                i % 2 === 1 ? "" : ""
-              }`}
+              className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center"
             >
               {/* Text */}
               <div className={i % 2 === 1 ? "lg:order-2" : ""}>
                 <div className="flex items-center gap-4 mb-6">
-                  <span className={`text-5xl font-bold ${step.color} opacity-30`}>
+                  <span className={`text-5xl font-bold ${step.color} opacity-20`}>
                     {step.number}
                   </span>
                   <h3 className="text-heading-sm text-navy">{step.title}</h3>

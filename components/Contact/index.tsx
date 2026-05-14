@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import NetworkMesh from "@/components/Common/NetworkMesh";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -37,29 +38,31 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact" className="py-32 lg:py-40 bg-navy text-white relative overflow-hidden">
-      {/* Background accent */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-navy-light/10 to-transparent" />
+    <section id="contact" className="relative bg-[#0a0a0a] text-white overflow-hidden">
+      {/* Very subtle mesh in the background */}
+      <div className="absolute inset-0 opacity-20">
+        <NetworkMesh density={20} />
+      </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="relative z-10 py-32 lg:py-40 mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
           {/* Left: Copy */}
           <div className="flex flex-col justify-center">
-            <p className="text-sm font-semibold tracking-[0.2em] uppercase text-logo-blue mb-4">
+            <p className="text-sm font-semibold tracking-[0.2em] uppercase text-logo-blue/70 mb-4">
               Contact
             </p>
-            <h2 className="text-heading-sm lg:text-heading text-white mb-6">
+            <h2 className="text-heading-sm lg:text-heading text-white font-medium mb-6">
               Ready to accelerate your research?
             </h2>
-            <p className="text-lg text-white/50 leading-relaxed mb-8">
+            <p className="text-lg text-white/40 leading-relaxed mb-8">
               Tell us about your lab automation challenges. We&apos;ll show you how
               ProviGen can transform your experimental workflows.
             </p>
-            <div className="flex items-center gap-3 text-white/40">
+            <div className="flex items-center gap-3 text-white/30">
               <span className="text-sm">Or reach us directly at</span>
               <a
                 href="mailto:contact@provigen.ai"
-                className="text-logo-blue hover:text-white transition-colors font-medium"
+                className="text-logo-blue/70 hover:text-logo-blue transition-colors font-medium"
               >
                 contact@provigen.ai
               </a>
@@ -70,7 +73,7 @@ const Contact = () => {
           <div>
             <form
               onSubmit={handleSubmit}
-              className="bg-white/[0.05] backdrop-blur-sm rounded-2xl border border-white/10 p-8 lg:p-10"
+              className="bg-white/[0.03] backdrop-blur-sm rounded-2xl border border-white/[0.06] p-8 lg:p-10"
             >
               {/* Honeypot field */}
               <div className="absolute opacity-0 top-0 left-0 h-0 w-0 -z-10" aria-hidden="true">
@@ -87,7 +90,7 @@ const Contact = () => {
               </div>
 
               <div className="mb-6">
-                <label htmlFor="email" className="block mb-2 text-sm font-medium text-white/70">
+                <label htmlFor="email" className="block mb-2 text-sm font-medium text-white/50">
                   Email
                 </label>
                 <input
@@ -97,13 +100,13 @@ const Contact = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3.5 bg-white/[0.07] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-logo-blue/50 focus:ring-1 focus:ring-logo-blue/30 transition-all"
+                  className="w-full px-4 py-3.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-logo-blue/40 focus:ring-1 focus:ring-logo-blue/20 transition-all"
                   placeholder="name@example.com"
                 />
               </div>
 
               <div className="mb-8">
-                <label htmlFor="message" className="block mb-2 text-sm font-medium text-white/70">
+                <label htmlFor="message" className="block mb-2 text-sm font-medium text-white/50">
                   Message
                 </label>
                 <textarea
@@ -113,7 +116,7 @@ const Contact = () => {
                   onChange={handleChange}
                   required
                   rows={5}
-                  className="w-full px-4 py-3.5 bg-white/[0.07] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-logo-blue/50 focus:ring-1 focus:ring-logo-blue/30 transition-all resize-none"
+                  className="w-full px-4 py-3.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-logo-blue/40 focus:ring-1 focus:ring-logo-blue/20 transition-all resize-none"
                   placeholder="Tell us about your project..."
                 />
               </div>
@@ -121,7 +124,7 @@ const Contact = () => {
               <button
                 type="submit"
                 disabled={status === "sending"}
-                className="w-full rounded-xl bg-white text-navy py-4 text-base font-semibold hover:bg-white/90 transition-all duration-300 disabled:opacity-50"
+                className="w-full rounded-xl bg-white text-[#0a0a0a] py-4 text-base font-semibold hover:bg-white/90 transition-all duration-300 disabled:opacity-50"
               >
                 {status === "sending" ? "Sending..." : "Send Message"}
               </button>
