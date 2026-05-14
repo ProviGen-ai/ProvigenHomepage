@@ -5,11 +5,11 @@ const Footer = () => {
   return (
     <footer className="bg-off-white">
       {/* Thin separator */}
-      <div className="mx-auto max-w-7xl px-8 lg:px-12">
-        <div className="border-t border-light-gray" />
+      <div className="px-12 lg:px-[7%]">
+        <div className="border-t border-light-gray/80" />
       </div>
 
-      <div className="mx-auto max-w-7xl px-8 lg:px-12">
+      <div className="px-12 lg:px-[7%]">
         <div className="py-12 lg:py-16 flex flex-col md:flex-row items-start justify-between gap-8">
           {/* Left: Logo + copyright */}
           <div>

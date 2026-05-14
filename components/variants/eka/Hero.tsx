@@ -23,13 +23,17 @@ const Hero = () => {
             for Life Science
           </h1>
           <div className="flex flex-wrap gap-3 mt-8">
-            {["Assay Development", "DNA Assembly", "Cell Culture"].map((app) => (
+            {[
+              { label: "Assay Development", hover: "hover:bg-white/10 hover:text-[#3bbef0] hover:border-[#3bbef0]/40" },
+              { label: "DNA Assembly", hover: "hover:bg-white/10 hover:text-[#34d399] hover:border-[#34d399]/40" },
+              { label: "Cell Culture", hover: "hover:bg-white/10 hover:text-[#fbbf24] hover:border-[#fbbf24]/40" },
+            ].map((app) => (
               <button
-                key={app}
+                key={app.label}
                 onClick={() => document.getElementById("applications")?.scrollIntoView({ behavior: "smooth" })}
-                className="px-4 py-1.5 rounded-full border border-white/20 text-sm text-white/60 hover:border-white/40 hover:text-white/80 transition-all cursor-pointer"
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer bg-white/5 text-white/60 border border-white/20 ${app.hover}`}
               >
-                {app}
+                {app.label}
               </button>
             ))}
           </div>

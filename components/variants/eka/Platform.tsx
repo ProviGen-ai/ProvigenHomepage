@@ -13,7 +13,7 @@ const Platform = () => {
         {/* Capability 1: Design */}
         <div className="grid lg:grid-cols-2 min-h-[70vh]">
           <div className="flex flex-col justify-center px-8 lg:px-12 xl:px-20 py-16">
-            <span className="font-mono text-2xl uppercase text-white/40 tracking-[0.4em] mb-6 text-dotted font-bold">
+            <span className="font-mono text-2xl uppercase text-white/70 tracking-[0.4em] mb-6 text-dotted font-bold">
               DESIGN
             </span>
             <p className="text-xl lg:text-2xl text-white/80 font-light leading-relaxed max-w-lg">
@@ -64,7 +64,7 @@ const Platform = () => {
             </div>
           </div>
           <div className="flex flex-col justify-center px-8 lg:px-12 xl:px-20 py-16 order-1 lg:order-2">
-            <span className="font-mono text-2xl uppercase text-white/40 tracking-[0.4em] mb-6 text-dotted font-bold">
+            <span className="font-mono text-2xl uppercase text-white/70 tracking-[0.4em] mb-6 text-dotted font-bold">
               EXECUTE
             </span>
             <p className="text-xl lg:text-2xl text-white/80 font-light leading-relaxed max-w-lg">
@@ -78,7 +78,7 @@ const Platform = () => {
         {/* Capability 3: Learn */}
         <div className="grid lg:grid-cols-2 min-h-[70vh]">
           <div className="flex flex-col justify-center px-8 lg:px-12 xl:px-20 py-16">
-            <span className="font-mono text-2xl uppercase text-white/40 tracking-[0.4em] mb-6 text-dotted font-bold">
+            <span className="font-mono text-2xl uppercase text-white/70 tracking-[0.4em] mb-6 text-dotted font-bold">
               LEARN
             </span>
             <p className="text-xl lg:text-2xl text-white/80 font-light leading-relaxed max-w-lg">

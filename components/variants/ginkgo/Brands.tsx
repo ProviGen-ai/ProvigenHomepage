@@ -115,7 +115,7 @@ const SingleBrand = ({ brand }: { brand: Brand }) => {
         href={href}
         target="_blank"
         rel="nofollow noreferrer"
-        className={`relative ${logoHeight} w-auto max-w-[200px] transition-all duration-300 hover:scale-105 hover:opacity-80 flex items-center justify-center gap-1 opacity-60 grayscale hover:grayscale-0`}
+        className={`relative ${logoHeight} w-auto max-w-[200px] transition-all duration-300 hover:scale-105 flex items-center justify-center gap-1 opacity-50 grayscale hover:grayscale-0 hover:opacity-100`}
         style={
           backgroundHex
             ? { backgroundColor: backgroundHex, borderRadius: "6px", padding: "6px" }

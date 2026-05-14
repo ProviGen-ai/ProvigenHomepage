@@ -36,13 +36,17 @@ const Hero = () => {
             </p>
 
             <div className="flex flex-wrap gap-3 mb-10">
-              {["Assay Development", "DNA Assembly", "Cell Culture"].map((app) => (
+              {[
+                { label: "Assay Development", hover: "hover:bg-logo-blue/8 hover:text-logo-blue hover:border-logo-blue/25" },
+                { label: "DNA Assembly", hover: "hover:bg-logo-green/8 hover:text-logo-green hover:border-logo-green/25" },
+                { label: "Cell Culture", hover: "hover:bg-[#d97706]/8 hover:text-[#d97706] hover:border-[#d97706]/25" },
+              ].map((app) => (
                 <button
-                  key={app}
+                  key={app.label}
                   onClick={() => document.getElementById("applications")?.scrollIntoView({ behavior: "smooth" })}
-                  className="px-4 py-1.5 rounded-full border border-navy/15 text-sm text-navy/70 bg-white/50 hover:border-navy/30 hover:bg-white/80 transition-all cursor-pointer"
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer bg-transparent text-navy/60 border border-navy/12 ${app.hover}`}
                 >
-                  {app}
+                  {app.label}
                 </button>
               ))}
             </div>

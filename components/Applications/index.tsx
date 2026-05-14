@@ -42,7 +42,7 @@ const Applications = ({ dark = false }: { dark?: boolean }) => {
               dark ? "text-white" : "text-navy"
             }`}
           >
-            Is it relevant to your process?
+            One platform, many workflows
           </h2>
           <p
             className={`text-lg max-w-2xl mx-auto leading-relaxed ${
