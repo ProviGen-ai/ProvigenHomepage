@@ -54,7 +54,7 @@ module.exports = {
         "logo-green": "#057119",
         "body-color": "#959CB1",
         "body-color-dark": "#6c7793",
-        // New premium palette (Ginkgo-inspired)
+        // Ginkgo palette
         cream: "#F2EEEB",
         "warm-white": "#FAFAF8",
         "soft-gray": "#f5f5f3",
@@ -62,6 +62,13 @@ module.exports = {
         "navy-light": "#1a3a52",
         "slate": "#3d4f5f",
         "muted": "#6b7b8d",
+        // Eka palette
+        "off-white": "#f7f7f5",
+        "light-gray": "#e8e8e6",
+        "mid-gray": "#999",
+        "charcoal": "#1a1a1a",
+        "near-black": "#111",
+        "warm-tan": "#b8956a",
       },
       boxShadow: {
         signUp: "0px 5px 10px rgba(4, 10, 34, 0.2)",
@@ -76,6 +83,7 @@ module.exports = {
         "heading": ["2.5rem", { lineHeight: "1.15", letterSpacing: "-0.015em" }],
         "heading-sm": ["1.75rem", { lineHeight: "1.2", letterSpacing: "-0.01em" }],
         "subheading": ["1.25rem", { lineHeight: "1.5" }],
+        "label": ["0.75rem", { lineHeight: "1", letterSpacing: "0.25em" }],
       },
       animation: {
         "scroll-infinite": "scroll-infinite 30s linear infinite",

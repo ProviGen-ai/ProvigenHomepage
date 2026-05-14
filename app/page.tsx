@@ -1,15 +1,13 @@
 "use client";
 import { useEffect } from "react";
-import ScrollUp from "@/components/Common/ScrollUp";
-import Hero from "@/components/Hero";
-import Problem from "@/components/Problem";
-import Platform from "@/components/Platform";
-import CompoundingSection from "@/components/CompoundingSection";
-import HowItWorks from "@/components/HowItWorks";
-import Features from "@/components/Features";
-import Brands from "@/components/Brands";
-import Contact from "@/components/Contact";
+import { useVariant } from "@/components/VariantSwitcher/context";
+import dynamic from "next/dynamic";
 
+const GinkgoPage = dynamic(() => import("@/components/variants/ginkgo/Page"), { ssr: false });
+const EkaPage = dynamic(() => import("@/components/variants/eka/Page"), { ssr: false });
+const ScalePage = dynamic(() => import("@/components/variants/scale/Page"), { ssr: false });
+
+const pages = { ginkgo: GinkgoPage, eka: EkaPage, scale: ScalePage };
 
 export default function Home() {
   useEffect(() => {
@@ -22,17 +20,8 @@ export default function Home() {
     }
   }, []);
 
-  return (
-    <>
-      <ScrollUp />
-      <Hero />
-      <Problem />
-      <Platform />
-      <CompoundingSection />
-      <HowItWorks />
-      <Features />
-      <Brands />
-      <Contact />
-    </>
-  );
+  const { variant } = useVariant();
+  const Page = pages[variant];
+
+  return <Page />;
 }
