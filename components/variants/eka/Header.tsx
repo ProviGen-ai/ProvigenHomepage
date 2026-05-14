@@ -88,7 +88,7 @@ const Header = () => {
 
           {/* Desktop nav — only visible after scrolling */}
           <nav
-            className={`hidden lg:flex items-center gap-10 transition-all duration-500 ${
+            className={`hidden lg:flex items-center gap-6 transition-all duration-500 ${
               scrolled ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 pointer-events-none"
             }`}
           >

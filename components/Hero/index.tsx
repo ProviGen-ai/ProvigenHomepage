@@ -28,7 +28,7 @@ const Hero = () => {
           {/* Left: Text content */}
           <div className="animate-fade-in-up pt-24 lg:pt-0">
             <p className="text-sm font-semibold tracking-[0.2em] uppercase text-logo-blue mb-6">
-              AI-Powered Lab Automation
+              Intelligent Lab Automation
             </p>
             <h1 className="text-display-sm lg:text-display text-navy mb-8">
               The control layer for{" "}

@@ -9,7 +9,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "ProviGen",
-  description: "ProviGen - AI-powered experimental design",
+  description: "ProviGen - Intelligent experimental design for life science",
 };
 
 export default function RootLayout({

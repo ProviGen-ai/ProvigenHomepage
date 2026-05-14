@@ -75,7 +75,7 @@ const Header = () => {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-10">
+          <nav className="hidden lg:flex items-center gap-6">
             {menuData.map((item) => (
               <div key={item.id}>
                 {item.jumpTo ? (
@@ -97,7 +97,7 @@ const Header = () => {
             ))}
             <a
               href="/#contact"
-              className="ml-2 rounded-full bg-navy text-white px-6 py-2.5 text-sm font-medium hover:bg-navy-light transition-colors duration-200"
+              className="rounded-full bg-navy text-white px-6 py-2.5 text-sm font-medium hover:bg-navy-light transition-colors duration-200"
             >
               Get in Touch
             </a>

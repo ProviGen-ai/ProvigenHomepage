@@ -10,7 +10,7 @@ const Features = () => {
             Why ProviGen
           </p>
           <h2 className="text-heading-sm lg:text-heading text-navy mb-6 max-w-3xl mx-auto">
-            Built for scientists, powered by AI
+            Built for scientists, engineered for discovery
           </h2>
         </div>
 
