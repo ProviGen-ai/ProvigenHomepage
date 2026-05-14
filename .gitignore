@@ -47,6 +47,8 @@ public/images/blog/gaussian_vis_*.PNG
 public/images/blog/media-cytokine-composition.png
 public/images/blog/media-response-surface-pbmc-v3.png
 public/images/blog/media-response-surface-v2.png
+public/images/blog/data-timeline.png
+public/images/blog/data-timeline.svg
 .env
 __pycache__/
 *.pyc
