@@ -1,3 +1,5 @@
+import DotMatrixText from "@/components/Common/DotMatrixText";
+
 const steps = [
   {
     number: "01",
@@ -5,6 +7,7 @@ const steps = [
     description:
       "Our AI analyzes your experimental objectives and designs an optimal set of experiments using Bayesian optimization and active learning.",
     color: "text-logo-blue",
+    dottedClass: "text-dotted-blue",
     imagePlaceholder: {
       label: "Design Step",
       description:
@@ -17,6 +20,7 @@ const steps = [
     description:
       "Protocols are automatically translated into machine-executable instructions and deployed on your robotic platform. No manual coding required.",
     color: "text-logo-green",
+    dottedClass: "text-dotted-green",
     imagePlaceholder: {
       label: "Experiment Step",
       description:
@@ -29,6 +33,7 @@ const steps = [
     description:
       "Real-time sensor data is automatically collected, cleaned, and analyzed. Anomalies are flagged, and results are mapped to your design space.",
     color: "text-logo-blue",
+    dottedClass: "text-dotted-blue",
     imagePlaceholder: {
       label: "Analyze Step",
       description:
@@ -41,6 +46,7 @@ const steps = [
     description:
       "The model learns from each cycle and automatically refines the next experimental batch, converging on optimal conditions with minimal runs.",
     color: "text-logo-green",
+    dottedClass: "text-dotted-green",
     imagePlaceholder: {
       label: "Adapt Step",
       description:
@@ -79,10 +85,10 @@ const HowItWorks = () => {
               {/* Text */}
               <div className={i % 2 === 1 ? "lg:order-2" : ""}>
                 <div className="flex items-center gap-4 mb-6">
-                  <span className={`text-5xl font-bold ${step.color} opacity-30`}>
+                  <span className={`text-5xl font-bold ${step.color} opacity-60`}>
                     {step.number}
                   </span>
-                  <h3 className="text-heading-sm text-navy">{step.title}</h3>
+                  <DotMatrixText text={step.title} color="#0b1f30" dotSize={3} gap={2} className="h-8" />
                 </div>
                 <p className="text-lg text-muted leading-relaxed">
                   {step.description}

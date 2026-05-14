@@ -216,12 +216,34 @@ body.workshop-page section.pb-\[120px\] {
 
 /* Dot-matrix / stippled text effect (Eka-style capability labels) */
 .text-dotted {
-  background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
-  background-size: 4px 4px;
+  background-image: radial-gradient(circle, currentColor 1.2px, transparent 1.2px);
+  background-size: 5px 5px;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
+}
+/* Dot-matrix for light backgrounds - dense grid so dots form the letters */
+.text-dotted-dark {
+  background-image: radial-gradient(circle, #0b1f30 1px, transparent 1px);
+  background-size: 3.5px 3.5px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.text-dotted-blue-dense {
+  background-image: radial-gradient(circle, #05A2E6 1px, transparent 1px);
+  background-size: 3.5px 3.5px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.text-dotted-green-dense {
+  background-image: radial-gradient(circle, #057119 1px, transparent 1px);
+  background-size: 3.5px 3.5px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Image placeholder styling */
