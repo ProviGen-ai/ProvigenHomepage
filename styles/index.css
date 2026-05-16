@@ -238,6 +238,20 @@ body.workshop-page section.pb-\[120px\] {
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+.text-dotted-violet {
+  background-image: radial-gradient(circle, #7c3aed 1px, transparent 1px);
+  background-size: 3.5px 3.5px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.text-dotted-orange {
+  background-image: radial-gradient(circle, #d97706 1px, transparent 1px);
+  background-size: 3.5px 3.5px;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 .text-dotted-green-dense {
   background-image: radial-gradient(circle, #057119 1px, transparent 1px);
   background-size: 3.5px 3.5px;

@@ -47,10 +47,10 @@ const Contact = () => {
           Contact
         </span>
         <h2 className="text-heading-sm lg:text-heading text-charcoal font-medium mb-6">
-          Ready to accelerate your research?
+          Let&#39;s build something together
         </h2>
         <p className="text-mid-gray leading-relaxed mb-16 max-w-xl mx-auto font-mono text-sm">
-          Tell us about your lab automation challenges.
+          Tell us about your process.
           We&apos;ll show you how ProviGen can transform your workflows.
         </p>
 

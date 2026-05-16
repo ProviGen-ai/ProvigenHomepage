@@ -52,11 +52,11 @@ const Contact = () => {
               Contact
             </p>
             <h2 className="text-heading-sm lg:text-heading text-white font-medium mb-6">
-              Ready to accelerate your research?
+              Let&#39;s build something together
             </h2>
             <p className="text-lg text-white/40 leading-relaxed mb-8">
-              Tell us about your lab automation challenges. We&apos;ll show you how
-              ProviGen can transform your experimental workflows.
+              Tell us about your process. We&#39;ll show you how
+              ProviGen can help you get there faster.
             </p>
             <div className="flex items-center gap-3 text-white/30">
               <span className="text-sm">Or reach us directly at</span>

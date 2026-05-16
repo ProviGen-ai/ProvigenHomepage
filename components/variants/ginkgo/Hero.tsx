@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 const Hero = () => {
   const scrollToContact = () => {
@@ -21,7 +22,7 @@ const Hero = () => {
       />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8 w-full">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 relative items-center">
           <div className="animate-fade-in-up pt-24 lg:pt-0">
             <p className="text-sm font-semibold tracking-[0.2em] uppercase text-logo-blue mb-6">
               Intelligent Lab Automation
@@ -30,9 +31,9 @@ const Hero = () => {
               The control layer for{" "}
               <span className="italic font-light">life science</span>
             </h1>
-            <p className="text-lg lg:text-xl text-muted leading-relaxed max-w-lg mb-8">
-              We turn robotic biolabs into closed-loop systems that design,
-              run, and learn from experiments autonomously.
+            <p className="text-lg lg:text-xl text-muted leading-relaxed mb-8">
+              The intelligence layer for biological and chemical processes.<br />
+              Built for the infrastructure you already have.
             </p>
 
             <div className="flex flex-wrap gap-3 mb-10">
@@ -67,20 +68,15 @@ const Hero = () => {
             </div>
           </div>
 
-          <div className="animate-fade-in hidden lg:block">
-            <div className="image-placeholder aspect-[4/3] rounded-2xl">
-              <svg className="placeholder-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <rect x="4" y="4" width="40" height="40" rx="4" />
-                <circle cx="16" cy="16" r="4" />
-                <path d="M4 32 L16 22 L24 28 L36 18 L44 24 L44 40 L4 40Z" />
-              </svg>
-              <span className="placeholder-label">Hero Image</span>
-              <span className="placeholder-description">
-                A wide-angle photo of an automated liquid-handling robot in a modern biolab.
-                Robot arm mid-motion, pipetting into a 96-well plate. Soft clinical lighting,
-                shallow depth of field. Reference: Opentrons/Hamilton STAR lab photography.
-              </span>
-            </div>
+          <div className="animate-fade-in hidden lg:block absolute -right-[10%] top-[40%] -translate-y-1/2 w-[60%] pointer-events-none">
+            <Image
+              src="/images/hero/wireframe_v5.png"
+              alt="Biotech intelligence visualization"
+              width={800}
+              height={600}
+              className="w-full h-auto"
+              priority
+            />
           </div>
         </div>
       </div>

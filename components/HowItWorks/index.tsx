@@ -3,7 +3,7 @@ const steps = [
     number: "01",
     title: "Design",
     description:
-      "Our AI analyzes your experimental objectives and designs an optimal set of experiments using Bayesian optimization and active learning.",
+      "We adapt to your existing processes and make every experiment count, finding the fastest path to your target.",
     color: "text-logo-blue",
     imagePlaceholder: {
       label: "Design Step",
@@ -15,7 +15,7 @@ const steps = [
     number: "02",
     title: "Experiment",
     description:
-      "Protocols are automatically translated into machine-executable instructions and deployed on your robotic platform. No manual coding required.",
+      "Your protocols run automatically on the hardware you already have. No manual programming, no re-tooling.",
     color: "text-logo-green",
     imagePlaceholder: {
       label: "Experiment Step",
@@ -27,7 +27,7 @@ const steps = [
     number: "03",
     title: "Analyze",
     description:
-      "Real-time sensor data is automatically collected, cleaned, and analyzed. Anomalies are flagged, and results are mapped to your design space.",
+      "Results come back structured and ready to act on. Outliers are flagged automatically so nothing slips through.",
     color: "text-logo-blue",
     imagePlaceholder: {
       label: "Analyze Step",
@@ -39,7 +39,7 @@ const steps = [
     number: "04",
     title: "Adapt",
     description:
-      "The model learns from each cycle and automatically refines the next batch, converging on optimal conditions with minimal experimental runs.",
+      "Each cycle builds on the last. The system gets smarter with every run and converges on the best conditions faster than any manual approach.",
     color: "text-logo-green",
     imagePlaceholder: {
       label: "Adapt Step",

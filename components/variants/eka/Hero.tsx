@@ -22,7 +22,11 @@ const Hero = () => {
             <br />
             for Life Science
           </h1>
-          <div className="flex flex-wrap gap-3 mt-8">
+          <p className="text-lg text-white/50 leading-relaxed mt-6">
+            The intelligence layer for biological and chemical processes.<br />
+            Built for the infrastructure you already have.
+          </p>
+          <div className="flex flex-wrap gap-3 mt-6">
             {[
               { label: "Assay Development", hover: "hover:bg-white/10 hover:text-[#3bbef0] hover:border-[#3bbef0]/40" },
               { label: "DNA Assembly", hover: "hover:bg-white/10 hover:text-[#34d399] hover:border-[#34d399]/40" },

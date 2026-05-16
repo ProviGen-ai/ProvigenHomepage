@@ -15,13 +15,21 @@ const Header = () => {
   const pathname = usePathname();
 
   useEffect(() => {
+    // Wheel fires before scroll — triggers hide immediately on intent
+    // Require stronger upward intent to show (prevents trackpad inertia flicker)
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY > 2) {
+        setHidden(true);
+      } else if (e.deltaY < -10) {
+        setHidden(false);
+      }
+    };
+
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // Show/hide based on scroll direction (Ginkgo-style)
-      if (currentScrollY > 200) {
-        setHidden(currentScrollY > lastScrollY);
-      } else {
+      // Only force-show when fully at the top (not mid-scroll near top)
+      if (currentScrollY === 0) {
         setHidden(false);
       }
 
@@ -29,8 +37,12 @@ const Header = () => {
       setLastScrollY(currentScrollY);
     };
 
+    window.addEventListener("wheel", handleWheel, { passive: true });
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, [lastScrollY]);
 
   useEffect(() => {
@@ -51,10 +63,10 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 z-[9999] w-full transition-all duration-500 ${
-        hidden ? "-translate-y-full" : "translate-y-0"
+      className={`fixed top-0 left-0 z-[9999] w-full ${
+        hidden ? "-translate-y-full duration-300" : "translate-y-0 transition-transform duration-300"
       } ${
-        scrolled
+        scrolled && !hidden
           ? "bg-white/90 backdrop-blur-md shadow-[0_1px_0_rgba(0,0,0,0.06)]"
           : "bg-transparent"
       }`}

@@ -49,11 +49,11 @@ const Contact = () => {
               Contact
             </p>
             <h2 className="text-heading-sm lg:text-heading text-white mb-6">
-              Ready to accelerate your research?
+              Let&#39;s build something together
             </h2>
             <p className="text-lg text-white/50 leading-relaxed mb-8">
-              Tell us about your lab automation challenges. We&apos;ll show you how
-              ProviGen can transform your experimental workflows.
+              Tell us about your process. We&#39;ll show you how
+              ProviGen can help you get there faster.
             </p>
             <div className="flex items-center gap-3 text-white/40">
               <span className="text-sm">Or reach us directly at</span>
@@ -87,7 +87,7 @@ const Contact = () => {
               </div>
 
               <div className="mb-6">
-                <label htmlFor="email" className="block mb-2 text-sm font-medium text-white/70">
+                <label htmlFor="email" className="block mb-2 text-sm font-medium text-white/80">
                   Email
                 </label>
                 <input
@@ -97,13 +97,13 @@ const Contact = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3.5 bg-white/[0.07] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-logo-blue/50 focus:ring-1 focus:ring-logo-blue/30 transition-all"
+                  className="w-full px-4 py-3.5 bg-white/[0.07] border border-white/10 rounded-xl text-white placeholder-white/45 focus:outline-none focus:border-logo-blue/50 focus:ring-1 focus:ring-logo-blue/30 transition-all"
                   placeholder="name@example.com"
                 />
               </div>
 
               <div className="mb-8">
-                <label htmlFor="message" className="block mb-2 text-sm font-medium text-white/70">
+                <label htmlFor="message" className="block mb-2 text-sm font-medium text-white/80">
                   Message
                 </label>
                 <textarea
@@ -113,7 +113,7 @@ const Contact = () => {
                   onChange={handleChange}
                   required
                   rows={5}
-                  className="w-full px-4 py-3.5 bg-white/[0.07] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-logo-blue/50 focus:ring-1 focus:ring-logo-blue/30 transition-all resize-none"
+                  className="w-full px-4 py-3.5 bg-white/[0.07] border border-white/10 rounded-xl text-white placeholder-white/45 focus:outline-none focus:border-logo-blue/50 focus:ring-1 focus:ring-logo-blue/30 transition-all resize-none"
                   placeholder="Tell us about your project..."
                 />
               </div>
