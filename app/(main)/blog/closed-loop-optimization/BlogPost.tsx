@@ -261,7 +261,7 @@ export default function BlogPost() {
               </p>
 
               {/* ---- Story 1: Assay Optimization ---- */}
-              <h2 id="assay-optimization">
+              <h2 id="assay-optimization" className="scroll-mt-16">
                 Assay optimization
               </h2>
 
@@ -432,7 +432,7 @@ export default function BlogPost() {
               </p>
 
               {/* ---- Story 3: Media Formulation ---- */}
-              <h2 id="media-optimization">
+              <h2 id="media-optimization" className="scroll-mt-16">
                 Media formulation
               </h2>
 

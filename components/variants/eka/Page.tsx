@@ -11,9 +11,7 @@ const EkaPage = () => (
   <>
     <ScrollUp />
     <Hero />
-    <SectionDivider />
     <HowItWorks />
-    <SectionDivider />
     <Applications dark />
     <SectionDivider />
     <Team />

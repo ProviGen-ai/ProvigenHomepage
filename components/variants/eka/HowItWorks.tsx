@@ -1,7 +1,16 @@
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="py-24 lg:py-32 bg-[#0a0a0a]">
-      <div className="mx-auto max-w-5xl px-6 lg:px-8">
+    <section id="how-it-works" className="py-24 lg:py-32 bg-[#0a0a0a] relative overflow-hidden">
+      <div
+        className="absolute inset-0 opacity-[0.01]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)`,
+          backgroundSize: "80px 80px",
+          maskImage: "radial-gradient(ellipse at center, transparent 20%, black 80%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, transparent 20%, black 80%)",
+        }}
+      />
+      <div className="relative z-10 mx-auto max-w-5xl px-6 lg:px-8">
         {/* Section header */}
         <div className="text-center mb-16">
           {/* alt: Impact */}
