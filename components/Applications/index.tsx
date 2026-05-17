@@ -44,7 +44,7 @@ const applications = [
 import { useState, useRef, useEffect } from "react";
 
 const Applications = ({ dark = false }: { dark?: boolean }) => {
-  const [fadeStart, setFadeStart] = useState(15);
+  const [fadeStart, setFadeStart] = useState(50);
   const [visible, setVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -63,7 +63,7 @@ const Applications = ({ dark = false }: { dark?: boolean }) => {
       className={`py-32 lg:py-40 relative overflow-hidden ${dark ? "bg-charcoal text-white" : ""}`}
     >
       <div
-        className="absolute inset-0 opacity-[0.06]"
+        className="absolute inset-0 opacity-[0.10]"
         style={{
           backgroundImage: "url('/images/applications/biofoundry_sketch.png')",
           backgroundSize: "cover",

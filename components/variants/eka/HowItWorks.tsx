@@ -1,15 +1,15 @@
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="py-24 lg:py-32 bg-[#0a0a0a] relative overflow-hidden">
-      <div
-        className="absolute inset-0 opacity-[0.01]"
+    <section id="how-it-works" className="py-24 lg:py-32 bg-[#0a0a0a] relative overflow-visible">
+      {/* <div
+        className="absolute inset-0 opacity-[0.04]"
         style={{
           backgroundImage: `linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)`,
           backgroundSize: "80px 80px",
-          maskImage: "radial-gradient(ellipse at center, transparent 20%, black 80%)",
-          WebkitMaskImage: "radial-gradient(ellipse at center, transparent 20%, black 80%)",
+          maskImage: "radial-gradient(ellipse at center, transparent 50%, black 90%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, transparent 50%, black 90%)",
         }}
-      />
+      /> */}
       <div className="relative z-10 mx-auto max-w-5xl px-6 sm:px-8 overflow-hidden">
         {/* Section header */}
         <div className="text-center mb-16">
@@ -52,6 +52,9 @@ const HowItWorks = () => {
         </div>
 
       </div>
+
+      {/* Semicircle grid extending into next section */}
+      {/* Grid with circle cutout — spans from section top through bottom into next section */}
     </section>
   );
 };

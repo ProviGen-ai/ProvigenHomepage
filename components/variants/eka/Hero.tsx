@@ -1,27 +1,17 @@
 "use client";
-import { useState } from "react";
-
-const bgOptions = [
-  { label: "None", src: null },
-  { label: "Paper", src: "/images/hero/paper_bg.png" },
-  { label: "Clean", src: "/images/hero/paper_bg_clean.png" },
-];
 
 const Hero = () => {
-  const [bgIdx, setBgIdx] = useState(1);
   return (
     <section id="home" className="relative h-screen w-full overflow-hidden bg-near-black">
       {/* Paper background */}
-      {bgOptions[bgIdx].src && (
-        <div
-          className="absolute inset-0 opacity-100 pointer-events-none"
-          style={{
-            backgroundImage: `url('${bgOptions[bgIdx].src}')`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-      )}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: "url('/images/hero/paper_bg.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
       {/* Pencil wireframe — inverted */}
       <div
         className="absolute right-[5%] top-1/2 -translate-y-1/2 w-[65%] lg:w-[55%] opacity-90 pointer-events-none hidden sm:block"
@@ -62,18 +52,6 @@ const Hero = () => {
             ))}
           </div>
         </div>
-      </div>
-      {/* Dev toggle — remove when done */}
-      <div className="fixed top-20 right-4 z-[9999] bg-black/80 text-white p-2 rounded-lg text-xs font-mono flex gap-1">
-        {bgOptions.map((opt, i) => (
-          <button
-            key={opt.label}
-            onClick={() => setBgIdx(i)}
-            className={`px-3 py-1 rounded ${bgIdx === i ? "bg-white text-black" : "text-white/60"}`}
-          >
-            {opt.label}
-          </button>
-        ))}
       </div>
     </section>
   );
