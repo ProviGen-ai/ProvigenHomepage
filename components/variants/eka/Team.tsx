@@ -10,11 +10,9 @@ const Team = () => {
           <br />
           AI, Robotics and Life Science
         </h2>
-        <p className="font-mono text-sm lg:text-base text-mid-gray leading-relaxed max-w-2xl mx-auto mb-12">
-          Experts in Bayesian optimization, lab automation, and
-          bioengineering. From TU Munich, with deep roots in computational
-          biology and robotic systems. Now building the control layer
-          for the next generation of life science infrastructure.
+        <p className="font-mono text-sm lg:text-base text-charcoal/60 leading-relaxed max-w-4xl mx-auto mb-12">
+          Experts in Bayesian optimization, lab automation, and bioengineering. From TU Munich, Helmholtz Institute and Harvard Medical School.
+          <span className="block mt-3 whitespace-nowrap">Building the control layer for next generation life science infrastructure.</span>
         </p>
         <button
           onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}

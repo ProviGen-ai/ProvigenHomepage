@@ -86,12 +86,14 @@ const Contact = () => {
               name="inquiryType"
               value={formData.inquiryType}
               onChange={handleChange}
+              required
+              onInvalid={(e) => (e.target as HTMLSelectElement).setCustomValidity("Please select an inquiry type")}
+              onChange={(e) => { handleChange(e); (e.target as HTMLSelectElement).setCustomValidity(""); }}
               className={`${inputClass} appearance-none cursor-pointer`}
               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='rgba(184,149,106,0.5)' stroke-width='1.5'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0 center' }}
             >
               <option value="" className="bg-[#1a1a2e] text-white/40">Select type</option>
               <option value="partnership" className="bg-[#1a1a2e] text-white">Partnership</option>
-              <option value="public-sector" className="bg-[#1a1a2e] text-white">Public Sector</option>
               <option value="investor" className="bg-[#1a1a2e] text-white">Investor</option>
               <option value="media" className="bg-[#1a1a2e] text-white">Media</option>
               <option value="careers" className="bg-[#1a1a2e] text-white">Careers</option>
@@ -110,6 +112,8 @@ const Contact = () => {
               value={formData.email}
               onChange={handleChange}
               required
+              onInvalid={(e) => (e.target as HTMLInputElement).setCustomValidity("Please fill in your email address")}
+              onInput={(e) => (e.target as HTMLInputElement).setCustomValidity("")}
               className={inputClass}
             />
           </div>
@@ -124,6 +128,8 @@ const Contact = () => {
               value={formData.message}
               onChange={handleChange}
               required
+              onInvalid={(e) => (e.target as HTMLTextAreaElement).setCustomValidity("Please fill in your message")}
+              onInput={(e) => (e.target as HTMLTextAreaElement).setCustomValidity("")}
               rows={4}
               className={`${inputClass} resize-none overflow-hidden`}
             />

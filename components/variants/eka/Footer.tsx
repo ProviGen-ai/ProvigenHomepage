@@ -43,7 +43,7 @@ const Footer = () => {
           </div>
 
           {/* Right: Links with arrows */}
-          <div className="flex flex-col items-end gap-3">
+          <div className="flex flex-col items-start md:items-end gap-3">
             <a
               href="/legal_notice"
               className="font-mono text-xs uppercase tracking-wider text-white/50 hover:text-white/70 transition-colors inline-flex items-center gap-2"

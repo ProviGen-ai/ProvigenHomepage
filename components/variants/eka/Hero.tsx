@@ -20,7 +20,7 @@ const Hero = () => {
           <h1 className="text-4xl sm:text-5xl lg:text-[4rem] xl:text-[4.5rem] text-white font-medium leading-[1.1] tracking-tight">
             The Control Layer
             <br />
-            for Life Science
+            for <em className="italic font-normal">Life Science</em>
           </h1>
           <p className="text-lg text-white/50 leading-relaxed mt-6">
             The intelligence layer for biological and chemical processes.<br />
