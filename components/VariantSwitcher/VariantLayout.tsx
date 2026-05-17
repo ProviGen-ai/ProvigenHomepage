@@ -17,11 +17,11 @@ const VariantLayout = ({ children }: { children: React.ReactNode }) => {
   const Footer = footers[variant];
 
   return (
-    <>
+    <div className="w-full max-w-[100vw] overflow-x-hidden">
       <Header />
       {children}
       <Footer />
-    </>
+    </div>
   );
 };
 

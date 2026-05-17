@@ -48,10 +48,10 @@ const Contact = () => {
   return (
     <section id="contact" className="pt-20 lg:pt-28 pb-32 lg:pb-48 bg-[#0a0a0a]">
       {/* Copper accent border */}
-      <div className="mx-auto max-w-3xl px-8 mb-16">
+      <div className="mx-auto max-w-3xl px-6 sm:px-8 mb-16">
         <div className="border-t border-warm-tan/30" />
       </div>
-      <div className="mx-auto max-w-3xl px-8">
+      <div className="mx-auto max-w-3xl px-6 sm:px-8">
         <form onSubmit={handleSubmit} className="text-left max-w-lg mx-auto">
           <p className="text-sm font-mono uppercase text-warm-tan tracking-[0.3em] mb-12 text-center">
             Contact

@@ -19,9 +19,9 @@ const ScalePage = () => (
     <SectionDivider />
     <HowItWorks />
     <SectionDivider />
-    <Brands />
-    <SectionDivider />
     <Contact />
+    <SectionDivider />
+    <Brands />
   </>
 );
 

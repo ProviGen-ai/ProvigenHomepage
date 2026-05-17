@@ -4,11 +4,11 @@ import Link from "next/link";
 const Footer = () => {
   return (
     <footer className="bg-[#0a0a0a]">
-      <div className="px-12 lg:px-[7%]">
+      <div className="px-6 sm:px-12 lg:px-[7%]">
         <div className="border-t border-white/15" />
       </div>
 
-      <div className="px-12 lg:px-[7%]">
+      <div className="px-6 sm:px-12 lg:px-[7%]">
         <div className="py-6 lg:py-8 flex flex-col md:flex-row items-start justify-between gap-8">
           {/* Left: Logo + copyright */}
           <div>
