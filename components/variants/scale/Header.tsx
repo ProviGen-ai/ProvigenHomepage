@@ -63,8 +63,8 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 z-[9999] w-full ${
-        hidden ? "-translate-y-full duration-300" : "translate-y-0 transition-transform duration-300"
+      className={`fixed top-0 left-0 z-[9999] w-full transition-all duration-300 ${
+        hidden ? "opacity-0 pointer-events-none" : "opacity-100"
       } ${
         scrolled && !hidden
           ? "bg-white/90 backdrop-blur-md shadow-[0_1px_0_rgba(0,0,0,0.06)]"

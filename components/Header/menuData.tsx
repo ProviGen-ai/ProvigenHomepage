@@ -25,12 +25,11 @@ const menuData: Menu[] = [
   //   path: "/about",
   //   newTab: false,
   // },
-  // Contact removed — redundant with "Get in Touch" CTA button
-  // {
-  //   id: 5,
-  //   title: "Contact",
-  //   jumpTo: "contact",
-  //   newTab: false,
-  // },
+  {
+    id: 5,
+    title: "Contact",
+    jumpTo: "contact",
+    newTab: false,
+  },
 ];
 export default menuData;

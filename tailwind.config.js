@@ -26,15 +26,27 @@ module.exports = {
     },
     screens: {
       xs: "280px",
+      // => @media (min-width: 450px) { ... }
+
       sm: "575px",
+      // => @media (min-width: 576px) { ... }
+
       md: "768px",
+      // => @media (min-width: 768px) { ... }
+
       lg: "992px",
+      // => @media (min-width: 992px) { ... }
+
       xl: "1200px",
+      // => @media (min-width: 1200px) { ... }
+
       "2xl": "1400px",
+      // => @media (min-width: 1400px) { ... }
+
       "3xl": "1600px",
+      // => @media (min-width: 1600px) { ... }
     },
     fontFamily: {
-      sans: ['"Inter"', 'system-ui', 'sans-serif'],
       serif: ['"Source Serif 4"', "Georgia", "serif"],
       mono: ['"IBM Plex Mono"', "Menlo", "monospace"],
     },
@@ -54,7 +66,7 @@ module.exports = {
         "logo-green": "#057119",
         "body-color": "#959CB1",
         "body-color-dark": "#6c7793",
-        // Ginkgo palette
+        // New design palette
         cream: "#F2EEEB",
         "warm-white": "#FAFAF8",
         "soft-gray": "#f5f5f3",
@@ -62,7 +74,6 @@ module.exports = {
         "navy-light": "#1a3a52",
         "slate": "#3d4f5f",
         "muted": "#6b7b8d",
-        // Eka palette
         "off-white": "#f7f7f5",
         "light-gray": "#e8e8e6",
         "mid-gray": "#999",
@@ -87,10 +98,9 @@ module.exports = {
       },
       animation: {
         "scroll-infinite": "scroll-infinite 30s linear infinite",
-        "fade-in": "fade-in 0.6s ease-out",
-        "fade-in-up": "fade-in-up 0.6s ease-out",
-        "slide-in-left": "slide-in-left 0.8s ease-out",
-        "slide-in-right": "slide-in-right 0.8s ease-out",
+        "fade-in": "fade-in 0.8s ease-out",
+        "fade-in-up": "fade-in-up 0.8s ease-out",
+        "fade-in-slow": "fade-in 1.2s ease-out",
       },
       keyframes: {
         "scroll-infinite": {
@@ -102,16 +112,8 @@ module.exports = {
           "100%": { opacity: "1" },
         },
         "fade-in-up": {
-          "0%": { opacity: "0", transform: "translateY(20px)" },
+          "0%": { opacity: "0", transform: "translateY(30px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        "slide-in-left": {
-          "0%": { opacity: "0", transform: "translateX(-30px)" },
-          "100%": { opacity: "1", transform: "translateX(0)" },
-        },
-        "slide-in-right": {
-          "0%": { opacity: "0", transform: "translateX(30px)" },
-          "100%": { opacity: "1", transform: "translateX(0)" },
         },
       },
     },

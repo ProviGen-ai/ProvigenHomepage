@@ -1,47 +1,43 @@
+import SectionTitle from "../Common/SectionTitle";
+import SingleFeature from "./SingleFeature";
 import featuresData from "./featuresData";
 
 const Features = () => {
   return (
-    <section id="features" className="py-32 lg:py-40 bg-soft-gray/50">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        {/* Section header */}
-        <div className="text-center mb-20">
-          <p className="text-sm font-semibold tracking-[0.2em] uppercase text-logo-green mb-4">
-            Why ProviGen
-          </p>
-          <h2 className="text-heading-sm lg:text-heading text-navy mb-6 max-w-3xl mx-auto">
-            Built for scientists, engineered for discovery
-          </h2>
-        </div>
-
-        {/* Feature cards */}
-        <div className="grid md:grid-cols-3 gap-8">
-          {featuresData.map((feature) => (
-            <div
-              key={feature.id}
-              className="group bg-white rounded-2xl p-8 lg:p-10 shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1"
-            >
-              {/* Icon placeholder */}
-              <div className="w-14 h-14 rounded-xl bg-cream flex items-center justify-center mb-6 group-hover:bg-navy/5 transition-colors duration-300">
-                <img
-                  src={feature.iconPath}
-                  alt={feature.title}
-                  className="w-8 h-8 object-contain"
-                />
+    <>
+      <section
+        id="features"
+        className="bg-primary/[.03]"
+        style={{ paddingTop: '20vh', paddingBottom: '10vh' }}
+      >
+        <div className="w-full max-w-[80%] md:max-w-7xl mx-auto px-2 md:px-4">
+          <SectionTitle
+            title="We turn robotic biolabs into closed-loop systems."
+            paragraph={
+              <>
+                Deploying and optimizing protocols on laboratory robots still demands months of manual debugging. 
+                <br />
+                To address this, we use active learning techniques to shorten optimization timelines from months to weeks.
+                <br />
+                Our platform connects to equipment, reads sensor data to auto-debug workflows, and runs continuous loops of:
+                <br /><br />
+                <span className="font-bold text-logo-blue">design</span> &nbsp;-&nbsp; <span className="font-bold text-logo-green">experiment</span> &nbsp;-&nbsp; <span className="font-bold text-logo-blue">analyze</span> &nbsp;-&nbsp; <span className="font-bold text-logo-green">adapt</span>
+              </>
+            }
+            paragraphWidth="1000px"
+            mb="24vh"
+            center
+          />
+          <div className="grid grid-cols-1 gap-x-12 gap-y-14 md:grid-cols-3 lg:grid-cols-3 px-4">
+            {featuresData.map((feature, index) => (
+              <div key={feature.id} className={index === 1 ? "md:ml-5" : ""}>
+                <SingleFeature feature={feature} />
               </div>
-
-              <h3 className="text-xl font-semibold text-navy mb-4">
-                {feature.title}
-              </h3>
-
-              <p className="text-muted leading-relaxed">
-                {feature.paragraph}
-              </p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 

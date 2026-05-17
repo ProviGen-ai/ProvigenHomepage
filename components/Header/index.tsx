@@ -3,170 +3,151 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import menuData from "./menuData";
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 
 const Header = () => {
+  // Navbar toggle
   const [navbarOpen, setNavbarOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const navbarToggleHandler = () => {
+    setNavbarOpen(!navbarOpen);
+  };
 
-  const router = useRouter();
-  const pathname = usePathname();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      // Show/hide based on scroll direction (Ginkgo-style)
-      if (currentScrollY > 200) {
-        setHidden(currentScrollY > lastScrollY);
-      } else {
-        setHidden(false);
-      }
-
-      setScrolled(currentScrollY > 60);
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
-
-  useEffect(() => {
-    setNavbarOpen(false);
-  }, [pathname]);
-
-  const scrollToElement = (elementId: string) => {
-    if (pathname === '/') {
-      const element = document.getElementById(elementId);
-      element?.scrollIntoView({ behavior: 'smooth' });
-      // Clean up the URL hash without triggering navigation
-      window.history.replaceState(null, '', '/');
+  // Sticky Navbar
+  const [sticky, setSticky] = useState(false);
+  const handleStickyNavbar = () => {
+    if (window.scrollY >= 80) {
+      setSticky(true);
     } else {
-      router.push(`/#${elementId}`);
+      setSticky(false);
     }
+  };
+  useEffect(() => {
+    window.addEventListener("scroll", handleStickyNavbar);
+  });
+
+  // submenu handler
+  const [openIndex, setOpenIndex] = useState(-1);
+  const handleSubmenu = (index) => {
+    if (openIndex === index) {
+      setOpenIndex(-1);
+    } else {
+      setOpenIndex(index);
+    }
+  };
+
+
+  const router = useRouter()
+  const pathname = usePathname()
+
+  useEffect(() => {
     setNavbarOpen(false);
+  }, [pathname])
+
+  const scrollToElement = (elementId) => {
+        if(pathname === '/'){
+          const element = document.getElementById(elementId);
+          element?.scrollIntoView({ behavior: 'smooth' });
+        }
+        else {
+          router.push(`/#${elementId}`);
+        }
+        setNavbarOpen(false);
   };
 
   return (
-    <header
-      className={`fixed top-0 left-0 z-[9999] w-full transition-all duration-500 ${
-        hidden ? "-translate-y-full" : "translate-y-0"
-      } ${
-        scrolled
-          ? "bg-white/90 backdrop-blur-md shadow-[0_1px_0_rgba(0,0,0,0.06)]"
-          : "bg-transparent"
-      }`}
-    >
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="flex h-16 lg:h-20 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
-            <Image
-              src="/images/logo/provigenLogoTransparent.png"
-              alt="ProviGen"
-              width={160}
-              height={36}
-              loading="eager"
-              priority
-              className="h-8 lg:h-9 w-auto"
-            />
-          </Link>
-
-          {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-10">
-            {menuData.map((item) => (
-              <div key={item.id}>
-                {item.jumpTo ? (
-                  <button
-                    onClick={() => scrollToElement(item.jumpTo!)}
-                    className="text-sm font-medium text-navy/70 hover:text-navy transition-colors duration-200 tracking-wide"
-                  >
-                    {item.title}
-                  </button>
-                ) : item.path ? (
-                  <Link
-                    href={item.path}
-                    className="text-sm font-medium text-navy/70 hover:text-navy transition-colors duration-200 tracking-wide"
-                  >
-                    {item.title}
-                  </Link>
-                ) : null}
-              </div>
-            ))}
-            <a
-              href="/#contact"
-              className="ml-2 rounded-full bg-navy text-white px-6 py-2.5 text-sm font-medium hover:bg-navy-light transition-colors duration-200"
-            >
-              Get in Touch
-            </a>
-          </nav>
-
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setNavbarOpen(!navbarOpen)}
-            aria-label="Toggle menu"
-            className="lg:hidden flex flex-col justify-center items-center w-8 h-8 gap-1.5"
-          >
-            <span
-              className={`block h-[1.5px] w-6 bg-navy transition-all duration-300 origin-center ${
-                navbarOpen ? "rotate-45 translate-y-[4.5px]" : ""
-              }`}
-            />
-            <span
-              className={`block h-[1.5px] w-6 bg-navy transition-all duration-300 ${
-                navbarOpen ? "opacity-0 scale-0" : ""
-              }`}
-            />
-            <span
-              className={`block h-[1.5px] w-6 bg-navy transition-all duration-300 origin-center ${
-                navbarOpen ? "-rotate-45 -translate-y-[4.5px]" : ""
-              }`}
-            />
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile nav panel */}
-      <div
-        className={`lg:hidden overflow-hidden transition-all duration-300 ${
-          navbarOpen ? "max-h-96 border-t border-black/5" : "max-h-0"
-        } bg-white/95 backdrop-blur-md`}
+    <>
+      <header
+        className={`header top-0 left-0 z-40 flex w-full items-center bg-transparent ${
+          sticky
+            ? "!fixed !z-[9999] !bg-white !bg-opacity-80 shadow-sticky backdrop-blur-sm !transition dark:!bg-primary dark:!bg-opacity-20"
+            : "absolute"
+        }`}
       >
-        <nav className="mx-auto max-w-7xl px-6 py-4 space-y-1">
-          {menuData.map((item) => (
-            <div key={item.id}>
-              {item.jumpTo ? (
-                <button
-                  onClick={() => scrollToElement(item.jumpTo!)}
-                  className="block w-full text-left py-3 text-base text-navy/70 hover:text-navy transition-colors"
-                >
-                  {item.title}
-                </button>
-              ) : item.path ? (
-                <Link
-                  href={item.path}
-                  className="block py-3 text-base text-navy/70 hover:text-navy transition-colors"
-                  onClick={() => setNavbarOpen(false)}
-                >
-                  {item.title}
-                </Link>
-              ) : null}
+        <div className="container">
+          <div className="relative -mx-4 flex items-center justify-between">
+            <div className="w-80 max-w-full px-4 xl:mr-12">
+              <Link
+                href="https://provigen.ai/"
+                className={`header-logo block w-full ${
+                  sticky ? "py-0 lg:py-0" : "py-0"
+                } `}
+              >
+                <Image
+                  src="/images/logo/provigenLogoTransparent.png"
+                  alt="logo"
+                  width={400}
+                  height={80}
+                  loading="eager"
+                  priority
+                  className="w-full dark:hidden"
+                />
+                
+              </Link>
             </div>
-          ))}
-          <div className="pt-2">
-            <a
-              href="/#contact"
-              className="inline-block rounded-full bg-navy text-white px-6 py-2.5 text-sm font-medium"
-              onClick={() => setNavbarOpen(false)}
-            >
-              Get in Touch
-            </a>
+            <div className="flex px-4">
+              <div>
+                <button
+                  onClick={navbarToggleHandler}
+                  id="navbarToggler"
+                  aria-label="Mobile Menu"
+                  className="absolute right-4 top-1/2 block translate-y-[-50%] rounded-lg px-3 py-[6px] ring-primary focus:ring-2 lg:hidden"
+                >
+                  <span
+                    className={`relative my-1.5 block h-0.5 w-[30px] bg-black transition-all duration-300 dark:bg-white ${
+                      navbarOpen ? " top-[7px] rotate-45" : " "
+                    }`}
+                  />
+                  <span
+                    className={`relative my-1.5 block h-0.5 w-[30px] bg-black transition-all duration-300 dark:bg-white ${
+                      navbarOpen ? "opacity-0 " : " "
+                    }`}
+                  />
+                  <span
+                    className={`relative my-1.5 block h-0.5 w-[30px] bg-black transition-all duration-300 dark:bg-white ${
+                      navbarOpen ? " top-[-8px] -rotate-45" : " "
+                    }`}
+                  />
+                </button>
+                <nav
+                  id="navbarCollapse"
+                  className={`navbar absolute right-0 z-30 w-[250px] rounded border-[.5px] border-body-color/50 bg-white py-4 px-6 duration-300 dark:border-body-color/20 dark:bg-dark lg:visible lg:static lg:w-auto lg:border-none lg:!bg-transparent lg:p-0 lg:opacity-100 ${
+                    navbarOpen
+                      ? "visibility top-full opacity-100"
+                      : "invisible top-[120%] opacity-0"
+                  }`}
+                >
+                  <ul className="block lg:flex lg:space-x-12">
+                    {menuData.map((menuItem, index) => (
+                      <li key={menuItem.id} className="group relative">
+                        {menuItem.jumpTo ? (
+                          <button
+                            className={`flex py-2 text-base text-dark group-hover:text-primary   lg:mr-0 lg:inline-flex lg:py-6 lg:px-0`}
+                            onClick={() =>scrollToElement(menuItem.jumpTo)}
+                          >
+                            {menuItem.title}
+                          </button>
+                        ) : menuItem.path ? (
+                          <Link
+                            href={menuItem.path}
+                            className={`flex py-2 text-base text-dark group-hover:text-primary   lg:mr-0 lg:inline-flex lg:py-6 lg:px-0`}
+                          >
+                            {menuItem.title}
+                          </Link>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              </div>
+              <div className="flex items-center justify-end pr-16 lg:pr-0">
+
+                
+              </div>
+            </div>
           </div>
-        </nav>
-      </div>
-    </header>
+        </div>
+      </header>
+    </>
   );
 };
 

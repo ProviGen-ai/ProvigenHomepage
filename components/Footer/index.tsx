@@ -3,63 +3,61 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="bg-[#0a0a0a]">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="border-t border-white/[0.06]" />
-      </div>
+    <>
+      <footer
+        className="wow fadeInUp relative z-10 bg-primary bg-opacity-5 pt-8 md:pt-8 lg:pt-8"
+        data-wow-delay=".1s"
+      >
+        <div className="container">
+          <div className="-mx-4 flex flex-wrap">
+            <div className="w-full px-4 md:w-1/2 lg:w-4/12 xl:w-5/12">
+              <div className="mb-12 max-w-[360px] lg:mb-16">
+                <Link href="/" className="mb-8 inline-block">
+                  <Image
+                    src="/images/logo/provigenLogoTransparent.png"
+                    alt="logo"
+                    className="w-full "
+                    width={140}
+                    height={30}
+                  />
+                  <Image
+                    src="images/logo/logo.svg"
+                    alt="logo"
+                    className="hidden w-full "
+                    width={140}
+                    height={30}
+                  />
+                </Link>
+                <ul className="inline">
+                  <li>
+                    <a
+                      href="/legal_notice"
+                      className="mb-4 inline text-base font-medium text-body-color hover:text-primary"
+                    >
+                      {" "}
+                      Legal Disclosure{" "}
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="/privacy_policy"
+                      className="mb-4 inline text-base font-medium text-body-color hover:text-primary"
+                    >
+                      {" "}
+                      Privacy Policy{" "}
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="py-12 lg:py-16 flex flex-col md:flex-row items-start justify-between gap-8">
-          {/* Left: Logo + copyright */}
-          <div>
-            <Link href="/" className="inline-block mb-4 relative">
-              <Image
-                src="/images/logo/provigenLogoTransparent.png"
-                alt="ProviGen"
-                width={120}
-                height={26}
-                className="h-6 w-auto"
-                style={{ filter: "brightness(0) invert(1)", opacity: 0.7 }}
-              />
-              <Image
-                src="/images/logo/provigenLogoTransparent.png"
-                alt=""
-                width={120}
-                height={26}
-                aria-hidden="true"
-                className="h-6 w-auto absolute inset-0"
-                style={{ clipPath: "inset(0% 46% 0% 36%)" }}
-              />
-            </Link>
-            <p className="text-xs text-white/25">
-              &copy; {new Date().getFullYear()} ProviGen
-            </p>
-          </div>
-
-          {/* Right: Links with arrows */}
-          <div className="flex flex-col items-end gap-3">
-            <a
-              href="/legal_notice"
-              className="text-xs uppercase tracking-wider text-white/30 hover:text-white/60 transition-colors inline-flex items-center gap-2"
-            >
-              Legal Disclosure <span>&rarr;</span>
-            </a>
-            <a
-              href="/privacy_policy"
-              className="text-xs uppercase tracking-wider text-white/30 hover:text-white/60 transition-colors inline-flex items-center gap-2"
-            >
-              Privacy Policy <span>&rarr;</span>
-            </a>
-            <a
-              href="mailto:contact@provigen.ai"
-              className="text-xs text-white/30 hover:text-white/60 transition-colors inline-flex items-center gap-2"
-            >
-              contact@provigen.ai <span>&rarr;</span>
-            </a>
           </div>
         </div>
-      </div>
-    </footer>
+
+
+
+      </footer>
+    </>
   );
 };
 

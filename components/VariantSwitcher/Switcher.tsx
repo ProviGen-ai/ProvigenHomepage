@@ -2,7 +2,6 @@
 import { useVariant, Variant } from "./context";
 
 const variants: { id: Variant; label: string; color: string }[] = [
-  { id: "ginkgo", label: "Ginkgo", color: "bg-[#F2EEEB] text-[#0b1f30] border-[#0b1f30]/20" },
   { id: "eka", label: "Eka", color: "bg-[#1a1a1a] text-white border-white/20" },
   { id: "scale", label: "Scale", color: "bg-[#0a0a0a] text-[#05A2E6] border-[#05A2E6]/30" },
 ];

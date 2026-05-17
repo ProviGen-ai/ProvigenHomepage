@@ -1,91 +1,68 @@
 "use client";
 
+
+const scrollToFeatures = () => {
+  const element = document.getElementById('features');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+};
+
 const Hero = () => {
-  const scrollToContact = () => {
-    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const scrollToFeatures = () => {
-    document.getElementById("problem")?.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
-    <section id="home" className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Subtle gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-cream via-warm-white to-soft-gray" />
-
-      {/* Faint grid pattern overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `linear-gradient(rgba(11,31,48,1) 1px, transparent 1px), linear-gradient(90deg, rgba(11,31,48,1) 1px, transparent 1px)`,
-          backgroundSize: "80px 80px",
-        }}
-      />
-
-      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8 w-full">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
-          {/* Left: Text content */}
-          <div className="animate-fade-in-up pt-24 lg:pt-0">
-            <p className="text-sm font-semibold tracking-[0.2em] uppercase text-logo-blue mb-6">
-              Intelligent Lab Automation
-            </p>
-            <h1 className="text-display-sm lg:text-display text-navy mb-8">
-              The control layer for{" "}
-              <span className="italic font-light">life science</span>
-            </h1>
-            <p className="text-lg lg:text-xl text-muted leading-relaxed max-w-lg mb-10">
-              We turn robotic biolabs into closed-loop systems. Our AI designs,
-              runs, and learns from experiments autonomously, cutting optimization
-              timelines from months to weeks.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <button
-                onClick={scrollToContact}
-                className="rounded-full bg-navy text-white px-8 py-4 text-base font-medium hover:bg-navy-light transition-all duration-300 hover:shadow-lg"
-              >
-                Get in Touch
-              </button>
-              <button
-                onClick={scrollToFeatures}
-                className="rounded-full border border-navy/20 text-navy px-8 py-4 text-base font-medium hover:border-navy/40 hover:bg-navy/[0.03] transition-all duration-300"
-              >
-                Learn More
-              </button>
-            </div>
-          </div>
-
-          {/* Right: Hero image placeholder */}
-          <div className="animate-fade-in hidden lg:block">
-            <div className="image-placeholder aspect-[4/3] rounded-2xl">
-              <svg className="placeholder-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <rect x="4" y="4" width="40" height="40" rx="4" />
-                <circle cx="16" cy="16" r="4" />
-                <path d="M4 32 L16 22 L24 28 L36 18 L44 24 L44 40 L4 40Z" />
-              </svg>
-              <span className="placeholder-label">Hero Image</span>
-              <span className="placeholder-description">
-                A wide-angle photo of an automated liquid-handling robot (like an Opentrons or Hamilton STAR)
-                in a modern, clean biolab. The robot arm is mid-motion, pipetting into a 96-well plate.
-                Soft, clinical lighting with a slight blue-teal tint. Shallow depth of field with blurred
-                lab equipment in the background. The aesthetic should feel futuristic but real — similar to
-                Ginkgo Bioworks&apos; lab photography or images from Strateos/Emerald Cloud Lab.
-                Reference: search &quot;automated liquid handling robot biolab photography&quot; on Google Images.
-              </span>
+    <>
+    <section
+        id="home"
+        className="relative overflow-hidden h-screen"
+      >
+      <div className="w-full h-screen flex items-center">
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="object-cover absolute w-full h-screen z-0 opacity-20"
+      >
+      <source src="/videos/network.mp4" type="video/mp4"/>
+      </video>
+          <div className="container z-1 pt-32 sm:pt-28 md:pt-20 pb-8 relative w-full">
+          
+            <div className="-mx-4 flex flex-wrap">
+            
+              <div className="w-full px-4">
+              
+                <div
+                  className="wow fadeInUp mx-auto max-w-[800px] text-center"
+                  data-wow-delay=".2s"
+                >
+                  
+                  <h1 className="mb-5 text-5xl  leading-tight text-black  xs:text-4xl xxs:text-2xl sm:text-4xl sm:leading-tight md:text-5xl lg:text-6xl md:leading-tight">
+                  <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-black to-blue">Accelerating</span> <span className="italic">research in</span> <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-black to-blue">biotechnology</span>
+                  </h1>
+                  <p className="mb-12 text-base font-medium !leading-relaxed text-body-color-dark  sm:text-lg md:text-xl">
+                  We build the <span className="text-logo-blue">control layer</span> for <span className="text-logo-green">life science</span>.
+                  </p>
+                  <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+                    <a
+                      href="/#contact"
+                      className="inline-block rounded-md bg-primary py-4 px-8 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80"
+                    >
+                      Contact Us
+                    </a>
+                    <button
+                      className="rounded-md bg-transparent border-2 border-black/20 py-4 px-8 text-base font-semibold text-black duration-300 ease-in-out hover:border-black/40 hover:bg-black/5"
+                      onClick={scrollToFeatures}
+                    >
+                      Learn More
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce hidden lg:block">
-        <button onClick={scrollToFeatures} className="text-navy/30 hover:text-navy/50 transition-colors">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M12 5v14M5 12l7 7 7-7" />
-          </svg>
-        </button>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 
