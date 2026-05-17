@@ -1,5 +1,3 @@
-"use client";
-
 const applications = [
   {
     title: "Assay Development",
@@ -8,6 +6,7 @@ const applications = [
     detail:
       "Define your target readout and constraints.\n\nActive Learning designs the next set of experiments, learns from results, and iterates until your assay performs.\n\nWorks with plate readers, liquid handlers, and imaging systems. Typical campaigns converge in 5x fewer iterations than Design of Experiments (DoE).",
     image: "/images/applications/assay_development.png",
+    imageStyle: { transform: "scale(1.8) translateX(12%) rotate(5deg)" },
     link: "/blog/closed-loop-optimization#assay-optimization",
   },
   // {
@@ -35,30 +34,16 @@ const applications = [
       "Protocol development for stem cell differentiation and adaptive culture processes.",
     detail:
       "Set your growth and reproducibility targets.\n\nHandle multi-objective trade-offs between growth, viability, and yield. Identify root causes of unexpected outcomes through causal attribution analysis.\n\nIntegrates with plate-based or suspension culture systems.",
-    imagePlaceholder:
-      "A cell culture flask or bioreactor vessel with visible cell growth media, warm amber lighting. Clean, modern lab. Reference: cell culture photography from Corning or Thermo Fisher marketing.",
+    image: "/images/applications/cell_painting.png",
     link: "/blog/closed-loop-optimization#media-optimization",
   },
 ];
 
-import { useState, useRef, useEffect } from "react";
-
 const Applications = ({ dark = false }: { dark?: boolean }) => {
-  const [fadeStart, setFadeStart] = useState(50);
-  const [visible, setVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.1 });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
+  const fadeStart = 50;
 
   return (
     <section
-      ref={sectionRef}
       id="applications"
       className={`py-32 lg:py-40 relative overflow-hidden ${dark ? "bg-charcoal text-white" : ""}`}
     >
@@ -119,7 +104,7 @@ const Applications = ({ dark = false }: { dark?: boolean }) => {
                     src={app.image}
                     alt={app.title}
                     className="w-full h-full object-cover"
-                    style={{ transform: "scale(1.8) translateX(12%) rotate(5deg)" }}
+                    style={app.imageStyle || {}}
                   />
                 </div>
               ) : (
@@ -207,18 +192,6 @@ const Applications = ({ dark = false }: { dark?: boolean }) => {
             );
           })}
         </div>
-      </div>
-      {/* Dev slider — remove when done */}
-      <div className={`fixed bottom-20 right-4 z-[9999] bg-black/80 text-white p-3 rounded-lg text-xs font-mono transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-        <label>Fade: {fadeStart}%</label>
-        <input
-          type="range"
-          min={0}
-          max={50}
-          value={fadeStart}
-          onChange={(e) => setFadeStart(Number(e.target.value))}
-          className="block w-32 mt-1"
-        />
       </div>
     </section>
   );

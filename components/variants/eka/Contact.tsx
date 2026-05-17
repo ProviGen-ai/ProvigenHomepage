@@ -93,7 +93,6 @@ const Contact = () => {
               id="inquiryType"
               name="inquiryType"
               value={formData.inquiryType}
-              onChange={handleChange}
               required
               onInvalid={(e) => (e.target as HTMLSelectElement).setCustomValidity("Please select an inquiry type")}
               onChange={(e) => { handleChange(e); (e.target as HTMLSelectElement).setCustomValidity(""); }}

@@ -13,8 +13,9 @@ const EkaPage = () => (
     <Hero />
     <div className="relative overflow-hidden">
       {/* Paper texture spanning both sections */}
+      {/* Paper texture — fades on desktop, extends full on mobile */}
       <div
-        className="absolute inset-0 opacity-[0.25] pointer-events-none z-[2]"
+        className="absolute inset-0 opacity-[0.25] pointer-events-none z-[2] hidden md:block"
         style={{
           backgroundImage: "url('/images/hero/paper_bg.png')",
           backgroundSize: "cover",
@@ -23,8 +24,18 @@ const EkaPage = () => (
           WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 40%, transparent 70%)",
         }}
       />
+      <div
+        className="absolute inset-0 opacity-[0.25] pointer-events-none z-[2] md:hidden"
+        style={{
+          backgroundImage: "url('/images/hero/paper_bg.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          maskImage: "linear-gradient(to bottom, black 0%, black 70%, transparent 95%)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 70%, transparent 95%)",
+        }}
+      />
       {/* Grid with circle cutout spanning both sections */}
-      <div className="absolute inset-0 left-[-10%] right-[-10%] pointer-events-none z-[1]">
+      <div className="absolute inset-0 left-[-10%] right-[-10%] pointer-events-none z-[1] hidden md:block">
         <svg viewBox="0 0 1200 960" className="w-full h-full" preserveAspectRatio="none">
           <defs>
             <clipPath id="inverted-circle-clip">

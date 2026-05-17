@@ -14,7 +14,7 @@ const Hero = () => {
       />
       {/* Pencil wireframe — inverted */}
       <div
-        className="absolute right-[5%] top-1/2 -translate-y-1/2 w-[65%] lg:w-[55%] opacity-90 pointer-events-none hidden sm:block"
+        className="absolute left-0 right-[-40%] top-[35%] -translate-y-1/2 w-[160%] sm:left-auto sm:right-[5%] sm:top-1/2 sm:w-[65%] lg:w-[55%] opacity-70 sm:opacity-90 pointer-events-none"
       >
         <img
           src="/images/hero/wireframe_pencil.png"
