@@ -53,3 +53,6 @@ public/images/blog/data-timeline.svg
 __pycache__/
 *.pyc
 *.db
+
+# WSL Zone.Identifier metadata files
+*:Zone.Identifier
