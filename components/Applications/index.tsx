@@ -1,3 +1,5 @@
+"use client";
+
 const applications = [
   {
     title: "Assay Development",
@@ -39,12 +41,24 @@ const applications = [
   },
 ];
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const Applications = ({ dark = false }: { dark?: boolean }) => {
   const [fadeStart, setFadeStart] = useState(15);
+  const [visible, setVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.1 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       id="applications"
       className={`py-32 lg:py-40 relative overflow-hidden ${dark ? "bg-charcoal text-white" : ""}`}
     >
@@ -195,7 +209,7 @@ const Applications = ({ dark = false }: { dark?: boolean }) => {
         </div>
       </div>
       {/* Dev slider — remove when done */}
-      <div className="fixed bottom-20 right-4 z-[9999] bg-black/80 text-white p-3 rounded-lg text-xs font-mono">
+      <div className={`fixed bottom-20 right-4 z-[9999] bg-black/80 text-white p-3 rounded-lg text-xs font-mono transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
         <label>Fade: {fadeStart}%</label>
         <input
           type="range"
