@@ -46,7 +46,15 @@ const Contact = () => {
   const inputClass = "w-full px-0 py-3 bg-transparent border-0 border-b border-white/15 text-white placeholder-white/20 focus:outline-none focus:border-warm-tan/50 transition-colors";
 
   return (
-    <section id="contact" className="pt-20 lg:pt-28 pb-32 lg:pb-48 bg-[#0a0a0a]">
+    <section id="contact" className="pt-20 lg:pt-28 pb-32 lg:pb-48 bg-[#0a0a0a] relative">
+      <div
+        className="absolute inset-0 opacity-[0.25] pointer-events-none"
+        style={{
+          backgroundImage: "url('/images/hero/paper_bg.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
       {/* Copper accent border */}
       <div className="mx-auto max-w-3xl px-6 sm:px-8 mb-16">
         <div className="border-t border-warm-tan/30" />
