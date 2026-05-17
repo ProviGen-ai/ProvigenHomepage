@@ -2,7 +2,6 @@
 import ScrollUp from "@/components/Common/ScrollUp";
 import SectionDivider from "@/components/Common/SectionDivider";
 import Hero from "./Hero";
-import KPIs from "@/components/KPIs";
 import Applications from "@/components/Applications";
 import HowItWorks from "./HowItWorks";
 import Team from "./Team";
@@ -13,11 +12,9 @@ const EkaPage = () => (
     <ScrollUp />
     <Hero />
     <SectionDivider />
-    <KPIs dark />
+    <HowItWorks />
     <SectionDivider />
     <Applications dark />
-    <SectionDivider />
-    <HowItWorks />
     <SectionDivider />
     <Team />
     <SectionDivider />

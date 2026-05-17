@@ -28,12 +28,12 @@ const Header = () => {
   }, [pathname]);
 
   const scrollToElement = (elementId: string) => {
-    if (pathname === "/") {
-      const element = document.getElementById(elementId);
-      element?.scrollIntoView({ behavior: "smooth" });
-      window.history.replaceState(null, "", "/");
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+      window.history.replaceState(null, "", window.location.pathname);
     } else {
-      router.push(`/#${elementId}`);
+      router.push(`/new-design#${elementId}`);
     }
     setNavbarOpen(false);
   };

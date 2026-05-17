@@ -3,6 +3,7 @@ import { useState } from "react";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
+    inquiryType: "",
     email: "",
     message: "",
     website: "", // honeypot field
@@ -23,38 +24,45 @@ const Contact = () => {
       if (!res.ok) throw new Error("Failed to send");
 
       setStatus("sent");
-      setFormData({ email: "", message: "", website: "" });
+      setFormData({ inquiryType: "", email: "", message: "", website: "" });
     } catch {
       setStatus("error");
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+    // Auto-resize textarea
+    if (e.target instanceof HTMLTextAreaElement) {
+      e.target.style.height = "auto";
+      e.target.style.height = e.target.scrollHeight + "px";
+    }
   };
 
+  const labelClass = "block mb-3 font-mono text-xs uppercase tracking-wider text-white/40";
+  const inputClass = "w-full px-0 py-3 bg-transparent border-0 border-b border-white/15 text-white placeholder-white/20 focus:outline-none focus:border-warm-tan/50 transition-colors";
+
   return (
-    <section id="contact" className="py-32 lg:py-48 bg-[#0a0a0a]">
+    <section id="contact" className="pt-20 lg:pt-28 pb-32 lg:pb-48 bg-[#0a0a0a]">
       {/* Copper accent border */}
-      <div className="mx-auto max-w-3xl px-8 mb-20">
+      <div className="mx-auto max-w-3xl px-8 mb-16">
         <div className="border-t border-warm-tan/30" />
       </div>
-      <div className="mx-auto max-w-3xl px-8 text-center">
-        <span className="font-mono text-label uppercase text-warm-tan tracking-[0.3em] mb-6 block">
-          Contact
-        </span>
-        <h2 className="text-heading-sm lg:text-heading text-white font-medium mb-6">
-          Let&#39;s build something together
-        </h2>
-        <p className="text-white/50 leading-relaxed mb-16 max-w-xl mx-auto font-mono text-sm">
-          Tell us about your process.
-          We&apos;ll show you how ProviGen can transform your workflows.
-        </p>
-
+      <div className="mx-auto max-w-3xl px-8">
         <form onSubmit={handleSubmit} className="text-left max-w-lg mx-auto">
+          <p className="text-sm font-mono uppercase text-warm-tan tracking-[0.3em] mb-12 text-center">
+            Contact
+          </p>
+          <h2 className="text-heading-sm lg:text-heading text-white font-medium mb-6">
+            Get in touch
+          </h2>
+          <p className="text-white/50 leading-relaxed mb-16 font-mono text-base">
+            Tell us what you&apos;re working on.<br />Whether you have automation infrastructure or are just starting out, we&apos;d love to hear from you.
+          </p>
+
           {/* Honeypot field */}
           <div className="absolute opacity-0 top-0 left-0 h-0 w-0 -z-10" aria-hidden="true">
             <label htmlFor="website">Website</label>
@@ -70,7 +78,29 @@ const Contact = () => {
           </div>
 
           <div className="mb-6">
-            <label htmlFor="email" className="block mb-2 font-mono text-xs uppercase tracking-wider text-white/40">
+            <label htmlFor="inquiryType" className={labelClass}>
+              Inquiry Type
+            </label>
+            <select
+              id="inquiryType"
+              name="inquiryType"
+              value={formData.inquiryType}
+              onChange={handleChange}
+              className={`${inputClass} appearance-none cursor-pointer`}
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='rgba(184,149,106,0.5)' stroke-width='1.5'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0 center' }}
+            >
+              <option value="" className="bg-[#1a1a2e] text-white/40">Select type</option>
+              <option value="partnership" className="bg-[#1a1a2e] text-white">Partnership</option>
+              <option value="public-sector" className="bg-[#1a1a2e] text-white">Public Sector</option>
+              <option value="investor" className="bg-[#1a1a2e] text-white">Investor</option>
+              <option value="media" className="bg-[#1a1a2e] text-white">Media</option>
+              <option value="careers" className="bg-[#1a1a2e] text-white">Careers</option>
+              <option value="other" className="bg-[#1a1a2e] text-white">Other</option>
+            </select>
+          </div>
+
+          <div className="mb-6">
+            <label htmlFor="email" className={labelClass}>
               Email
             </label>
             <input
@@ -80,13 +110,12 @@ const Contact = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-0 py-3 bg-transparent border-0 border-b border-white/15 text-white placeholder-white/30 focus:outline-none focus:border-white/50 transition-colors"
-              placeholder="name@example.com"
+              className={inputClass}
             />
           </div>
 
-          <div className="mb-10">
-            <label htmlFor="message" className="block mb-2 font-mono text-xs uppercase tracking-wider text-white/40">
+          <div className="mb-12 relative">
+            <label htmlFor="message" className={labelClass}>
               Message
             </label>
             <textarea
@@ -96,12 +125,17 @@ const Contact = () => {
               onChange={handleChange}
               required
               rows={4}
-              className="w-full px-0 py-3 bg-transparent border-0 border-b border-white/15 text-white placeholder-white/30 focus:outline-none focus:border-white/50 transition-colors resize-none"
-              placeholder="Tell us about your project..."
+              className={`${inputClass} resize-none overflow-hidden`}
             />
+            {/* Resize grip */}
+            <svg className="absolute bottom-2 right-0 w-3 h-3 pointer-events-none" viewBox="0 0 12 12">
+              <line x1="11" y1="1" x2="1" y2="11" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
+              <line x1="11" y1="4.5" x2="4.5" y2="11" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
+              <line x1="11" y1="8" x2="8" y2="11" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
+            </svg>
           </div>
 
-          <div className="text-center">
+          <div>
             <button
               type="submit"
               disabled={status === "sending"}
@@ -113,23 +147,23 @@ const Contact = () => {
           </div>
 
           {status === "sent" && (
-            <p className="mt-6 text-center text-sm text-green-400">
+            <p className="mt-6 text-sm text-green-400">
               Message sent successfully! We&apos;ll get back to you soon.
             </p>
           )}
           {status === "error" && (
-            <p className="mt-6 text-center text-sm text-red-400">
+            <p className="mt-6 text-sm text-red-400">
               Something went wrong. Please try again or email us directly.
             </p>
           )}
         </form>
 
-        <div className="mt-16 pt-8">
+        <div className="mt-16 pt-8 text-center">
           <a
             href="mailto:contact@provigen.ai"
-            className="font-mono text-sm text-white/50 hover:text-white/70 transition-colors inline-flex items-center gap-2"
+            className="font-mono text-base text-warm-tan hover:text-warm-tan/80 transition-colors"
           >
-            contact@provigen.ai <span>&rarr;</span>
+            contact@provigen.ai
           </a>
         </div>
       </div>

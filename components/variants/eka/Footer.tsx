@@ -9,7 +9,7 @@ const Footer = () => {
       </div>
 
       <div className="px-12 lg:px-[7%]">
-        <div className="py-12 lg:py-16 flex flex-col md:flex-row items-start justify-between gap-8">
+        <div className="py-6 lg:py-8 flex flex-col md:flex-row items-start justify-between gap-8">
           {/* Left: Logo + copyright */}
           <div>
             <Link href="/" className="inline-block mb-4 relative">
@@ -32,8 +32,14 @@ const Footer = () => {
               />
             </Link>
             <p className="text-xs text-white/40">
-              &copy; {new Date().getFullYear()} ProviGen
+              &copy; {new Date().getFullYear()} ProviGenAI
             </p>
+            <a
+              href="mailto:contact@provigen.ai"
+              className="font-mono text-xs text-white/50 hover:text-white/70 transition-colors mt-3 block"
+            >
+              contact@provigen.ai
+            </a>
           </div>
 
           {/* Right: Links with arrows */}
@@ -49,12 +55,6 @@ const Footer = () => {
               className="font-mono text-xs uppercase tracking-wider text-white/50 hover:text-white/70 transition-colors inline-flex items-center gap-2"
             >
               Privacy Policy <span>&rarr;</span>
-            </a>
-            <a
-              href="mailto:contact@provigen.ai"
-              className="font-mono text-xs text-white/50 hover:text-white/70 transition-colors inline-flex items-center gap-2"
-            >
-              contact@provigen.ai <span>&rarr;</span>
             </a>
             <div className="flex items-center gap-3 mt-2">
               <a

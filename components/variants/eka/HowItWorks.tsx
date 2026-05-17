@@ -1,29 +1,41 @@
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="py-32 lg:py-40 bg-off-white">
-      <div className="mx-auto max-w-7xl px-8 lg:px-12">
+    <section id="how-it-works" className="py-24 lg:py-32 bg-[#0a0a0a]">
+      <div className="mx-auto max-w-5xl px-6 lg:px-8">
         {/* Section header */}
-        <div className="text-center mb-24">
-          <span className="font-mono text-label uppercase text-warm-tan tracking-[0.3em] mb-6 block">
-            Impact
-          </span>
-          <h2 className="text-heading-sm lg:text-heading text-charcoal font-medium max-w-3xl mx-auto">
-            From months of manual debugging to weeks of autonomous optimization
+        <div className="text-center mb-16">
+          {/* alt: Impact */}
+          <p className="text-sm font-semibold tracking-[0.2em] uppercase text-warm-tan mb-4">
+            The Difference
+          </p>
+          <h2 className="text-heading-sm lg:text-heading text-white font-medium max-w-3xl mx-auto mb-4">
+            Speed up process development
           </h2>
+          <p className="text-lg max-w-2xl mx-auto leading-relaxed text-white/50">
+            Process development in a fraction of the time.
+            Your team focuses on decisions, not debugging.
+          </p>
         </div>
 
-        {/* Stats grid */}
-        <div className="grid md:grid-cols-3 gap-px bg-light-gray max-w-4xl mx-auto">
+        <div className="text-sm uppercase tracking-[0.15em] text-center mb-8 text-white/30">
+          up to
+        </div>
+
+        {/* Stats grid with shorter vertical separators */}
+        <div className="grid md:grid-cols-3 gap-12 mx-auto">
           {[
             { value: "10x", label: "Faster protocol optimization" },
-            { value: "80%", label: "Less manual intervention" },
-            { value: "3x", label: "Higher experimental throughput" },
+            { value: "80%", label: "Less manual intervention", nudge: true },
+            { value: "3x", label: "Higher throughput" },
           ].map((stat, i) => (
-            <div key={i} className="bg-off-white px-8 py-16 text-center">
-              <div className="text-5xl lg:text-6xl font-light text-charcoal mb-4 tracking-tight">
+            <div key={i} className="text-center relative">
+              {i > 0 && (
+                <div className="hidden md:block absolute -left-6 top-[20%] bottom-[20%] w-px bg-white/10" />
+              )}
+              <div className={`text-5xl lg:text-6xl font-light text-white mb-3 tracking-tight ${stat.nudge ? "ml-[0.35em]" : ""}`}>
                 {stat.value}
               </div>
-              <div className="font-mono text-xs uppercase tracking-[0.15em] text-mid-gray">
+              <div className="text-xs uppercase tracking-[0.15em] text-white/40">
                 {stat.label}
               </div>
             </div>

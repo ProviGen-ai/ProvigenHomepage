@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const { email, message, website } = await req.json();
+    const { email, message, website, inquiryType } = await req.json();
 
     // Honeypot check — bots fill this hidden field, real users don't
     if (website) {
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
       to: "contact@provigen.ai",
       replyTo: email,
       subject: `Contact form inquiry from ${email}`,
-      text: `From: ${email}\n\nMessage:\n${message}`,
+      text: `Email: ${email}\nInquiry type: ${inquiryType || "Not specified"}\n\nMessage:\n${message}`,
     });
 
     // Send confirmation to the sender
