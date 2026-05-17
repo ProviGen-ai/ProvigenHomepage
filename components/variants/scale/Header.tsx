@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import menuData from "@/components/Header/menuData";
+
+const navItems = menuData.filter((item) => item.title !== "Home");
 import { useRouter, usePathname } from 'next/navigation'
 
 const Header = () => {
@@ -88,7 +90,7 @@ const Header = () => {
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-6">
-            {menuData.map((item) => (
+            {navItems.map((item) => (
               <div key={item.id}>
                 {item.jumpTo ? (
                   <button
@@ -147,7 +149,7 @@ const Header = () => {
         } bg-white/95 backdrop-blur-md`}
       >
         <nav className="mx-auto max-w-7xl px-6 py-4 space-y-1">
-          {menuData.map((item) => (
+          {navItems.map((item) => (
             <div key={item.id}>
               {item.jumpTo ? (
                 <button

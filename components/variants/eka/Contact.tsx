@@ -37,7 +37,7 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact" className="py-32 lg:py-48 bg-off-white">
+    <section id="contact" className="py-32 lg:py-48 bg-[#0a0a0a]">
       {/* Copper accent border */}
       <div className="mx-auto max-w-3xl px-8 mb-20">
         <div className="border-t border-warm-tan/30" />
@@ -46,10 +46,10 @@ const Contact = () => {
         <span className="font-mono text-label uppercase text-warm-tan tracking-[0.3em] mb-6 block">
           Contact
         </span>
-        <h2 className="text-heading-sm lg:text-heading text-charcoal font-medium mb-6">
+        <h2 className="text-heading-sm lg:text-heading text-white font-medium mb-6">
           Let&#39;s build something together
         </h2>
-        <p className="text-mid-gray leading-relaxed mb-16 max-w-xl mx-auto font-mono text-sm">
+        <p className="text-white/50 leading-relaxed mb-16 max-w-xl mx-auto font-mono text-sm">
           Tell us about your process.
           We&apos;ll show you how ProviGen can transform your workflows.
         </p>
@@ -70,7 +70,7 @@ const Contact = () => {
           </div>
 
           <div className="mb-6">
-            <label htmlFor="email" className="block mb-2 font-mono text-xs uppercase tracking-wider text-mid-gray">
+            <label htmlFor="email" className="block mb-2 font-mono text-xs uppercase tracking-wider text-white/40">
               Email
             </label>
             <input
@@ -80,13 +80,13 @@ const Contact = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-0 py-3 bg-transparent border-0 border-b border-light-gray text-charcoal placeholder-mid-gray/50 focus:outline-none focus:border-charcoal transition-colors"
+              className="w-full px-0 py-3 bg-transparent border-0 border-b border-white/15 text-white placeholder-white/30 focus:outline-none focus:border-white/50 transition-colors"
               placeholder="name@example.com"
             />
           </div>
 
           <div className="mb-10">
-            <label htmlFor="message" className="block mb-2 font-mono text-xs uppercase tracking-wider text-mid-gray">
+            <label htmlFor="message" className="block mb-2 font-mono text-xs uppercase tracking-wider text-white/40">
               Message
             </label>
             <textarea
@@ -96,7 +96,7 @@ const Contact = () => {
               onChange={handleChange}
               required
               rows={4}
-              className="w-full px-0 py-3 bg-transparent border-0 border-b border-light-gray text-charcoal placeholder-mid-gray/50 focus:outline-none focus:border-charcoal transition-colors resize-none"
+              className="w-full px-0 py-3 bg-transparent border-0 border-b border-white/15 text-white placeholder-white/30 focus:outline-none focus:border-white/50 transition-colors resize-none"
               placeholder="Tell us about your project..."
             />
           </div>
@@ -105,7 +105,7 @@ const Contact = () => {
             <button
               type="submit"
               disabled={status === "sending"}
-              className="inline-flex items-center gap-2 rounded-full bg-charcoal text-white px-10 py-4 text-sm font-medium hover:bg-near-black transition-all duration-300 disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-full bg-white text-[#0a0a0a] px-10 py-4 text-sm font-medium hover:bg-white/90 transition-all duration-300 disabled:opacity-50"
             >
               {status === "sending" ? "Sending..." : "SEND MESSAGE"}
               <span aria-hidden="true">&rarr;</span>
@@ -113,12 +113,12 @@ const Contact = () => {
           </div>
 
           {status === "sent" && (
-            <p className="mt-6 text-center text-sm text-green-600">
+            <p className="mt-6 text-center text-sm text-green-400">
               Message sent successfully! We&apos;ll get back to you soon.
             </p>
           )}
           {status === "error" && (
-            <p className="mt-6 text-center text-sm text-red-500">
+            <p className="mt-6 text-center text-sm text-red-400">
               Something went wrong. Please try again or email us directly.
             </p>
           )}
@@ -127,7 +127,7 @@ const Contact = () => {
         <div className="mt-16 pt-8">
           <a
             href="mailto:contact@provigen.ai"
-            className="font-mono text-sm text-mid-gray hover:text-charcoal transition-colors inline-flex items-center gap-2"
+            className="font-mono text-sm text-white/50 hover:text-white/70 transition-colors inline-flex items-center gap-2"
           >
             contact@provigen.ai <span>&rarr;</span>
           </a>

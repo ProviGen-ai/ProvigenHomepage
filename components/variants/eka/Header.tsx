@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import menuData from "@/components/Header/menuData";
+
+const navItems = menuData.filter((item) => item.title !== "Home");
 import { useRouter, usePathname } from "next/navigation";
 
 const Header = () => {
@@ -39,16 +41,13 @@ const Header = () => {
   return (
     <header
       className={`fixed top-0 left-0 z-[9999] w-full transition-all duration-500 ${
-        scrolled
-          ? "bg-off-white/95 backdrop-blur-md shadow-[0_1px_0_rgba(0,0,0,0.06)]"
-          : ""
+        scrolled ? "bg-[#0a0a0a] shadow-[0_1px_0_rgba(255,255,255,0.08)]" : ""
       }`}
     >
       <div className="px-6 lg:px-8">
         <div className="flex h-16 lg:h-20 items-center justify-between">
-          {/* Logo — layered: inverted white for dark hero, normal when scrolled */}
+          {/* Logo — always show white version with colored diamond */}
           <Link href="/" className="flex-shrink-0 relative">
-            {/* White version (visible on dark hero) */}
             <Image
               src="/images/logo/provigenLogoTransparent.png"
               alt="ProviGen"
@@ -56,55 +55,44 @@ const Header = () => {
               height={36}
               loading="eager"
               priority
-              className={`h-8 lg:h-9 w-auto transition-all duration-500 ${
-                scrolled ? "opacity-0" : "opacity-90"
-              }`}
+              className="h-8 lg:h-9 w-auto opacity-90"
               style={{ filter: "brightness(0) invert(1)" }}
             />
-            {/* Color diamond overlay (visible on dark hero) */}
+            {/* Color diamond overlay */}
             <Image
               src="/images/logo/provigenLogoTransparent.png"
               alt=""
               width={160}
               height={36}
               aria-hidden="true"
-              className={`h-8 lg:h-9 w-auto absolute inset-0 transition-all duration-500 ${
-                scrolled ? "opacity-0" : "opacity-100"
-              }`}
+              className="h-8 lg:h-9 w-auto absolute inset-0"
               style={{ clipPath: "inset(0% 46% 0% 36%)" }}
-            />
-            {/* Normal version (visible when scrolled) */}
-            <Image
-              src="/images/logo/provigenLogoTransparent.png"
-              alt=""
-              width={160}
-              height={36}
-              aria-hidden="true"
-              className={`h-8 lg:h-9 w-auto absolute inset-0 transition-all duration-500 ${
-                scrolled ? "opacity-100" : "opacity-0"
-              }`}
             />
           </Link>
 
-          {/* Desktop nav — only visible after scrolling */}
-          <nav
-            className={`hidden lg:flex items-center gap-6 transition-all duration-500 ${
-              scrolled ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 pointer-events-none"
-            }`}
-          >
-            {menuData.map((item) => (
+          {/* Desktop nav */}
+          <nav className="hidden lg:flex items-center gap-6">
+            {navItems.map((item) => (
               <div key={item.id}>
                 {item.jumpTo ? (
                   <button
                     onClick={() => scrollToElement(item.jumpTo!)}
-                    className="text-sm font-medium text-charcoal/60 hover:text-charcoal transition-colors duration-200"
+                    className={`text-sm font-semibold tracking-[0.2em] uppercase transition-colors duration-500 ${
+                      scrolled
+                        ? "text-warm-tan hover:text-white"
+                        : "text-white/60 hover:text-white"
+                    }`}
                   >
                     {item.title}
                   </button>
                 ) : item.path ? (
                   <Link
                     href={item.path}
-                    className="text-sm font-medium text-charcoal/60 hover:text-charcoal transition-colors duration-200"
+                    className={`text-sm font-semibold tracking-[0.2em] uppercase transition-colors duration-500 ${
+                      scrolled
+                        ? "text-warm-tan hover:text-white"
+                        : "text-white/60 hover:text-white"
+                    }`}
                   >
                     {item.title}
                   </Link>
@@ -122,7 +110,7 @@ const Header = () => {
             {[0, 1, 2].map((i) => (
               <span
                 key={i}
-                className={`block h-[1.5px] w-6 bg-charcoal transition-all duration-300 origin-center ${
+                className={`block h-[1.5px] w-6 bg-white transition-all duration-300 origin-center ${
                   i === 0 && navbarOpen ? "rotate-45 translate-y-[4.5px]" : ""
                 } ${
                   i === 1 && navbarOpen ? "opacity-0 scale-0" : ""
@@ -142,7 +130,7 @@ const Header = () => {
         } bg-off-white/95 backdrop-blur-md`}
       >
         <nav className="mx-auto max-w-7xl px-8 py-4 space-y-1">
-          {menuData.map((item) => (
+          {navItems.map((item) => (
             <div key={item.id}>
               {item.jumpTo ? (
                 <button
