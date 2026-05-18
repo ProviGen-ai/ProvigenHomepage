@@ -1,12 +1,10 @@
 "use client";
 import { useEffect } from "react";
-import dynamic from "next/dynamic";
+import EkaHeader from "@/components/variants/eka/Header";
+import EkaFooter from "@/components/variants/eka/Footer";
+import EkaPage from "@/components/variants/eka/Page";
 
-const EkaHeader = dynamic(() => import("@/components/variants/eka/Header"), { ssr: false });
-const EkaFooter = dynamic(() => import("@/components/variants/eka/Footer"), { ssr: false });
-const EkaPage = dynamic(() => import("@/components/variants/eka/Page"), { ssr: false });
-
-function HomeContent() {
+export default function Home() {
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
@@ -24,8 +22,4 @@ function HomeContent() {
       <EkaFooter />
     </div>
   );
-}
-
-export default function Home() {
-  return <HomeContent />;
 }

@@ -1,30 +1,49 @@
 "use client";
+import { useState, useEffect } from "react";
 
 const Hero = () => {
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const images = ["/images/hero/paper_bg.png", "/images/hero/wireframe_pencil.png"];
+    let count = 0;
+    images.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        count++;
+        if (count === images.length) setLoaded(true);
+      };
+    });
+  }, []);
+
   return (
+    <>
+    {!loaded && <div className="fixed inset-0 z-[99999] bg-near-black" />}
     <section id="home" className="relative h-screen w-full overflow-hidden bg-near-black">
-      {/* Paper background */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: "url('/images/hero/paper_bg.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
-      {/* Pencil wireframe — inverted */}
-      <div
-        className="absolute left-0 right-[-40%] top-[35%] -translate-y-1/2 w-[160%] sm:left-auto sm:right-[5%] sm:top-1/2 sm:w-[65%] lg:w-[55%] opacity-70 sm:opacity-90 pointer-events-none"
-      >
-        <img
-          src="/images/hero/wireframe_pencil.png"
-          alt=""
-          className="w-full h-auto invert"
+      <div className={`absolute inset-0 transition-opacity duration-700 ${loaded ? "opacity-100" : "opacity-0"}`}>
+        {/* Paper background */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: "url('/images/hero/paper_bg.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
         />
+        {/* Pencil wireframe — inverted */}
+        <div
+          className="absolute left-0 right-[-40%] top-[35%] -translate-y-1/2 w-[160%] sm:left-auto sm:right-[5%] sm:top-1/2 sm:w-[65%] lg:w-[55%] opacity-70 sm:opacity-90 pointer-events-none"
+        >
+          <img
+            src="/images/hero/wireframe_pencil.png"
+            alt=""
+            className="w-full h-auto invert"
+          />
+        </div>
       </div>
 
-
-      <div className="absolute bottom-0 left-0 right-0 z-10 pb-20 lg:pb-28 px-6 sm:px-8 lg:pl-12">
+      <div className={`absolute bottom-0 left-0 right-0 z-10 pb-20 lg:pb-28 px-6 sm:px-8 lg:pl-12 transition-opacity duration-700 ${loaded ? "opacity-100" : "opacity-0"}`}>
         <div className="animate-fade-in-up max-w-[90%] sm:max-w-[80%] lg:max-w-none">
           <h1 className="text-4xl sm:text-5xl lg:text-[4rem] xl:text-[4.5rem] text-white font-medium leading-[1.1] tracking-tight">
             The Control Layer
@@ -54,6 +73,7 @@ const Hero = () => {
         </div>
       </div>
     </section>
+    </>
   );
 };
 
