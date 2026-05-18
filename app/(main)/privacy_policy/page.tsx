@@ -28,10 +28,10 @@ const PrivacyPolicy = () => {
   }
 
   return (
-    <div className="min-h-screen pt-40 pb-24 px-12 lg:px-[18%]">
-      <Link href="/" className="text-sm text-muted hover:text-navy transition-colors mb-12 inline-block">
-        &larr; Back to overview
-      </Link>
+    <div className="min-h-screen pt-40 pb-24 px-12 lg:px-[18%] relative">
+      <a href="/" className="absolute top-5 left-6 lg:left-8 inline-flex items-center gap-2 text-sm text-[#6c7793] hover:text-[#090E34] transition-colors">
+        <span>&larr;</span> Back to Overview
+      </a>
 
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted mb-6">
         Legal

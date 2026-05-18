@@ -10,18 +10,41 @@ import { useRouter, usePathname } from "next/navigation";
 const Header = () => {
   const [navbarOpen, setNavbarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
   const router = useRouter();
   const pathname = usePathname();
 
+  // Pages with light backgrounds need permanent dark header
+  const isLightPage = pathname.startsWith("/blog/") || pathname === "/demo" || pathname === "/legal_notice" || pathname === "/privacy_policy";
+  // Subpages: hide header initially, show on scroll up
+  const isSubpage = (pathname.startsWith("/blog/") && pathname !== "/blog") || pathname === "/legal_notice" || pathname === "/privacy_policy" || pathname === "/demo";
+
+  const [hidden, setHidden] = useState(isSubpage);
+
   useEffect(() => {
+    setHidden(isSubpage);
+  }, [pathname, isSubpage]);
+
+  useEffect(() => {
+    let lastY = window.scrollY;
     const handleScroll = () => {
-      setScrolled(window.scrollY > 60);
+      const currentY = window.scrollY;
+      setScrolled(currentY > 60);
+      setNavbarOpen(false);
+      if (isSubpage) {
+        if (currentY <= 60) {
+          setHidden(true);
+        } else if (currentY < lastY) {
+          setHidden(false);
+        } else if (currentY > lastY) {
+          setHidden(true);
+        }
+      }
+      lastY = currentY;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isSubpage]);
 
   useEffect(() => {
     setNavbarOpen(false);
@@ -33,7 +56,17 @@ const Header = () => {
       element.scrollIntoView({ behavior: "smooth" });
       window.history.replaceState(null, "", window.location.pathname);
     } else {
-      router.push(`/new-design#${elementId}`);
+      router.push(`/`);
+      // Wait for the page to render, then scroll to element
+      const waitForElement = () => {
+        const el = document.getElementById(elementId);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+        } else {
+          requestAnimationFrame(waitForElement);
+        }
+      };
+      setTimeout(waitForElement, 100);
     }
     setNavbarOpen(false);
   };
@@ -41,8 +74,8 @@ const Header = () => {
   return (
     <header
       className={`fixed top-0 left-0 z-[9999] w-full transition-all duration-500 ${
-        scrolled ? "bg-[#0a0a0a] shadow-[0_1px_0_rgba(255,255,255,0.08)]" : ""
-      }`}
+        scrolled || isLightPage ? "bg-[#0a0a0a] shadow-[0_1px_0_rgba(255,255,255,0.08)]" : ""
+      } ${hidden ? "opacity-0 pointer-events-none" : "opacity-100"}`}
     >
       <div className="px-6 lg:px-8">
         <div className="flex h-16 lg:h-20 items-center justify-between">
@@ -78,7 +111,7 @@ const Header = () => {
                   <button
                     onClick={() => scrollToElement(item.jumpTo!)}
                     className={`text-sm font-semibold tracking-[0.2em] uppercase transition-colors duration-500 ${
-                      scrolled
+                      scrolled || isLightPage
                         ? "text-warm-tan hover:text-white"
                         : "text-white/60 hover:text-white"
                     }`}
@@ -89,7 +122,7 @@ const Header = () => {
                   <Link
                     href={item.path}
                     className={`text-sm font-semibold tracking-[0.2em] uppercase transition-colors duration-500 ${
-                      scrolled
+                      scrolled || isLightPage
                         ? "text-warm-tan hover:text-white"
                         : "text-white/60 hover:text-white"
                     }`}
@@ -125,24 +158,24 @@ const Header = () => {
 
       {/* Mobile nav panel */}
       <div
-        className={`lg:hidden overflow-hidden transition-all duration-300 ${
-          navbarOpen ? "max-h-96 border-t border-black/5" : "max-h-0"
-        } bg-off-white/95 backdrop-blur-md`}
+        className={`lg:hidden transition-all duration-300 ${
+          navbarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        } absolute right-6 top-16 z-50`}
       >
-        <nav className="mx-auto max-w-7xl px-8 py-4 space-y-1">
-          {navItems.map((item) => (
+        <nav className="bg-[#0a0a0a] border border-warm-tan/15 rounded-2xl shadow-2xl px-8 py-6 space-y-1 text-right min-w-[200px]">
+          {navItems.filter((item) => item.title !== "Demo").map((item) => (
             <div key={item.id}>
               {item.jumpTo ? (
                 <button
                   onClick={() => scrollToElement(item.jumpTo!)}
-                  className="block w-full text-left py-3 text-base text-charcoal/60 hover:text-charcoal transition-colors"
+                  className="block w-full text-right py-3 text-sm font-semibold uppercase tracking-[0.15em] text-warm-tan/70 hover:text-warm-tan transition-colors"
                 >
                   {item.title}
                 </button>
               ) : item.path ? (
                 <Link
                   href={item.path}
-                  className="block py-3 text-base text-charcoal/60 hover:text-charcoal transition-colors"
+                  className="block py-3 text-sm font-semibold uppercase tracking-[0.15em] text-warm-tan/70 hover:text-warm-tan transition-colors text-right"
                   onClick={() => setNavbarOpen(false)}
                 >
                   {item.title}

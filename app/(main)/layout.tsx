@@ -1,5 +1,5 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import Header from "@/components/variants/eka/Header";
+import Footer from "@/components/variants/eka/Footer";
 
 export default function MainLayout({
   children,

@@ -25,8 +25,8 @@ const applications = [
     detail:
       "Track critical process parameters across batches and scale from bench to production.\n\nPredict deviations before they impact yield. Connects to continuous sensor readouts, downstream measurements like mass spec, and adapts the process automatically.\n\nCompatible with standard bioreactors and industrial control infrastructure.",
     // future: "Integrates with process analytical technology (PAT), LIMS, and MES systems.",
-    imagePlaceholder:
-      "Industrial bioreactor facility with stainless steel vessels, monitoring screens, and clean room environment. Reference: Sartorius or Cytiva manufacturing photography.",
+    image: "/images/applications/bioreactor.png",
+    imageStyle: { objectPosition: "20% 69%", transform: "scale(1.3) translateX(10%)" },
   },
   {
     title: "Cell Culture",
@@ -93,57 +93,29 @@ const Applications = ({ dark = false }: { dark?: boolean }) => {
               {...wrapperProps}
               className={`rounded-2xl p-8 lg:p-10 transition-all duration-300 block relative overflow-hidden group ${
                 dark
-                  ? "bg-charcoal/95 border border-warm-tan/10 hover:bg-charcoal"
+                  ? "bg-charcoal/95 border border-warm-tan/10"
                   : "bg-white shadow-card hover:shadow-card-hover hover:-translate-y-1"
               } ${app.link ? "cursor-pointer" : ""}`}
             >
-              {/* Image */}
-              {app.image ? (
-                <div className="aspect-[3/2] rounded-xl mb-6 overflow-hidden">
-                  <img
-                    src={app.image}
-                    alt={app.title}
-                    className="w-full h-full object-cover"
-                    style={app.imageStyle || {}}
-                  />
-                </div>
-              ) : (
+              {/* Card background image (dark mode) — uncomment to enable */}
+              {/* {dark && (
                 <div
-                  className="image-placeholder aspect-[3/2] rounded-xl mb-6"
-                  style={
-                    dark
-                      ? {
-                          background: "linear-gradient(135deg, #222 0%, #1a1a1a 100%)",
-                          borderColor: "rgba(255,255,255,0.06)",
-                        }
-                      : {}
-                  }
-                >
-                  <svg
-                    className="placeholder-icon w-8 h-8"
-                    viewBox="0 0 48 48"
-                    fill="none"
-                    stroke={dark ? "rgba(255,255,255,0.2)" : "currentColor"}
-                    strokeWidth="1.5"
-                  >
-                    <rect x="4" y="4" width="40" height="40" rx="4" />
-                    <circle cx="16" cy="16" r="4" />
-                    <path d="M4 32 L16 22 L24 28 L36 18 L44 24 L44 40 L4 40Z" />
-                  </svg>
-                  <span
-                    className="placeholder-label"
-                    style={dark ? { color: "rgba(255,255,255,0.3)" } : {}}
-                  >
-                    {app.title}
-                  </span>
-                  <span
-                    className="placeholder-description text-xs"
-                    style={dark ? { color: "rgba(255,255,255,0.2)" } : {}}
-                  >
-                    {app.imagePlaceholder}
-                  </span>
-                </div>
-              )}
+                  className="absolute inset-0 rounded-2xl opacity-[0.80]"
+                  style={{
+                    backgroundImage: "url('/images/hero/paper_bg.png')",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                />
+              )} */}
+              <div className="aspect-[3/2] rounded-xl mb-6 overflow-hidden">
+                <img
+                  src={app.image}
+                  alt={app.title}
+                  className="w-full h-full object-cover"
+                  style={app.imageStyle || {}}
+                />
+              </div>
 
               <h3
                 className={`text-xl font-semibold mb-3 ${
@@ -163,8 +135,8 @@ const Applications = ({ dark = false }: { dark?: boolean }) => {
               {/* Hover overlay */}
               <div className={`absolute inset-0 rounded-2xl flex flex-col justify-start pt-12 px-8 lg:pt-14 lg:px-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
                 dark
-                  ? "bg-[#1a1a1a]/[0.98]"
-                  : "bg-white/[0.98]"
+                  ? "bg-[#1a1a1a]"
+                  : "bg-white"
               }`}>
                 <h3
                   className={`text-xl font-semibold mb-3 ${

@@ -5,8 +5,12 @@ import { ConvergenceComparison } from "@/components/Demo/ConvergenceComparison";
 
 export default function DemoPage() {
   return (
-    <section className="pb-[120px] pt-[150px]">
+    <section className="pb-[120px] pt-[150px] relative">
       <div className="container min-w-[700px]">
+        {/* Back arrow */}
+        <a href="/" className="absolute top-5 left-6 lg:left-8 inline-flex items-center gap-2 text-sm text-[#6c7793] hover:text-[#090E34] transition-colors">
+          <span>&larr;</span> Back to Overview
+        </a>
         {/* Page header */}
         <div className="mx-auto max-w-4xl mb-16 text-center">
           <h1 className="mb-4 text-3xl font-bold !leading-tight text-black sm:text-4xl md:text-[45px]">

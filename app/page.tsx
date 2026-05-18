@@ -1,15 +1,10 @@
 "use client";
 import { useEffect } from "react";
-import { VariantProvider } from "@/components/VariantSwitcher/context";
-import VariantLayout from "@/components/VariantSwitcher/VariantLayout";
-import Switcher from "@/components/VariantSwitcher/Switcher";
-import { useVariant } from "@/components/VariantSwitcher/context";
 import dynamic from "next/dynamic";
 
+const EkaHeader = dynamic(() => import("@/components/variants/eka/Header"), { ssr: false });
+const EkaFooter = dynamic(() => import("@/components/variants/eka/Footer"), { ssr: false });
 const EkaPage = dynamic(() => import("@/components/variants/eka/Page"), { ssr: false });
-const ScalePage = dynamic(() => import("@/components/variants/scale/Page"), { ssr: false });
-
-const pages = { eka: EkaPage, scale: ScalePage };
 
 function HomeContent() {
   useEffect(() => {
@@ -22,23 +17,15 @@ function HomeContent() {
     }
   }, []);
 
-  const { variant } = useVariant();
-  const Page = pages[variant];
-
   return (
-    <>
-      <VariantLayout>
-        <Page />
-      </VariantLayout>
-      <Switcher />
-    </>
+    <div className="w-full max-w-[100vw] overflow-x-hidden">
+      <EkaHeader />
+      <EkaPage />
+      <EkaFooter />
+    </div>
   );
 }
 
 export default function Home() {
-  return (
-    <VariantProvider>
-      <HomeContent />
-    </VariantProvider>
-  );
+  return <HomeContent />;
 }

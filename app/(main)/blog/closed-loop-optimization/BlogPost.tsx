@@ -47,8 +47,12 @@ export default function BlogPost() {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf9f7]">
-      <article className="pb-24 pt-[160px]">
+    <div className="min-h-screen bg-[#faf9f7] relative">
+      {/* Back arrow */}
+      <a href="/blog" className="absolute top-5 left-6 lg:left-8 inline-flex items-center gap-2 text-sm text-[#6c7793] hover:text-[#090E34] transition-colors">
+        <span>&larr;</span> Back to Blog
+      </a>
+      <article className="pb-24 pt-[200px]">
         {/* Header - full width centered */}
         <div className="max-w-3xl mx-auto px-4 md:px-12 mb-16">
           <header>
