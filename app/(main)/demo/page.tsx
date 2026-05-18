@@ -57,18 +57,6 @@ export default function DemoPage() {
           <ConvergenceComparison height={500} />
         </div>
 
-        {/* CTA section */}
-        <div className="text-center mt-12">
-          <p className="mb-6 text-base text-body-color-dark">
-            Ready to optimize your laboratory workflows?
-          </p>
-          <a
-            href="/#contact"
-            className="inline-block rounded-md bg-primary py-4 px-8 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80"
-          >
-            Contact Us
-          </a>
-        </div>
       </div>
     </section>
   );
