@@ -133,20 +133,20 @@ const Applications = ({ dark = false }: { dark?: boolean }) => {
               </p>
 
               {/* Hover overlay */}
-              <div className={`absolute inset-0 rounded-2xl flex flex-col justify-start pt-12 px-8 lg:pt-14 lg:px-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+              <div className={`absolute inset-0 rounded-2xl flex flex-col justify-start pt-6 px-6 md:pt-12 md:px-8 lg:pt-14 lg:px-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 overflow-y-auto md:overflow-hidden ${
                 dark
                   ? "bg-[#1a1a1a]"
                   : "bg-white"
               }`}>
                 <h3
-                  className={`text-xl font-semibold mb-3 ${
+                  className={`text-base md:text-xl font-semibold mb-2 md:mb-3 ${
                     dark ? "text-white" : "text-navy"
                   }`}
                 >
                   {app.title}
                 </h3>
                 <p
-                  className={`leading-relaxed text-sm mb-4 whitespace-pre-line ${
+                  className={`leading-relaxed text-xs md:text-sm mb-3 md:mb-4 whitespace-pre-line ${
                     dark ? "text-white/60" : "text-muted"
                   }`}
                 >

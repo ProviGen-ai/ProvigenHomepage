@@ -33,7 +33,7 @@ const Hero = () => {
         />
         {/* Pencil wireframe — inverted */}
         <div
-          className="absolute left-1/2 -translate-x-1/2 top-[30%] -translate-y-1/2 w-[120%] sm:translate-x-0 sm:left-auto sm:right-[5%] sm:top-1/2 sm:w-[65%] lg:w-[55%] opacity-70 sm:opacity-90 pointer-events-none"
+          className="absolute left-1/2 -translate-x-1/2 top-[30%] -translate-y-1/2 w-[140%] sm:top-[40%] sm:w-[120%] md:w-[100%] lg:w-[90%] xl:translate-x-0 xl:left-auto xl:right-[5%] xl:top-1/2 xl:w-[55%] opacity-70 sm:opacity-90 pointer-events-none"
         >
           <img
             src="/images/hero/wireframe_pencil.webp"
@@ -54,7 +54,7 @@ const Hero = () => {
             The intelligence layer for biological and chemical processes.<br />
             Built for the infrastructure you already have.
           </p>
-          <div className="flex flex-wrap gap-3 mt-6">
+          <div className="flex flex-wrap gap-2 sm:gap-3 mt-6">
             {[
               { label: "Assay Development", mobileLabel: "Assays", hover: "hover:bg-white/10 hover:text-[#3bbef0] hover:border-[#3bbef0]/40" },
               { label: "Biomanufacturing", mobileLabel: "Biomanufacturing", hover: "hover:bg-white/10 hover:text-[#34d399] hover:border-[#34d399]/40" },
@@ -63,7 +63,7 @@ const Hero = () => {
               <button
                 key={app.label}
                 onClick={() => document.getElementById("applications")?.scrollIntoView({ behavior: "smooth" })}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer bg-white/5 text-white/60 border border-white/20 ${app.hover}`}
+                className={`px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-300 cursor-pointer bg-white/5 text-white/60 border border-white/20 ${app.hover}`}
               >
                 <span className="sm:hidden">{app.mobileLabel}</span>
                 <span className="hidden sm:inline">{app.label}</span>
