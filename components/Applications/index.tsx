@@ -5,7 +5,7 @@ const applications = [
       "Find the right conditions faster. Optimize reagents, protocols, and parameters in fewer iterations.",
     detail:
       "Define your target readout and constraints.\n\nActive Learning designs the next set of experiments, learns from results, and iterates until your assay performs.\n\nWorks with plate readers, liquid handlers, and imaging systems. Typical campaigns converge in 5x fewer iterations than Design of Experiments (DoE).",
-    image: "/images/applications/assay_development.png",
+    image: "/images/applications/assay_development.webp",
     imageStyle: { transform: "scale(1.8) translateX(12%) rotate(5deg)" },
     link: "/blog/closed-loop-optimization#assay-optimization",
   },
@@ -25,7 +25,7 @@ const applications = [
     detail:
       "Track critical process parameters across batches and scale from bench to production.\n\nPredict deviations before they impact yield. Connects to continuous sensor readouts, downstream measurements like mass spec, and adapts the process automatically.\n\nCompatible with standard bioreactors and industrial control infrastructure.",
     // future: "Integrates with process analytical technology (PAT), LIMS, and MES systems.",
-    image: "/images/applications/bioreactor.png",
+    image: "/images/applications/bioreactor.webp",
     imageStyle: { objectPosition: "20% 69%", transform: "scale(1.3) translateX(10%)" },
   },
   {
@@ -34,7 +34,7 @@ const applications = [
       "Protocol development for stem cell differentiation and adaptive culture processes.",
     detail:
       "Set your growth and reproducibility targets.\n\nHandle multi-objective trade-offs between growth, viability, and yield. Identify root causes of unexpected outcomes through causal attribution analysis.\n\nIntegrates with plate-based or suspension culture systems.",
-    image: "/images/applications/cell_painting.png",
+    image: "/images/applications/cell_painting.webp",
     link: "/blog/closed-loop-optimization#media-optimization",
   },
 ];
@@ -50,7 +50,7 @@ const Applications = ({ dark = false }: { dark?: boolean }) => {
       <div
         className="absolute inset-0 opacity-[0.10]"
         style={{
-          backgroundImage: "url('/images/applications/biofoundry_sketch.png')",
+          backgroundImage: "url('/images/applications/biofoundry_sketch.webp')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           maskImage: `linear-gradient(90deg, black 0%, transparent ${fadeStart}%, transparent ${100 - fadeStart}%, black 100%)`,
@@ -102,7 +102,7 @@ const Applications = ({ dark = false }: { dark?: boolean }) => {
                 <div
                   className="absolute inset-0 rounded-2xl opacity-[0.80]"
                   style={{
-                    backgroundImage: "url('/images/hero/paper_bg.png')",
+                    backgroundImage: "url('/images/hero/paper_bg.webp')",
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                   }}

@@ -70,7 +70,7 @@ const Hero = () => {
 
           <div className="animate-fade-in hidden lg:block absolute -right-[10%] top-[40%] -translate-y-1/2 w-[60%] pointer-events-none">
             <Image
-              src="/images/hero/wireframe_v5.png"
+              src="/images/hero/wireframe_v5.webp"
               alt="Biotech intelligence visualization"
               width={800}
               height={600}

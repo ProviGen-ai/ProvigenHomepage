@@ -7,7 +7,7 @@ const Footer = () => {
       <div
         className="absolute inset-0 opacity-[0.25] pointer-events-none"
         style={{
-          backgroundImage: "url('/images/hero/paper_bg.png')",
+          backgroundImage: "url('/images/hero/paper_bg.webp')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}

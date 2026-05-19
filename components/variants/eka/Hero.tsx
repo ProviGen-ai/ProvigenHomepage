@@ -5,7 +5,7 @@ const Hero = () => {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const images = ["/images/hero/paper_bg.png", "/images/hero/wireframe_pencil.png"];
+    const images = ["/images/hero/paper_bg.webp", "/images/hero/wireframe_pencil.webp"];
     let count = 0;
     images.forEach((src) => {
       const img = new Image();
@@ -26,17 +26,17 @@ const Hero = () => {
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            backgroundImage: "url('/images/hero/paper_bg.png')",
+            backgroundImage: "url('/images/hero/paper_bg.webp')",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         />
         {/* Pencil wireframe — inverted */}
         <div
-          className="absolute left-0 right-[-40%] top-[35%] -translate-y-1/2 w-[160%] sm:left-auto sm:right-[5%] sm:top-1/2 sm:w-[65%] lg:w-[55%] opacity-70 sm:opacity-90 pointer-events-none"
+          className="absolute left-1/2 -translate-x-1/2 top-[30%] -translate-y-1/2 w-[120%] sm:translate-x-0 sm:left-auto sm:right-[5%] sm:top-1/2 sm:w-[65%] lg:w-[55%] opacity-70 sm:opacity-90 pointer-events-none"
         >
           <img
-            src="/images/hero/wireframe_pencil.png"
+            src="/images/hero/wireframe_pencil.webp"
             alt=""
             className="w-full h-auto invert"
           />

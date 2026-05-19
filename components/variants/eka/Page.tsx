@@ -17,7 +17,7 @@ const EkaPage = () => (
       <div
         className="absolute inset-0 opacity-[0.25] pointer-events-none z-[2] hidden md:block"
         style={{
-          backgroundImage: "url('/images/hero/paper_bg.png')",
+          backgroundImage: "url('/images/hero/paper_bg.webp')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           maskImage: "linear-gradient(to bottom, black 0%, black 40%, transparent 70%)",
@@ -27,7 +27,7 @@ const EkaPage = () => (
       <div
         className="absolute inset-0 opacity-[0.25] pointer-events-none z-[2] md:hidden"
         style={{
-          backgroundImage: "url('/images/hero/paper_bg.png')",
+          backgroundImage: "url('/images/hero/paper_bg.webp')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           maskImage: "linear-gradient(to bottom, black 0%, black 70%, transparent 95%)",
