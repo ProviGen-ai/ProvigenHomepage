@@ -85,17 +85,14 @@ const Applications = ({ dark = false }: { dark?: boolean }) => {
 
         <div className="grid md:grid-cols-3 gap-10">
           {applications.map((app) => {
-            const Wrapper = app.link ? "a" : "div";
-            const wrapperProps = app.link ? { href: app.link } : {};
             return (
-            <Wrapper
+            <div
               key={app.title}
-              {...wrapperProps}
               className={`rounded-2xl p-8 lg:p-10 transition-all duration-300 block relative overflow-hidden group ${
                 dark
                   ? "bg-charcoal/95 border border-warm-tan/10"
                   : "bg-white shadow-card hover:shadow-card-hover hover:-translate-y-1"
-              } ${app.link ? "cursor-pointer" : ""}`}
+              }`}
             >
               {/* Card background image (dark mode) — uncomment to enable */}
               {/* {dark && (
@@ -153,14 +150,14 @@ const Applications = ({ dark = false }: { dark?: boolean }) => {
                   {app.detail}
                 </p>
                 {app.link && (
-                  <span className={`text-xs font-semibold uppercase tracking-wider ${
+                  <a href={app.link} className={`text-xs font-semibold uppercase tracking-wider hover:underline ${
                     dark ? "text-warm-tan" : "text-logo-green"
                   }`}>
                     Read more &rarr;
-                  </span>
+                  </a>
                 )}
               </div>
-            </Wrapper>
+            </div>
             );
           })}
         </div>
