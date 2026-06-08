@@ -1,39 +1,33 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 // --- TABLE OF CONTENTS ---
 const sections = [
-  { id: "the-workflow", label: "The workflow" },
-  { id: "decision-points", label: "Decision points" },
-  { id: "learning-from-data", label: "Learning from data" },
-  { id: "multi-objective", label: "Multi-objective reality" },
-  { id: "lab-in-the-loop", label: "Lab-in-the-loop precedent" },
+  { id: "the-pipeline", label: "The pipeline" },
+  { id: "generate-and-predict", label: "Generate and predict" },
+  { id: "select-and-test", label: "Select and test" },
+  { id: "multi-property", label: "Multi-property optimization" },
+  { id: "lab-in-the-loop", label: "Lab-in-the-loop" },
 ];
 
 export default function UseCaseContent() {
   const [activeId, setActiveId] = useState<string>("");
-  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible.length > 0) {
-          setActiveId(visible[0].target.id);
+    const onScroll = () => {
+      let current = "";
+      for (const s of sections) {
+        const el = document.getElementById(s.id);
+        if (el && el.getBoundingClientRect().top <= 120) {
+          current = s.id;
         }
-      },
-      { rootMargin: "-80px 0px -60% 0px", threshold: 0 }
-    );
-
-    const elements = sections
-      .map((s) => document.getElementById(s.id))
-      .filter(Boolean);
-    elements.forEach((el) => observerRef.current?.observe(el!));
-
-    return () => observerRef.current?.disconnect();
+      }
+      if (current) setActiveId(current);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const scrollTo = (id: string) => {
@@ -103,298 +97,286 @@ export default function UseCaseContent() {
           {/* Main content */}
           <div className="prose-blog">
 
-            {/* --- SECTION 1: THE WORKFLOW --- */}
+            {/* --- SECTION 1: THE PIPELINE --- */}
             {/*
-              IMAGE IDEA: Horizontal funnel/flow diagram showing the antibody
-              discovery pipeline. Wide at the top (many candidates) narrowing
-              toward the bottom (few advanced candidates). Stages:
-              Candidate Generation → Binding Assays → Functional Screens →
-              Recombinant Expression → Specificity Testing →
-              Stability Profiling → Developability Assessment →
-              Manufacturability Review
-
-              SVG component, same minimal line-art style as blog graphics.
+              IMAGE IDEA: Horizontal funnel showing the antibody discovery
+              pipeline narrowing from many candidates to few advanced leads.
+              Stages: Generation → Binding → Function → Expression →
+              Specificity → Stability → Developability → Manufacturability
             */}
-            <h2 id="the-workflow">The workflow</h2>
+            <h2 id="the-pipeline">The pipeline</h2>
 
             <p>
-              {/* TODO: Opening paragraph framing antibody discovery as a
-                  multi-stage funnel where candidates are progressively
-                  characterized and filtered.
-
-                  Cover the candidate generation methods:
-                  - Hybridoma
-                  - Phage display
-                  - Yeast display
-                  - Single B-cell workflows
-                  - Computational/generative libraries
-
-                  Then the characterization pipeline:
-                  - Binding assays (affinity, kinetics via SPR/BLI)
-                  - Functional screens (cell-based, reporter, neutralization)
-                  - Recombinant expression (transient/stable, yield, aggregation)
-                  - Specificity testing (cross-reactivity panels, polyreactivity)
-                  - Stability profiling (thermal, accelerated, pH, freeze-thaw)
-                  - Developability assessment (viscosity, self-interaction, charge variants)
-                  - Manufacturability review (expression system compatibility, scale-up feasibility)
-              */}
+              Antibody discovery starts with a large pool of candidates
+              and progressively narrows it. Initial candidates come from
+              hybridoma campaigns, phage or yeast display, single B-cell
+              workflows, immune repertoire mining, or computational
+              generation. From there, the pipeline moves through binding
+              assays, functional screens, recombinant expression,
+              specificity testing, stability profiling, developability
+              assessment, and eventually manufacturability review.
             </p>
 
-            {/* --- SECTION 2: DECISION POINTS --- */}
+            <p>
+              At each stage, the pool shrinks. A display campaign may
+              yield hundreds of hits. Only a fraction get expressed
+              recombinantly. Fewer still make it through specificity and
+              stability panels. By the time a candidate reaches
+              developability assessment, it has consumed significant
+              resources across multiple assay types, expression systems,
+              and characterization rounds.
+            </p>
+
+            <p>
+              The decisions about which candidates advance, which assays
+              to run next, and which tradeoffs to accept are made
+              manually at each gate. They draw on program experience,
+              threshold rules, and team judgment. The data from earlier
+              stages is available but rarely integrated into a model
+              that systematically informs the next decision.
+            </p>
+
+            <p>
+              ProviGen connects all of this into a decision loop. The
+              platform ingests sequence features, binding data,
+              expression levels, stability measurements, specificity
+              profiles, and execution metadata. After each
+              characterization round, it updates its model and
+              recommends which candidates to advance, which to
+              re-engineer, and which assays are most informative to
+              run next.
+            </p>
+
+            {/* --- SECTION 2: GENERATE AND PREDICT --- */}
             {/*
-              IMAGE IDEA: Same funnel but with decision gates highlighted.
-              At each gate, show the question being asked.
-              Could annotate with example decisions:
-              "Which 50 of 500 candidates to express?"
-              "Which CDRs to mutate?"
-              "Run specificity panel now or wait for stability data?"
+              IMAGE IDEA: Diagram showing generative model producing
+              candidate sequences, filtered by property predictors
+              before any wet lab work.
             */}
-            <h2 id="decision-points">Decision points at each stage</h2>
+            <h2 id="generate-and-predict">Generate and predict</h2>
 
             <p>
-              {/* TODO: Frame as "at each stage, teams decide..."
-                  - Generation: which library design, which diversity strategy,
-                    how many candidates to generate
-                  - Binding: which candidates to advance from primary screen,
-                    cutoff thresholds, which to re-test
-                  - Expression: which candidates to express recombinantly,
-                    which expression system, scale
-                  - CDR engineering: which positions to mutate, which mutations
-                    to combine, how many variants per round
-                  - Assay prioritization: which assays to run next (specificity
-                    vs stability vs function), given limited material
-                  - Advancement: which candidates move to more expensive/slower
-                    downstream characterization
-                  - Tradeoff decisions: accept lower affinity for better
-                    stability? Accept lower expression for better specificity?
-              */}
+              Modern antibody campaigns increasingly start with
+              computational candidate generation. Generative models can
+              propose variants of a lead sequence by exploring mutations
+              in complementarity-determining regions (CDRs) while
+              respecting structural constraints. Multi-task property
+              predictors then score each variant across binding,
+              expression likelihood, stability, and developability
+              before anything is synthesized.
             </p>
 
             <p>
-              {/* TODO: Emphasize the combinatorial explosion.
-                  Even with 100 candidates from a display campaign,
-                  full characterization across all assays is prohibitive.
-                  Teams must decide which candidates get which assays,
-                  and in what order. These decisions are usually based on
-                  rules of thumb, previous program experience, or gut feel.
-              */}
+              This filtering step matters because synthesis and
+              screening capacity is limited. A generative model may
+              propose thousands of plausible variants. Property
+              predictors narrow the field to those worth testing.
+              Recent lab-in-the-loop work
+              <sup>
+                <a href="#fn1" className="text-[#6c7793] hover:text-[#090E34] no-underline">[1]</a>
+              </sup>
+              {" "}has shown that this approach can produce variants
+              where 97 to 100% express and up to 70% show functional
+              binding, dramatically reducing wasted synthesis and
+              screening effort.
             </p>
 
-            {/* --- SECTION 3: THE DECISION LOOP --- */}
+            <p>
+              ProviGen supports this workflow by connecting generative
+              proposals with experimental results. As real assay data
+              comes back, the property predictors improve. Unexpected
+              failures and surprising results on stability or
+              specificity all refine the scoring. Each round
+              of synthesis and testing makes the next round of
+              generation more targeted.
+            </p>
+
+            {/* --- SECTION 3: SELECT AND TEST --- */}
             {/*
-              IMAGE IDEA: Circular DBTL (Design-Build-Test-Learn) loop diagram
-              with ProviGen at the center. Each quadrant shows:
-              Design: sequence, structure, generative models
-              Build: synthesis, expression, purification
-              Test: binding, function, stability, specificity, developability
-              Learn: model update, recommendation, next candidates
-
-              Arrows showing data flowing into the model from all test stages,
-              and recommendations flowing out to design and test stages.
+              IMAGE IDEA: Active learning selection diagram.
+              Ranked list of candidates, with top candidates selected
+              for the next experimental round.
             */}
-            <h2 id="learning-from-data">Learning from data</h2>
+            <h2 id="select-and-test">Select and test</h2>
 
             <p>
-              {/* TODO: Core pitch paragraph.
-                  "With ProviGen, antibody discovery becomes a decision loop
-                  across design, build, test, and learn."
-
-                  The platform connects:
-                  - Sequence and structure features
-                  - Binding assay results
-                  - Expression data
-                  - Stability measurements
-                  - Specificity profiles
-                  - Developability scores
-                  - Manufacturability assessments
-                  - Execution metadata (which assay, which batch, which operator)
-
-                  Then recommends:
-                  - Which candidates to test next
-                  - Which mutations to make
-                  - Which assay conditions to prioritize
-                  - Which tradeoffs to explore
-              */}
+              Given a scored pool of candidates, the question is which
+              ones to test next. Active learning formalizes this: instead
+              of testing the top-ranked candidates by a single metric,
+              the system selects variants that are most informative
+              given what the model already knows. Some are selected
+              because they are predicted to perform well. Others because
+              they sit in regions of the design space where the model
+              is uncertain and testing them would improve future
+              predictions.
             </p>
 
             <p>
-              {/* TODO: Explain what "connected" means in practice:
-                  - Early binding data helps predict which candidates are worth
-                    the expensive stability profiling
-                  - Expression failures inform future sequence design choices
-                  - Cross-reactivity patterns learned from one target inform
-                    library design for the next
-                  - The model learns which early signals actually predict
-                    downstream developability (and which are misleading)
-                  - Failed candidates are not wasted; they teach the model
-                    what to avoid next
-              */}
+              In practice, this means each round of synthesis and
+              screening produces data that the model uses to update its
+              predictions and propose the next set of candidates. A
+              typical strategy enforces sequence constraints that relax
+              across rounds: early rounds stay close to the lead (within
+              a few mutations), later rounds explore further. This
+              graduated exploration balances confidence in the starting
+              point against the need to discover better regions of
+              sequence space.
             </p>
 
-            {/* --- SECTION 4: MULTI-OBJECTIVE REALITY --- */}
+            <p>
+              ProviGen manages this iterative selection across the full
+              characterization pipeline. Binding data from an early
+              round informs which candidates are worth the more
+              expensive stability profiling. Expression failures from
+              one batch inform sequence design choices in the next.
+              Specificity patterns learned from one target can transfer
+              to related campaigns.
+            </p>
+
+            {/* --- SECTION 4: MULTI-PROPERTY OPTIMIZATION --- */}
             {/*
-              IMAGE IDEA: Parallel coordinates plot or radar chart showing
-              multiple antibody properties for a set of candidates.
-              Axes: affinity, expression, specificity, thermal stability,
-              viscosity, polyreactivity, manufacturability score.
-              Show that no single candidate is best on all axes.
-              Highlight the Pareto front concept visually.
+              IMAGE IDEA: Parallel coordinates or radar chart showing
+              multiple antibody properties. No single candidate is best
+              on all axes.
             */}
-            <h2 id="multi-objective">Multi-objective reality</h2>
+            <h2 id="multi-property">Multi-property optimization</h2>
 
             <p>
-              {/* TODO: Antibody discovery cannot optimize affinity alone.
-                  Real objectives include:
-                  - Binding affinity and kinetics (on-rate, off-rate, KD)
-                  - Expression level and yield
-                  - Specificity (low cross-reactivity, low polyreactivity)
-                  - Thermal and colloidal stability
-                  - Functional potency (neutralization, ADCC, CDC)
-                  - Developability (viscosity, self-interaction, charge variants)
-                  - Manufacturability (expression system, purification ease, scale-up)
-                  - Cost per candidate
-
-                  These trade off. Tighter binding often comes with reduced
-                  stability or increased polyreactivity. High expression
-                  variants may have developability liabilities. The decision
-                  loop handles these tradeoffs explicitly, helping teams find
-                  candidates that are good enough across all axes rather than
-                  chasing perfection on one.
-              */}
+              Therapeutic antibody candidates must perform across
+              multiple properties simultaneously: binding affinity and
+              kinetics, expression yield, specificity (low
+              cross-reactivity, low polyreactivity), thermal and
+              colloidal stability, functional potency, and
+              developability (viscosity, self-interaction, charge
+              variants). Tighter binding often comes with reduced
+              stability or increased polyreactivity. High expression
+              variants may have developability liabilities.
             </p>
 
-            {/* --- SECTION 5: LAB-IN-THE-LOOP PRECEDENT --- */}
+            <p>
+              The model maps the <em>Pareto frontier</em> (the set of
+              candidates where no single property can be improved
+              without compromising another). Teams define which
+              properties matter most for their specific program, and
+              the model proposes candidates and experiments that move
+              toward that frontier. This replaces the typical approach
+              of optimizing affinity first and hoping the other
+              properties follow.
+            </p>
+
+            {/* --- SECTION 5: LAB-IN-THE-LOOP --- */}
             {/*
-              IMAGE IDEA: Diagram showing the Genentech/Prescient Design
-              lab-in-the-loop cycle: Generative Model → Property Predictor →
-              Active Learning Selection → Synthesis → In Vitro Testing →
-              Data Ingestion → back to Generative Model.
-
-              Or: a timeline showing optimization rounds for one target
-              (e.g. EGFR) with binding improvement across iterations.
+              IMAGE IDEA: The Genentech lab-in-the-loop cycle:
+              Generative Model → Property Predictor → Active Learning
+              Selection → Synthesis → In Vitro Testing → Data Ingestion
+              → back to Generative Model.
             */}
-            <h2 id="lab-in-the-loop">Lab-in-the-loop precedent</h2>
+            <h2 id="lab-in-the-loop">Lab-in-the-loop</h2>
 
             <p>
-              {/* TODO: Genentech / Roche / Prescient Design section.
-                  Reference: Frey et al., "Lab-in-the-loop therapeutic antibody
-                  design with deep learning," bioRxiv, 2025.
-                  DOI: 10.1101/2025.02.19.639050
-
-                  Key points:
-                  - Therapeutic antibody design framed as complex multi-property
-                    optimization problem
-                  - Lab-in-the-loop system combining:
-                    * Generative ML models
-                    * Multi-task property predictors
-                    * Active-learning ranking and selection
-                    * Synthesis
-                    * In vitro testing
-                    * Repeated ingestion of lab data
-                  - Results:
-                    * >1,800 unique antibody variants designed and tested
-                    * Four clinically relevant targets: EGFR, IL-6, HER2, OSM
-                    * Iterative optimization across multiple rounds
-                    * 3-100x binding improvements across targets
-                    * Best binders in therapeutically relevant 100 pM range
-
-                  Frame: "This is the strongest antibody-discovery proof point.
-                  It shows that a major pharma/biotech setting is already using
-                  a decision-loop approach for therapeutic antibody optimization."
-
-                  Note: This paper was one of the main drivers behind Anthropic's
-                  $400M acquisition of Coefficient Bio (April 2026). The Coefficient
-                  team came from Genentech's Prescient Design lab.
-              */}
+              The strongest public demonstration of this approach comes
+              from Genentech, Roche, and Prescient Design.
+              <sup>
+                <a href="#fn1" className="text-[#6c7793] hover:text-[#090E34] no-underline">[1]</a>
+              </sup>
+              {" "}Their lab-in-the-loop system combined generative
+              models, multi-task property predictors, active-learning
+              selection, synthesis, and in vitro testing into a
+              semi-autonomous optimization loop. Applied to four
+              clinically relevant targets (EGFR, IL-6, HER2, OSM), the
+              system designed and tested over 1,800 unique antibody
+              variants across iterative rounds, achieving 3 to 100x
+              binding improvements with best binders in the
+              therapeutically relevant sub-100 pM range.
             </p>
 
             <p>
-              {/* TODO: Arc Institute / MULTI-evolve connection.
-                  Reference: Tran et al., "Rapid directed evolution guided by
-                  protein language models," Science, 2026.
-
-                  Key points:
-                  - Arc's first lab-in-the-loop framework for biological design
-                  - Protein language models guide rapid evolution of complex
-                    multi-mutant proteins
-                  - Computational prediction and experimental design coupled
-                    from the beginning
-                  - Validates the same direction: frontier bio R&D is moving
-                    toward coupled model-experiment decision loops
-              */}
+              Arc Institute&apos;s MULTI-evolve framework
+              <sup>
+                <a href="#fn2" className="text-[#6c7793] hover:text-[#090E34] no-underline">[2]</a>
+              </sup>
+              {" "}points in the same direction: protein language models
+              guiding rapid directed evolution of complex multi-mutant
+              proteins, with computational prediction and experimental
+              design coupled from the start. The Coefficient Bio team
+              that built much of the Genentech system was acquired by
+              Anthropic for $400M in April 2026,
+              <sup>
+                <a href="#fn3" className="text-[#6c7793] hover:text-[#090E34] no-underline">[3]</a>
+              </sup>
+              {" "}signaling that foundational AI companies see
+              lab-in-the-loop biological design as a core application.
             </p>
 
-            {/* --- SECTION 6: PROOF POINTS --- */}
-            <h2 id="proof-points">Proof points</h2>
+            <hr />
 
             <p>
-              {/* TODO: Broader industry context paragraph.
-                  - Genentech/Prescient Design: lab-in-the-loop antibody
-                    optimization (covered in detail above)
-                  - Arc Institute: MULTI-evolve, protein language model-guided
-                    directed evolution
-                  - Bo Wang group / Vector Institute: foundation models +
-                    active learning for therapeutic delivery (LNP/mRNA)
-                    Caution: verify specific numbers before publishing
-                  - Acceleration Consortium: formalized self-driving labs as
-                    systems requiring a decision layer
-                  - Anthropic / Coefficient Bio: $400M acquisition (April 2026)
-                    signals foundational AI companies see lab-in-the-loop as
-                    core application
-
-                  Website-ready paragraph:
-                  "The commercial and institutional precedent is clear.
-                  Genentech, Roche, and Prescient Design have shown that
-                  therapeutic antibody optimization can be run as a
-                  lab-in-the-loop process, combining generative design,
-                  property prediction, active-learning selection, synthesis,
-                  in vitro testing, and repeated data ingestion across
-                  optimization rounds."
-              */}
-            </p>
-
-            {/* --- SECTION 7: VALUE SUMMARY --- */}
-            {/*
-              IMAGE IDEA: Before/after comparison or simple value metrics.
-              Could show:
-              - "X fewer candidates needed to find a clinical lead"
-              - "Y% reduction in characterization cost"
-              - "Z weeks faster from hit to lead"
-              These would be illustrative/projected, not hard claims,
-              unless we have data to back them up.
-            */}
-            <h2 id="value-summary">Value summary</h2>
-
-            <p>
-              {/* TODO: Concrete value props:
-                  1. Better candidate selection: which variants to design,
-                     express, and test, based on all available data (not just
-                     the last assay result)
-                  2. Reduced decision latency: from assay result to next
-                     design/test decision without manual data review cycles
-                  3. Better use of constrained capacity: allocate expression
-                     slots, assay capacity, and characterization resources to
-                     candidates with highest expected value
-                  4. Multi-objective optimization: handle affinity/expression/
-                     specificity/stability/developability tradeoffs explicitly
-                  5. Compounding program intelligence: every variant tested
-                     (including failures) updates a shared model. Learnings
-                     transfer across targets and programs.
-                  6. Earlier de-risking: identify developability liabilities
-                     earlier by learning which early signals predict downstream
-                     problems
-              */}
+              ProviGen brings this decision loop to antibody discovery
+              teams working with their own targets, assays, and
+              automation. Every candidate tested produces a result,
+              updates the model, and improves the next selection.
+              Learnings compound across rounds and transfer across
+              programs. Failed candidates are informative. Partial
+              characterization data is usable immediately, without
+              waiting for full panels to complete.
             </p>
 
             <p>
-              {/* TODO: Closing paragraph.
-                  "ProviGen helps teams make better decisions with fewer
-                  experiments. Every candidate tested produces a result,
-                  updates the model, and improves the next decision."
-              */}
+              If you are interested in exploring what a lab-in-the-loop
+              campaign could look like for your antibody program, reach
+              out to{" "}
+              <a href="mailto:research@provigen.ai">research@provigen.ai</a>.
             </p>
 
           </div>
+
+            {/* Footnotes */}
+            <footer className="mt-20 pt-8 border-t border-[#e8e6e1]">
+              <div className="font-mono text-xs text-[#6c7793] leading-relaxed space-y-2">
+                <p id="fn1">
+                  [1] Frey et&nbsp;al.,{" "}
+                  <a
+                    href="https://doi.org/10.1101/2025.02.19.639050"
+                    className="underline decoration-dotted underline-offset-2 hover:text-[#090E34]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    &ldquo;Lab-in-the-loop therapeutic antibody design
+                    with deep learning,&rdquo; bioRxiv, 2025
+                  </a>
+                  . Genentech, Roche, and Prescient Design. Over 1,800
+                  unique antibody variants designed and tested across
+                  EGFR, IL-6, HER2, and OSM targets.
+                </p>
+                <p id="fn2">
+                  [2] Tran et&nbsp;al.,{" "}
+                  <a
+                    href="https://doi.org/10.1126/science.adr6006"
+                    className="underline decoration-dotted underline-offset-2 hover:text-[#090E34]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    &ldquo;Rapid directed evolution guided by protein
+                    language models,&rdquo; Science, 2026
+                  </a>
+                  . Arc Institute. MULTI-evolve framework for
+                  lab-in-the-loop biological design.
+                </p>
+                <p id="fn3">
+                  [3]{" "}
+                  <a
+                    href="https://www.biospace.com/business/ai-giant-anthropic-leans-into-life-sciences-with-400m-coefficient-bio-catch"
+                    className="underline decoration-dotted underline-offset-2 hover:text-[#090E34]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Anthropic acquires Coefficient Bio for $400M
+                  </a>
+                  , BioSpace, April 2026. Coefficient Bio&apos;s team
+                  came from Genentech&apos;s Prescient Design lab.
+                </p>
+              </div>
+            </footer>
         </div>
       </article>
     </div>
