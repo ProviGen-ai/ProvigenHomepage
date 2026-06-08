@@ -21,7 +21,7 @@ export const blogPosts: BlogPostMeta[] = [
   // {
   //   id: 2,
   //   slug: null,
-  //   title: "Closed-Loop Control in Industrial Bioprocessing",
+  //   title: "Predicting Industrial Bioprocesses",
   //   date: "Coming soon",
   //   author: "ProviGen Team",
   //   excerpt:

@@ -6,11 +6,9 @@ import { useEffect, useState, useRef } from "react";
 const sections = [
   { id: "the-workflow", label: "The workflow" },
   { id: "decision-points", label: "Decision points" },
-  { id: "the-decision-loop", label: "The decision loop" },
+  { id: "learning-from-data", label: "Learning from data" },
   { id: "multi-objective", label: "Multi-objective reality" },
   { id: "lab-in-the-loop", label: "Lab-in-the-loop precedent" },
-  { id: "proof-points", label: "Proof points" },
-  { id: "value-summary", label: "Value summary" },
 ];
 
 export default function UseCaseContent() {
@@ -47,8 +45,12 @@ export default function UseCaseContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf9f7]">
-      <article className="pb-24 pt-[160px]">
+    <div className="min-h-screen bg-[#faf9f7] relative">
+      {/* Back arrow */}
+      <a href="/" className="absolute top-5 left-6 lg:left-8 inline-flex items-center gap-2 text-sm text-[#6c7793] hover:text-[#090E34] transition-colors">
+        <span>&larr;</span> Back to Overview
+      </a>
+      <article className="pb-24 pt-[200px]">
         {/* Header */}
         <div className="max-w-3xl mx-auto px-4 md:px-12 mb-16">
           <header>
@@ -56,14 +58,16 @@ export default function UseCaseContent() {
               Antibody Discovery
             </h1>
             <div className="grid md:grid-cols-[120px_1fr] gap-x-6 gap-y-1 font-mono text-sm text-[#090E34]">
-              <span className="text-[#6c7793]">Type</span>
-              <span>Use Case</span>
+              {/* <span className="text-[#6c7793]">Published</span>
+              <span>June 8, 2026</span> */}
+              <span className="text-[#6c7793]">Authors</span>
+              <span>ProviGen Team</span>
               <span className="text-[#6c7793]">Contact</span>
               <a
-                href="mailto:contact@provigen.ai"
+                href="mailto:research@provigen.ai"
                 className="underline decoration-dotted decoration-[#090E34]/40 underline-offset-4 hover:decoration-solid"
               >
-                contact@provigen.ai
+                research@provigen.ai
               </a>
             </div>
           </header>
@@ -188,7 +192,7 @@ export default function UseCaseContent() {
               Arrows showing data flowing into the model from all test stages,
               and recommendations flowing out to design and test stages.
             */}
-            <h2 id="the-decision-loop">The decision loop</h2>
+            <h2 id="learning-from-data">Learning from data</h2>
 
             <p>
               {/* TODO: Core pitch paragraph.

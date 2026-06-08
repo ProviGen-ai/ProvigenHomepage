@@ -14,9 +14,9 @@ const Header = () => {
   const pathname = usePathname();
 
   // Pages with light backgrounds need permanent dark header
-  const isLightPage = pathname.startsWith("/blog/") || pathname === "/demo" || pathname === "/legal_notice" || pathname === "/privacy_policy";
+  const isLightPage = pathname.startsWith("/blog/") || pathname.startsWith("/use-cases/") || pathname === "/demo" || pathname === "/legal_notice" || pathname === "/privacy_policy";
   // Subpages: hide header initially, show on scroll up
-  const isSubpage = (pathname.startsWith("/blog/") && pathname !== "/blog") || pathname === "/legal_notice" || pathname === "/privacy_policy" || pathname === "/demo";
+  const isSubpage = (pathname.startsWith("/blog/") && pathname !== "/blog") || pathname.startsWith("/use-cases/") || pathname === "/legal_notice" || pathname === "/privacy_policy" || pathname === "/demo";
 
   const [hidden, setHidden] = useState(isSubpage);
 

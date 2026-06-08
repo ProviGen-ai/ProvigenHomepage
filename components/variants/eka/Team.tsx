@@ -10,7 +10,7 @@ const Team = () => {
           <br />
           AI, Robotics and Life Science
         </h2>
-        <p className="font-mono text-sm lg:text-base text-charcoal/60 leading-relaxed max-w-4xl mx-auto mb-12">
+        <p className="font-mono text-sm lg:text-base text-charcoal/80 leading-relaxed max-w-4xl mx-auto mb-12">
           Experts in Bayesian optimization, lab automation, and bioengineering. <span className="whitespace-nowrap">From TU Munich,</span> Helmholtz Institute and Harvard Medical School.
           <span className="block mt-3 sm:whitespace-nowrap">Building the control layer for next generation life science infrastructure.</span>
         </p>
