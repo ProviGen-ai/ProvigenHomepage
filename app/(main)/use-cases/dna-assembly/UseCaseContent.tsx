@@ -1,39 +1,33 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 // --- TABLE OF CONTENTS ---
 const sections = [
   { id: "the-workflow", label: "The workflow" },
   { id: "decision-points", label: "Decision points" },
-  { id: "learning-from-data", label: "Learning from data" },
+  { id: "learning-over-time", label: "Learning over time" },
   { id: "multi-objective", label: "Multi-objective reality" },
   { id: "moclo", label: "MoClo at scale" },
 ];
 
 export default function UseCaseContent() {
   const [activeId, setActiveId] = useState<string>("");
-  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible.length > 0) {
-          setActiveId(visible[0].target.id);
+    const onScroll = () => {
+      let current = "";
+      for (const s of sections) {
+        const el = document.getElementById(s.id);
+        if (el && el.getBoundingClientRect().top <= 120) {
+          current = s.id;
         }
-      },
-      { rootMargin: "-80px 0px -60% 0px", threshold: 0 }
-    );
-
-    const elements = sections
-      .map((s) => document.getElementById(s.id))
-      .filter(Boolean);
-    elements.forEach((el) => observerRef.current?.observe(el!));
-
-    return () => observerRef.current?.disconnect();
+      }
+      if (current) setActiveId(current);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const scrollTo = (id: string) => {
@@ -105,13 +99,10 @@ export default function UseCaseContent() {
 
             {/* --- SECTION 1: THE WORKFLOW --- */}
             {/*
-              IMAGE IDEA: Horizontal timeline showing the 4-week cycle.
-              Week 1: Miniprep (DNA extraction)
-              Week 2: Transformation + Plating
-              Week 3: Assembly (MoClo core)
-              Week 4: Colony Picking, Verification, Culture
+              IMAGE IDEA: Horizontal pipeline showing the stages:
+              Miniprep → Assembly (MoClo) → Transformation → Colony Picking & Verification
 
-              Below the timeline, show the three-layer automation stack:
+              Below the pipeline, show the three-layer automation stack:
               Layer 3: BFASU (Python/PostgreSQL) ← "AI operates here"
               Layer 2: Momentum (Thermo Fisher) ← scheduling + plate routing
               Layer 1: Venus/Hamilton (HSL firmware) ← hardware control
@@ -121,71 +112,73 @@ export default function UseCaseContent() {
             <h2 id="the-workflow">The workflow</h2>
 
             <p>
-              {/* TODO: Opening paragraph.
-                  Plasmid manufacturing is a 4-week experimental cycle.
-                  Each week produces an intermediate that feeds the next stage.
-                  The full loop runs on automation hardware, but the decisions
-                  about what to assemble, under which conditions, and which
-                  clones to advance are still made manually between cycles.
-
-                  Frame: "The lab is automated. The decisions are not."
-              */}
+              Plasmid manufacturing is a multi-stage experimental
+              pipeline. Each stage produces an intermediate that feeds
+              the next: purified DNA goes into assembly reactions,
+              assembly products are transformed into cells, colonies are
+              screened, and verified clones are scaled up. On a modern
+              biofoundry platform, most of this runs on automation
+              hardware. The liquid handling, thermal cycling, colony
+              picking, and plate routing happen with minimal hands-on
+              time. But the decisions about what to assemble, under which
+              conditions, and which clones to advance are still made
+              manually between stages.
             </p>
 
             <p>
-              {/* TODO: The four weeks in detail:
-
-                  Week 1 — Miniprep (DNA extraction)
-                  Alkaline lysis on StarV liquid handler (P1 resuspension →
-                  P2 lysis → N3 neutralization). Centrifugation at 2918 RPM / 5 min.
-                  Magnetic bead binding + wash cycles + elution in AE buffer (100 µL).
-                  Output: purified plasmid DNA in 96-well plate.
-
-                  Week 2 — Transformation + Plating
-                  DH5-alpha competent cells from -20°C storage.
-                  Electroporation: 1800 V, 5 ms pulse.
-                  Recovery: 700 µL SOC media, 37°C, 60 min, 250 RPM.
-                  Plating on selective agar (antibiotic matched to resistance marker).
-                  Output: colonies on selective plates.
-
-                  Week 3 — Assembly (the MoClo core step)
-                  Echo survey (acoustic volume measurement, 2.5 nL resolution).
-                  Echo dispense (nanoliter-precision acoustic transfer: backbone at
-                  5 fmol, inserts at 10 fmol each).
-                  Heat seal → thermal cycling (Golden Gate reaction):
-                    37°C digest / 16°C ligation, alternating 30-60 cycles
-                    (scaled by part count: 30 for ≤3 parts, 45 for 4-6, 60 for 7+).
-                    60°C final digest (5 min), 80°C heat inactivation (10 min).
-                  94 assemblies + 2 controls per plate. This is the natural batch size.
-
-                  Week 4 — Colony Picking, Verification, Culture
-                  Colony picking (QPix): 4-8 colonies per construct.
-                  Colony PCR with verification primers flanking insert.
-                  Band verification (correct size vs. empty vector ~240 bp).
-                  Cherry-pick positive clones.
-                  Culture scaleup: 10 µL → 700 µL overnight in selective media.
-                  DNA quantification (PicoGreen).
-                  Optional: on-site nanopore sequencing (same-day turnaround).
-              */}
+              In a typical Golden Gate (MoClo) pipeline at a biofoundry,
+              source plasmids are extracted via automated alkaline lysis
+              and bead-based purification into 96-well plates. An
+              acoustic liquid handler dispenses DNA parts at nanoliter
+              precision, followed by thermal cycling with digest/ligation
+              cycles scaled to part count. A single plate holds 94
+              assemblies plus two controls. Assembly products are
+              transformed into competent cells and plated on selective
+              media. Colonies are picked, verified by colony PCR, and
+              positive clones are cherry-picked for culture scaleup and
+              DNA quantification. Sequence verification runs either
+              on-site via nanopore or through external sequencing
+              services.
             </p>
 
             <p>
-              {/* TODO: The automation stack paragraph.
-                  Three-layer architecture:
-                  - Layer 1 (hardware): Venus/Hamilton HSL firmware controls
-                    liquid handlers, Echo, thermal cyclers, plate readers
-                  - Layer 2 (scheduling): Momentum (Thermo Fisher) handles
-                    plate routing, device reservation, timing coordination
-                  - Layer 3 (orchestration): BFASU (Python/PostgreSQL) manages
-                    experiments, protocols, samples, containers, worklists
+              The automation typically runs on a three-layer stack. At the
+              bottom, firmware controls individual instruments: liquid
+              handlers, acoustic dispensers, thermal cyclers, plate
+              readers. A scheduling layer coordinates plate routing,
+              device reservations, and timing across instruments. At the
+              top, an orchestration layer manages experiments, protocols,
+              samples, and worklists in a database. A single campaign
+              generates over a million logged variable values, tens of
+              thousands of device operations, and hundreds of thousands of
+              system messages.
+            </p>
 
-                  ProviGen integrates at Layer 3: it reads from the same database,
-                  observes execution metadata, and writes back experimental
-                  recommendations as structured worklists.
+            <p>
+              In practice, the heavy manual workload sits between
+              stages. When an assembly fails, someone has to dig through
+              logs and plate data to understand why, then decide whether
+              to adjust part ratios, redesign overhangs, change the
+              thermal cycling protocol, or retry with a fresh enzyme
+              lot. When yields are low, someone scripts a new worklist
+              with adjusted parameters. When results are ambiguous,
+              teams often accept suboptimal outcomes rather than spend
+              another cycle troubleshooting. None of this analysis
+              carries over to the next campaign in a structured way.
+            </p>
 
-                  Data scale: 1M+ Momentum variable values per campaign,
-                  68K+ device operations logged with timestamps, 215K+ system messages.
-              */}
+            <p>
+              ProviGen closes this gap. The platform sits at the
+              orchestration layer and reads every data source the
+              automation stack produces: dispense volumes, device logs,
+              colony counts, PCR results, sequencing outcomes, and
+              execution metadata. After each stage, it updates a model
+              of what works, what fails, and why. Before the next batch,
+              it recommends which reagent conditions, part ratios,
+              and cycling parameters to use for a given set of
+              constructs. Those
+              recommendations are written back as structured worklists
+              that the automation executes directly.
             </p>
 
             {/* --- SECTION 2: DECISION POINTS --- */}
@@ -197,76 +190,69 @@ export default function UseCaseContent() {
             <h2 id="decision-points">Decision points at each stage</h2>
 
             <p>
-              {/* TODO: Opening framing.
-                  "At every stage of this 4-week cycle, teams make decisions
-                  that affect downstream success. Currently those decisions are
-                  based on fixed defaults, SOPs, or operator intuition. None of
-                  them systematically learn from previous campaigns."
-              */}
+              At every stage of this cycle, teams make decisions that
+              affect downstream success. Currently those decisions are
+              based on fixed defaults, SOPs, or operator intuition. None
+              of them systematically learn from previous campaigns.
             </p>
 
-            {/* TODO: Structured list or table of decision points:
-
-                1. Part molar ratios
-                   What the model recommends: backbone:insert ratio per construct
-                   Currently fixed at 1:2, but optimal ratio depends on part
-                   count, overhang set, fragment lengths
-                   Learns from: colony counts, PCR positive rate, sequencing results
-
-                2. Cycle count selection
-                   What the model recommends: optimal cycles for a given
-                   part-count + overhang set
-                   Currently: 30 for ≤3 parts, 45 for 4-6, 60 for 7+
-                   Learns from: overhang fidelity data (Potapov 2018), observed
-                   assembly efficiency at this platform
-
-                3. Construct prioritization
-                   What the model recommends: which 94 of N candidate constructs
-                   to run this week
-                   Learns from: predicted success probability, information value,
-                   coverage of design space
-
-                4. Colony screening strategy
-                   What the model recommends: how many colonies to pick per construct
-                   Range: 4-96 (currently fixed at 4-8)
-                   Learns from: historical positive rate for similar assemblies,
-                   cost of sequencing
-
-                5. Troubleshooting failed assemblies
-                   What the model recommends: retry with modified conditions vs.
-                   redesign parts
-                   Learns from: failure mode classification:
-                     - No colonies = transformation failure
-                     - All empty vector = assembly failure
-                     - Mixed bands = partial assembly
-
-                6. Cherry-pick decisions
-                   What the model recommends: which clones to advance based on
-                   partial QC data
-                   Learns from: colony PCR band quality, growth rate, prior
-                   nanopore results for similar constructs
-            */}
+            <ol>
+              <li>
+                <strong>Part molar ratios.</strong> The backbone-to-insert
+                ratio is typically fixed at 1:2, but the optimal ratio
+                depends on part count, overhang set, and fragment lengths.
+                The model recommends ratios per construct and learns from
+                colony counts, PCR positive rates, and sequencing results.
+              </li>
+              <li>
+                <strong>Cycle count.</strong> Common defaults scale cycle
+                count by part number (e.g. 30 cycles for simple
+                assemblies, up to 60 for complex ones). The model
+                refines this based on overhang fidelity data and
+                observed assembly efficiency at the specific platform.
+              </li>
+              <li>
+                <strong>Process parameters.</strong> Reaction volume,
+                enzyme concentration, ligation temperature, and
+                inactivation time all affect assembly yield, quality,
+                and run-to-run variance. Small changes compound across
+                stages. The model learns which parameter combinations
+                produce reliable outcomes for a given assembly type
+                and construct.
+              </li>
+              <li>
+                <strong>Colony screening.</strong> After picking, the
+                model flags constructs where the positive rate is
+                unexpectedly low compared to similar assemblies. This
+                helps teams catch assembly or transformation problems
+                early rather than discovering them at sequence
+                verification.
+              </li>
+              <li>
+                <strong>Failure response.</strong> When an assembly fails,
+                the question is whether to retry with modified conditions
+                or redesign the parts. The model classifies failure modes:
+                no colonies points to a transformation problem, all empty
+                vector to an assembly problem, mixed bands to partial
+                assembly.
+              </li>
+              <li>
+                <strong>Cherry-pick decisions.</strong> Which clones to
+                advance based on partial QC data. The model draws on
+                colony PCR band quality, growth rate, and prior nanopore
+                results for similar constructs.
+              </li>
+            </ol>
 
             <p>
-              {/* TODO: Transformation parameters paragraph.
-                  Even "standard" steps have tunable parameters:
-                  - Voltage: 1500-2500 V (strain-dependent optimum)
-                  - Pulse duration: 1-10 ms
-                  - Recovery volume: 500-1000 µL
-                  - Recovery time: 30-120 min (longer for large plasmids)
-                  - Recovery temperature: 30-37°C
-
-                  Plus batch-level variables that drift:
-                  - Competent cell lot and time-since-thaw
-                  - Enzyme lot (BsaI activity varies between lots)
-                  - SOC media batch
-                  - Antibiotic plate freshness
-
-                  Currently none of these are tracked quantitatively against
-                  outcomes. The model learns to filter nuisance variability
-                  (instrument noise, handling variance) from control-relevant
-                  state changes (enzyme degradation, cell competence drift).
-              */}
+              Beyond the assembly reaction itself, even standard steps
+              have tunable parameters that the model can learn to
+              understand and predict: electroporation voltage (1500 to
+              2500 V, strain-dependent), pulse duration, recovery volume
+              and time, recovery temperature. And there are batch-level
+              variables that drift silently: competent cell lot and
+              time-since-thaw, enzyme lot activity, SOC media batch,
+              antibiotic plate freshness.
             </p>
 
             {/* --- SECTION 3: THE DECISION LOOP --- */}
@@ -282,322 +268,229 @@ export default function UseCaseContent() {
               Could be an SVG showing data flowing in from each week,
               converging on "Next campaign" recommendation.
             */}
-            <h2 id="learning-from-data">Learning from data</h2>
+            <h2 id="learning-over-time">Learning over time</h2>
 
             <p>
-              {/* TODO: Core pitch paragraph.
-                  "With ProviGen, the 4-week cycle becomes a decision loop.
-                  Each plate of 94 assemblies is one batch evaluation. The AI
-                  selects which 94 constructs (from a larger candidate pool)
-                  maximize information gain per cycle."
-
-                  Integration points:
-                  - AssemblyGraph as the intermediate representation: every
-                    assembly plan is a typed DAG with float parameters, directly
-                    compatible with Bayesian optimization
-                  - 94-sample batch = natural BO iteration
-                  - Overhang fidelity (Potapov 2018: 256×256 pair matrix,
-                    calibrated on 436 real plasmids) provides a strong prior
-                    on assembly success before any experiments run
-              */}
+              Each assembly run generates data at every stage: dispense
+              volumes, device logs, colony counts, PCR results, and
+              eventually full sequence verification. These observations
+              arrive at different times. Dispense confirmations are
+              immediate. Colony counts follow after transformation. PCR
+              results come after screening. Sequencing arrives last. The
+              model updates as each signal comes in, so a colony count
+              already informs the next batch design before sequencing
+              confirms which clones are correct.
             </p>
 
             <p>
-              {/* TODO: Observation streams paragraph.
-                  "Each experiment produces a stream of observations over 4 weeks,
-                  not a single success/fail score."
-
-                  Week by week:
-                  - Echo volumes (pre-dispense survey)
-                  - Colony counts (post-transformation)
-                  - PCR band presence/absence (post-screening)
-                  - Sequence verification (post-nanopore)
-
-                  The model learns from partial observations before the full
-                  cycle completes. A colony count alone (Week 2 result) already
-                  informs the next plate design, even before sequence verification
-                  (Week 4) confirms which clones are correct.
-
-                  This is the "delayed evidence" pattern from the blog post,
-                  applied concretely to DNA assembly.
-              */}
+              Published overhang fidelity data
+              <sup>
+                <a href="#fn1" className="text-[#6c7793] hover:text-[#090E34] no-underline">[1]</a>
+              </sup>
+              {" "}covering all 256 possible 4-nucleotide pairs provides
+              a strong
+              prior on assembly success before any wet lab work begins. As real results
+              accumulate, the model refines these priors for the specific
+              platform, part libraries, and conditions in use.
             </p>
 
             <p>
-              {/* TODO: Drift tracking paragraph.
-                  "The model tracks drift in batch-level variables over time."
-
-                  Competent cell batch quality, enzyme lot activity, and plate
-                  reader calibration change gradually. The model filters nuisance
-                  variability (handling variance, instrument noise) while tracking
-                  control-relevant state changes (degraded enzyme lot, poorly
-                  stored cells).
-
-                  This is data that currently disappears into troubleshooting
-                  notes or operator memory. Connected to the model, it becomes
-                  reusable process intelligence.
-              */}
+              Batch-level drift is another signal the model tracks.
+              Competent cell quality, enzyme lot activity, and plate
+              reader calibration change gradually. This information
+              typically disappears into troubleshooting notes or operator
+              memory. Connected to the model, it becomes reusable process
+              intelligence that carries over across campaigns.
             </p>
 
             {/* --- SECTION 4: MULTI-OBJECTIVE REALITY --- */}
             {/*
               IMAGE IDEA: Radar/spider chart or parallel coordinates showing
-              multiple objectives per construct. Axes could include:
-              - Assembly success probability
-              - Sequencing pass rate
-              - Information value (what we learn from this experiment)
-              - Cost (number of colonies to screen, sequencing cost)
-              - Time (weeks until verified clone)
-              - Design space coverage
-
-              Show the Pareto concept: some constructs are high-probability
-              but teach nothing; others are likely to fail but their failure
-              mode is informative.
+              multiple objectives. Axes: yield, purity, supercoiling %,
+              impurity profile, robustness, turnaround time, cost.
             */}
             <h2 id="multi-objective">Multi-objective reality</h2>
 
             <p>
-              {/* TODO: Multi-objective Pareto ranking paragraph.
-                  "The model ranks candidate experiments across multiple objectives
-                  simultaneously."
-
-                  Objectives for construct prioritization:
-                  - Success probability (will this assembly work?)
-                  - Information value (what do we learn if it fails?)
-                  - Design space coverage (are we exploring broadly enough?)
-                  - Cost (how many colonies must we screen to verify?)
-                  - Time to verified clone
-
-                  Key insight: "Constructs that are likely to succeed but teach
-                  nothing get deprioritized. Constructs likely to fail but whose
-                  failure mode is informative get promoted."
-
-                  This is the difference between an optimization engine (maximize
-                  success rate) and a decision engine (maximize value of the
-                  next experiment given what we already know).
-              */}
+              Plasmid manufacturing involves multiple objectives that
+              trade off against each other. Yield, purity (supercoiled
+              fraction, absence of genomic DNA), plasmid quality,
+              impurity profile (endotoxin, host-cell protein, RNA),
+              robustness across operators and batches, turnaround time,
+              and cost per batch all matter. Higher yield conditions may
+              compromise supercoiling fraction. Faster turnaround may
+              mean less stringent QC. Optimizing one metric while
+              ignoring the rest leads to processes that pass one test
+              but fail in production.
             </p>
 
             <p>
-              {/* TODO: Process-level objectives paragraph.
-                  Beyond individual constructs, the full manufacturing process
-                  has its own multi-objective landscape:
-                  - Yield (mg per liter or per batch)
-                  - Purity (% supercoiled, absence of genomic DNA)
-                  - Plasmid quality (homogeneity, correct topology)
-                  - Impurity profile (endotoxin, host-cell protein, RNA)
-                  - Robustness (reproducibility across operators/batches)
-                  - Turnaround time (weeks per verified construct)
-                  - Cost per batch
-
-                  These trade off. Higher yield conditions may compromise
-                  supercoiling fraction. More colonies screened per construct
-                  increases verification confidence but multiplies cost.
-              */}
+              The model handles these tradeoffs explicitly by mapping
+              the <em>Pareto frontier</em> (a set of conditions where
+              no single objective can be improved without compromising
+              another). Teams define what matters and how much, and the
+              model proposes experiments that move toward that frontier
+              rather than chasing a single metric.
             </p>
 
             {/* --- SECTION 5: MOCLO AT SCALE --- */}
             {/*
               IMAGE IDEA: Diagram showing the MoClo hierarchy:
               Level 0 (basic parts) → Level 1 (transcription units) → Level M (multigene)
-              With exponential design space annotation.
 
-              Or: photo/screenshot from Paris Biofoundry automation platform.
-              Reference video: https://www.youtube.com/watch?v=pCD1HVpVR9M
-
-              Could also show the "fragment count vs. success rate" relationship:
-              2-3 parts = high success
-              4-6 parts = moderate
-              7+ parts = significant drop
-              24 parts = the hard frontier
+              Or: fragment count vs. success rate curve.
             */}
             <h2 id="moclo">MoClo at scale</h2>
 
             <p>
-              {/* TODO: What MoClo is and why it creates a combinatorial explosion.
-                  Modular Cloning (MoClo) uses standardized Type IIS restriction
-                  enzymes (BsaI, BsmBI) to assemble multiple DNA parts in a single
-                  reaction. Parts are designed with compatible 4-nucleotide overhangs
-                  that dictate assembly order.
-
-                  The Paris Biofoundry registry contains 866 real plasmids spanning
-                  three MoClo tiers:
-                  - Level 0: basic parts (promoters, CDS, terminators)
-                  - Level 1: transcription units (assembled from Level 0)
-                  - Level M: multigene constructs (assembled from Level 1)
-
-                  The design space grows combinatorially. With a modest library
-                  of 50 Level 0 parts across 5 positions, there are already
-                  50^5 = 312 million possible Level 1 combinations. Only 94
-                  can be tested per weekly plate.
-              */}
+              Modular Cloning (MoClo) uses standardized Type IIS
+              restriction enzymes (BsaI, BsmBI) to assemble multiple DNA
+              parts in a single reaction. Parts are designed with
+              compatible 4-nucleotide overhangs that dictate assembly
+              order. Related standards follow the same modular logic:
+              Golden Braid extends MoClo with alternating enzyme pairs
+              for unlimited hierarchical levels; Gibson Assembly joins
+              overlapping fragments without restriction enzymes; BASIC
+              Assembly uses linkers for combinatorial pathway
+              construction. The decision loop applies to all of these.
+              The parameters differ but the optimization structure is the
+              same.
             </p>
 
             <p>
-              {/* TODO: The complexity frontier.
-                  Fragment count ranges from 1 to 24 per assembly (average 3).
-                  Success drops significantly above 6 parts.
-
-                  Key challenge: overhang fidelity.
-                  The Potapov 2018 dataset (256×256 pair fidelities) shows that
-                  some 4-nt overhang pairs have near-zero ligation fidelity.
-                  With more fragments, the probability of hitting a bad overhang
-                  pair increases multiplicatively.
-
-                  Additional failure modes:
-                  - BsaI is dam-methylation sensitive. E. coli-propagated parts
-                    with dam sites at the recognition sequence silently fail.
-                  - Multi-level MoClo (L0 → L1 → LM) compounds failure probability
-                    across tiers.
-
-                  The AI uses overhang fidelity as a strong prior: the Potapov
-                  matrix calibrated against 436 real plasmids predicts assembly
-                  success before any wet lab work begins.
-              */}
+              The design space grows combinatorially. Even a moderate
+              parts library creates thousands of relevant combinations,
+              and each new construct may behave differently during
+              assembly depending on its specific overhangs, fragment
+              lengths, and part interactions. It is impossible to
+              manually test each beforehand, which
+              is where a predictive model becomes highly valuable: it
+              generalizes from past assemblies to predict conditions for
+              new constructs that have never been built before.
+              Multi-level assembly (Level 0 parts into Level 1
+              transcription units into Level M multigene constructs)
+              compounds this further across tiers.
             </p>
 
             <p>
-              {/* TODO: The biofoundry platform specifics.
-                  The Paris Biofoundry (Sorbonne node) runs this as a fully
-                  automated pipeline:
-                  - Echo acoustic liquid handler for nanoliter-precision dispensing
-                  - Hamilton StarV for standard liquid handling
-                  - Automated thermal cycling (ATC) for Golden Gate reactions
-                  - QPix colony picker (human-mediated plate loading is the only
-                    manual step in the entire pipeline)
-                  - On-site Oxford Nanopore for same-day sequence verification
-
-                  Data generated per campaign:
-                  - 1M+ Momentum variable values
-                  - 68K+ device operations with timestamps
-                  - Echo survey volumes (per-well, pre-dispense)
-                  - Echo dispense confirmations (actual vs. requested)
-                  - Thermal cycler execution traces
-                  - Colony counts, PCR results, sequencing data
-
-                  Reference video: https://www.youtube.com/watch?v=pCD1HVpVR9M
-              */}
+              Fragment count is the primary driver of difficulty.
+              Assemblies with 2 to 3 parts typically succeed at high
+              rates. Above 6 parts, success drops significantly.
+              Assemblies with up to 24 fragments are at the hard
+              frontier. The main challenge is overhang fidelity: some
+              4-nucleotide overhang pairs have near-zero ligation
+              efficiency, and with more fragments the probability of
+              hitting a problematic pair increases multiplicatively.
+              Additional failure modes include dam-methylation sensitivity
+              (E. coli-propagated parts with dam sites at the BsaI
+              recognition sequence silently fail) and compounding failure
+              probability across multi-level assemblies.
             </p>
 
             <p>
-              {/* TODO: Current pain points that AI addresses.
-
-                  1. Assembly efficiency prediction is poor:
-                     No systematic record of which parameter combinations work
-                     for which part families. The model builds this map.
-
-                  2. Screening bottleneck:
-                     Default 4-8 colonies may be insufficient for low-efficiency
-                     assemblies. The model predicts how many colonies to screen
-                     based on expected positive rate.
-
-                  3. Colony PCR is binary:
-                     Correct band / no band. Doesn't distinguish partial assemblies
-                     from contamination. The model learns to interpret ambiguous
-                     results in context of assembly conditions.
-
-                  4. Batch drift is untracked:
-                     Competent cell quality, enzyme lots, media batches vary but
-                     nobody correlates this with outcomes. The model does.
-
-                  5. Platform failure modes:
-                     Echo volume drift (stale survey + evaporation = under-aspiration),
-                     equipment reservation leaks, HoldOnError retry loops (120s × 10).
-                     The model detects anomalies in execution metadata.
-              */}
+              Standard pain points in this space are clear targets for
+              the decision loop. There is typically no systematic record
+              of which parameter combinations work for which part
+              families. Colony PCR gives a binary result (correct band
+              or not) that does not distinguish partial assemblies from
+              contamination. Batch-level drift in competent cell quality,
+              enzyme lots, and media goes untracked. Platform-level
+              anomalies (volume drift from stale acoustic surveys,
+              equipment reservation conflicts, retry loops) are caught
+              manually rather than flagged from execution metadata.
             </p>
 
-            {/* --- SECTION 6: PROOF POINTS --- */}
-            <h2 id="proof-points">Proof points</h2>
+            <hr />
 
             <p>
-              {/* TODO: Industry precedent paragraph.
-
-                  Merck KGaA / BayBE:
-                  Operationalized Bayesian experimental planning across industrial
-                  R&D. Dozens of internal use cases before open-sourcing. Named
-                  examples include VRP ExcipientFinder, BayChem, and self-driving
-                  autonomous flow chemistry.
-                  Reference: Fitzner et al., Digital Discovery, 2025.
-
-                  Acceleration Consortium:
-                  Formalized self-driving labs as systems requiring a decision
-                  layer that selects what to test next, updates from results,
-                  and improves future experimental choices.
-                  Reference: Maffettone et al., arXiv, 2023.
-
-                  Paris Biofoundry validation:
-                  - 866 plasmids in registry across all three MoClo tiers
-                  - Overhang fidelity prediction calibrated on 436-plasmid dataset
-                  - Multi-backend consensus (4 independent verification tools)
-                  - 12 Type IIS enzymes with real NEB parameters
-
-                  Frame: "The infrastructure exists. The hardware runs. The data
-                  is generated. What is missing is the decision layer that
-                  connects past results to future experiments."
-              */}
-            </p>
-
-            {/* --- SECTION 7: VALUE SUMMARY --- */}
-            {/*
-              IMAGE IDEA: Before/after comparison showing:
-              Without ProviGen:
-              - Fixed parameters (1:2 ratio, 30 cycles, 4 colonies)
-              - No learning between campaigns
-              - Manual troubleshooting when assemblies fail
-              - Operator-dependent decisions
-
-              With ProviGen:
-              - Adaptive parameters per construct
-              - Every campaign improves the next
-              - Automated failure classification and response
-              - Data-driven prioritization of the next 94 experiments
-            */}
-            <h2 id="value-summary">Value summary</h2>
-
-            <p>
-              {/* TODO: Concrete value props:
-
-                  1. Better next-experiment selection
-                     Which 94 constructs to assemble this week, under which
-                     conditions, maximizing combined probability of success and
-                     information gain.
-
-                  2. Adaptive parameters per construct
-                     Backbone:insert ratio, cycle count, colony screening depth
-                     tuned to predicted difficulty rather than fixed defaults.
-
-                  3. Reduced decision latency
-                     Colony counts available after Week 2 already inform the
-                     next plate design. No waiting for full 4-week verification
-                     to update the model.
-
-                  4. Better use of constrained capacity
-                     94 slots per plate, 4 weeks per cycle. Every slot allocated
-                     to the experiment with highest expected value.
-
-                  5. Compounding process intelligence
-                     Every campaign (including failed assemblies) updates a
-                     shared model of what works for which part families, overhang
-                     combinations, and conditions. Reusable across projects.
-
-                  6. Drift detection
-                     Competent cell degradation, enzyme lot changes, and
-                     instrument drift caught early through execution metadata
-                     rather than discovered through unexplained failures.
-              */}
+              The precedent for model-guided experimental planning is
+              growing. Merck KGaA developed BayBE,
+              <sup>
+                <a href="#fn2" className="text-[#6c7793] hover:text-[#090E34] no-underline">[2]</a>
+              </sup>
+              {" "}a Bayesian experimental planning framework that
+              powered dozens of internal R&D use cases before being
+              open-sourced. Ginkgo Bioworks integrated
+              Zymergen&apos;s machine learning and automation stack
+              specifically to explore genetic design space more
+              efficiently across their foundry operations.
+              <sup>
+                <a href="#fn3" className="text-[#6c7793] hover:text-[#090E34] no-underline">[3]</a>
+              </sup>
             </p>
 
             <p>
-              {/* TODO: Closing paragraph.
-                  "ProviGen helps teams make better decisions with fewer
-                  experimental cycles. Every plate of 94 assemblies produces
-                  results, updates the model, and improves the next plate.
-                  The lab is already automated. Now the decisions are too."
-              */}
+              ProviGen helps teams make better decisions with fewer
+              experimental runs. Every batch produces results, updates
+              the model, and improves the next batch. Adaptive parameters
+              per construct replace fixed defaults. Partial results from
+              early stages inform the next round before full verification
+              is complete. Failed assemblies teach the model what to
+              avoid. Batch drift is caught from execution metadata rather
+              than discovered through unexplained failures.
+            </p>
+
+            <p>
+              If you are interested in exploring what a decision loop
+              could look like for your assembly workflow, reach out
+              to{" "}
+              <a href="mailto:research@provigen.ai">research@provigen.ai</a>.
             </p>
 
           </div>
+
+            {/* Footnotes */}
+            <footer className="mt-20 pt-8 border-t border-[#e8e6e1]">
+              <div className="font-mono text-xs text-[#6c7793] leading-relaxed space-y-2">
+                <p id="fn1">
+                  [1] Potapov et&nbsp;al.,{" "}
+                  <a
+                    href="https://doi.org/10.1021/acssynbio.8b00333"
+                    className="underline decoration-dotted underline-offset-2 hover:text-[#090E34]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    &ldquo;Comprehensive Profiling of Four Base Overhang
+                    Ligation Fidelity by T4 DNA Ligase and Application to
+                    DNA Assembly,&rdquo; ACS Synth. Biol. 2018
+                  </a>
+                  . Provides a 256&times;256 overhang fidelity matrix for
+                  Type IIS enzyme-based assembly, widely used as a reference
+                  for Golden Gate and MoClo protocol design.
+                </p>
+                <p id="fn2">
+                  [2] Fitzner et&nbsp;al.,{" "}
+                  <a
+                    href="https://doi.org/10.1039/D4DD00316K"
+                    className="underline decoration-dotted underline-offset-2 hover:text-[#090E34]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    &ldquo;BayBE: a Bayesian Back End for experimental
+                    planning in the low-to-no-data regime,&rdquo; Digital
+                    Discovery, 2025
+                  </a>
+                  . Open-sourced by Merck KGaA in collaboration with the
+                  Acceleration Consortium.
+                </p>
+                <p id="fn3">
+                  [3] Zymergen Technology Team,{" "}
+                  <a
+                    href="https://medium.com/@ZymergenTechBlog/programming-microbes-fa8b2cca1aab"
+                    className="underline decoration-dotted underline-offset-2 hover:text-[#090E34]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    &ldquo;Programming Microbes,&rdquo; Zymergen Tech Blog
+                  </a>
+                  . Describes ML-guided strain engineering where models
+                  predict which genetic edits will improve production,
+                  generate strain recommendations, and update as new
+                  experimental data arrives. Now part of Ginkgo
+                  Bioworks&apos; foundry platform.
+                </p>
+              </div>
+            </footer>
         </div>
       </article>
     </div>
