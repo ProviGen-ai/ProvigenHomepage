@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import Logo from "./Logo";
 
 const Footer = () => {
   return (
@@ -20,24 +20,8 @@ const Footer = () => {
         <div className="py-6 lg:py-8 flex flex-col md:flex-row items-start justify-between gap-8">
           {/* Left: Logo + copyright */}
           <div>
-            <Link href="/" className="inline-block mb-4 relative">
-              <Image
-                src="/images/logo/provigenLogoTransparent.png"
-                alt="ProviGen"
-                width={400}
-                height={80}
-                className="h-6 w-auto"
-                style={{ filter: "brightness(0) invert(1)", opacity: 0.7 }}
-              />
-              <Image
-                src="/images/logo/provigenLogoTransparent.png"
-                alt=""
-                width={400}
-                height={80}
-                aria-hidden="true"
-                className="h-6 w-auto absolute inset-0"
-                style={{ clipPath: "inset(0% 46% 0% 36%)" }}
-              />
+            <Link href="/" className="inline-block mb-4" aria-label="ProviGen.ai home">
+              <Logo className="h-12 w-auto text-white/60 hover:text-white transition-colors" />
             </Link>
             <p className="text-xs text-white/40">
               &copy; {new Date().getFullYear()} ProviGenAI

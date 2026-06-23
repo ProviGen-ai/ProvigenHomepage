@@ -1,8 +1,8 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import menuData from "@/components/Header/menuData";
+import AnimatedLogo from "./AnimatedLogo";
 
 const navItems = menuData.filter((item) => item.title !== "Home");
 import { useRouter, usePathname } from "next/navigation";
@@ -79,28 +79,9 @@ const Header = () => {
     >
       <div className="px-6 lg:px-8">
         <div className="flex h-16 lg:h-20 items-center justify-between">
-          {/* Logo — always show white version with colored diamond */}
-          <Link href="/" className="flex-shrink-0 relative">
-            <Image
-              src="/images/logo/provigenLogoTransparent.png"
-              alt="ProviGen"
-              width={160}
-              height={36}
-              loading="eager"
-              priority
-              className="h-8 lg:h-9 w-auto opacity-90"
-              style={{ filter: "brightness(0) invert(1)" }}
-            />
-            {/* Color diamond overlay */}
-            <Image
-              src="/images/logo/provigenLogoTransparent.png"
-              alt=""
-              width={160}
-              height={36}
-              aria-hidden="true"
-              className="h-8 lg:h-9 w-auto absolute inset-0"
-              style={{ clipPath: "inset(0% 46% 0% 36%)" }}
-            />
+          {/* Logo — collapses on scroll: words slide behind the raven, raven moves to the corner */}
+          <Link href="/" className="flex-shrink-0 text-white/60 transition-colors duration-500 hover:text-white" aria-label="ProviGen.ai home">
+            <AnimatedLogo collapsed={scrolled} className="h-14 lg:h-16" />
           </Link>
 
           {/* Desktop nav */}

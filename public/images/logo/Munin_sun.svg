@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" width="1254" height="1254">
+  <!-- Thin "sun" ring, recreated from white_circle_logo.png.
+       Geometry: center (626,626), mean radius 364, stroke 22 (≈0.03 of diameter).
+       White by default, matching Munin_raven_yata.svg. -->
+  <circle cx="627" cy="627" r="364" fill="none" stroke="#ffffff" stroke-width="22"/>
+</svg>
