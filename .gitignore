@@ -39,6 +39,7 @@ yarn-error.log*
 # local archives / scratch
 frontend.zip
 archive/
+logo-export/
 
 # typescript build info
 tsconfig.tsbuildinfo
