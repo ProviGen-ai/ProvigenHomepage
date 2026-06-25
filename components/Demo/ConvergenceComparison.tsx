@@ -6,13 +6,17 @@ import { motion } from 'framer-motion';
 import { Play, RotateCcw, Zap } from 'lucide-react';
 import {
   calculateNextBayesianPointND,
-  lhsSampleND,
+  generateMaximinLHSDesignND,
+  sobolSampleND,
   createInitialTrustRegionState,
   type Sample,
   type TrustRegionState
 } from '@/utils/bayesianOptimization';
 
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
+
+// Estimated total budget for Latin Hypercube stratification (matches the demo's run length)
+const LHS_TOTAL = 100;
 
 // Test functions for N-dimensional optimization
 const TEST_FUNCTIONS_ND = {
@@ -91,6 +95,13 @@ export function ConvergenceComparison({ darkMode = false, height = 500 }: Conver
   const func = TEST_FUNCTIONS_ND[selectedFunction];
   const domain = func.domain;
 
+  // Precompute a fixed N-D Latin Hypercube design; the k-th DoE sample reveals
+  // design[k]. Seeded per function + dimensionality for a stable pattern.
+  const lhsDesign = useMemo(() => {
+    const seed = selectedFunction.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, dimensions);
+    return generateMaximinLHSDesignND(LHS_TOTAL, dimensions, seed);
+  }, [selectedFunction, dimensions]);
+
   // Add noise to measurement
   const addNoise = (value: number) => {
     const noise = (Math.random() - 0.5) * 2 * noiseLevel * Math.abs(value);
@@ -108,12 +119,11 @@ export function ConvergenceComparison({ darkMode = false, height = 500 }: Conver
 
     if (doeMethod === 'lhs') {
       // True Latin Hypercube Sampling with space-filling properties
-      // Uses same structured sampling as BO for fair comparison
-      const sample = lhsSampleND(doeSamples.length, dimensions, 100); // Estimate 100 total samples
+      const sample = lhsDesign[doeSamples.length % LHS_TOTAL];
       x = sample.map(s => domain[0] + s * (domain[1] - domain[0]));
     } else {
-      // Sobol sequence (using LHS for proper space-filling)
-      const sample = lhsSampleND(doeSamples.length, dimensions, 100); // Estimate 100 total samples
+      // Genuine N-dimensional Sobol sequence (skip index 0 origin)
+      const sample = sobolSampleND(doeSamples.length + 1, dimensions);
       x = sample.map(s => domain[0] + s * (domain[1] - domain[0]));
     }
 
@@ -256,7 +266,7 @@ export function ConvergenceComparison({ darkMode = false, height = 500 }: Conver
               <option value="sobol">Sobol Sequence</option>
             </select>
             <p className={`text-xs mt-1 ${darkMode ? 'text-slate-500' : 'text-slate-600'}`}>
-              {doeMethod === 'lhs' ? 'Space-filling grid sampling' : 'Quasi-random low-discrepancy'}
+              {doeMethod === 'lhs' ? 'Stratified space-filling sampling' : 'Quasi-random low-discrepancy'}
             </p>
           </div>
 

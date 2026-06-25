@@ -4,9 +4,12 @@ import { useState, useMemo, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { Play, RotateCcw, Zap } from 'lucide-react';
-import { calculateNextBayesianPoint2D, type Sample2D } from '@/utils/bayesianOptimization';
+import { calculateNextBayesianPoint2D, generateLHSDesign2D, sobolSample2D, type Sample2D } from '@/utils/bayesianOptimization';
 
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
+
+// Estimated total budget for Latin Hypercube stratification (matches the demo's run length)
+const LHS_TOTAL = 100;
 
 // Test functions for optimization
 const TEST_FUNCTIONS = {
@@ -96,6 +99,13 @@ export function DoESimulation({ darkMode = false, height = 600 }: DoESimulationP
 
   const func = TEST_FUNCTIONS[selectedFunction];
 
+  // Precompute a fixed Latin Hypercube design; the k-th DoE sample reveals
+  // design[k]. Seeded per function so each surface gets a stable pattern.
+  const lhsDesign = useMemo(() => {
+    const seed = selectedFunction.split('').reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7);
+    return generateLHSDesign2D(LHS_TOTAL, seed);
+  }, [selectedFunction]);
+
   // Generate ground truth surface
   const groundTruthSurface = useMemo(() => {
     const gridSize = 40;
@@ -132,27 +142,6 @@ export function DoESimulation({ darkMode = false, height = 600 }: DoESimulationP
     return value + noise;
   };
 
-  // Generate Sobol sequence point
-  const sobolSample = (index: number): [number, number] => {
-    // Simple Sobol sequence implementation for 2D
-    // Uses Gray code for better distribution
-    const grayCode = (n: number) => n ^ (n >> 1);
-
-    let x = 0, y = 0;
-    let i = grayCode(index);
-    let scale = 0.5;
-
-    while (i > 0) {
-      if (i & 1) x += scale;
-      i >>= 1;
-      if (i & 1) y += scale;
-      i >>= 1;
-      scale *= 0.5;
-    }
-
-    return [x, y];
-  };
-
   // DoE Sampling (Latin Hypercube or Sobol)
   const sampleDoE = () => {
     const xRange = func.domain.x;
@@ -160,19 +149,13 @@ export function DoESimulation({ darkMode = false, height = 600 }: DoESimulationP
     let x: number, y: number;
 
     if (doeMethod === 'lhs') {
-      // Latin Hypercube: divide space into cells and sample one point per cell
-      const n = doeSamples.length;
-      const gridSize = Math.ceil(Math.sqrt(n + 1));
-
-      // Generate LHS sample
-      const cellX = Math.floor(Math.random() * gridSize);
-      const cellY = Math.floor(Math.random() * gridSize);
-
-      x = xRange[0] + (cellX + Math.random()) * (xRange[1] - xRange[0]) / gridSize;
-      y = yRange[0] + (cellY + Math.random()) * (yRange[1] - yRange[0]) / gridSize;
+      // Latin Hypercube: structured, space-filling sampling (one point per stratum)
+      const [lx, ly] = lhsDesign[doeSamples.length % LHS_TOTAL];
+      x = xRange[0] + lx * (xRange[1] - xRange[0]);
+      y = yRange[0] + ly * (yRange[1] - yRange[0]);
     } else {
-      // Sobol sequence: quasi-random low-discrepancy sequence
-      const [sx, sy] = sobolSample(doeSamples.length + 1);
+      // Sobol sequence: quasi-random low-discrepancy sequence (skip index 0 origin)
+      const [sx, sy] = sobolSample2D(doeSamples.length + 1);
       x = xRange[0] + sx * (xRange[1] - xRange[0]);
       y = yRange[0] + sy * (yRange[1] - yRange[0]);
     }
@@ -299,14 +282,11 @@ export function DoESimulation({ darkMode = false, height = 600 }: DoESimulationP
       let x: number, y: number;
 
       if (doeMethod === 'lhs') {
-        const n = currentDoeSamples.length;
-        const gridSize = Math.ceil(Math.sqrt(n + 1));
-        const cellX = Math.floor(Math.random() * gridSize);
-        const cellY = Math.floor(Math.random() * gridSize);
-        x = xRange[0] + (cellX + Math.random()) * (xRange[1] - xRange[0]) / gridSize;
-        y = yRange[0] + (cellY + Math.random()) * (yRange[1] - yRange[0]) / gridSize;
+        const [lx, ly] = lhsDesign[currentDoeSamples.length % LHS_TOTAL];
+        x = xRange[0] + lx * (xRange[1] - xRange[0]);
+        y = yRange[0] + ly * (yRange[1] - yRange[0]);
       } else {
-        const [sx, sy] = sobolSample(currentDoeSamples.length + 1);
+        const [sx, sy] = sobolSample2D(currentDoeSamples.length + 1);
         x = xRange[0] + sx * (xRange[1] - xRange[0]);
         y = yRange[0] + sy * (yRange[1] - yRange[0]);
       }
@@ -420,7 +400,7 @@ export function DoESimulation({ darkMode = false, height = 600 }: DoESimulationP
               <option value="sobol">Sobol Sequence</option>
             </select>
             <p className={`text-xs mt-1 ${darkMode ? 'text-slate-500' : 'text-slate-600'}`}>
-              {doeMethod === 'lhs' ? 'Space-filling grid sampling' : 'Quasi-random low-discrepancy'}
+              {doeMethod === 'lhs' ? 'Stratified space-filling sampling' : 'Quasi-random low-discrepancy'}
             </p>
           </div>
 
