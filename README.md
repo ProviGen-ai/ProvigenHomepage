@@ -1,4 +1,4 @@
-# Provigen Homepage
+# ProviGen Homepage
 Start website locally
 ```
 npm install

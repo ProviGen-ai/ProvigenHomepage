@@ -8,7 +8,7 @@ const blogData: Blog[] = [
       "Exploring how AI and robotics are transforming biological research and drug discovery processes.",
     image: "/images/blog/blog-01.jpg",
     author: {
-      name: "Provigen Team",
+      name: "ProviGen Team",
       image: "/images/blog/author-01.png",
       designation: "Research & Development",
     },
@@ -22,7 +22,7 @@ const blogData: Blog[] = [
       "How machine learning enables laboratories to continuously improve their experimental protocols.",
     image: "/images/blog/blog-02.jpg",
     author: {
-      name: "Provigen Team",
+      name: "ProviGen Team",
       image: "/images/blog/author-02.png",
       designation: "AI Research",
     },
@@ -36,7 +36,7 @@ const blogData: Blog[] = [
       "The impact of robotic automation on reducing time-to-market for new therapeutics.",
     image: "/images/blog/blog-03.jpg",
     author: {
-      name: "Provigen Team",
+      name: "ProviGen Team",
       image: "/images/blog/author-03.png",
       designation: "Industry Insights",
     },

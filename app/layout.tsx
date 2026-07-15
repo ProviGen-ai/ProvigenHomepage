@@ -5,8 +5,17 @@ import "../styles/index.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "ProviGen",
+  metadataBase: new URL("https://provigen.ai"),
+  title: "ProviGen — AI-Powered Experimental Design",
   description: "ProviGen - AI-powered experimental design",
+  applicationName: "ProviGen",
+  openGraph: {
+    title: "ProviGen - AI-Powered Experimental Design",
+    description: "ProviGen - AI-powered experimental design",
+    siteName: "ProviGen",
+    url: "https://provigen.ai",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
