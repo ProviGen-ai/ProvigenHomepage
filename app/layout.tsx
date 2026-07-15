@@ -6,12 +6,12 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://provigen.ai"),
-  title: "ProviGen — AI-Powered Experimental Design",
-  description: "ProviGen - AI-powered experimental design",
+  title: "ProviGen | Autonomous Life Science Infrastructure",
+  description: "ProviGen — autonomous life science infrastructure",
   applicationName: "ProviGen",
   openGraph: {
-    title: "ProviGen - AI-Powered Experimental Design",
-    description: "ProviGen - AI-powered experimental design",
+    title: "ProviGen | Autonomous Life Science Infrastructure",
+    description: "ProviGen — autonomous life science infrastructure",
     siteName: "ProviGen",
     url: "https://provigen.ai",
     type: "website",
