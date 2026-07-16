@@ -41,6 +41,10 @@ frontend.zip
 archive/
 logo-export/
 
+# confidential pitch materials (do not publish)
+ProviGenAI Deck.pdf
+pitch/
+
 # typescript build info
 tsconfig.tsbuildinfo
 

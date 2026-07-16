@@ -7,11 +7,11 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   metadataBase: new URL("https://provigen.ai"),
   title: "ProviGen | Autonomous Life Science Infrastructure",
-  description: "ProviGen — autonomous life science infrastructure",
+  description: "ProviGen - autonomous life science infrastructure",
   applicationName: "ProviGen",
   openGraph: {
     title: "ProviGen | Autonomous Life Science Infrastructure",
-    description: "ProviGen — autonomous life science infrastructure",
+    description: "ProviGen - autonomous life science infrastructure",
     siteName: "ProviGen",
     url: "https://provigen.ai",
     type: "website",
