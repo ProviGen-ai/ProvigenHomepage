@@ -12,10 +12,10 @@ const PrivacyPolicy = () => {
 
   const obfuscatedData = {
     name: btoa("Lucas Mair"),
-    company: btoa("ProviGen"),
-    street: btoa("Fritz-Meyer-Weg 22"),
-    city: btoa("81925 Munich"),
-    country: btoa("Germany"),
+    company: btoa("ProviGenAI Inc."),
+    street: btoa("995 Market St, Floor 8"),
+    city: btoa("San Francisco, CA 94103"),
+    country: btoa("United States"),
     email: btoa("contact@provigen.ai")
   };
 
@@ -44,7 +44,7 @@ const PrivacyPolicy = () => {
 
         <section>
           <h2 className="text-base font-semibold text-navy mb-2">Responsible Party</h2>
-          <p className="text-muted">{atob(obfuscatedData.company)} (in formation)</p>
+          <p className="text-muted">{atob(obfuscatedData.company)}</p>
           <p className="text-muted">{atob(obfuscatedData.name)}</p>
         </section>
 

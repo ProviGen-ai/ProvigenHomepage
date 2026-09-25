@@ -66,7 +66,9 @@ export default function Manifesto() {
             <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8b90a0] mb-6">
               Manifesto
             </div>
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl leading-tight font-normal text-[#090E34] mb-10">
+            {/* Fluid size + nowrap: the title always occupies exactly one
+                line, scaling down on narrow screens instead of wrapping. */}
+            <h1 className="font-serif text-[clamp(1.25rem,7vw,3.25rem)] whitespace-nowrap leading-tight font-normal text-[#090E34] mb-10">
               Biotech is entering a new era
             </h1>
             <div className="grid md:grid-cols-[120px_1fr] gap-x-6 gap-y-1 font-mono text-sm text-[#090E34]">

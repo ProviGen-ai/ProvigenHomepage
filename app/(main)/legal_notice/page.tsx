@@ -12,9 +12,9 @@ const LegalNotice = () => {
 
     const obfuscatedData = {
         name: btoa("Lucas Mair"),
-        street: btoa("Fritz-Meyer-Weg 22"),
-        city: btoa("81925 Munich"),
-        country: btoa("Germany"),
+        street: btoa("995 Market St, Floor 8"),
+        city: btoa("San Francisco, CA 94103"),
+        country: btoa("United States"),
         email: btoa("contact@provigen.ai")
     };
 
@@ -42,7 +42,7 @@ const LegalNotice = () => {
             <div className="max-w-xl space-y-8" style={{ letterSpacing: "-0.01em" }}>
                 <div>
                     <h2 className="text-base font-semibold text-navy mb-2">Service Provider</h2>
-                    <p className="text-muted">ProviGen (in formation)</p>
+                    <p className="text-muted">ProviGenAI Inc.</p>
                     <p className="text-muted">{atob(obfuscatedData.name)}</p>
                 </div>
 
@@ -70,13 +70,13 @@ const LegalNotice = () => {
 
                     <h3 className="text-sm font-semibold text-navy/70 mb-2 mt-5">Liability for Content</h3>
                     <p className="text-muted leading-relaxed">
-                        The contents of this website have been created with the utmost care. However, ProviGen cannot
+                        The contents of this website have been created with the utmost care. However, ProviGenAI Inc. cannot
                         guarantee the accuracy, completeness, or timeliness of the content.
                     </p>
 
                     <h3 className="text-sm font-semibold text-navy/70 mb-2 mt-5">Liability for Links</h3>
                     <p className="text-muted leading-relaxed">
-                        This website may contain links to external third-party websites. ProviGen has no influence on the
+                        This website may contain links to external third-party websites. ProviGenAI Inc. has no influence on the
                         content of these websites and therefore cannot accept any liability for this external content.
                         The respective provider or operator is always responsible for the content of linked pages.
                     </p>

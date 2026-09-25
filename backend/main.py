@@ -52,7 +52,11 @@ class SecretMiddleware(BaseHTTPMiddleware):
     """Reject requests that don't carry the shared secret header."""
 
     async def dispatch(self, request: Request, call_next):
-        if request.url.path == "/health":
+        # Compare against scope["path"], the raw path the router dispatches on.
+        # request.url is rebuilt from the Host header, which an attacker can
+        # craft ("Host: example.com/health?x=") to make url.path read /health
+        # while the router still serves the real, protected path.
+        if request.scope["path"] == "/health":
             return await call_next(request)
         if request.headers.get("X-Workshop-Secret") != WORKSHOP_SECRET:
             return JSONResponse(status_code=403, content={"detail": "Forbidden"})
@@ -63,7 +67,11 @@ app.add_middleware(SecretMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    # The browser only ever talks to the Next.js origin, which proxies here
+    # server-side, so no credentialed cross-origin request is needed. "*" with
+    # credentials is invalid per the CORS spec and makes Starlette echo back
+    # whatever Origin is presented.
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
