@@ -1,31 +1,4 @@
-"use client";
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-
 const LegalNotice = () => {
-    const [showContent, setShowContent] = useState(false);
-
-    useEffect(() => {
-        const timer = setTimeout(() => setShowContent(true), 100);
-        return () => clearTimeout(timer);
-    }, []);
-
-    const obfuscatedData = {
-        name: btoa("Lucas Mair"),
-        street: btoa("995 Market St, Floor 8"),
-        city: btoa("San Francisco, CA 94103"),
-        country: btoa("United States"),
-        email: btoa("contact@provigen.ai")
-    };
-
-    if (!showContent) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <p className="text-muted">Loading...</p>
-            </div>
-        );
-    }
-
     return (
         <div className="min-h-screen pt-40 pb-24 px-12 lg:px-[18%] relative">
             <a href="/" className="absolute top-5 left-6 lg:left-8 inline-flex items-center gap-2 text-sm text-[#6c7793] hover:text-[#090E34] transition-colors">
@@ -43,20 +16,23 @@ const LegalNotice = () => {
                 <div>
                     <h2 className="text-base font-semibold text-navy mb-2">Service Provider</h2>
                     <p className="text-muted">ProviGenAI Inc.</p>
-                    <p className="text-muted">{atob(obfuscatedData.name)}</p>
+                    <p className="text-muted">Lucas Mair, authorized representative</p>
                 </div>
 
                 <div>
                     <h2 className="text-base font-semibold text-navy mb-2">Address</h2>
-                    <p className="text-muted">{atob(obfuscatedData.street)}</p>
-                    <p className="text-muted">{atob(obfuscatedData.city)}</p>
-                    <p className="text-muted">{atob(obfuscatedData.country)}</p>
+                    <p className="text-muted">995 Market St, Floor 8</p>
+                    <p className="text-muted">San Francisco, CA 94103</p>
+                    <p className="text-muted">United States</p>
                 </div>
 
                 <div>
                     <h2 className="text-base font-semibold text-navy mb-2">Contact</h2>
                     <p className="text-muted">
-                        Email: {atob(obfuscatedData.email).replace('@', '[at]').replace('.', '[dot]')}
+                        Email:{" "}
+                        <a href="mailto:contact@provigen.ai" className="underline underline-offset-4 hover:text-navy">
+                            contact@provigen.ai
+                        </a>
                     </p>
                 </div>
 

@@ -1,32 +1,4 @@
-"use client";
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-
 const PrivacyPolicy = () => {
-  const [showContent, setShowContent] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowContent(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const obfuscatedData = {
-    name: btoa("Lucas Mair"),
-    company: btoa("ProviGenAI Inc."),
-    street: btoa("995 Market St, Floor 8"),
-    city: btoa("San Francisco, CA 94103"),
-    country: btoa("United States"),
-    email: btoa("contact@provigen.ai")
-  };
-
-  if (!showContent) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted">Loading...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen pt-40 pb-24 px-12 lg:px-[18%] relative">
       <a href="/" className="absolute top-5 left-6 lg:left-8 inline-flex items-center gap-2 text-sm text-[#6c7793] hover:text-[#090E34] transition-colors">
@@ -44,17 +16,36 @@ const PrivacyPolicy = () => {
 
         <section>
           <h2 className="text-base font-semibold text-navy mb-2">Responsible Party</h2>
-          <p className="text-muted">{atob(obfuscatedData.company)}</p>
-          <p className="text-muted">{atob(obfuscatedData.name)}</p>
+          <p className="text-muted">ProviGenAI Inc.</p>
+          <p className="text-muted">Lucas Mair</p>
         </section>
 
         <section>
           <h2 className="text-base font-semibold text-navy mb-2">Address</h2>
-          <p className="text-muted">{atob(obfuscatedData.street)}</p>
-          <p className="text-muted">{atob(obfuscatedData.city)}</p>
-          <p className="text-muted">{atob(obfuscatedData.country)}</p>
+          <p className="text-muted">995 Market St, Floor 8</p>
+          <p className="text-muted">San Francisco, CA 94103</p>
+          <p className="text-muted">United States</p>
           <p className="text-muted mt-2">
-            Email: {atob(obfuscatedData.email).replace('@', '[at]').replace('.', '[dot]')}
+            Email:{" "}
+            <a href="mailto:contact@provigen.ai" className="underline underline-offset-4 hover:text-navy">
+              contact@provigen.ai
+            </a>
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-semibold text-navy mb-2">
+            Representative in the European Union
+          </h2>
+          <p className="text-muted leading-relaxed">
+            Pursuant to Art. 27 GDPR, our representative in the European Union
+            is Lucas Mair, reachable at{" "}
+            <a href="mailto:contact@provigen.ai" className="underline underline-offset-4 hover:text-navy">
+              contact@provigen.ai
+            </a>
+            . Data subjects and supervisory authorities may contact the
+            representative on all matters relating to the processing of personal
+            data.
           </p>
         </section>
 
