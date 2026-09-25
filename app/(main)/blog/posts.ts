@@ -18,6 +18,18 @@ export const blogPosts: BlogPostMeta[] = [
     excerpt:
       "A practical walkthrough of active learning campaigns across assay optimization, therapeutic design, and media formulation.",
   },
+  {
+    // Hidden: reachable only via the direct URL /blog/manifesto.
+    // Not listed on the blog index and not indexed by search engines.
+    id: 5,
+    slug: "manifesto",
+    title: "Manifesto",
+    date: "September 25, 2026",
+    author: "ProviGen Team",
+    excerpt:
+      "Laboratory automation infrastructure already exists. It is waiting for its intelligence upgrade.",
+    hidden: true,
+  },
   // {
   //   id: 2,
   //   slug: null,

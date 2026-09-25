@@ -150,6 +150,33 @@ body.workshop-page section.pb-\[120px\] {
   @apply text-2xl sm:text-3xl font-semibold text-[#090E34] mt-20 mb-8;
 }
 
+.prose-blog h3 {
+  font-family: "Source Serif 4", Georgia, serif;
+  @apply text-xl sm:text-2xl font-semibold text-[#090E34] mt-12 mb-5;
+}
+
+.prose-blog strong {
+  @apply font-semibold text-[#090E34];
+}
+
+/* Opening statement of a section */
+.prose-blog .lead {
+  @apply text-xl sm:text-2xl leading-[1.6] text-[#090E34] font-medium mb-8;
+}
+
+/* Centered emphasis line, e.g. a loop or a progression */
+.prose-blog .callout {
+  font-family: "IBM Plex Mono", Menlo, monospace;
+  @apply text-sm sm:text-base leading-[1.9] text-[#090E34] font-medium text-center
+    bg-white border border-[#e8e6e1] rounded-lg px-6 py-6 my-10;
+}
+
+/* Standalone claim set off from the body text */
+.prose-blog .pullquote {
+  @apply border-l-[3px] border-[#4A6CF7]/40 pl-6 my-10 py-1
+    text-xl leading-[1.6] text-[#090E34] font-medium;
+}
+
 .prose-blog a {
   @apply text-[#4A6CF7] underline decoration-dotted decoration-[#4A6CF7]/40 underline-offset-4;
 }

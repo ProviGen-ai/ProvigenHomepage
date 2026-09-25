@@ -2,6 +2,9 @@
   "name": "startup-nextjs-template",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
@@ -26,7 +29,7 @@
     "resend": "^6.9.3"
   },
   "devDependencies": {
-    "@types/node": "^18.15.11",
+    "@types/node": "^24.13.6",
     "@types/react": "^18.0.34",
     "@types/react-plotly.js": "^2.6.4",
     "autoprefixer": "^10.4.13",

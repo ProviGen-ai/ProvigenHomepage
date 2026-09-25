@@ -26,33 +26,35 @@ export default function BlogPage() {
           </h1>
 
           <div>
-            {blogPosts.map((post, index) => {
-              const card = (
-                <article
-                  key={post.id}
-                  className={`py-8 ${index !== 0 ? "border-t border-white/10" : ""}`}
-                >
-                  <div className="font-mono text-xs text-white/30 mb-2 tracking-wide">
-                    {post.date}
-                  </div>
-                  <h2 className="text-xl sm:text-2xl font-medium text-white mb-2 leading-snug">
-                    {post.title}
-                  </h2>
-                  <p className="text-sm text-white/50 leading-relaxed max-w-2xl">
-                    {post.excerpt}
-                  </p>
-                </article>
-              );
-
-              if (post.slug) {
-                return (
-                  <Link key={post.id} href={`/blog/${post.slug}`} className="block hover:bg-white/[0.03] -mx-4 px-4 rounded-md transition-colors">
-                    {card}
-                  </Link>
+            {blogPosts
+              .filter((post) => !post.hidden)
+              .map((post, index) => {
+                const card = (
+                  <article
+                    key={post.id}
+                    className={`py-8 ${index !== 0 ? "border-t border-white/10" : ""}`}
+                  >
+                    <div className="font-mono text-xs text-white/30 mb-2 tracking-wide">
+                      {post.date}
+                    </div>
+                    <h2 className="text-xl sm:text-2xl font-medium text-white mb-2 leading-snug">
+                      {post.title}
+                    </h2>
+                    <p className="text-sm text-white/50 leading-relaxed max-w-2xl">
+                      {post.excerpt}
+                    </p>
+                  </article>
                 );
-              }
-              return card;
-            })}
+
+                if (post.slug) {
+                  return (
+                    <Link key={post.id} href={`/blog/${post.slug}`} className="block hover:bg-white/[0.03] -mx-4 px-4 rounded-md transition-colors">
+                      {card}
+                    </Link>
+                  );
+                }
+                return card;
+              })}
           </div>
         </div>
       </section>
