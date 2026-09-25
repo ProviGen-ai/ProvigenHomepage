@@ -40,8 +40,8 @@ const PrivacyPolicy = () => {
           <p className="text-muted leading-relaxed">
             Pursuant to Art. 27 GDPR, our representative in the European Union
             is Lucas Mair, reachable at{" "}
-            <a href="mailto:contact@provigen.ai" className="underline underline-offset-4 hover:text-navy">
-              contact@provigen.ai
+            <a href="mailto:privacy@provigen.ai" className="underline underline-offset-4 hover:text-navy">
+              privacy@provigen.ai
             </a>
             . Data subjects and supervisory authorities may contact the
             representative on all matters relating to the processing of personal
@@ -142,7 +142,11 @@ const PrivacyPolicy = () => {
             <li>Right to withdraw consent at any time</li>
           </ul>
           <p className="text-muted leading-relaxed">
-            To exercise these rights, please contact us using the information above.
+            To exercise these rights, contact{" "}
+            <a href="mailto:privacy@provigen.ai" className="underline underline-offset-4 hover:text-navy">
+              privacy@provigen.ai
+            </a>
+            .
           </p>
         </section>
 
