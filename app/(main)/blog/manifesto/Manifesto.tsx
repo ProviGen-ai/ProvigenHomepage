@@ -159,8 +159,8 @@ export default function Manifesto() {
 
             <p>
               OpenAI connected GPT-5 to Ginkgo Bioworks&apos; automated
-              laboratory. Across six experimental rounds and more than 36,000
-              reactions, the system established a new low-cost benchmark for
+              laboratory. Across more than 36,000 reactions, the system
+              established a new low-cost benchmark for
               cell-free protein synthesis and reduced protein-production cost by{" "}
               <strong>40%</strong>.
             </p>
@@ -214,11 +214,6 @@ export default function Manifesto() {
               ProviGenAI provides that intelligence upgrade.
             </p>
 
-            <p>
-              We connect scientific AI to existing laboratory automation so that
-              every result can change what happens next.
-            </p>
-
             <hr />
 
             {/* ---- We make existing laboratories adaptive ---- */}
@@ -246,8 +241,8 @@ export default function Manifesto() {
             </p>
 
             <p>
-              ProviGenAI turns this existing infrastructure into a distributed
-              network for closed-loop experimentation.
+              ProviGenAI turns this infrastructure into a distributed network
+              for closed-loop experimentation.
             </p>
 
             <p>
@@ -294,13 +289,7 @@ export default function Manifesto() {
                 AI coding agents materially reduce the engineering cost of
                 connecting heterogeneous software systems
               </strong>
-              , generating adapters, translating schemas, testing integrations,
-              and maintaining site-specific interfaces.
-            </p>
-
-            <p>
-              Because of that, a deployment can remain partially customized and
-              still support attractive unit economics.
+              .
             </p>
 
             <hr />
