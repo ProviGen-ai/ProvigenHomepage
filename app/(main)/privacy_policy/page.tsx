@@ -12,7 +12,7 @@ const PrivacyPolicy = () => {
 
   const obfuscatedData = {
     name: btoa("Lucas Mair"),
-    company: btoa("ProviGenAI"),
+    company: btoa("ProviGen"),
     street: btoa("Fritz-Meyer-Weg 22"),
     city: btoa("81925 Munich"),
     country: btoa("Germany"),

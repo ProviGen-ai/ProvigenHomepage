@@ -24,7 +24,7 @@ const Footer = () => {
               <Logo className="h-12 w-auto text-white/60 hover:text-white transition-colors" />
             </Link>
             <p className="text-xs text-white/40">
-              &copy; {new Date().getFullYear()} ProviGenAI
+              &copy; {new Date().getFullYear()} ProviGen
             </p>
             <a
               href="mailto:contact@provigen.ai"

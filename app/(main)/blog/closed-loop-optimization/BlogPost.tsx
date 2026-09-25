@@ -260,7 +260,7 @@ export default function BlogPost() {
                 </li>
               </ul>
               <p>
-                ProviGenAI focuses on this last category, combining active
+                ProviGen focuses on this last category, combining active
                 learning with end-to-end campaign execution.
               </p>
 

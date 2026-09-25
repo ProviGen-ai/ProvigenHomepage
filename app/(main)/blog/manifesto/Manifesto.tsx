@@ -211,7 +211,7 @@ export default function Manifesto() {
             </p>
 
             <p className="pullquote">
-              ProviGenAI provides that intelligence upgrade.
+              ProviGen provides that intelligence upgrade.
             </p>
 
             <hr />
@@ -241,7 +241,7 @@ export default function Manifesto() {
             </p>
 
             <p>
-              ProviGenAI turns this infrastructure into a distributed network
+              ProviGen turns this infrastructure into a distributed network
               for closed-loop experimentation.
             </p>
 
@@ -278,7 +278,7 @@ export default function Manifesto() {
 
             <p>
               Schedulers and orchestration platforms abstract much of the
-              underlying hardware complexity, allowing ProviGenAI to integrate
+              underlying hardware complexity, allowing ProviGen to integrate
               at the workflow layer rather than writing direct drivers for every
               instrument.
             </p>
@@ -300,7 +300,7 @@ export default function Manifesto() {
             </h2>
 
             <p>
-              The larger opportunity begins once ProviGenAI operates across
+              The larger opportunity begins once ProviGen operates across
               multiple experimental environments.
             </p>
 
@@ -313,16 +313,16 @@ export default function Manifesto() {
             <p>The critical comparison is:</p>
 
             <p className="callout">
-              ProviGenAI starting cold
+              ProviGen starting cold
               <br />
               <span className="text-[#6c7793] font-normal">vs.</span>
               <br />
-              ProviGenAI starting warm with relevant prior experimental
+              ProviGen starting warm with relevant prior experimental
               experience
             </p>
 
             <p>
-              If the second requires materially fewer experiments, ProviGenAI
+              If the second requires materially fewer experiments, ProviGen
               begins to accumulate critical process data that cannot be easily
               recreated.
             </p>
@@ -388,7 +388,7 @@ export default function Manifesto() {
               world.
             </p>
 
-            <p>Over time, ProviGenAI can accumulate:</p>
+            <p>Over time, ProviGen can accumulate:</p>
 
             <ul>
               <li>process dynamics</li>
@@ -516,7 +516,7 @@ export default function Manifesto() {
             <h3>2. Repeatability</h3>
 
             <p>
-              We will show that ProviGenAI can integrate and create similar
+              We will show that ProviGen can integrate and create similar
               value across additional sites and workflows without deployment
               costs overwhelming site economics.
             </p>
@@ -563,7 +563,7 @@ export default function Manifesto() {
             </p>
 
             <p>
-              ProviGenAI makes individual laboratories adaptive today and turns
+              ProviGen makes individual laboratories adaptive today and turns
               them into nodes of a distributed learning network over time.
             </p>
 
