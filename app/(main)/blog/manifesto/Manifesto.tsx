@@ -6,7 +6,6 @@ import { postsBySlug } from "../posts";
 const post = postsBySlug["manifesto"];
 
 const sections = [
-  { id: "new-era", label: "A new era" },
   { id: "intelligence-upgrade", label: "The intelligence upgrade" },
   { id: "existing-labs", label: "Existing laboratories" },
   { id: "integration", label: "Integration cost" },
@@ -68,8 +67,7 @@ export default function Manifesto() {
               Manifesto
             </div>
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl leading-tight font-normal text-[#090E34] mb-10">
-              The laboratory automation infrastructure already exists. It is
-              waiting for its intelligence upgrade.
+              Biotech is entering a new era
             </h1>
             <div className="grid md:grid-cols-[120px_1fr] gap-x-6 gap-y-1 font-mono text-sm text-[#090E34]">
               <span className="text-[#6c7793]">Published</span>
@@ -116,11 +114,7 @@ export default function Manifesto() {
 
           {/* Main content */}
           <div className="prose-blog">
-            {/* ---- Biotech is entering a new era ---- */}
-            <h2 id="new-era" className="scroll-mt-16 !mt-0">
-              Biotech is entering a new era
-            </h2>
-
+            {/* ---- Biotech is entering a new era (title section, heading is the h1) ---- */}
             <p className="lead">
               Lab-in-the-loop is becoming the new operating model for
               biotechnology.
