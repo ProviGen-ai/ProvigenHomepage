@@ -63,9 +63,6 @@ export default function Manifesto() {
         {/* Header - full width centered */}
         <div className="max-w-3xl mx-auto px-4 md:px-12 mb-16">
           <header>
-            <div className="font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8b90a0] mb-6">
-              Manifesto
-            </div>
             {/* Fluid size + nowrap: the title always occupies exactly one
                 line, scaling down on narrow screens instead of wrapping. */}
             <h1 className="font-serif text-[clamp(1.25rem,7vw,3.25rem)] whitespace-nowrap leading-tight font-normal text-[#090E34] mb-10">
