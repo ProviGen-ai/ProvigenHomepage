@@ -1,0 +1,286 @@
+/* Section 4b · A look inside */
+.in-inside {
+  position: relative;
+  /* The band is the whole section: Build's foot is the paper gap before it,
+     and the Team section brings its own air after it. */
+  padding-block: 0;
+  color: var(--c-ink);
+}
+/* "A look inside" stands on the shared dawn field (Dawn.css): no tone or
+   rules of its own, so the light runs on into the team. */
+.in-band {
+  padding-block: clamp(4.5rem, 3rem + 5vw, 8rem) clamp(3.5rem, 2.5rem + 4vw, 6.5rem);
+  overflow: hidden;
+}
+/* Small notes in muted, which keeps AA on the mist (faint would not). */
+.in-band .s-source {
+  color: var(--c-muted);
+}
+
+/* ---------- Part 1 · Film ---------- */
+
+/* No isolation here (4 Oct 2026): the stage below has to blend with the dawn field itself. */
+.in-film {
+  position: relative;
+}
+/*
+ * The film is the paper cut (4 Oct 2026): ink and teal on pure white, rendered for the page.
+ * Multiplied onto the dawn field, its white ground is the field itself, grain included, so
+ * the film has no frame and no edge. Nothing between this stage and .d-dawn may create a
+ * stacking context (transform, opacity, filter, isolation), or the blend sees only a
+ * transparent group and the white shows: the reveal therefore rises the stage itself.
+ */
+.in-film-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  mix-blend-mode: multiply;
+  container-type: inline-size;
+}
+/* The film's opening line, set over the clean poster (the section h2). */
+.in-film-head {
+  position: absolute;
+  inset: 8.5% 6% auto;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  pointer-events: none;
+}
+/* The display face (PP Supply Mono Ultralight), as every heading since 3 Oct 2026. */
+.in-film-title {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: max(1.1rem, 3.9cqi);
+  line-height: 1.1;
+  letter-spacing: var(--d-track-l);
+  text-align: center;
+  text-wrap: balance;
+  color: var(--c-ink);
+}
+.in-film-title > span {
+  display: block;
+}
+/* The smallest posters (a 320 px phone): the floor would break the first line
+   in two and push "Different result." onto the play button; 16 px keeps it to
+   two lines clear of it. */
+@container (max-width: 280px) {
+  .in-film-title {
+    font-size: 1rem;
+  }
+}
+.in-film-title em {
+  font-family: inherit;
+  font-weight: inherit;
+  font-style: normal;
+  letter-spacing: inherit;
+  color: var(--c-teal-ink);
+}
+.in-film-poster {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.in-film-poster img {
+  object-fit: cover;
+  transition: transform 1.4s var(--e-out);
+}
+.in-film-poster::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(75% 75% at 50% 50%, transparent 55%, rgb(5 14 12 / 38%) 100%);
+  pointer-events: none;
+}
+.in-film-poster:hover img {
+  transform: scale(1.025);
+}
+/* The ring is drawn on the vignette layer, which paints above the poster image. */
+.in-film-poster:focus-visible {
+  outline: none;
+}
+.in-film-poster:focus-visible::after {
+  outline: 2px solid var(--c-paper);
+  outline-offset: -10px;
+}
+/* Centred on the poster's protocol hub, between the two dishes. */
+.in-play {
+  position: absolute;
+  left: 50%;
+  top: 56.5%;
+  z-index: 2;
+  translate: -50% -50%;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: clamp(0.5rem, 1vw, 0.9rem);
+  width: clamp(68px, 11.8%, 156px);
+  aspect-ratio: 1;
+  background: var(--c-paper);
+  color: var(--c-ink);
+  transition:
+    background-color 260ms ease,
+    transform 600ms var(--e-out);
+}
+.in-play-icon {
+  width: clamp(22px, 2.3vw, 32px);
+  height: auto;
+  fill: currentColor;
+  transform: translateX(6%);
+}
+.in-play-text {
+  font-family: var(--f-mono);
+  font-size: clamp(0.5625rem, 0.5rem + 0.2vw, 0.6875rem);
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.in-film-poster:hover .in-play,
+.in-film-poster:focus-visible .in-play {
+  background: var(--c-orange);
+  transform: scale(1.04);
+}
+.in-play-sonar {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgb(248 244 239 / 80%);
+  animation: in-sonar 2.8s var(--e-out) infinite;
+  pointer-events: none;
+}
+@keyframes in-sonar {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+.in-film-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* White is the field under the multiply blend, so nothing shows before the poster loads. */
+  background: #fff;
+}
+.in-film-video:focus-visible {
+  outline: 2px solid var(--c-ink);
+  outline-offset: -10px;
+}
+/* The film's two small controls (it plays by itself since 4 Oct 2026): Pause
+   and Sound, ink on the paper film. Bottom left since 4 Oct 2026: at the right
+   they covered the film's own "Illustrative data" mark (its only disclosure
+   since the caption went), and on paper its letters showed around them. The
+   bottom-left corner is empty in every scene. */
+.in-film-ctl {
+  position: absolute;
+  z-index: 3;
+  left: clamp(10px, 1.6cqi, 22px);
+  bottom: clamp(10px, 1.6cqi, 22px);
+  display: flex;
+  gap: 6px;
+}
+.in-film-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 30px;
+  padding: 0 0.7rem;
+  border: 1px solid var(--c-line-2);
+  /* White under the multiply blend is the field itself: the film behind is veiled, not boxed. */
+  background: rgb(255 255 255 / 72%);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: var(--c-ink);
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease;
+}
+.in-film-btn svg {
+  flex: none;
+  width: 11px;
+  height: 11px;
+  fill: currentColor;
+}
+.in-film-btn:hover {
+  border-color: var(--c-ink);
+  background: rgb(255 255 255 / 92%);
+}
+.in-film-btn:focus-visible {
+  outline: 2px solid var(--c-ink);
+  outline-offset: 2px;
+}
+@media (pointer: coarse) {
+  .in-film-btn {
+    min-height: 44px;
+  }
+}
+/* The voice-over as text, closed by default (R25, 3 Oct 2026). It takes the place
+   of the caption, which was removed (founder, 4 Oct 2026). */
+.in-transcript {
+  margin-top: 1.1rem;
+}
+.in-transcript summary {
+  display: inline-block;
+  cursor: pointer;
+  color: var(--c-muted);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+}
+.in-transcript summary::-webkit-details-marker {
+  display: none;
+}
+.in-transcript summary:hover {
+  color: var(--c-ink);
+}
+.in-transcript p {
+  max-width: 64ch;
+  margin-top: 0.9rem;
+  font-family: var(--f-serif);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--c-ink);
+}
+
+/* ---------- Motion off ---------- */
+html[data-motion='paused'] .in-play-sonar {
+  animation: none !important;
+}
+html[data-motion='paused'] .in-play-sonar {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion='playing']) .in-play-sonar {
+    animation: none !important;
+  }
+  html:not([data-motion='playing']) .in-play-sonar {
+    opacity: 0;
+  }
+}
+
+/* Film captions in the site's mono register (PP Supply Mono Regular). */
+.in-film-video::cue {
+  background: rgb(19 19 18 / 78%);
+  color: #f8f4ef;
+  font-family: 'PP Supply Mono', 'Geist Mono', ui-monospace, monospace;
+  line-height: 1.4;
+}

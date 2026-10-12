@@ -1,0 +1,258 @@
+/* /ai-labs figures (components/audiences/ailabs). All classes al-*. */
+.al-fig {
+  position: relative;
+}
+.al-box {
+  position: relative;
+  width: 100%;
+  /* the first paint's shape; usePlate sets the layout's own ratio */
+  aspect-ratio: 760 / 510;
+}
+.al-box > canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* by the figure's own width, as the script picks its layout (propose.ts), so the box does not jump on hydration */
+.al-propose {
+  container-type: inline-size;
+}
+@container (width < 639.5px) {
+  .al-box--propose {
+    aspect-ratio: 520 / 480;
+  }
+}
+
+/* The house pause control (as on the homepage loop and the /biopharma pair). */
+.al-play {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--c-line-2);
+  background: none;
+  color: var(--c-muted);
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
+}
+.al-play svg {
+  width: 12px;
+  height: 12px;
+  flex: none;
+}
+@media (hover: hover) {
+  .al-play:hover {
+    color: var(--c-ink);
+    border-color: var(--c-line-3);
+  }
+}
+.al-play:focus-visible {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 3px;
+}
+@media (pointer: coarse) {
+  .al-play::before {
+    content: '';
+    position: absolute;
+    inset: -7px;
+  }
+}
+
+/* ---------- For your models: three cards ---------- */
+.al-cards-wrap {
+  position: relative;
+}
+.al-cards {
+  list-style: none;
+  margin: 0;
+  padding: clamp(1.5rem, 1rem + 1.5vw, 2.5rem) 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--sp-col-gap);
+  row-gap: 3rem;
+}
+/* Each card's figure: a hairline SVG that fills in once seen (ModelCards.tsx). */
+.al-art {
+  border-bottom: 1px solid var(--c-line-2);
+  padding-bottom: 0.5rem;
+}
+.al-art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.al-tag {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  fill: var(--c-muted);
+}
+.al-seq {
+  font-family: var(--f-mono);
+  font-size: 14px;
+  letter-spacing: 0.16em;
+  fill: rgb(19 19 18 / 62%);
+}
+.al-seq .is-changed {
+  fill: var(--c-teal-ink);
+  font-weight: 700;
+}
+/* protein: each measured property fills in, its strength as teal opacity */
+.al-cellv {
+  fill: var(--c-teal);
+  fill-opacity: 0;
+  stroke: var(--c-line-2);
+  stroke-width: 1;
+  transition: fill-opacity 700ms ease;
+  transition-delay: var(--d, 0s);
+}
+.is-in .al-cellv {
+  fill-opacity: calc(0.12 + 0.78 * var(--o));
+}
+/* cells: appear time point by time point, smaller and fainter where they respond */
+.al-cell {
+  opacity: 0;
+  transform: scale(0.6);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    opacity 700ms ease,
+    transform 900ms var(--e-out);
+  transition-delay: var(--d, 0s);
+}
+.is-in .al-cell {
+  opacity: var(--fade);
+  transform: none;
+}
+.al-cell-wall {
+  fill: rgb(162 208 190 / 28%);
+  stroke: var(--c-teal-ink);
+  stroke-width: 1.2;
+}
+.al-cell-core {
+  fill: var(--c-teal);
+}
+/* DNA and RNA: the strand, its designed region, and each variant's expression */
+.al-strand {
+  stroke: var(--c-ink);
+  stroke-opacity: 0.6;
+  stroke-width: 1.2;
+}
+.al-rung {
+  stroke: var(--c-ink);
+  stroke-opacity: 0.25;
+  stroke-width: 1;
+}
+.al-region {
+  fill: rgb(66 145 149 / 14%);
+  stroke: var(--c-teal);
+  stroke-width: 1.4;
+}
+.al-zoom {
+  fill: none;
+  stroke: var(--c-teal);
+  stroke-opacity: 0.6;
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.al-variant {
+  opacity: 0;
+  transition: opacity 600ms ease;
+  transition-delay: var(--d, 0s);
+}
+.is-in .al-variant {
+  opacity: 1;
+}
+.al-bar-track {
+  fill: rgb(19 19 18 / 6%);
+}
+.al-bar {
+  fill: var(--c-teal);
+  transform: scaleX(0);
+  transform-box: fill-box;
+  transform-origin: left;
+  transition: transform 1.2s var(--e-out);
+  transition-delay: calc(var(--d, 0s) + 0.3s);
+}
+.is-in .al-bar {
+  transform: none;
+}
+html[data-motion='paused'] :is(.al-cellv, .al-cell, .al-variant, .al-bar) {
+  transition: none !important;
+}
+.al-card-name {
+  margin-top: 1.25rem;
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(1.25rem, 0.95rem + 0.8vw, 1.8rem);
+  line-height: 1.1;
+  letter-spacing: var(--d-track-l);
+}
+.al-card-line {
+  margin-top: 0.6rem;
+  max-width: 36ch;
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  line-height: 1.45;
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+@media (max-width: 899px) {
+  .al-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .al-art {
+    max-width: 30rem;
+  }
+}
+
+/* ---------- The BindCraft example: a thousand designs, two plates (BinderMap.tsx) ---------- */
+.al-bm {
+  position: relative;
+}
+.al-bm-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.al-bm-dot {
+  fill: rgb(19 19 18 / 28%);
+  stroke: none;
+  transition:
+    r 500ms var(--e-out),
+    fill 500ms ease,
+    stroke 400ms ease;
+}
+.al-bm-dot.is-picked {
+  fill: var(--c-paper);
+  stroke: var(--c-teal-ink);
+  stroke-width: 1.4;
+}
+.al-bm-dot.is-hit {
+  fill: var(--c-orange);
+  stroke: var(--c-amber-ink);
+}
+.al-bm-dot.is-miss {
+  fill: rgb(19 19 18 / 30%);
+  stroke: rgb(19 19 18 / 40%);
+}
+.al-play--bm {
+  left: auto;
+  right: 0;
+}
+html[data-motion='paused'] .al-bm-dot {
+  transition: none !important;
+}

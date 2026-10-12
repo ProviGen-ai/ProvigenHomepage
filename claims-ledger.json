@@ -1,0 +1,149 @@
+{
+  "_about": "Disclosure gate ledger (competitor review R02, 3 Oct 2026). scripts/check-claims.mjs scans the built HTML for placeholders ([TBC], TODO, lorem) and for figures (percentages, multipliers, x-fold). Every figure on a page must be listed here; a production build (SITE_ENV=production) fails on any placeholder, any unlisted figure and any listed figure that is not signed off. Other builds only report. To sign off: set signedOff to true and fill by and date. Not served: this file lives outside public/.",
+  "claims": [
+    {
+      "id": "evidence-hebenstreit-100x",
+      "pages": [
+        "/"
+      ],
+      "figures": [
+        "100×"
+      ],
+      "what": "Peer-reviewed modelled analysis (Hebenstreit, Convalexius et al., Scientific Reports 2026), the second evidence line under the film: even with thinking 100× faster, lab time becomes the bottleneck.",
+      "signedOff": true,
+      "by": "founder, v3 copy deck",
+      "date": "2026-10-01"
+    },
+    {
+      "id": "forecast-probabilities",
+      "pages": [
+        "*"
+      ],
+      "figures": [
+        "55%",
+        "55 %",
+        "30%",
+        "30 %",
+        "45%",
+        "45 %",
+        "70%",
+        "70 %",
+        "40%",
+        "40 %",
+        "0.1%",
+        "0.1 %",
+        "100%",
+        "50%"
+      ],
+      "what": "The six forecast probabilities of forecast registry v0.2 (and the chart's 50% and 100% axis labels), on the forecast card that /writings and the essays' Next cards show, and in the forecast essay.",
+      "signedOff": false,
+      "by": null,
+      "date": null,
+      "note": "HANDOFF item 3 and the 9 Sep disclosure doc (sensitive forecasts): the founder signs off publishing the probabilities, or they come off the card and the essay before production."
+    },
+    {
+      "id": "forecast-essay-citations",
+      "pages": [
+        "/writings/cheap-thought-costly-evidence"
+      ],
+      "figures": "*",
+      "what": "Cited external figures in the forecast essay (each with a numbered reference): benchmark cost trends, trial success rates, the Narayanan et al. 3–30× range, the cost-per-gram reduction and others.",
+      "signedOff": false,
+      "by": null,
+      "date": null,
+      "note": "Goes with forecast-probabilities: sign off both together."
+    },
+    {
+      "id": "field-note-media-fractions",
+      "pages": [
+        "/writings/closed-loop-optimization"
+      ],
+      "figures": [
+        "100%"
+      ],
+      "what": "Not a claim: the media-blend arithmetic in the PBMC figure caption (100% − DMEM − RPMI-1640).",
+      "signedOff": true,
+      "by": "not a performance figure",
+      "date": "2026-10-03"
+    },
+    {
+      "id": "field-note-simulation-noise",
+      "pages": [
+        "/writings/closed-loop-optimization"
+      ],
+      "figures": [
+        "2%"
+      ],
+      "what": "Not a claim: a parameter of the live simulation (measurement noise of 2% of the test function's range), stated in footnote 2.",
+      "signedOff": true,
+      "by": "not a performance figure",
+      "date": "2026-10-03"
+    },
+    {
+      "id": "manifesto-figures",
+      "pages": [
+        "/writings/manifesto"
+      ],
+      "figures": [
+        "5×",
+        "40%"
+      ],
+      "what": "The data-room manifesto, published verbatim on the founder's call (4 Oct 2026). '5×' is ProviGen's own preliminary pilot figure (sample efficiency). '40%' is the OpenAI/Ginkgo preprint's cost reduction per gram of sfGFP in cell-free synthesis versus the best published value (reference 8 says so).",
+      "signedOff": false,
+      "by": null,
+      "date": null,
+      "note": "Founder: sign off the 5× pilot figure (methodology packet: baseline, scope, n) and the 40% wording before production, or reword."
+    },
+    {
+      "id": "third-party-frey-binders",
+      "pages": [
+        "/writings/antibody-discovery",
+        "/writings/three-papers-lab-in-the-loop"
+      ],
+      "figures": [
+        "2%",
+        "21%"
+      ],
+      "what": "Frey et al. (bioRxiv preprint v3, Nov 2025, Genentech/Roche): the share of designs binding at least 3x better than their seed rose from about 2% in round 1 to over 21% in round 4 (p. 8, Table 1). Third-party result, attributed on the page.",
+      "signedOff": false,
+      "by": null,
+      "date": null,
+      "note": "Third-party figure; founder signs off before production (preprint status re-checked at publish time)."
+    },
+    {
+      "id": "third-party-demeo-hitrate",
+      "pages": [
+        "/writings/three-papers-lab-in-the-loop"
+      ],
+      "figures": [
+        "19.6%",
+        "1.1%"
+      ],
+      "what": "DeMeo et al., Science 2025: megakaryocyte hit rate 19.6% for model-ranked compounds vs 1.1% for random picks (in vitro, small random arm). Third-party result, attributed on the page.",
+      "signedOff": false,
+      "by": null,
+      "date": null,
+      "note": "Third-party figure; founder signs off before production."
+    },
+    {
+      "id": "biopharma-case-study",
+      "pages": [
+        "/biopharma"
+      ],
+      "figures": [
+        "30%",
+        "30 %"
+      ],
+      "what": "ProviGen's own case study from the founders' Merck LNP deck (slide 7, 8 Oct 2026): enzymatic assay optimisation with an industry partner on two robotic HTS workcells, ~200 samples with DoE against ~40 with active learning, assay precision about 30% better. The deck's ~$10k-per-round saving and '5x' are not on the page.",
+      "signedOff": false,
+      "by": null,
+      "date": null,
+      "note": "Founder signs off publishing ProviGen figures (CLAUDE.md: no ProviGen metrics without it); the partner approves the wording; Lucas names the precision measure (CV?). The ~200 and ~40 counts are not caught by the scanner but belong to this claim."
+    }
+  ],
+  "manual": [
+    "The film (public/assets/v3/film.mp4) shows a baked-in 'Status · TBC' in stage 03: re-render it with the confirmed status before production (HANDOFF).",
+    "Instrument classes in the hero subline stay out until engineering confirms them.",
+    "Team: Thejas Nagaraju's title (Founding team or Co-founder) needs the founders' word (the footer shows no city since 4 Oct 2026)."
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "teamTitle": "Our Team",
+  "backers": [
+    {
+      "name": "FR8",
+      "image": "/assets/provigen/fr8.svg",
+      "url": "https://www.fr8.so/"
+    },
+    {
+      "name": "EWOR",
+      "image": "/assets/provigen/ewor.svg",
+      "url": "https://www.ewor.com/"
+    }
+  ],
+  "team": [
+    {
+      "name": "Magdalena Lang",
+      "firstName": "Magdalena",
+      "lastName": "Lang",
+      "role": "Co-Founder & CEO",
+      "shortBio": "Strategy, operations, fundraising. Background spans medicine and biomedical neuroscience (TU Munich), genome editing research at Harvard Medical School, and doctoral research at Boston Children’s Hospital. Turns deep bioprocess pain into a fundable product wedge.",
+      "image": "/assets/provigen/team/magdalena-lang.webp",
+      "imagePosition": "50% 0%",
+      "imageScale": 1.5,
+      "degree": "",
+      "institutions": ["harvard", "tum", "lmu"],
+      "imageOffsetY": "0%"
+    },
+    {
+      "name": "Lucas Mair",
+      "firstName": "Lucas",
+      "lastName": "Mair",
+      "role": "Co-Founder & CTO",
+      "shortBio": "AI, automation, product. MD-PhD candidate at TU Munich / Helmholtz Munich. Builds the closed-loop intelligence layer connecting biological readouts, decision-making, and existing lab automation infrastructure.",
+      "image": "/assets/provigen/team/lucas-mair.webp",
+      "imagePosition": "50% 0%",
+      "imageScale": 1.0,
+      "degree": "",
+      "institutions": ["tum"],
+      "imageOffsetY": "0%"
+    },
+    {
+      "name": "Constantin Convalexius, MD",
+      "firstName": "Constantin",
+      "lastName": "Convalexius",
+      "role": "Founding Engineer",
+      "shortBio": "Physician and researcher building physical AI for life-science laboratories, connecting experimental design, automated execution, and adaptive learning.",
+      "image": "/assets/provigen/team/constantin-convalexius.webp",
+      "imagePosition": "50% 0%",
+      "imageScale": 1.3,
+      "degree": "MD",
+      "institutions": ["harvard", "meduni-vienna"],
+      "imageOffsetY": "-7.5%"
+    },
+    {
+      "name": "Thejas Nagaraju, PhD",
+      "firstName": "Thejas",
+      "lastName": "Nagaraju",
+      "role": "Founding Team & CCO",
+      "shortBio": "Biotech go-to-market, partnerships, scale-up. Trained molecular biologist with 8+ years in life sciences and a track record building early-stage health ventures, translating bench research into commercial propositions. De-risks commercial adoption through CDMO/pharma access and pilot-to-partnership strategy.",
+      "image": "/assets/provigen/team/thejas-nagaraju.webp",
+      "imagePosition": "50% 0%",
+      "imageScale": 1.0,
+      "degree": "PhD",
+      "institutions": ["imperial", "uw-madison", "valneva"],
+      "imageOffsetY": "0%"
+    },
+    {
+      "name": "Cheng-Wei Liao",
+      "firstName": "Cheng-Wei",
+      "lastName": "Liao",
+      "role": "Forward Deployed Engineer",
+      "shortBio": "Machine-learning engineer from TUM, LMU and the Max Planck Society who built a state-of-the-art AI model for predicting mass spectra.",
+      "image": "/assets/provigen/team/cheng-wei-liao.webp",
+      "imagePosition": "50% 0%",
+      "imageScale": 1.0,
+      "degree": "",
+      "institutions": ["tum", "lmu", "max-planck"],
+      "imageOffsetY": "0%"
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+/*
+ * /ai-labs (7 Oct 2026; /frontier-labs before). All classes fl-*; the skeleton is
+ * components/pages/Subpage.css. The idea's three lines are set in the display
+ * face, as the principles on /careers.
+ */
+.fl-idea .sp-lines-text {
+  max-width: 34ch;
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(1.3rem, 0.9rem + 1.3vw, 2.25rem);
+  line-height: 1.14;
+  letter-spacing: var(--d-track-l);
+}
+@media (max-width: 900px) {
+  .fl-idea .sp-lines-text {
+    font-weight: 400;
+    letter-spacing: var(--d-track-s);
+  }
+}
+.fl-note {
+  margin-top: 1.25rem;
+}
+.fl-page .sp-close-title {
+  max-width: 28ch;
+}
+
+/* ---------- Without labels (8 Oct 2026): sections are set apart by space alone ---------- */
+.fl-page .sp-section--bare {
+  padding-top: clamp(3rem, 2rem + 4vw, 6rem);
+}
+.fl-idea .sp-lines-item:first-child {
+  border-top: 1px solid var(--c-line-2);
+}
+.fl-kicker {
+  color: var(--c-teal-ink);
+}
+.fl-planned {
+  color: var(--c-muted);
+}
+
+/* the example: two lines beside the map of designs */
+.fl-example-grid {
+  display: grid;
+  gap: clamp(1.5rem, 1rem + 2vw, 3rem);
+  align-items: center;
+}
+@media (min-width: 960px) {
+  .fl-example-grid {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  }
+}
+.fl-example-line {
+  margin: 1rem 0 0;
+  max-width: 32ch;
+  font-family: var(--f-display);
+  font-size: clamp(1.3rem, 1.05rem + 0.9vw, 1.9rem);
+  line-height: 1.2;
+  letter-spacing: var(--d-track);
+  text-wrap: balance;
+}
+.fl-example-line + .fl-example-line {
+  max-width: 44ch;
+  text-wrap: pretty;
+  font-family: var(--f-serif);
+  font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.3rem);
+  line-height: 1.45;
+  color: var(--c-muted);
+}
+
+.fl-lead {
+  margin: 0.9rem 0 0;
+  max-width: 40ch;
+  font-family: var(--f-display);
+  font-size: clamp(1.3rem, 1.05rem + 0.9vw, 1.9rem);
+  line-height: 1.2;
+  text-wrap: balance;
+}

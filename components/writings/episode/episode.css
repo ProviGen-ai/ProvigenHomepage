@@ -1,0 +1,207 @@
+/* The episode post (/writings/frameshifts-episode-15): the click-to-load
+   player in the article's lead slot, quote attributions with a time, and the
+   episode guide. Tokens from app/site.css; the frame and caption from
+   writings.css (.w-figure, .w-figcap). */
+
+/* ---------- Player ---------- */
+.ep .s-frame {
+  padding: clamp(1.6rem, 2.6vw, 2.1rem) clamp(0.5rem, 1.2vw, 0.85rem) clamp(0.5rem, 1.2vw, 0.85rem);
+}
+.ep-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--c-ink);
+  overflow: hidden;
+}
+.ep-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.ep-poster img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 220ms ease;
+}
+.ep-poster:hover img {
+  opacity: 0.86;
+}
+.ep-play {
+  position: absolute;
+  /* Centred in the thumbnail's free band between its quote and the show's
+     wordmark, which the button should not cover. */
+  left: 50%;
+  bottom: 19.5%;
+  translate: -50% 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 38px;
+  padding: 0 1rem;
+  border: 1px solid rgb(248 244 239 / 40%);
+  background: rgb(14 29 26 / 62%);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: var(--c-paper);
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.ep-play svg {
+  flex: none;
+  width: 11px;
+  height: 11px;
+  fill: currentColor;
+}
+.ep-poster:hover .ep-play {
+  border-color: var(--c-paper);
+  background: rgb(14 29 26 / 84%);
+}
+.ep-poster:focus-visible {
+  outline: 2px solid var(--c-teal);
+  outline-offset: 3px;
+}
+/* The whole poster is the button (and the touch target), so on narrow
+   screens the mark shrinks to a play icon that fits the thumbnail's band. */
+@media (max-width: 560px) {
+  .ep-play {
+    min-height: 28px;
+    width: 28px;
+    padding: 0;
+    justify-content: center;
+  }
+  .ep-play-label {
+    display: none;
+  }
+}
+.ep-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.ep-cap a {
+  color: var(--c-teal-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  white-space: nowrap;
+}
+
+/* ---------- Times in running text (t() in the content file) ---------- */
+.w-prose a.ep-t {
+  font-family: var(--f-mono);
+  font-size: 0.66em;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--c-teal-ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.w-prose a.ep-t::before {
+  content: '';
+  display: inline-block;
+  width: 0.5em;
+  height: 0.62em;
+  margin-right: 0.32em;
+  background: currentColor;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+.w-prose a.ep-t:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.w-prose a.ep-t:focus-visible {
+  outline: 2px solid var(--c-teal);
+  outline-offset: 2px;
+}
+
+/* ---------- Quotes from the episode ---------- */
+.w-prose blockquote.ep-quote p {
+  margin: 0;
+}
+.w-prose blockquote.ep-quote footer {
+  margin-top: 1rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  color: var(--c-faint);
+}
+.ep-quote-time {
+  color: var(--c-teal-ink);
+  text-decoration: none;
+}
+.ep-quote-time:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* ---------- Episode guide ---------- */
+.w-prose .ep-guide {
+  margin-top: 1.6rem;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--c-line-2);
+}
+.ep-guide li {
+  border-bottom: 1px solid var(--c-line-2);
+}
+.ep-guide-link {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  color: inherit;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+.ep-guide-link time {
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--c-teal-ink);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.ep-guide-title {
+  font-size: 1.0625rem;
+  line-height: 1.4;
+}
+.ep-guide-link:hover .ep-guide-title {
+  color: var(--c-teal-ink);
+}
+.ep-guide-link:focus-visible {
+  outline: 2px solid var(--c-teal);
+  outline-offset: 2px;
+}
+@media (max-width: 520px) {
+  .ep-guide-link {
+    grid-template-columns: 4.25rem 1fr;
+    gap: 0.75rem;
+  }
+}
+.ep-listen {
+  margin-top: 1.4rem;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--c-muted);
+}
+.ep-listen a {
+  color: var(--c-teal-ink);
+}

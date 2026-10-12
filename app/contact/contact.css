@@ -1,0 +1,745 @@
+/* /contact (v3). All classes c-*. Builds on app/site.css tokens. */
+.c-page {
+  --c-overlap: clamp(150px, 24svh, 250px);
+}
+
+/* ---------- Hero: living dawn field ---------- */
+.c-hero {
+  position: relative;
+  min-height: max(100svh, 700px);
+  display: grid;
+  align-items: center;
+  padding-bottom: var(--c-overlap);
+  overflow: hidden;
+  background: var(--c-paper);
+}
+/* The grain thins out with the field, so the hero has no edge against the page.
+   The grain layer is twice the hero's height (inset -50%), so the hero's foot
+   sits at 75% of it; the fade ends a little before that. */
+.c-hero.s-grain::after {
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 50%, transparent 66%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 50%, transparent 66%);
+}
+.c-hero-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+/* Graph-paper grid, held to the middle of the field. */
+.c-hero-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(19 19 18 / 7%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(19 19 18 / 7%) 1px, transparent 1px);
+  background-size: 72px 72px;
+  background-position: 50% 0;
+  -webkit-mask-image: radial-gradient(70% 60% at 50% 70%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(70% 60% at 50% 70%, #000 0%, transparent 75%);
+}
+/* Grade: paper behind the type, paper at the top for the header, paper at the foot. */
+.c-hero-grade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(44% 34% at 50% 40%, rgb(248 244 239 / 82%), rgb(248 244 239 / 0%) 100%),
+    linear-gradient(
+      180deg,
+      rgb(248 244 239 / 70%) 0%,
+      rgb(248 244 239 / 0%) 20%,
+      rgb(248 244 239 / 0%) 80%,
+      var(--c-paper) 97%
+    );
+}
+
+.c-hero-inner {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  padding-top: calc(var(--s-header) + 2.5rem);
+  padding-bottom: 3rem;
+}
+.c-hero-title {
+  margin-top: 1.6rem;
+}
+.c-hero-title .s-line > span {
+  text-wrap: balance;
+}
+
+/* ---------- The form panel ---------- */
+.c-write {
+  position: relative;
+  z-index: 5;
+  margin-top: calc(-1 * var(--c-overlap));
+}
+.c-panel {
+  --frame-bg: var(--c-paper);
+  background: rgb(248 244 239 / 72%);
+  -webkit-backdrop-filter: blur(22px) saturate(1.15);
+  backdrop-filter: blur(22px) saturate(1.15);
+}
+.c-form {
+  display: grid;
+}
+
+/* Body: the question on the left, the fields on the right. */
+.c-form-body {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  grid-template-areas:
+    'ask fields'
+    'ask submit'
+    'ask status';
+  grid-template-rows: auto auto 1fr;
+  column-gap: clamp(2rem, 5vw, 5.5rem);
+  padding: clamp(1.75rem, 3.4vw, 3.25rem);
+}
+.c-aside {
+  grid-area: ask;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2.5rem;
+  min-width: 0;
+}
+/* Mono keys in the instrument register: the envelope, the partner brief, the
+   boilerplate's label. */
+.c-envelope dt {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-faint);
+}
+
+/* The envelope: address and subject, in the instrument register. */
+.c-envelope {
+  display: grid;
+  margin: 0;
+  border-top: 1px solid var(--c-line-2);
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0.08em;
+}
+.c-envelope > div {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  gap: 1rem;
+  padding-block: 0.7rem;
+  border-bottom: 1px solid var(--c-line);
+}
+.c-envelope dd {
+  margin: 0;
+  color: var(--c-ink);
+  overflow-wrap: anywhere;
+}
+
+/* Fields: one hairline table. The message (and Partner's instruments) span it;
+   name and email share the last row. */
+.c-fields {
+  grid-area: fields;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--c-line-2);
+}
+.c-cell {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.45rem;
+  min-width: 0;
+  /* No bottom padding: the field itself carries it, so a tap anywhere below
+     the label lands in the input. */
+  padding: 0.95rem 1.1rem 0;
+  background: rgb(248 244 239 / 55%);
+  transition:
+    background-color 200ms ease,
+    box-shadow 200ms ease;
+  cursor: text;
+}
+.c-cell--wide {
+  grid-column: 1 / -1;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.c-cell--name {
+  border-right: 1px solid var(--c-line-2);
+}
+.c-cell:hover {
+  background: rgb(248 244 239 / 85%);
+}
+.c-cell:focus-within {
+  background: var(--c-paper);
+  box-shadow: inset 0 0 0 1px var(--c-teal-ink);
+}
+.c-cell-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-faint);
+  transition: color 200ms ease;
+}
+.c-cell:focus-within .c-cell-label {
+  color: var(--c-teal-ink);
+}
+.c-cell:has(.c-input:user-invalid),
+.c-cell:has(.c-input[aria-invalid='true']) {
+  box-shadow: inset 0 0 0 1px var(--c-amber-ink);
+}
+.c-cell:has(.c-input:user-invalid) .c-cell-label,
+.c-cell:has(.c-input[aria-invalid='true']) .c-cell-label {
+  color: var(--c-amber-ink);
+}
+/* The problem in words, not only colour (WCAG 1.4.1, 3.3.1). */
+.c-error {
+  margin: -0.85rem 0 0;
+  padding-bottom: 1rem;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  color: var(--c-amber-ink);
+}
+.c-input {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0 0 1rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--c-ink);
+  font-family: var(--f-serif);
+  font-size: 1.25rem;
+  line-height: 1.45;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.c-input::placeholder {
+  color: var(--c-faint);
+  opacity: 1;
+}
+.c-input:focus,
+.c-input:focus-visible {
+  outline: none;
+}
+.c-textarea {
+  min-height: 9.5rem;
+  resize: vertical;
+  text-wrap: pretty;
+}
+
+/* The honeypot: off screen rather than display: none, which some bots skip. */
+.c-honey {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.c-submit {
+  grid-area: submit;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  margin-top: 1.5rem;
+}
+.c-submit-btn {
+  min-width: 13.5rem;
+  justify-content: space-between;
+  padding: 1.2em 1.5em 1.15em;
+}
+.c-submit-btn svg {
+  transition: transform 300ms var(--e-out);
+}
+.c-submit-btn:hover svg {
+  transform: translateX(3px);
+}
+/* Sending: the button holds still and says so. */
+.c-submit-btn[aria-disabled='true'] {
+  --btn-bg: var(--c-ink);
+  --btn-bd: var(--c-ink);
+  opacity: 0.72;
+  cursor: progress;
+}
+.c-submit-btn[aria-disabled='true'] svg {
+  transform: none;
+}
+.c-submit-note {
+  max-width: 30ch;
+  color: var(--c-muted);
+}
+.c-status {
+  grid-area: status;
+  max-width: 60ch;
+  margin-top: 1rem;
+  color: var(--c-teal-ink);
+}
+.c-status:empty {
+  margin: 0;
+}
+
+/* ---------- Direct: the address itself ---------- */
+.c-direct {
+  position: relative;
+  padding-block: clamp(5rem, 3rem + 7vw, 10rem) clamp(5rem, 3rem + 6vw, 9rem);
+}
+.c-direct-title {
+  margin-bottom: 1.5rem;
+  color: var(--c-muted);
+}
+/* The key column is a share of the row, not of what the Copy button leaves,
+   so the address and LinkedIn start on one line. */
+.c-row {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 25% minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  padding-block: clamp(1.4rem, 1rem + 1.6vw, 2.5rem);
+  border-top: 1px solid var(--c-line-2);
+}
+.c-row:last-child {
+  border-bottom: 1px solid var(--c-line-2);
+}
+/* A dawn wash slides in under the row on hover. */
+.c-row::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    rgb(162 208 190 / 0%) 0%,
+    rgb(162 208 190 / 42%) 30%,
+    rgb(230 217 171 / 55%) 62%,
+    rgb(226 159 55 / 42%) 100%
+  );
+  opacity: 0;
+  transform: scaleX(0.96);
+  transform-origin: left;
+  transition:
+    opacity 450ms var(--e-out),
+    transform 650ms var(--e-out);
+  pointer-events: none;
+}
+.c-row:has(.c-row-link:hover)::before,
+.c-row:has(.c-row-link:focus-visible)::before {
+  opacity: 1;
+  transform: none;
+}
+.c-row-key {
+  color: var(--c-muted);
+}
+.c-row-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  min-width: 0;
+  color: var(--c-ink);
+}
+.c-row-value {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(1.6rem, 0.7rem + 3.3vw, 4.1rem);
+  line-height: 1.08;
+  letter-spacing: var(--d-track-l);
+  overflow-wrap: anywhere;
+  padding-bottom: 0.06em;
+}
+.c-row-link:hover .c-row-value,
+.c-row-link:focus-visible .c-row-value {
+  background: linear-gradient(90deg, var(--c-teal-ink), var(--c-amber-ink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.c-row-link svg {
+  flex: none;
+  width: clamp(20px, 1rem + 1.4vw, 40px);
+  height: clamp(20px, 1rem + 1.4vw, 40px);
+  transition: transform 400ms var(--e-out);
+}
+.c-row-link:hover svg {
+  transform: translate(4px, -4px);
+}
+.c-row--small .c-row-value {
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2.25rem);
+}
+.c-row--small .c-row-link svg {
+  width: 20px;
+  height: 20px;
+}
+.c-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85em 1.1em 0.8em;
+  border: 1px solid var(--c-line-2);
+  background: transparent;
+  color: var(--c-ink);
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    border-color 200ms ease;
+}
+.c-copy:hover {
+  background: var(--c-ink);
+  border-color: var(--c-ink);
+  color: var(--c-paper);
+}
+.c-copy-icon svg {
+  display: block;
+  width: 13px;
+  height: 13px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1080px) {
+  .c-form-body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'ask'
+      'fields'
+      'submit'
+      'status';
+    grid-template-rows: none;
+    row-gap: 1.75rem;
+  }
+  .c-submit {
+    margin-top: 0;
+  }
+  .c-envelope {
+    display: none;
+  }
+}
+@media (max-width: 820px) {
+  .c-page {
+    --c-overlap: clamp(120px, 18svh, 180px);
+  }
+  .c-hero-grid {
+    background-size: 48px 48px;
+  }
+  .c-form-body {
+    padding: 1.5rem 1.1rem 1.6rem;
+  }
+  .c-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'key copy'
+      'link link';
+  }
+  .c-row-key {
+    grid-area: key;
+  }
+  .c-row-link {
+    grid-area: link;
+  }
+  .c-row .c-copy {
+    grid-area: copy;
+  }
+}
+@media (max-width: 560px) {
+  .c-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .c-cell--name {
+    border-right: 0;
+    border-bottom: 1px solid var(--c-line-2);
+  }
+  .c-submit-btn {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c-row::before {
+    transform: none;
+  }
+}
+
+/* =====================================================================
+ * One screen (founder, 3 Oct 2026, late: "more compact, no scroll"). The
+ * hero holds everything: heading and address on the left, the form on
+ * the right; the form's envelope (To, Subject) is dropped as it repeats the
+ * address beside it. Phones stack, compactly.
+ * ===================================================================== */
+.c-hero {
+  min-height: 100svh;
+  padding-bottom: 0;
+}
+/* Paper behind the heading, paper at the top for the header, and paper at the
+   foot, so the field never ends on an edge where the footer's dawn rises. */
+.c-hero-grade {
+  background:
+    radial-gradient(40% 46% at 27% 52%, rgb(248 244 239 / 80%), rgb(248 244 239 / 0%) 100%),
+    linear-gradient(
+      180deg,
+      rgb(248 244 239 / 70%) 0%,
+      rgb(248 244 239 / 0%) 22%,
+      rgb(248 244 239 / 0%) 78%,
+      var(--c-paper) 100%
+    );
+}
+.c-hero-inner {
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: center;
+  justify-items: stretch;
+  column-gap: clamp(2rem, 5vw, 5.5rem);
+  row-gap: 2rem;
+  text-align: left;
+  padding-top: calc(var(--s-header) + clamp(1.5rem, 4vh, 3rem));
+  padding-bottom: clamp(1.5rem, 4vh, 3rem);
+}
+.c-hero-title {
+  margin-top: 0;
+}
+.c-write {
+  margin-top: 0;
+}
+.c-aside {
+  display: none;
+}
+.c-form-body {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'fields'
+    'submit'
+    'status';
+  grid-template-rows: none;
+  padding: clamp(1.1rem, 2vw, 1.75rem);
+}
+.c-submit {
+  margin-top: 1.1rem;
+}
+.c-textarea {
+  min-height: clamp(6rem, 18vh, 9rem);
+}
+/* The address under the heading: a short instrument table, not a second section. */
+.c-direct {
+  margin-top: clamp(1.5rem, 4vh, 2.75rem);
+  padding: 0;
+}
+.c-direct .c-row {
+  grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+  padding-block: 0.85rem;
+}
+.c-direct .c-row-value {
+  font-size: clamp(1.2rem, 0.95rem + 0.7vw, 1.6rem);
+}
+.c-direct .c-row--small .c-row-value {
+  font-size: clamp(1.05rem, 0.95rem + 0.35vw, 1.25rem);
+}
+@media (max-width: 900px) {
+  .c-hero {
+    align-items: start;
+  }
+  .c-hero-inner {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 1.5rem;
+  }
+  .c-direct {
+    margin-top: 1.25rem;
+  }
+}
+@media (max-width: 820px) {
+  .c-direct .c-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-block: 0.7rem;
+  }
+}
+.c-direct .c-row-value {
+  white-space: nowrap;
+}
+.c-direct .c-row--email .c-row-value {
+  font-size: clamp(1.05rem, 0.85rem + 0.5vw, 1.35rem);
+}
+.c-direct .c-row-link svg {
+  width: 0.95em;
+  height: 0.95em;
+}
+/* Phones: the whole page in one screen too, tightened everywhere. */
+@media (max-width: 600px) {
+  .c-hero-inner {
+    padding-top: calc(var(--s-header) + 1rem);
+    padding-bottom: 1rem;
+    row-gap: 1rem;
+  }
+  .c-hero-title {
+    font-size: 2rem;
+  }
+  .c-direct {
+    margin-top: 0.75rem;
+  }
+  .c-direct .c-row {
+    padding-block: 0.5rem;
+  }
+  .c-form-body {
+    padding: 0.85rem;
+  }
+  .c-cell {
+    padding: 0.6rem 0.8rem 0;
+    gap: 0.25rem;
+  }
+  .c-input {
+    font-size: 1.0625rem;
+    padding-bottom: 0.6rem;
+  }
+  /* rows="6" would set the height: the box is sized here instead, and grows as one types. */
+  .c-textarea {
+    height: 5.25rem;
+    min-height: 0;
+  }
+  .c-submit {
+    margin-top: 0.75rem;
+  }
+  .c-submit-note {
+    display: none;
+  }
+}
+/* Short phones (iPhone SE): the LinkedIn row gives way so the form still fits one screen. */
+@media (max-width: 600px) and (max-height: 700px) {
+  .c-direct .c-row--small {
+    display: none;
+  }
+  .c-hero-inner {
+    padding-top: calc(var(--s-header) + 0.5rem);
+  }
+  .c-textarea {
+    height: 4rem;
+  }
+  /* the button names the field */
+  .c-cell--files .c-cell-label {
+    display: none;
+  }
+}
+
+/* ---------- Attachments (founder, 4 Oct 2026): they go with the email ---------- */
+.c-cell--files {
+  cursor: default;
+  padding-bottom: 0.85rem;
+}
+.c-files {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1rem;
+}
+.c-files-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5em 0.8em 0.45em;
+  border: 1px solid var(--c-line-3);
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+  cursor: pointer;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+.c-files-add svg {
+  width: 11px;
+  height: 11px;
+}
+.c-files-add:hover,
+.c-cell--files:has(input:focus-visible) .c-files-add {
+  background: var(--c-ink);
+  color: var(--c-paper);
+}
+.c-cell--files:has(input:focus-visible) .c-files-add {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 2px;
+}
+.c-files-hint {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--c-muted);
+}
+.c-file-list {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+}
+.c-file-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.c-file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.c-file-size {
+  flex: none;
+  color: var(--c-muted);
+}
+.c-file-remove {
+  flex: none;
+  margin-left: auto;
+  width: 1.6rem;
+  height: 1.6rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-muted);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.c-file-remove:hover {
+  color: var(--c-ink);
+}
+.c-file-remove:focus-visible {
+  outline: 2px solid var(--c-teal-ink);
+}
+.c-cell--files .c-error {
+  margin: 0.4rem 0 0;
+  padding: 0;
+}
+@media (max-width: 600px) {
+  .c-cell--files {
+    padding-bottom: 0.6rem;
+  }
+  .c-files-hint {
+    display: none;
+  }
+}

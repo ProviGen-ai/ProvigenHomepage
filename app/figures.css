@@ -1,0 +1,82 @@
+/* The Figure component's frame: registration corners, FIG label, Pause / Play,
+   provenance and caption. (Figures inside it draw on plates: components/plate.) */
+.figure {
+  position: relative;
+  min-width: 0;
+}
+.figure-frame {
+  position: relative;
+  border: 1px solid var(--line);
+  padding: clamp(1rem, 0.6rem + 1.5vw, 1.75rem);
+}
+.figure-frame.bare {
+  border: 0;
+  padding: 0;
+}
+.figure-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  color: var(--fg-muted);
+}
+.figure-caption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 16px;
+  margin-top: 12px;
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.figure-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 0;
+  background: none;
+  border: 0;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color var(--dur-1);
+}
+.figure-btn:hover {
+  color: var(--fg);
+}
+/* 26px of ink, 44px of target. The hit area is an inset overlay rather than a
+   min-height so the button's own box stays 25.6px and .figure-head does not
+   grow (it is exactly as tall as the button, so a taller button would push
+   every figure down the page). */
+.figure-btn::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  translate: 0 -50%;
+  height: 44px;
+}
+/* The overlay hangs below the head, where the figure's SVG is painted later and
+   would otherwise win the hit test over the lower half of the target. */
+.figure-btn {
+  z-index: 1;
+}
+
+/* Scripting off: the controls never wire up, so a Pause button would be dead
+   chrome. */
+@media (scripting: none) {
+  .figure-btn {
+    display: none;
+  }
+}

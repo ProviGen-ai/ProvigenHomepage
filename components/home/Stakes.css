@@ -1,0 +1,302 @@
+/* Section 3 · Why it matters (prefix st-; rebuilt 3 Oct 2026) */
+.st {
+  position: relative;
+  /* Shallow foot: How it works opens with its own top padding. */
+  padding-block: var(--s-section) calc(var(--s-section) * 0.5);
+  overflow: clip;
+  background: var(--c-paper);
+  color: var(--c-ink);
+  /* Column gap shared by the points and the ladder, so their columns line up. */
+  --st-gap: clamp(2rem, 1rem + 3vw, 4.5rem);
+  /* One stretch of the ladder's line draws in this long. */
+  --st-draw: 700ms;
+}
+
+/* ---------- Headline: two lines over the full width ---------- */
+.st-head {
+  display: grid;
+  justify-items: start;
+}
+.st-title {
+  margin-top: clamp(1.25rem, 2.2vw, 2rem);
+  font-family: var(--f-serif);
+  font-weight: 400;
+  /* Each sentence on one line at 1440 px; balanced into two below that. */
+  font-size: clamp(2.2rem, 0.95rem + 3.4vw, 4.15rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums;
+}
+.st-title em {
+  font-style: italic;
+  color: var(--c-teal-ink);
+  letter-spacing: inherit;
+}
+.st-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.st-line > span {
+  display: block;
+  text-wrap: balance;
+}
+
+/* ---------- Three points: title, one sentence, source ---------- */
+.st-points {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: clamp(2.5rem, 2rem + 2vw, 3.25rem);
+  margin: clamp(3.5rem, 2.5rem + 4vw, 6.5rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 900px) {
+  .st-points {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: var(--st-gap);
+  }
+  /* On a row the three points rise one after another. */
+  .st-point-in {
+    --kd: calc(var(--k, 0) * 130ms);
+  }
+}
+.st-point-title {
+  font-family: var(--f-serif);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 1.2rem + 0.9vw, 2.05rem);
+  line-height: 1.12;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+.st-point-text {
+  margin-top: 0.8rem;
+  max-width: 34ch;
+  font-size: clamp(1.125rem, 1.05rem + 0.25vw, 1.3rem);
+  line-height: 1.42;
+  text-wrap: pretty;
+}
+.st-source {
+  margin-top: 1rem;
+  max-width: 46ch;
+  text-wrap: pretty;
+}
+.st-source a {
+  transition: color 160ms ease;
+}
+.st-source a:hover {
+  color: var(--c-teal-ink);
+}
+
+/* ---------- The ladder: one line, its style the status ---------- */
+.st-ladder {
+  margin-top: clamp(5rem, 3.5rem + 5vw, 9rem);
+}
+.st-ladder-title {
+  font-family: var(--f-serif);
+  font-weight: 400;
+  font-size: clamp(1.85rem, 1.3rem + 1.7vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.014em;
+  text-wrap: balance;
+}
+.st-rungs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--st-gap);
+  margin: clamp(2.75rem, 2rem + 2.4vw, 4.25rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.st-rung {
+  position: relative;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  row-gap: 1rem;
+  min-width: 0;
+  padding-top: 2.1rem;
+}
+/* Colour per status: Now teal (as the running chips), Next ink, the ambition
+   in the orange of B in Fig. 01. */
+.st-rung--running {
+  --st-c: var(--c-teal);
+}
+.st-rung--planned {
+  --st-c: rgb(19 19 18 / 60%);
+}
+.st-rung--ambition {
+  --st-c: var(--c-orange);
+}
+/* The stretch runs on across the column gap to the next rung's tick, so the
+   three read as one line. A 14 px band; the line is drawn at its middle. */
+.st-seg {
+  position: absolute;
+  top: -7px;
+  left: 0;
+  right: calc(-1 * var(--st-gap));
+  height: 14px;
+  color: var(--st-c);
+  background: linear-gradient(currentColor, currentColor) 0 50% / 100% 2px no-repeat;
+}
+.st-rung--planned .st-seg {
+  background: repeating-linear-gradient(90deg, currentColor 0 12px, transparent 12px 20px) 0 50% / 100% 2px
+    no-repeat;
+}
+.st-rung--ambition .st-seg {
+  background: radial-gradient(circle, currentColor 0 1.5px, transparent 2px) 0 50% / 8px 8px repeat-x;
+}
+/* The last stretch ends at the column's edge and fades: no end point. */
+.st-rung:last-child .st-seg {
+  right: 0;
+  -webkit-mask-image: linear-gradient(90deg, #000 55%, transparent);
+  mask-image: linear-gradient(90deg, #000 55%, transparent);
+}
+/* A tick where each stage begins. */
+.st-seg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  background: currentColor;
+}
+.st-chip {
+  max-width: 100%;
+}
+.st-rung-line {
+  max-width: 32ch;
+  font-size: clamp(1.075rem, 1rem + 0.25vw, 1.25rem);
+  line-height: 1.42;
+  text-wrap: pretty;
+}
+
+/* Phones: the rungs stack and the line runs down the left edge. */
+@media (max-width: 760px) {
+  .st-rungs {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 2.25rem;
+  }
+  .st-rung {
+    padding: 0 0 0 2rem;
+  }
+  /* From this rung's tick (the chip's middle) to the next one's. */
+  .st-seg {
+    top: 10px;
+    bottom: calc(-2.25rem - 10px);
+    left: 0;
+    right: auto;
+    width: 14px;
+    height: auto;
+    background: linear-gradient(currentColor, currentColor) 50% 0 / 2px 100% no-repeat;
+  }
+  .st-rung--planned .st-seg {
+    background: repeating-linear-gradient(180deg, currentColor 0 12px, transparent 12px 20px) 50% 0 / 2px 100%
+      no-repeat;
+  }
+  .st-rung--ambition .st-seg {
+    background: radial-gradient(circle, currentColor 0 1.5px, transparent 2px) 50% 0 / 8px 8px repeat-y;
+  }
+  .st-rung:last-child .st-seg {
+    right: auto;
+    bottom: -1.5rem;
+    -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent);
+    mask-image: linear-gradient(180deg, #000 45%, transparent);
+  }
+  .st-seg::before {
+    top: 0;
+    bottom: auto;
+    width: auto;
+    right: 0;
+    height: 1px;
+  }
+  .st-rung-line {
+    max-width: 40ch;
+  }
+}
+
+/* ---------- Motion (reveal once; final state with motion off) ---------- */
+:where(html[data-reveal='js']) .st-in {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.9s var(--e-out),
+    transform 1.1s var(--e-out);
+  transition-delay: calc(var(--i, 0) * 110ms + 120ms + var(--kd, 0ms));
+}
+.is-in .st-in {
+  opacity: 1;
+  transform: none;
+}
+:where(html[data-reveal='js']) .st-line > span {
+  transform: translateY(108%);
+  transition: transform 1.25s var(--e-out);
+  transition-delay: calc(var(--i, 0) * 130ms + 80ms);
+}
+.is-in .st-line > span {
+  transform: none;
+}
+/* The line draws once, left to right (top to bottom on phones), one stretch
+   after the other; each chip and line follows its stretch. */
+:where(html[data-reveal='js']) .st-seg {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path var(--st-draw) linear;
+  transition-delay: calc(250ms + var(--k, 0) * var(--st-draw));
+}
+:where(html[data-reveal='js']) :is(.st-chip, .st-rung-line) {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 700ms ease,
+    transform 900ms var(--e-out);
+  transition-delay: calc(450ms + var(--k, 0) * var(--st-draw));
+}
+:where(html[data-reveal='js']) .st-rung-line {
+  transition-delay: calc(560ms + var(--k, 0) * var(--st-draw));
+}
+@media (max-width: 760px) {
+  :where(html[data-reveal='js']) .st-seg {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+.is-in .st-seg {
+  clip-path: inset(0 0 0 0);
+}
+.is-in :is(.st-chip, .st-rung-line) {
+  opacity: 1;
+  transform: none;
+}
+
+html[data-motion='paused'] .st :is(.st-in, .st-line > span, .st-seg, .st-chip, .st-rung-line) {
+  transition: none !important;
+}
+html[data-motion='paused'] .st :is(.st-in, .st-line > span, .st-chip, .st-rung-line) {
+  opacity: 1;
+  transform: none;
+}
+html[data-motion='paused'] .st .st-seg {
+  clip-path: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .st :is(.st-in, .st-line > span, .st-seg, .st-chip, .st-rung-line) {
+    transition: none !important;
+  }
+  .st :is(.st-in, .st-line > span, .st-chip, .st-rung-line) {
+    opacity: 1;
+    transform: none;
+  }
+  .st .st-seg {
+    clip-path: none;
+  }
+}
+@media (scripting: none) {
+  .st :is(.st-in, .st-line > span, .st-chip, .st-rung-line) {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .st .st-seg {
+    clip-path: none !important;
+  }
+}

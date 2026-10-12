@@ -1,0 +1,142 @@
+/* 404 (v3). All classes nf-*. */
+.nf-hero {
+  position: relative;
+  min-height: max(100svh, 640px);
+  display: grid;
+  align-items: center;
+  overflow: hidden;
+  background: var(--c-paper);
+}
+.nf-hero.s-grain::after {
+  -webkit-mask-image: linear-gradient(180deg, #000 52%, transparent 70%);
+  mask-image: linear-gradient(180deg, #000 52%, transparent 70%);
+}
+.nf-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.nf-grade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(46% 42% at 50% 48%, rgb(248 244 239 / 80%), rgb(248 244 239 / 0%) 100%),
+    linear-gradient(
+      180deg,
+      rgb(248 244 239 / 70%) 0%,
+      rgb(248 244 239 / 0%) 22%,
+      rgb(248 244 239 / 0%) 78%,
+      var(--c-paper) 100%
+    );
+}
+.nf-inner {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  padding-block: calc(var(--s-header) + 3rem) 5rem;
+}
+.nf-eyebrow {
+  color: var(--c-muted);
+}
+.nf-title {
+  margin-top: 1.75rem;
+}
+/* The A of the headline is the teal A of the figure below. */
+.nf-title-a {
+  color: var(--c-teal-ink);
+}
+
+/* The broken route. */
+.nf-path {
+  width: min(640px, 100%);
+  height: auto;
+  margin-top: clamp(2rem, 4vw, 3.25rem);
+  overflow: visible;
+}
+.nf-ghost {
+  stroke: rgb(19 19 18 / 30%);
+  stroke-width: 1;
+  stroke-dasharray: 1 6;
+  stroke-linecap: round;
+}
+.nf-ticks {
+  stroke: rgb(19 19 18 / 22%);
+  stroke-width: 1;
+}
+.nf-drift {
+  stroke-width: 1.25;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: nf-draw 2.6s var(--e-in-out) 0.5s forwards;
+}
+@keyframes nf-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.nf-a {
+  fill: var(--c-teal);
+}
+.nf-b {
+  fill: var(--c-orange);
+  animation: nf-wait 2.4s ease-in-out 3s infinite;
+}
+@keyframes nf-wait {
+  50% {
+    opacity: 0.35;
+  }
+}
+.nf-letter {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  fill: var(--c-muted);
+}
+
+.nf-lede {
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+  max-width: 34ch;
+  color: rgb(19 19 18 / 82%);
+}
+.nf-actions {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+.nf-btn-ghost {
+  background: rgb(248 244 239 / 55%);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+/* Motion off: the route is simply drawn. */
+html[data-motion='paused'] .nf-drift,
+html[data-motion='paused'] .nf-b {
+  animation: none;
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nf-drift,
+  .nf-b {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+@media (max-width: 560px) {
+  .nf-letter {
+    font-size: 18px;
+  }
+  .nf-actions {
+    display: grid;
+    width: min(100%, 20rem);
+  }
+  .nf-actions .s-btn {
+    justify-content: center;
+  }
+}

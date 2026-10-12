@@ -1,0 +1,208 @@
+/*
+ * Section 1b · Start here (6 Oct 2026). All classes a-*. Three doors between
+ * hairlines, in the site's register: a mono label over a 24 % rule, names in
+ * the display face, one Garamond line, a mono call with the arrow. Hover
+ * raises the writings rows' warm wash from the foot of the door; no boxes,
+ * no chips, no coloured markers (founder's cuts, 1 and 4 Oct 2026).
+ */
+.a-start {
+  position: relative;
+  z-index: 2;
+  /* Rises over the opening's paper foot, where the hero's fade reaches paper
+     (--h-rise in Hero.css); the problem section took this margin until now. */
+  margin-top: -10.5svh;
+  padding-bottom: clamp(1rem, 0.5rem + 1.5vw, 2rem);
+  background: var(--c-paper);
+  color: var(--c-ink);
+}
+@media (max-width: 599px) {
+  .a-start {
+    margin-top: -12.3svh;
+  }
+}
+.a-wrap {
+  padding-top: clamp(1.25rem, 0.75rem + 1.2vw, 2rem);
+}
+.a-label {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--c-line-2);
+  color: var(--c-muted);
+}
+
+.a-doors {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-bottom: 1px solid var(--c-line-2);
+}
+.a-door {
+  position: relative;
+  display: grid;
+}
+.a-door + .a-door {
+  border-left: 1px solid var(--c-line-2);
+}
+.a-door-link {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  row-gap: 1rem;
+  min-height: clamp(15.5rem, 9rem + 11vw, 21rem);
+  padding: clamp(1.5rem, 1rem + 1.4vw, 2.5rem) clamp(1.25rem, 0.5rem + 1.8vw, 2.5rem) clamp(1.5rem, 1rem + 1.2vw, 2.25rem);
+  color: inherit;
+  text-decoration: none;
+}
+.a-door:first-child .a-door-link {
+  padding-left: 0;
+}
+.a-door:last-child .a-door-link {
+  padding-right: 0;
+}
+/* The warm wash of a /writings row, rising from the foot of the door. */
+.a-door-link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(0deg, rgb(230 217 171 / 46%) 0%, rgb(162 208 190 / 22%) 55%, rgb(162 208 190 / 0%) 100%);
+  opacity: 0;
+  transform: scaleY(0.6);
+  transform-origin: 50% 100%;
+  transition:
+    opacity 500ms ease,
+    transform 700ms var(--e-out);
+}
+/* The outer doors' wash reaches the page gutter, so it is not cut at the text edge. */
+.a-door:first-child .a-door-link::before {
+  left: calc(-1 * var(--s-gutter));
+}
+.a-door:last-child .a-door-link::before {
+  right: calc(-1 * var(--s-gutter));
+}
+.a-door-link:hover::before,
+.a-door-link:focus-visible::before {
+  opacity: 1;
+  transform: none;
+}
+.a-door-link:focus-visible {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: -2px;
+}
+
+.a-door-title {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(1.75rem, 1rem + 1.9vw, 3rem);
+  line-height: 1.04;
+  letter-spacing: var(--d-track-xl);
+  text-wrap: balance;
+  transition: color 300ms ease;
+}
+.a-door-link:hover .a-door-title {
+  color: var(--c-teal-ink);
+}
+.a-door-line {
+  align-self: start;
+  max-width: 30ch;
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  line-height: 1.45;
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+.a-door-cta {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding-block: 0.35rem;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--c-line-3);
+  transition: border-color 200ms ease;
+}
+.a-door-cta svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  transition: translate 400ms var(--e-out);
+}
+.a-door-link:hover .a-door-cta {
+  border-color: var(--c-ink);
+}
+.a-door-link:hover .a-door-cta svg {
+  translate: 5px 0;
+}
+
+/* Tablet: the display names step down so "Pharma & Biotech" keeps one line. */
+@media (max-width: 1100px) {
+  .a-door-title {
+    font-size: clamp(1.5rem, 0.9rem + 1.6vw, 2.2rem);
+  }
+}
+/* Phone: the doors stack as rows, name and call on one line, the line under. */
+@media (max-width: 760px) {
+  .a-doors {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .a-door + .a-door {
+    border-left: 0;
+    border-top: 1px solid var(--c-line-2);
+  }
+  .a-door-link,
+  .a-door:first-child .a-door-link,
+  .a-door:last-child .a-door-link {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    column-gap: 1rem;
+    row-gap: 0.45rem;
+    padding: 1.35rem 0 1.4rem;
+  }
+  .a-door-link::before,
+  .a-door:first-child .a-door-link::before,
+  .a-door:last-child .a-door-link::before {
+    left: calc(-1 * var(--s-gutter));
+    right: calc(-1 * var(--s-gutter));
+  }
+  .a-door-title {
+    grid-column: 1;
+    font-size: clamp(1.45rem, 1.1rem + 1.6vw, 1.9rem);
+    font-weight: 400;
+    letter-spacing: var(--d-track);
+  }
+  .a-door-line {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  /* The call's words go; its arrow stays beside the name. */
+  .a-door-cta {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    border: 0;
+    padding: 0;
+    font-size: 0;
+    letter-spacing: 0;
+  }
+  .a-door-cta svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .a-door-link::before,
+  .a-door-title,
+  .a-door-cta,
+  .a-door-cta svg {
+    transition: none;
+  }
+}

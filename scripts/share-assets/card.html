@@ -1,0 +1,36 @@
+<!doctype html>
+<!--
+  Share card template for scripts/make-share-assets.mjs (served by its private
+  server: /src → repo sources, /tpl → this folder, everything else → public/).
+  The site's tokens and the writings motifs' styles come from the real
+  stylesheets; card.css lays the card out; card.js fills it per card.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Share card</title>
+    <link rel="stylesheet" href="/src/app/site.css" />
+    <link rel="stylesheet" href="/src/app/writings/writings.css" />
+    <link rel="stylesheet" href="/tpl/card.css" />
+    <script type="module" src="/tpl/card.js"></script>
+  </head>
+  <body>
+    <main class="card" id="card" data-kind="site">
+      <div class="card-grain" aria-hidden="true"></div>
+      <canvas class="card-terrain" aria-hidden="true"></canvas>
+      <img
+        class="card-logo"
+        src="/assets/provigen/logo-horizontal-ink.svg"
+        alt="ProviGen"
+      />
+      <div class="card-copy">
+        <p class="card-kicker"></p>
+        <h1 class="card-title"></h1>
+      </div>
+      <div class="card-visual" aria-hidden="true">
+        <canvas class="card-visual-terrain"></canvas>
+        <div class="card-stage"></div>
+      </div>
+    </main>
+  </body>
+</html>

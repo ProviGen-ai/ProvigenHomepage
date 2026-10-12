@@ -1,0 +1,563 @@
+/*
+ * /biopharma, rebuilt 8 Oct 2026 from the founders' Merck LNP deck and
+ * redesigned the same night. One design language: framed panels. The hero
+ * is the footage in a rounded frame with the line set in it; two dark
+ * instrument panels (the many parameters, the case study) break the paper
+ * so the page has a rhythm. Page classes
+ * bp-*, the small graphics g-* (components/audiences/Graphics.tsx); the
+ * skeleton is components/pages/Subpage.css, the
+ * deck's figures components/audiences/bp/bp.css (their dark variants are
+ * here, under .bp-dark).
+ */
+
+.bp-page {
+  --bp-ground: #0e1d1a;
+  --bp-on: rgb(248 244 239 / 92%);
+  --bp-on-2: rgb(248 244 239 / 66%);
+  --bp-on-3: rgb(248 244 239 / 18%);
+  --bp-panel-gap: clamp(8px, 1.2vw, 18px);
+  --bp-radius: 10px;
+}
+
+/* ================================================================
+   Hero: the footage in a frame, the line set in it
+   ================================================================ */
+.bp-hero {
+  padding: calc(var(--s-header) + 4px) var(--bp-panel-gap) 0;
+}
+.bp-hero-frame {
+  position: relative;
+  display: grid;
+  align-items: end;
+  min-height: clamp(560px, 88svh, 940px);
+  border-radius: var(--bp-radius);
+  overflow: hidden;
+  isolation: isolate;
+  background: #10201c;
+}
+.bp-hero-film {
+  z-index: 0;
+}
+.bp-hero-film > video {
+  transform: scale(1.03);
+  animation: bp-drift 18s ease-in-out infinite alternate;
+}
+@keyframes bp-drift {
+  to {
+    transform: scale(1.08) translateX(-1%);
+  }
+}
+.bp-hero-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgb(10 22 19 / 86%) 0%, rgb(10 22 19 / 62%) 30%, rgb(10 22 19 / 0%) 64%),
+    linear-gradient(0deg, rgb(10 22 19 / 72%) 0%, rgb(10 22 19 / 0%) 46%);
+}
+.bp-hero-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 50rem;
+  padding: clamp(1.5rem, 0.75rem + 3.5vw, 4.5rem);
+  color: var(--bp-on);
+}
+.bp-hero-title {
+  margin: 0;
+  max-width: 12ch;
+  font-size: clamp(2.6rem, 1.2rem + 4.6vw, 5.75rem);
+  line-height: 1;
+  color: var(--c-paper);
+}
+.bp-hero-title em {
+  color: var(--c-mint);
+}
+.bp-hero-dek {
+  margin: clamp(1.25rem, 1rem + 1vw, 2rem) 0 0;
+  max-width: 40ch;
+  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.4rem);
+  line-height: 1.45;
+  color: var(--bp-on-2);
+}
+.bp-hero-cta {
+  margin-top: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+}
+
+/* ================================================================
+   Section heads: one line in two tones, no labels
+   ================================================================ */
+.bp-head {
+  margin: 0;
+  max-width: 21ch;
+  font-size: clamp(2rem, 1.15rem + 2.9vw, 3.9rem);
+  line-height: 1.04;
+}
+.bp-head em {
+  color: var(--c-teal-ink);
+}
+.bp-lede {
+  margin: clamp(1rem, 0.75rem + 1vw, 1.5rem) 0 0;
+  max-width: 46ch;
+  font-size: clamp(1.125rem, 1rem + 0.45vw, 1.375rem);
+  line-height: 1.45;
+  color: rgb(19 19 18 / 84%);
+}
+.bp-lede--soft {
+  color: var(--c-muted);
+}
+.bp-kicker {
+  margin: 0 0 1.25rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-mint);
+}
+
+/* ================================================================
+   Panels: dark instrument panels, inset like the hero
+   ================================================================ */
+.bp-dark {
+  position: relative;
+  margin: clamp(4rem, 3rem + 4vw, 8rem) var(--bp-panel-gap) 0;
+  padding-block: clamp(3.5rem, 2.5rem + 4vw, 7rem);
+  border-radius: var(--bp-radius);
+  overflow: hidden;
+  isolation: isolate;
+}
+.bp-dark {
+  background:
+    radial-gradient(60% 70% at 88% 0%, rgb(66 145 149 / 22%), transparent 70%),
+    radial-gradient(50% 60% at 0% 100%, rgb(162 208 190 / 8%), transparent 70%),
+    var(--bp-ground);
+  color: var(--bp-on);
+}
+/* a hairline just inside the edge, as on the site's plates */
+.bp-dark::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgb(248 244 239 / 7%);
+  border-radius: inherit;
+  pointer-events: none;
+}
+.bp-dark .bp-head {
+  color: var(--c-paper);
+}
+.bp-dark .bp-head em {
+  color: var(--c-mint);
+}
+.bp-dark .bp-lede {
+  color: var(--bp-on-2);
+}
+/* what follows a panel gets the usual air above it */
+.bp-dark + .sp-section {
+  padding-top: clamp(4rem, 3rem + 4vw, 8rem);
+}
+
+.bp-dark .bp-play {
+  color: var(--bp-on-2);
+  border-color: rgb(248 244 239 / 24%);
+}
+
+/* ---------- The many parameters, on the dark panel ---------- */
+.bp-dark-head {
+  display: grid;
+  gap: 0 3rem;
+  align-items: end;
+}
+@media (min-width: 1000px) {
+  .bp-dark-head {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
+  }
+  .bp-dark-head .bp-lede {
+    margin: 0;
+  }
+}
+.bp-dark .cb-row {
+  border-bottom-color: rgb(248 244 239 / 9%);
+}
+.bp-dark .cb-name {
+  color: rgb(248 244 239 / 85%);
+}
+.bp-dark .cb-levels span {
+  box-shadow: inset 0 0 0 1px rgb(248 244 239 / 30%);
+}
+.bp-dark .cb-row.is-on .cb-levels span {
+  background: var(--c-mint);
+  box-shadow: 0 0 6px rgb(162 208 190 / 45%);
+}
+.bp-dark .cb-label {
+  color: var(--bp-on-2);
+}
+.bp-dark .cb-small {
+  color: var(--c-paper);
+}
+.bp-dark .cb-big {
+  color: var(--c-mint);
+  text-shadow: 0 0 28px rgb(162 208 190 / 25%);
+}
+.bp-dark .cb-plate {
+  color: var(--c-orange);
+}
+
+/* ---------- The case study, on the dark panel ---------- */
+.bp-dark--case .sm {
+  margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+}
+.bp-dark .sm-head {
+  border-bottom-color: var(--bp-on-3);
+}
+.bp-dark .sm-label {
+  color: var(--bp-on-2);
+}
+.bp-dark .sm-figure {
+  color: var(--c-paper);
+}
+.bp-dark .sm-side.is-ours .sm-label,
+.bp-dark .sm-side.is-ours .sm-figure {
+  color: var(--c-mint);
+}
+.bp-dark .sm-dots span {
+  box-shadow: inset 0 0 0 1px rgb(248 244 239 / 22%);
+}
+.bp-dark .is-in .sm-dots span {
+  background: rgb(248 244 239 / 22%);
+  box-shadow: none;
+}
+.bp-dark .is-in .sm-dots span.is-ours {
+  background: var(--c-mint);
+  box-shadow: 0 0 9px rgb(162 208 190 / 60%);
+}
+.bp-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem clamp(1.5rem, 1rem + 2vw, 3rem);
+  margin: clamp(2.5rem, 2rem + 2vw, 4rem) 0 0;
+}
+.bp-fact {
+  padding-top: 1rem;
+  border-top: 1px solid var(--bp-on-3);
+}
+.bp-fact dt {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bp-on-2);
+}
+.bp-fact dd {
+  margin: 0.65rem 0 0;
+  max-width: 30ch;
+  font-family: var(--f-display);
+  font-size: clamp(1.2rem, 1.05rem + 0.5vw, 1.55rem);
+  line-height: 1.25;
+  color: var(--c-paper);
+}
+
+/* ================================================================
+   Your past runs: the text held beside the two figures
+   ================================================================ */
+.bp-split {
+  display: grid;
+  gap: clamp(2rem, 1.5rem + 2vw, 3rem);
+}
+@media (min-width: 1040px) {
+  .bp-split {
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+    gap: clamp(3rem, 1rem + 4vw, 6rem);
+    align-items: start;
+  }
+  .bp-split-text {
+    position: sticky;
+    top: calc(var(--s-header) + 2.5rem);
+  }
+  .bp-split :is(.bt, .rd) {
+    padding-top: 0;
+  }
+  .bp-split :is(.bt, .rd) .bp-play {
+    top: -2.75rem;
+  }
+}
+
+/* ================================================================
+   Evidence: a ledger, one study a row
+   ================================================================ */
+.bp-ledger {
+  list-style: none;
+  margin: clamp(2rem, 1.5rem + 2vw, 3.5rem) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--c-line-2);
+}
+.bp-entry {
+  display: grid;
+  grid-template-columns: minmax(11rem, 0.75fr) minmax(0, 1.5fr) minmax(13rem, 0.85fr);
+  gap: 1.25rem clamp(1.5rem, 1rem + 2.5vw, 4rem);
+  align-items: start;
+  padding: clamp(1.5rem, 1rem + 1.5vw, 2.5rem) 0;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.bp-entry-figure {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+}
+.bp-entry-n {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-size: clamp(3rem, 2.1rem + 2.8vw, 4.75rem);
+  line-height: 0.9;
+  font-variant-numeric: lining-nums;
+  color: var(--c-teal-ink);
+}
+.bp-entry-unit {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.bp-entry-body {
+  display: grid;
+  gap: 1.25rem;
+  min-width: 0;
+}
+.bp-entry-body .g-bars {
+  max-width: 26rem;
+}
+.bp-entry-line {
+  margin: 0;
+  max-width: 42ch;
+  font-size: clamp(1.125rem, 1rem + 0.4vw, 1.35rem);
+  line-height: 1.4;
+}
+.bp-entry-cite {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--c-muted);
+}
+.bp-entry-cite a {
+  color: inherit;
+  text-decoration-color: var(--c-line-3);
+  text-underline-offset: 3px;
+}
+.bp-entry-cite a:hover {
+  color: var(--c-ink);
+}
+.bp-entry-cite span {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-teal-ink);
+}
+
+/* 24 experiments in four rounds: six dots a round, filling in turn */
+.g-dots {
+  display: flex;
+  gap: clamp(1rem, 0.5rem + 1.5vw, 2rem);
+}
+.g-dots-round {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}
+.g-dots-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 12px);
+  gap: 6px;
+}
+.g-dots-grid span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--c-teal);
+  background: transparent;
+  transition: background-color 500ms ease;
+  transition-delay: calc(0.3s + var(--i, 0) * 0.55s + var(--j, 0) * 0.05s);
+}
+.is-in .g-dots-grid span {
+  background: var(--c-teal);
+}
+.g-dots-label {
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.g-bars {
+  display: grid;
+  gap: 0.5rem;
+}
+.g-bar {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr) 2.5rem;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.g-bar-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgb(19 19 18 / 6%);
+  overflow: hidden;
+}
+.g-bar-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  transition: width 1.4s var(--e-out);
+  transition-delay: calc(0.2s + var(--i, 0) * 0.3s);
+}
+.g-bar.is-a .g-bar-fill {
+  background: var(--c-teal);
+}
+.g-bar.is-b .g-bar-fill {
+  background: var(--c-mist, #bdb8b0);
+}
+.is-in .g-bar-fill {
+  width: var(--w);
+}
+.g-bar-value {
+  text-align: right;
+  color: var(--c-ink);
+}
+
+/* ================================================================
+   A first project: a line with a stop per step
+   ================================================================ */
+.g-time {
+  position: relative;
+  margin-top: clamp(2rem, 1.5rem + 1.5vw, 3rem);
+}
+.g-time-line {
+  position: absolute;
+  top: 7px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--c-teal);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1.8s var(--e-out);
+}
+.is-in .g-time-line {
+  transform: none;
+}
+.g-time-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr));
+  gap: 1.5rem;
+}
+.g-time-step {
+  display: grid;
+  align-content: start;
+  gap: 0.6rem;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 600ms ease,
+    transform 700ms var(--e-out);
+  transition-delay: calc(0.3s + var(--i, 0) * 0.45s);
+}
+.is-in .g-time-step {
+  opacity: 1;
+  transform: none;
+}
+.g-time-dot {
+  position: relative;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--c-paper);
+  box-shadow: inset 0 0 0 1.5px var(--c-teal-ink);
+}
+.g-time-step:last-child .g-time-dot {
+  background: var(--c-orange);
+  box-shadow: none;
+}
+.g-time-when {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-teal-ink);
+}
+.g-time-what {
+  max-width: 24ch;
+  font-family: var(--f-display);
+  font-size: clamp(1.2rem, 1.05rem + 0.5vw, 1.5rem);
+  line-height: 1.2;
+}
+
+/* ---------- Close ---------- */
+.bp-page .sp-close-title {
+  max-width: 28ch;
+}
+
+/* ---------- Motion off: everything set ---------- */
+html[data-motion='paused'] :is(.g-bar-fill, .g-dots-grid span, .g-time-line, .g-time-step) {
+  transition: none !important;
+}
+html[data-motion='paused'] .bp-hero-film > video {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bp-hero-film > video {
+    animation: none;
+  }
+}
+
+/* ---------- Tablet and phone ---------- */
+@media (max-width: 900px) {
+  .bp-entry {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.9rem;
+  }
+  .bp-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 760px) {
+  .bp-hero-frame {
+    min-height: clamp(520px, 82svh, 760px);
+  }
+  .bp-hero-shade {
+    background: linear-gradient(0deg, rgb(10 22 19 / 92%) 0%, rgb(10 22 19 / 70%) 42%, rgb(10 22 19 / 10%) 78%);
+  }
+  .g-time-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .g-time-line {
+    top: 0;
+    bottom: 0;
+    left: 7px;
+    right: auto;
+    width: 1px;
+    height: auto;
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  .g-time-step {
+    grid-template-columns: 15px minmax(0, 1fr);
+    column-gap: 1rem;
+  }
+  .g-time-step > :not(.g-time-dot) {
+    grid-column: 2;
+  }
+  .g-time-dot {
+    grid-row: 1 / span 2;
+  }
+}

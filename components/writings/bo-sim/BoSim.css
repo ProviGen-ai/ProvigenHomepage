@@ -1,0 +1,151 @@
+/*
+ * The field note's simulation (BoSim.tsx): a plate at the article's wide
+ * measure (on paper since 4 Oct 2026, draw.ts LOOK), its controls set on the
+ * plate, the caption at the column width. The canvas draws in CSS px (draw.ts
+ * geometry), so the box's height is a linear function of its width; the
+ * calc()s below repeat draw.ts's layout (WIDE / NARROW, WIDE_MIN, TIGHT) to
+ * reserve that height before the first frame and to place the controls.
+ * Keep them in step.
+ */
+/* The target of /demo (#simulation) needs no scroll-margin of its own: the
+   root's scroll-padding (site.css, header + 16 px) clears the header, and
+   without more the plate and its caption fit a 900 px tall window on arrival. */
+.w-prose .bo {
+  margin-inline: calc(-1 * var(--w-o, 0px));
+}
+.bo-plate {
+  container-type: inline-size;
+}
+/* stacked (narrow): two square panels, 16 px gutters; h = 2P + 358 */
+.bo-box {
+  aspect-ratio: auto;
+  height: calc(2 * (100cqw - 32px) + 358px);
+}
+/* side by side from 640 px (draw.ts WIDE_MIN): 24 px gutters, 32 px between; h = P + 291 */
+@container (min-width: 640px) {
+  .bo-box {
+    height: calc((100cqw - 80px) / 2 + 291px);
+  }
+}
+
+/* The caption reads at the column width, under the wide plate. */
+.w-prose .bo > figcaption {
+  padding-inline: var(--w-o, 0px);
+}
+.w-prose .bo > figcaption sup {
+  margin-left: 0.15em;
+  line-height: 0;
+}
+
+/*
+ * Controls: right-aligned on the chart's title row ("best value so far" on
+ * the left), under the legends, where the drawing keeps clear. Top = 2P + 186
+ * (stacked) or P + 104 (wide), as in draw.ts's layout.
+ */
+.bo-controls {
+  position: absolute;
+  z-index: 3;
+  top: calc(2 * (100cqw - 32px) + 186px);
+  right: 16px;
+  display: flex;
+  gap: 6px;
+}
+@container (min-width: 640px) {
+  .bo-controls {
+    top: calc((100cqw - 80px) / 2 + 104px);
+    right: 24px;
+  }
+}
+/* Hairline mono buttons, the plate's own register (Build.css .b-play,
+   blueprints.css .pl-motion-btn); 44 px of target from an inset overlay. */
+.bo-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  height: 30px;
+  padding: 0;
+  border: 1px solid rgb(248 244 239 / 16%);
+  background: var(--pl-ground, #0e1d1a);
+  color: rgb(248 244 239 / 62%);
+  font-family: var(--f-mono, ui-monospace, monospace);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
+}
+.bo-btn::before {
+  content: '';
+  position: absolute;
+  inset: 50% -1px auto;
+  translate: 0 -50%;
+  height: 44px;
+}
+.bo-btn svg {
+  width: 12px;
+  height: 12px;
+  flex: none;
+}
+.bo-again {
+  padding: 0 0.8em 0 0.7em;
+}
+.bo-play {
+  width: 30px;
+}
+@media (hover: hover) {
+  .bo-btn:hover {
+    color: var(--c-paper, #f8f4ef);
+    border-color: rgb(248 244 239 / 34%);
+  }
+}
+.bo-btn:focus-visible {
+  outline: 1px solid var(--c-mint, #a2d0be);
+  outline-offset: 3px;
+}
+/* The narrowest plates (under draw.ts TIGHT, 340 px): Run again shows its
+   icon only, so the chart's title keeps its row; the word stays the
+   button's accessible name. */
+@container (max-width: 339.98px) {
+  .bo-again {
+    width: 30px;
+    padding: 0;
+  }
+  .bo-again span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+/* On the paper look (draw.ts LOOK), ink hairlines instead of paper ones,
+   on draw.ts's ground. */
+.bo-plate--paper {
+  --pl-ground: #fbf9f6;
+}
+.bo-plate--paper .bo-btn {
+  border-color: rgb(19 19 18 / 16%);
+  color: rgb(19 19 18 / 62%);
+}
+@media (hover: hover) {
+  .bo-plate--paper .bo-btn:hover {
+    color: var(--c-ink, #131312);
+    border-color: rgb(19 19 18 / 40%);
+  }
+}
+.bo-plate--paper .bo-btn:focus-visible {
+  outline-color: var(--c-teal-ink, #2a6669);
+}
+/* Scripting off: nothing to run again or pause. */
+@media (scripting: none) {
+  .bo-controls {
+    display: none;
+  }
+}

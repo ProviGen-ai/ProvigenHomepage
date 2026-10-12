@@ -1,0 +1,21 @@
+/*
+ * Fig. 01 · the ten-day cycle (CycleBar.tsx), a canvas on a dark plate.
+ * The canvas draws at one logical px per CSS px, so the box reserves the
+ * layout's height directly: 396 px, or 436 px once the plate is narrower than
+ * 640 px (the same test the component makes, as a container query on the
+ * plate). The page does not move when the canvas sizes itself. Pause / Play
+ * sits in the plate's bottom-right corner (.pl-controls, app/blueprints.css),
+ * which the drawing keeps clear.
+ */
+.cb-plate {
+  container-type: inline-size;
+}
+.cb-plate .cb-box {
+  aspect-ratio: auto;
+  height: 396px;
+}
+@container (max-width: 639px) {
+  .cb-plate .cb-box {
+    height: 436px;
+  }
+}

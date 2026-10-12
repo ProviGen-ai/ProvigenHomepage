@@ -1,0 +1,178 @@
+/*
+ * Brand faces, subset to woff2. Regenerate with pyftsubset (fonttools + brotli):
+ *
+ *   U='U+0020-007E,U+00A0-00FF,U+2013,U+2014,U+2018,U+2019,U+201C,U+201D,U+2022,U+2026,
+ *      U+2032,U+2033,U+2039,U+203A,U+2044,U+20AC,U+2122,U+2190-2194,U+2212,U+2248,U+2260,
+ *      U+2264,U+2265,U+2011,U+2009,U+202F,U+FEFF'
+ *   pyftsubset <source>.ttf --output-file=<face>.woff2 --flavor=woff2 --unicodes="$U" \
+ *     --layout-features='kern,liga,clig,calt,ccmp,locl,tnum,zero,frac,numr,dnom' \
+ *     --name-IDs='0,1,2,3,4,5,6,13,14' --notdef-outline --no-hinting --desubroutinize
+ *
+ * The range is Latin + digits + punctuation, plus the typographic marks the copy actually
+ * uses (– — ’ “ ” … × · ° § © ä é ü ≈ ≤ − →). tnum/zero are kept because the mono labels
+ * set font-variant-numeric: tabular-nums and font-feature-settings: 'zero' 1.
+ * Licences: Manrope-OFL.txt, InstrumentSerif-OFL.txt, GeistMono-OFL.txt.
+ *
+ * Manrope ships 400/500/600 only: no rule in the site resolves to 700, and every <b>/<strong>
+ * is given an explicit lighter weight (.prose strong 600, .band-head .eyebrow b 500).
+ */
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/assets/fonts/instrument-serif-italic.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/assets/fonts/instrument-serif-regular.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/assets/fonts/manrope-400.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/assets/fonts/manrope-500.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/assets/fonts/manrope-600.woff2) format('woff2');
+}
+/*
+ * Kessler Display (Production Type; Alaric Garnier, 2019): the headline face
+ * since 7 Oct 2026 (founder, after Extropic's site, which sets the same cut).
+ * Files: Production Type's TRIAL web cuts (KesslerDisplayWeb-Regular/Italic-
+ * Trial.woff2), renamed only, contents unchanged. Not for publication: buy the
+ * web licence (Regular, from €80) and swap in the licensed files before any
+ * deploy [TBC]. The trial holds 74 characters (A–Z a–z 0–9 . , ! ? ' " & - /
+ * + and space); ; : ’ ‘ “ ” – — ( ) · → × % ° and the rest fall back to EB
+ * Garamond through --f-display (site.css). One weight, declared for the whole
+ * range, so headings that ask for 200 (set for the old mono) get this cut.
+ * size-adjust 115% matches its x-height (0.45 em) to the old mono's (0.51 em)
+ * plus a little presence, so the rules' sizes still read right; lines come out
+ * about a fifth shorter, which the width caps in Hero.css and Problem.css only
+ * make safer. The overrides are given before size-adjust scales them: 85/23
+ * makes 0.98/0.26 em, so caps sit as the mono's did in the tight display line
+ * heights (the file's own hhea 1000/-270 would drop every line 0.1 em).
+ */
+@font-face {
+  font-family: 'Kessler Display';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url(/assets/fonts/kessler-display-regular.woff2) format('woff2');
+  size-adjust: 115%;
+  ascent-override: 85%;
+  descent-override: 23%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Kessler Display';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url(/assets/fonts/kessler-display-italic.woff2) format('woff2');
+  size-adjust: 115%;
+  ascent-override: 85%;
+  descent-override: 23%;
+  line-gap-override: 0%;
+}
+
+/*
+ * PP Supply Mono (Pangram Pangram): headings in Ultralight (200), labels in
+ * Regular (400), as on the founder's own site (3 Oct 2026). A commercial face:
+ * the web licence must be confirmed before a public launch or the next preview
+ * deploy [TBC]. The Regular covers the whole range above; the Ultralight lacks
+ * ≈ ≤ and − (U+2212), which in a heading fall back to Geist Mono 200 (−) or the
+ * system mono (≈ ≤; the Geist subset lacks them too), so keep them out of
+ * headings. A few Ultralight advances leave the 549-unit grid (} » ¿ ß § † ‡ ‰ ™).
+ * The files set USE_TYPO_METRICS with typo 710/-210/280 against hhea 990/-210/0:
+ * macOS lays them out by hhea, Windows and Android by typo (every glyph 0.14em
+ * higher). The overrides pin the hhea layout, the one QA'd, on every platform.
+ */
+@font-face {
+  font-family: 'PP Supply Mono';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url(/assets/fonts/pp-supply-mono-ultralight.woff2) format('woff2');
+  ascent-override: 99%;
+  descent-override: 21%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'PP Supply Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/assets/fonts/pp-supply-mono-regular.woff2) format('woff2');
+  ascent-override: 99%;
+  descent-override: 21%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url(/assets/fonts/geist-mono-var.woff2) format('woff2');
+}
+
+/*
+ * v3 (1 Oct 2026): EB Garamond (Georg Duffner, Octavio Pardo; SIL OFL 1.1, see EBGaramond-OFL.txt),
+ * variable wght 400-800, upright and italic, subset with the recipe above plus onum/lnum/smcp.
+ * Geist Mono (above) set the mono register until 3 Oct 2026; it is now the fallback behind
+ * PP Supply Mono.
+ */
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url(/assets/fonts/eb-garamond-var.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: italic;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url(/assets/fonts/eb-garamond-italic-var.woff2) format('woff2');
+}
+
+/*
+ * Metric-matched fallbacks (1 Oct 2026): Times New Roman scaled to EB Garamond's average
+ * advance (English letter frequency, computed with fontTools), so text keeps its line breaks
+ * when the web font swaps in. size-adjust = 0.3832 / 0.4052 (upright), 0.3715 / 0.4068 (italic);
+ * ascent/descent = EB Garamond hhea 1007 / -298 per 1000, divided by size-adjust.
+ */
+@font-face {
+  font-family: 'EB Garamond Fallback';
+  font-style: normal;
+  src: local('Times New Roman'), local('TimesNewRomanPSMT'), local('Times');
+  size-adjust: 94.57%;
+  ascent-override: 106.48%;
+  descent-override: 31.51%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'EB Garamond Fallback';
+  font-style: italic;
+  src: local('Times New Roman Italic'), local('TimesNewRomanPS-ItalicMT'), local('Times Italic');
+  size-adjust: 91.33%;
+  ascent-override: 110.26%;
+  descent-override: 32.63%;
+  line-gap-override: 0%;
+}
