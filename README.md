@@ -1,40 +1,106 @@
 # ProviGen website
 
-Source of provigen.ai. Built with vinext (the Next.js App Router API on Vite), React 19 and TypeScript.
+Source of [provigen.ai](https://provigen.ai). Built with vinext (the Next.js App Router API on Vite), React 19 and TypeScript.
 
-## Development
+## Quick start
 
-Node 22.13+. `npm ci`, `npm run dev` (http://localhost:3000). Checks: `npx tsc --noEmit`, `npm run lint`, `npm run build`. Changes to `next.config.ts` (redirects) need a dev-server restart.
+Requires Node 22.13 or newer.
 
-Environment: `SITE_URL` (default https://provigen.ai) and `SITE_ENV` (only `production` may be indexed) drive metadata, canonicals, robots and the sitemap (`lib/site-env.ts`); `SITE_ANALYTICS=vercel` turns on cookieless page views and switches the privacy text with them. The contact form's variables (`RESEND_API_KEY`, `CONTACT_*`) are documented in `lib/contact/README.md`. Keep secrets in `.env*` or `.dev.vars`; both are ignored by git.
+```bash
+npm ci
+npm run dev
+```
 
-Deploy folders: `npm run deploy:preview` and `npm run deploy:production` build the site and write a Vercel-ready folder next to this repository (`../output/provigen-preview-vercel`, `../output/provigen-site-vercel`).
+The site runs at http://localhost:3000.
 
-Screenshots: `node scripts/shot.mjs URL OUT.png [--width] [--height] [--mobile] [--settle]`. Full-page captures stretch `100svh` sections, so review long pages at successive scroll positions instead.
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Dev server with hot reload. Changes to `next.config.ts` need a restart. |
+| `npx tsc --noEmit` | Type check. |
+| `npm run lint` | Lint with oxlint. |
+| `npm run format` | Format with oxfmt. |
+| `npm run build` | Writes the feed, robots and sitemap, builds the site into `dist/`, then runs the claims check. |
+| `npm run start` | Serves the built site locally. |
+| `npm run check:claims` | Runs the claims check on its own (see [Claims](#claims)). |
+
+Run the type check, lint and build before you push.
+
+## Layout
+
+| Path | Contents |
+| --- | --- |
+| `app/` | Routes, the root layout and the global stylesheets. |
+| `components/home/` | The homepage: one server component and one CSS file per section, client islands in subfolders. |
+| `components/audiences/`, `components/pages/` | The audience pages and the shared subpage skeleton and tabs. |
+| `components/writings/` | Essay furniture and the interactive figures. |
+| `components/site/` | Header, Footer, Frame, Marquee, VideoBackdrop, ShaderGradient, MonoMarks. |
+| `components/plate/`, `components/hairline/` | The canvas and SVG kits the animated figures share. |
+| `content/` | All copy. Homepage sections in `content/home/`, pages in `content/pages/`, essays in `content/writings/`, site-wide text in `content/site.ts`. |
+| `lib/` | Site settings (`site-env.ts`), the contact handler and shared hooks. |
+| `public/` | Films, images, logos, fonts, share cards and icons. |
+| `scripts/` | Build, deploy and asset tooling. |
+| `claims-ledger.json` | The figures the claims check accepts. |
+
+To change text, edit `content/`. To change how something looks, edit the component and its CSS file.
 
 ## Pages
 
-- `/` — homepage, one section per component in `components/home/`.
-- `/biopharma`, `/ai-labs` — audience pages (`components/audiences/`, `components/pages/`).
-- `/writings` — index and the essays; copy in `content/writings/`.
-- `/careers`, `/contact`, `/legal-notice`, `/privacy`, 404.
-- `/api/contact` — the contact form's endpoint (`lib/contact/handler.ts`); the form falls back to an email draft.
-- `/preview/<slug>` (dev only) renders one homepage section: hero, problem, stakes, build, inside, team, join.
-- Retired routes redirect with 308 (`retired` in `next.config.ts`, which `scripts/prepare-vercel.mjs` also writes into vercel.json).
-- `feed.xml`, `robots.txt` and `sitemap.xml` are written to `public/` before each build by `scripts/make-public-files.mjs` (robots and sitemap follow `SITE_ENV`).
+- `/`: the homepage.
+- `/biopharma`, `/ai-labs`: audience pages.
+- `/writings`: the index and the essays.
+- `/careers`, `/contact`, `/legal-notice`, `/privacy` and the 404 page.
+- `/api/contact`: the contact form's endpoint. The form falls back to an email draft when sending is not configured.
+- `/preview/<slug>`: dev only, renders one homepage section (`hero`, `problem`, `stakes`, `build`, `inside`, `team`, `join`).
 
-## Design system
+Retired routes redirect with 308. The list is `retired` in `next.config.ts`.
 
-- `app/site.css` — v3 tokens (`--c-*`, `--f-*`, `--g-*`), type (`.s-display … .s-label`), buttons, status chips, grain, frames, motion, header, footer. Every v3 class is prefixed `s-`.
-- `app/tokens.css` — the v2 token names, remapped to the v3 palette and fonts so the article and legal templates inherit it. `app/{type,textures,motion,figures,prose,blueprints,globals,design}.css` remain for the long-form pages (`design.css` also imports `public/assets/fonts/fonts.css`).
-- `components/site/` — Header, Footer, Frame, Marquee, VideoBackdrop, ShaderGradient (WebGL living gradient), SquareRing.
-- `components/home/` — one server component + CSS per homepage section, client islands in subfolders; copy in `content/home/*.ts`; site-wide copy in `content/site.ts`.
-- `components/plate/` — the canvas kit the animated figures share.
-- CSS rule: import a section's CSS only from a server component or page (vinext orders CSS from client modules first). Raw `<img>` is a lint error; use `next/image` with `unoptimized`.
-- Motion: everything pauses with `prefers-reduced-motion`.
+`feed.xml`, `robots.txt` and `sitemap.xml` are generated into `public/` before every build by `scripts/make-public-files.mjs`. Do not edit or commit them.
+
+## Environment
+
+None of these is needed for local development.
+
+| Variable | Default | Effect |
+| --- | --- | --- |
+| `SITE_URL` | `https://provigen.ai` | Public origin for metadata, canonicals and the sitemap. |
+| `SITE_ENV` | none | Only `production` lets search engines index the site. Anything else stays noindex. |
+| `SITE_ANALYTICS` | none | `vercel` turns on cookieless page views and switches the privacy text with them. |
+| `STATIC_EXPORT` | none | `1` builds a plain static site into `dist/client`. |
+| `RESEND_API_KEY`, `CONTACT_*` | | The contact form. See `lib/contact/README.md`. |
+
+Keep secrets in `.env*` or `.dev.vars`. Both are ignored by git.
+
+## Deploying
+
+```bash
+npm run deploy:preview
+npm run deploy:production
+```
+
+Each command builds a static export and writes a Vercel-ready folder next to this repository (`../output/provigen-preview-vercel` and `../output/provigen-site-vercel`). Deploy from inside that folder with `npx vercel deploy --prod`. The preview build is noindex. The production build fails if the claims check does not pass.
+
+## Conventions
+
+- **Tokens and type** live in `app/site.css` (`--c-*`, `--f-*`, `--g-*`, `.s-display … .s-label`). Every class from this system is prefixed `s-`.
+- **Long-form pages** (essays, legal) use `app/tokens.css` and `app/{type,textures,motion,figures,prose,blueprints,globals,design}.css`.
+- **CSS imports:** import a section's CSS only from a server component or a page. vinext orders CSS from client modules first.
+- **Images:** raw `<img>` is a lint error. Use `next/image` with `unoptimized`.
+- **Motion:** every animation respects `prefers-reduced-motion`.
 
 ## Claims
 
-Public pages never say or imply that ProviGen builds a lab of its own or takes, keeps or reuses partners' data.
+Two rules apply to everything the site says:
 
-No ProviGen metrics, multipliers, partner names or raise sizes. Capability statuses live in `content/home/build.ts`. `npm run build` ends with `scripts/check-claims.mjs`: every figure in the built pages must be listed in `claims-ledger.json`, and a production build fails on any `[TBC]`, unlisted figure or figure not signed off. Every figure and number carries a source line.
+1. Public pages never say or imply that ProviGen builds a lab of its own or takes, keeps or reuses partners' data.
+2. No ProviGen metrics, multipliers, partner names or raise sizes. Every figure carries a source line.
+
+`npm run build` ends with `scripts/check-claims.mjs`. Every figure in the built pages must be listed in `claims-ledger.json`. A production build fails on any `[TBC]`, any unlisted figure and any figure that is not signed off. Capability statuses live in `content/home/build.ts`.
+
+## Tooling
+
+- `scripts/shot.mjs`: headless-Chrome screenshots. `node scripts/shot.mjs URL OUT.png [--width] [--height] [--mobile] [--settle]`. Full-page captures stretch `100svh` sections, so review long pages at successive scroll positions.
+- `scripts/make-share-assets.mjs`: renders the share cards and the icon set.
+- `scripts/make-grain.mjs`: regenerates the film-grain tile.
+- `scripts/calibrate-*.mjs`: calibrate the simulations behind the essay figures.
