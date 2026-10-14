@@ -1,8 +1,20 @@
 import { sites } from '@openai/sites-vite-plugin';
 import tailwindcss from '@tailwindcss/postcss';
 import vinext from 'vinext';
+import { readFileSync } from 'node:fs';
 import { defineConfig } from 'vite';
-import hostingConfig from './.openai/hosting.json';
+
+/* .openai/hosting.json names the D1 and R2 bindings where the site creator
+   provides them. It is not in git, so builds elsewhere (Vercel's, a fresh
+   clone) run without bindings, which this site does not use. */
+const hostedConfig: { d1: string | null; r2: string | null } | null = (() => {
+  try {
+    return JSON.parse(readFileSync(new URL('./.openai/hosting.json', import.meta.url), 'utf8'));
+  } catch {
+    return null;
+  }
+})();
+const hostingConfig = hostedConfig ?? { d1: null, r2: null };
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
   '00000000-0000-4000-8000-000000000000';
@@ -51,7 +63,8 @@ export default defineConfig(async () => {
       : undefined,
     plugins: [
       vinext(),
-      sites(),
+      // The site creator's plugin copies .openai/hosting.json; without it (Vercel) it stays out.
+      ...(hostedConfig ? [sites()] : []),
       cloudflare({
         viteEnvironment: { name: 'rsc', childEnvironments: ['ssr'] },
         config: localBindingConfig,
