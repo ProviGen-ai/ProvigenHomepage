@@ -121,7 +121,7 @@ export const members: Member[] = [
        biomedical neuroscience (TU Munich), genome editing research at Harvard
        Medical School, and doctoral research at Boston Children’s Hospital.
        Turns deep bioprocess pain into a fundable product wedge.'). */
-    bio: 'Strategy, operations, fundraising. Background in medicine × biomedical neuroscience, with research in genome editing. Brings a blend of business and product perspective.',
+    bio: 'Strategy, operations, fundraising. Background in medicine × biomedical neuroscience, with genome editing research at Harvard Medical School and Boston Children’s Hospital. Brings a blend of business and product perspective.',
     crop: { size: 660, x: 100, y: -8 },
     ...fromData('Magdalena'),
   },
