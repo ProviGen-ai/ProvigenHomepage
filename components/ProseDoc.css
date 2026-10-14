@@ -1,0 +1,78 @@
+/* Plain documents (/legal-notice, /privacy), v3. All classes pd-*.
+   One reading column (~720 px), head and body on the same left edge. */
+.pd-col {
+  max-width: var(--s-read);
+  margin-inline: auto;
+}
+
+/* ---------- Head ---------- */
+.pd-hero {
+  isolation: isolate;
+  padding-block: calc(var(--s-header) + clamp(4rem, 8vw, 8rem)) clamp(2.5rem, 4vw, 4rem);
+}
+.pd-hero.s-grain::after {
+  -webkit-mask-image: linear-gradient(180deg, #000 40%, transparent 66%);
+  mask-image: linear-gradient(180deg, #000 40%, transparent 66%);
+}
+.pd-hero-wash {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(48% 80% at 0% 0%, rgb(162 208 190 / 55%), transparent 72%),
+    radial-gradient(36% 70% at 100% 10%, rgb(230 217 171 / 70%), transparent 72%),
+    radial-gradient(28% 50% at 88% 55%, rgb(226 159 55 / 22%), transparent 72%),
+    linear-gradient(180deg, transparent 55%, var(--c-paper) 100%);
+}
+.pd-eyebrow {
+  color: var(--c-muted);
+}
+.s-page-hero .pd-title {
+  max-width: none;
+}
+.pd-updated {
+  margin-top: 1.5rem;
+  color: var(--c-muted);
+}
+
+/* ---------- Body ---------- */
+.pd-layout {
+  padding-bottom: clamp(5rem, 4rem + 5vw, 9rem);
+}
+.pd-section + .pd-section {
+  margin-top: clamp(2.75rem, 2.25rem + 1.5vw, 3.75rem);
+}
+.pd-h2 {
+  color: var(--c-ink);
+}
+.pd-text {
+  display: grid;
+  gap: 1.1em;
+  margin-top: 1.1rem;
+  font-family: var(--f-serif);
+  font-size: clamp(1.1875rem, 1.1rem + 0.25vw, 1.3125rem);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/* Bulleted lists inside a section: hairline dashes, not dots. */
+.pd-list {
+  display: grid;
+  gap: 0.2em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pd-list li {
+  position: relative;
+  padding-left: 1.5em;
+}
+.pd-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.8em;
+  width: 0.8em;
+  border-top: 1px solid var(--c-line-2);
+}

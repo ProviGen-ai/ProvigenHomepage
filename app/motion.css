@@ -1,0 +1,159 @@
+/* ProviGen v2 motion: four verbs (rise, reveal, draw-on, travelling signal), one site-wide pause. */
+:root {
+  --dur-1: 150ms;
+  --dur-2: 240ms;
+  --dur-3: 420ms;
+  --dur-4: 700ms;
+  --dur-draw: 1200ms;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Masked line rise for headlines: <span class="rise"><span style="--i:n">line</span></span> */
+.rise {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.rise > span {
+  display: block;
+  translate: 0 110%;
+  animation: pv-rise 900ms var(--ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 90ms + 80ms);
+}
+@keyframes pv-rise {
+  to {
+    translate: 0 0;
+  }
+}
+
+/* In-view reveal: a Reveal root gets .is-in once; children with data-reveal stagger by --i. */
+/* Hidden only once the boot script confirms JS can reveal it again; :where() keeps
+   the original specificity so .is-in and the paused overrides still win. */
+:where(html[data-reveal='js']) [data-reveal] {
+  opacity: 0;
+  translate: 0 22px;
+  transition:
+    opacity var(--dur-3) var(--ease-out),
+    translate var(--dur-3) var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+.is-in [data-reveal],
+[data-reveal].is-in {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* Draw-on for SVG paths with pathLength="1". */
+.draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.is-in .draw,
+[data-running='true'] .draw {
+  animation: pv-draw var(--dur-draw) var(--ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 120ms);
+}
+@keyframes pv-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Settle: figure tiers move 24px into their exploded position on enter. */
+.settle {
+  translate: 0 var(--settle-from, 24px);
+  transition: translate var(--dur-4) var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+.is-in .settle,
+[data-running='true'] .settle {
+  translate: 0 0;
+}
+
+/* Everything still when the visitor asks for it. */
+/* Pages gate .rise on their own .is-in root, so with scripting off nothing would ever
+   lift the pre-state. Author the finished state as the default there. */
+@media (scripting: none) {
+  .rise > span {
+    animation: none;
+    translate: 0 0;
+  }
+  /* The whole illustration system is gated on classes only JS adds (.is-in,
+     [data-running]), so with scripting off every fine-line figure held its
+     pre-state: paths at stroke-dashoffset 1 (invisible) inside tiers still
+     offset 24px, i.e. an empty frame with floating labels. Author the finished
+     state as the default, unscoped, for every route. */
+  .draw {
+    stroke-dashoffset: 0;
+  }
+  .settle {
+    translate: 0 0;
+    transition: none;
+  }
+  /* Defensive: the pre-state is already scoped to html[data-reveal='js'], which
+     only the boot script sets, but this keeps the finished state explicit.
+     Scoped to body: <html> itself carries data-reveal, and any `translate` on it
+     (even 0 0) makes it the containing block of position: fixed, which pinned the
+     header and the mobile menu to the top of the document under reduced motion. */
+  body [data-reveal] {
+    opacity: 1;
+    translate: 0 0;
+    transition: none;
+  }
+  /* Per-section fade-ins follow the same pattern: opacity 0 until .is-in/.is-on.
+     These live in section CSS that loads after this file, so the `html` prefix
+     buys one element of specificity and makes the override order-independent.
+     .s-why-now-cb-fade is deliberately absent: it is an inverted fade-OUT
+     (.is-in sets opacity 0), so it is already correct without JS. */
+  html .s-hero-fade,
+  html .s-layer-fade,
+  html .s-behaviour-fade,
+  html .s-campaign-fade {
+    animation: none;
+    opacity: 1;
+    transition: none;
+  }
+  html .s-company-rings-svg .s-company-fade {
+    opacity: var(--o, 0.85);
+    transition: none;
+  }
+}
+html[data-motion='paused'] .rise > span {
+  animation: none;
+  translate: 0 0;
+}
+html[data-motion='paused'] [data-reveal] {
+  opacity: 1;
+  translate: 0 0;
+  transition: none;
+}
+html[data-motion='paused'] .draw {
+  animation: none;
+  stroke-dashoffset: 0;
+}
+html[data-motion='paused'] .settle {
+  translate: 0 0;
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise > span {
+    animation: none;
+    translate: 0 0;
+  }
+  /* body-scoped: <html> carries data-reveal too (see above). */
+  body [data-reveal] {
+    opacity: 1;
+    translate: 0 0;
+    transition: none;
+  }
+  .draw {
+    animation: none !important;
+    stroke-dashoffset: 0;
+  }
+  .settle {
+    translate: 0 0;
+    transition: none;
+  }
+}

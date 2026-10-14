@@ -1,0 +1,476 @@
+/*
+ * Inner pages on one skeleton: /careers (3 Oct 2026; /how-it-works and
+ * /partners used it too until the founder removed them that evening).
+ * All classes sp-*. Tokens and type come from app/site.css; nothing here
+ * restyles an s- class outside these pages. The hero follows the /writings
+ * index (living gradient, paper wash, display line, one-line dek) at a lower
+ * height, so the first section shows on the first screen (review R25 asked
+ * the same of the Writings head). Sections open on the "Earlier essays"
+ * label: mono caps over a 24 % hairline.
+ */
+.sp-page {
+  /* The first column every ledger on these pages shares (step names, table
+     keys, linked titles), so the second column lines up down the page. */
+  --sp-key: clamp(10.5rem, 6rem + 12vw, 19.5rem);
+  --sp-col-gap: clamp(1.25rem, 0.5rem + 2vw, 2.75rem);
+  --sp-row-pad: clamp(1.25rem, 0.9rem + 1vw, 1.85rem);
+}
+
+/* ================================================================
+   Hero
+   ================================================================ */
+.sp-hero {
+  min-height: clamp(440px, 58svh, 620px);
+  display: grid;
+  align-items: end;
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
+  --grain: 0.12;
+  --grain-blend: overlay;
+}
+/* The grain fades before the hero ends, so no seam shows on the paper below. */
+.sp-hero.s-grain::after {
+  -webkit-mask-image: linear-gradient(180deg, #000 48%, transparent 64%);
+  mask-image: linear-gradient(180deg, #000 48%, transparent 64%);
+}
+.sp-hero-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+/* Paper from the left keeps the line legible over the field; the foot melts into the page. */
+.sp-hero-wash {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgb(248 244 239 / 74%) 0%, rgb(248 244 239 / 0%) 64%),
+    linear-gradient(
+      180deg,
+      rgb(248 244 239 / 55%) 0%,
+      rgb(248 244 239 / 0%) 30%,
+      rgb(248 244 239 / 0%) 60%,
+      var(--c-paper) 100%
+    );
+}
+.sp-hero-inner {
+  position: relative;
+  z-index: 4;
+}
+/* With a figure (/ai-labs, 8 Oct 2026): the line on the left, the figure on
+   the right from 1080 px; under the line, full width, below that. */
+.sp-hero--figure {
+  padding-top: calc(var(--s-header) + clamp(2.5rem, 5vw, 5rem));
+}
+.sp-hero--figure .sp-hero-figure {
+  margin-top: clamp(2rem, 1.25rem + 2vw, 3rem);
+}
+@media (min-width: 1080px) {
+  .sp-hero--figure .sp-hero-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    align-items: end;
+    column-gap: clamp(2rem, 4vw, 5rem);
+  }
+  .sp-hero--figure .sp-hero-figure {
+    margin-top: 0;
+  }
+}
+.s-page-hero .sp-hero-title {
+  margin-top: 0;
+  max-width: none;
+}
+.sp-hero-title em {
+  color: var(--c-teal-ink);
+}
+.s-page-hero .sp-hero-dek {
+  margin-top: 1.5rem;
+  max-width: 38ch;
+  color: rgb(19 19 18 / 78%);
+  text-wrap: balance;
+}
+
+/* ================================================================
+   Sections
+   ================================================================ */
+.sp-section {
+  padding-top: clamp(3.5rem, 2rem + 4.5vw, 7rem);
+}
+/* The section's h2, as "Earlier essays" on /writings. */
+.sp-label {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--c-line-2);
+  color: var(--c-muted);
+}
+
+/* ---------- Step ledger ---------- */
+.sp-steps,
+.sp-lines,
+.sp-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sp-step {
+  display: grid;
+  grid-template-columns: var(--sp-key) minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: var(--sp-col-gap);
+  row-gap: 0.4rem;
+  padding-block: var(--sp-row-pad);
+  border-bottom: 1px solid var(--c-line-2);
+}
+/* With statuses, a third column on the right; the long one wraps inside it. */
+.sp-steps--status .sp-step {
+  grid-template-columns: var(--sp-key) minmax(0, 1fr) minmax(0, 15.5rem);
+}
+/* Names and row titles in the display face since the founder's font swap
+   (3 Oct 2026): weight 200 at about 0.75× the serif size, the regular weight
+   where they fall under ~22 px. */
+.sp-step-name {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(1.25rem, 0.95rem + 0.8vw, 1.8rem);
+  line-height: 1.1;
+  letter-spacing: var(--d-track-l);
+}
+.sp-step-line,
+.sp-step-items {
+  max-width: 44ch;
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  line-height: 1.45;
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+/* A short list in place of the line: one item per line, no markers. */
+.sp-step-items {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sp-step-line a,
+.sp-step-items a {
+  color: var(--c-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+.sp-step-line a:hover,
+.sp-step-items a:hover {
+  color: var(--c-teal-ink);
+}
+/* Status in words: the mono register the chips used, without the box (the
+   founder cut the chips on 3 Oct 2026). Colour follows site.css: teal ink
+   for running, amber ink for in development. */
+.sp-status {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.sp-status--running {
+  color: var(--c-teal-ink);
+}
+.sp-status--dev {
+  color: var(--c-amber-ink);
+}
+.sp-status--planned {
+  color: var(--c-muted);
+}
+
+/* ---------- Sentence ledger ---------- */
+/* The rule runs the full width; the sentence keeps a reading measure. */
+.sp-lines-item {
+  padding-block: var(--sp-row-pad);
+  border-bottom: 1px solid var(--c-line-2);
+}
+/* Short statements: balanced, so none ends on a stranded word or two. */
+.sp-lines-text {
+  display: block;
+  max-width: 46ch;
+  font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.75rem);
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+.sp-lines-text a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+.sp-lines-text a:hover {
+  color: var(--c-teal-ink);
+}
+
+/* ---------- Linked rows ---------- */
+.sp-rows {
+  position: relative;
+  isolation: isolate;
+}
+.sp-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2.5rem;
+  align-items: baseline;
+  column-gap: var(--sp-col-gap);
+  row-gap: 0.45rem;
+  padding-block: var(--sp-row-pad);
+  border-bottom: 1px solid var(--c-line-2);
+}
+.sp-rows--split .sp-row {
+  grid-template-columns: var(--sp-key) minmax(0, 1fr) 2.5rem;
+}
+/* The same warm wash as a /writings row on hover. */
+.sp-row::before {
+  content: '';
+  position: absolute;
+  inset: 0 calc(-1 * var(--s-gutter));
+  z-index: -1;
+  background: linear-gradient(90deg, rgb(162 208 190 / 0%), rgb(162 208 190 / 22%) 30%, rgb(230 217 171 / 30%));
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+.sp-row:hover::before {
+  opacity: 1;
+}
+.sp-row-link {
+  grid-column: 1;
+  color: inherit;
+  text-decoration: none;
+}
+/* The whole row is the target; the title is the link's name. */
+.sp-row-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.sp-row-link:focus-visible {
+  outline: none;
+}
+.sp-row:has(.sp-row-link:focus-visible) {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 4px;
+}
+.sp-row-title {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(1.125rem, 0.86rem + 0.9vw, 1.8rem);
+  line-height: 1.12;
+  letter-spacing: var(--d-track-l);
+  text-wrap: balance;
+}
+.sp-row-title em {
+  font-family: inherit;
+  font-weight: inherit;
+  font-style: normal;
+  letter-spacing: inherit;
+  color: var(--c-teal-ink);
+}
+@media (max-width: 900px) {
+  .sp-step-name,
+  .sp-row-title {
+    font-weight: 400;
+    letter-spacing: var(--d-track-s);
+  }
+}
+.sp-row-line {
+  grid-column: 1;
+  max-width: 52ch;
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  line-height: 1.45;
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+.sp-rows--split .sp-row-line {
+  grid-column: 2;
+  grid-row: 1;
+}
+.sp-row-arrow {
+  grid-column: -2;
+  grid-row: 1;
+  justify-self: end;
+  align-self: center;
+  display: inline-flex;
+}
+.sp-row-arrow svg {
+  width: 18px;
+  height: 18px;
+  transition: translate 400ms var(--e-out);
+}
+.sp-row:hover .sp-row-arrow svg {
+  translate: 5px 0;
+}
+
+/* ---------- Arrow link (mono, as the cards' "Read") ---------- */
+.sp-arrow-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding-block: 0.35rem;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--c-line-3);
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
+}
+.sp-arrow-link svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  transition: translate 400ms var(--e-out);
+}
+.sp-arrow-link:hover {
+  color: var(--c-teal-ink);
+  border-color: currentColor;
+}
+.sp-arrow-link:hover svg {
+  translate: 4px 0;
+}
+
+/* ---------- Text tabs (components/pages/Tabs.tsx, 6 Oct 2026) ---------- */
+/* Words on the section's hairline: the active one in ink over a 1 px ink
+   rule, the others muted. No chips, no boxes (founder's cuts). */
+.sp-tablist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 clamp(1.25rem, 0.75rem + 1.5vw, 2.75rem);
+  border-bottom: 1px solid var(--c-line-2);
+}
+.sp-tab {
+  position: relative;
+  margin: 0 0 -1px;
+  padding: 1rem 0 0.95rem;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: none;
+  color: var(--c-muted);
+  font-family: var(--f-mono);
+  font-size: clamp(0.8125rem, 0.75rem + 0.25vw, 0.9375rem);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
+}
+.sp-tab:hover {
+  color: var(--c-ink);
+}
+.sp-tab.is-active {
+  color: var(--c-ink);
+  border-bottom-color: var(--c-ink);
+}
+.sp-tab:focus-visible {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 3px;
+}
+.sp-tabpanel:focus-visible {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 6px;
+}
+@media (pointer: coarse) {
+  .sp-tab {
+    min-height: 44px;
+  }
+}
+
+/* ================================================================
+   Close
+   ================================================================ */
+.sp-close {
+  padding-block: clamp(6rem, 4rem + 7vw, 11rem) clamp(3rem, 2rem + 3vw, 5rem);
+}
+.sp-close-eyebrow {
+  margin-bottom: 1.5rem;
+  color: var(--c-muted);
+}
+.sp-close-title {
+  max-width: 19ch;
+}
+.sp-close-note {
+  margin-top: 1.5rem;
+  max-width: 38ch;
+  font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.375rem);
+  line-height: 1.45;
+  color: var(--c-muted);
+  text-wrap: balance;
+}
+.sp-close-actions {
+  margin-top: clamp(2rem, 1.5rem + 1.5vw, 2.75rem);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem 2.25rem;
+}
+
+/* ================================================================
+   Tablet and phone
+   ================================================================ */
+@media (max-width: 960px) {
+  .sp-steps--status .sp-step {
+    grid-template-columns: var(--sp-key) minmax(0, 1fr);
+  }
+  .sp-steps--status .sp-status {
+    grid-column: 2;
+  }
+}
+/* Phone: one column. A step's name, line and status stack; a linked row keeps
+   its arrow beside the title, with the line under both. */
+@media (max-width: 720px) {
+  .sp-step,
+  .sp-steps--status .sp-step {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sp-steps--status .sp-status {
+    grid-column: 1;
+  }
+  .sp-step-line,
+  .sp-step-items {
+    margin-top: 0.15rem;
+  }
+  .sp-rows--split .sp-row {
+    grid-template-columns: minmax(0, 1fr) 2.5rem;
+  }
+  .sp-rows--split .sp-row-line {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+@media (max-width: 640px) {
+  .sp-hero {
+    min-height: clamp(420px, 64svh, 560px);
+  }
+}
+
+/* Touch: the arrow link grows to 44 px, as the site's buttons do. Linked rows
+   and FAQ questions are taller already; links inside a sentence are exempt
+   (WCAG 2.5.8). */
+@media (pointer: coarse) {
+  .sp-arrow-link {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-row::before,
+  .sp-row-arrow svg,
+  .sp-arrow-link svg {
+    transition: none;
+  }
+}

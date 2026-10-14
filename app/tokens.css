@@ -1,0 +1,139 @@
+/* ProviGen design tokens. v3 (1 Oct 2026) remaps the v2 swatch names onto the paper / ink / teal / orange palette so legacy article and legal pages inherit it. */
+:root {
+  --ink: #131312;
+  --ink-2: #1d1d1b;
+  --ink-3: #282826;
+  --ivory: #f8f4ef;
+  --ivory-2: #efeae3;
+  --ivory-3: #e3ded7;
+  --mint: #a2d0be;
+  --mint-2: #c6e3d7;
+  --green: #2a6669;
+  --green-2: #429195;
+  --stone: #5e5a55;
+  /* --stone-2 and --mist-2 exist only to feed --fg-faint, which carries
+     claims-critical, non-duplicated text at 10-13px (phase status labels, the
+     capabilities review date, figure provenance chips). They are therefore
+     tuned to clear WCAG 1.4.3 AA (4.5:1) on every ground they actually meet.
+     Was #8a948f: 2.75:1 on --ivory and 2.53:1 on --ivory-2 - both failing even
+     the 3:1 large-text floor. Now 5.15:1 on --ivory, 4.75:1 on --ivory-2
+     (4.33:1 on --ivory-3, which faint text never lands on; --stone itself only
+     reaches 4.75:1 there). Stays lighter than --stone so faint reads as a step
+     below --fg-muted rather than collapsing into it. */
+  --stone-2: #6b6762;
+  --mist: #bdb8b0;
+  /* Was #6f857c: 4.64:1 on --ink but 4.00:1 on --ink-2 and 3.55:1 on --ink-3,
+     so a faint caption on any inset ink panel failed silently. Now 6.07:1 on
+     --ink, 5.24:1 on --ink-2, 4.65:1 on --ink-3 - AA on all three - while
+     staying darker than --mist so the faint/muted step survives. */
+  --mist-2: #a29d95;
+  --flag: #e29f37;
+
+  --line-light: rgb(19 19 18 / 14%);
+  --line-light-2: rgb(19 19 18 / 30%);
+  --line-dark: rgb(248 244 239 / 16%);
+  --line-dark-2: rgb(248 244 239 / 38%);
+  --mark-light: rgb(66 145 149 / 55%);
+  --mark-dark: rgb(162 208 190 / 45%);
+
+  /* v3: EB Garamond carries display and reading text, Geist Mono (thin) every label. */
+  --font-sans: 'EB Garamond', Garamond, 'Times New Roman', serif;
+  --font-serif: 'EB Garamond', Garamond, 'Times New Roman', serif;
+  --font-mono:
+    'PP Supply Mono', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --content: 1200px;
+  --wide: 1440px;
+  --gutter: 24px;
+  --margin: clamp(1.25rem, 0.6rem + 3.5vw, 4rem);
+  --band-pad: clamp(5rem, 3.5rem + 5vw, 8.5rem);
+  --header-h: 64px;
+  --plate-gap: clamp(0.75rem, 0.4rem + 1.1vw, 1.25rem);
+
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4rem;
+  --s-9: 5rem;
+  --s-10: 6rem;
+  --s-11: 8rem;
+  --s-12: 10rem;
+
+  --grad-ink-wash:
+    radial-gradient(
+      ellipse 60% 50% at var(--wash-x, 78%) 42%,
+      rgb(66 145 149 / 40%),
+      transparent 62%
+    ),
+    radial-gradient(ellipse at 18% 108%, rgb(226 159 55 / 22%), transparent 58%);
+  --grad-ivory-wash:
+    linear-gradient(180deg, rgb(162 208 190 / 14%) 0%, rgb(162 208 190 / 0%) 38%),
+    radial-gradient(ellipse at 82% 12%, rgb(66 145 149 / 8%), transparent 55%);
+  --grad-close: linear-gradient(160deg, #131312 0%, #1d1d1b 48%, #2a6669 100%);
+}
+
+/* Light band (default inside the v2 system). */
+.pv,
+[data-theme='ivory'] {
+  --bg: var(--ivory);
+  --bg-2: var(--ivory-2);
+  --bg-3: var(--ivory-3);
+  --fg: var(--ink);
+  --fg-muted: var(--stone);
+  --fg-faint: var(--stone-2);
+  --accent: var(--green);
+  --accent-hover: var(--green-2);
+  --em: var(--green);
+  --signal: var(--green);
+  --line: var(--line-light);
+  --line-2: var(--line-light-2);
+  --mark: var(--mark-light);
+  --btn-bg: var(--ink);
+  --btn-fg: var(--ivory);
+  --btn-bg-hover: var(--green);
+  --grain-a: 0.07;
+  --grain-blend: multiply;
+  --wash: var(--grad-ivory-wash);
+  color-scheme: light;
+}
+[data-theme='ivory-2'] {
+  --bg: var(--ivory-2);
+  --bg-2: var(--ivory-3);
+  --grain-a: 0.06;
+}
+[data-theme='ink'],
+[data-theme='ink-2'],
+[data-theme='close'] {
+  --bg: var(--ink);
+  --bg-2: var(--ink-2);
+  --bg-3: var(--ink-3);
+  --fg: var(--ivory);
+  --fg-muted: var(--mist);
+  --fg-faint: var(--mist-2);
+  --accent: var(--mint);
+  --accent-hover: var(--mint-2);
+  --em: var(--mint);
+  --signal: var(--mint);
+  --line: var(--line-dark);
+  --line-2: var(--line-dark-2);
+  --mark: var(--mark-dark);
+  --btn-bg: var(--mint);
+  --btn-fg: var(--ink);
+  --btn-bg-hover: var(--mint-2);
+  --grain-a: 0.14;
+  --grain-blend: overlay;
+  --wash: var(--grad-ink-wash);
+  color-scheme: dark;
+}
+[data-theme='ink-2'] {
+  --bg: var(--ink-2);
+  --bg-2: var(--ink-3);
+  --grain-a: 0.12;
+}
+[data-theme='close'] {
+  --grain-a: 0.18;
+}

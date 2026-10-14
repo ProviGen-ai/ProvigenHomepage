@@ -1,0 +1,693 @@
+/* Section 5 · Team */
+.tm {
+  /* Portrait diameter: fluid, but never wider than a fifth of the row minus
+     a breathing gap (five people a row from 901 px up). */
+  --tm-d: min(
+    clamp(132px, 6rem + 9vw, 224px),
+    calc((100vw - 2 * var(--s-gutter)) / 5 - 2.5rem)
+  );
+  /* Capable's popup and glow timing: a 200 ms ease-out rise for the popup, a
+     short spring-like settle for the circles (stiffness 200, damping 25). */
+  --tm-settle: 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --tm-glow: rgb(66 145 149);
+  position: relative;
+  overflow: clip;
+  /* Neighbouring sections bring their own air; a full --s-section on both
+     sides would leave a screen of empty paper between them. */
+  /* Foot: 0.6 (was 0.8), founder 3 Oct 2026: 30% less air between the
+     backers and Join. Stands on the shared dawn field (Dawn.css). */
+  padding-block: calc(var(--s-section) * 0.6);
+  color: var(--c-ink);
+}
+
+/* Per-person light: one teal-to-orange sweep across the five portraits (the
+   duotone's radial light), the 1 Oct four-step sweep resampled to five. */
+[data-tm-n='0'] {
+  --tm-c1: #8cc4b2;
+  --tm-c2: #d3e2cf;
+  --tm-c3: #ecd5a0;
+}
+[data-tm-n='1'] {
+  --tm-c1: #9acbba;
+  --tm-c2: #dee3ca;
+  --tm-c3: #eece91;
+}
+[data-tm-n='2'] {
+  --tm-c1: #aad2c0;
+  --tm-c2: #e6e2c5;
+  --tm-c3: #ecc482;
+}
+[data-tm-n='3'] {
+  --tm-c1: #bbd8c4;
+  --tm-c2: #ecdebc;
+  --tm-c3: #e8b76b;
+}
+[data-tm-n='4'] {
+  --tm-c1: #c9dcc6;
+  --tm-c2: #efd9ae;
+  --tm-c3: #e3a445;
+}
+
+/* ---------- Background: paper with a breathing teal/sand glow behind the row ---------- */
+.tm-inner {
+  position: relative;
+}
+.tm-head,
+.tm-grid,
+.tm-block {
+  position: relative;
+  z-index: 4;
+}
+/* Room above the portraits for the popup, so the top row's popup opens between
+   the heading and the row instead of over (and seemingly cutting) the heading:
+   the tallest popup plus its 16 px gap and some air. Since 8 Oct 2026 the
+   bios are the founder's longer texts (up to six lines in the 400 px card,
+   ~190 px), so the room grew from 9rem. Phones get their own value below.
+   14 Oct 2026, the founder: half the gap (12rem → 6rem); a tall bio's popup
+   may now reach over the heading. */
+.tm-band {
+  position: relative;
+  margin-top: 6rem;
+}
+.tm-glow {
+  position: absolute;
+  inset: -45% -12%;
+  z-index: 1;
+  pointer-events: none;
+}
+.tm-glow > span {
+  position: absolute;
+  top: 50%;
+  width: min(68vw, 1040px);
+  aspect-ratio: 1.3;
+  border-radius: 50%;
+  filter: blur(18px);
+  animation: tm-breathe 18s var(--e-in-out) infinite alternate;
+}
+.tm-glow-teal {
+  left: 0;
+  translate: -18% -50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(162 208 190 / 72%),
+    rgb(162 208 190 / 34%) 46%,
+    rgb(162 208 190 / 0%) 100%
+  );
+}
+.tm-glow-sand {
+  right: 0;
+  translate: 18% -50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(234 184 98 / 58%),
+    rgb(236 212 160 / 40%) 46%,
+    rgb(230 217 171 / 0%) 100%
+  );
+  animation-delay: -9s;
+}
+@keyframes tm-breathe {
+  from {
+    transform: scale(0.94);
+    opacity: 0.82;
+  }
+  to {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+
+/* ---------- Head ---------- */
+.tm-head {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+.tm-eyebrow {
+  color: var(--c-muted);
+}
+
+/* ---------- Portrait row ---------- */
+.tm-stage {
+  position: relative;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+.tm-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 3.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* Five a row; a shorter last row (tablets, phones) stays centred. */
+.tm-cell {
+  position: relative;
+  display: flex;
+  flex: 0 0 20%;
+  justify-content: center;
+  min-width: 0;
+}
+/* The open person rises over its neighbours, so its popup does too. */
+.tm-cell[data-open] {
+  z-index: 2;
+}
+/* Hover area and popup anchor: portrait, name and role, nothing wider. */
+.tm-member {
+  position: relative;
+}
+
+/* The trigger: portrait, name, role. */
+.tm-person {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0 0.5rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.tm-person:focus-visible {
+  outline: none;
+}
+.tm-portrait {
+  position: relative;
+  display: block;
+  width: var(--tm-d);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: 0 4px 20px rgb(66 145 149 / 0%);
+  transition:
+    opacity var(--tm-settle),
+    box-shadow var(--tm-settle);
+}
+.tm-person:focus-visible .tm-portrait {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 5px;
+}
+
+/* Gradient duotone: grayscale portrait multiplied over a radial light (mint top
+   left into sand and orange bottom right), shadows lifted into deep teal. */
+.tm-photo {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  clip-path: circle(50% at 50% 50%);
+  isolation: isolate;
+  background: #fff;
+}
+.tm-light {
+  position: absolute;
+  inset: -30%;
+  background: radial-gradient(
+    72% 72% at 30% 26%,
+    var(--tm-c1) 0%,
+    var(--tm-c2) 42%,
+    var(--tm-c3) 82%
+  );
+  transform: rotate(calc(var(--n) * -6deg));
+}
+.tm-photo .tm-img {
+  position: absolute;
+  max-width: none;
+  height: auto;
+  mix-blend-mode: multiply;
+  filter: grayscale(1) contrast(1.06) brightness(1.03);
+}
+.tm-tint {
+  position: absolute;
+  inset: 0;
+  background: #1c4143;
+  mix-blend-mode: lighten;
+}
+
+/* First over last at every width: the longest name never fits a fifth of the
+   row on one line, and a lone two-line name dropped its role below the others. */
+.tm-name {
+  display: grid;
+  margin-top: 1.4rem;
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(1.375rem, 1.05rem + 0.75vw, 1.875rem);
+  line-height: 1.04;
+  /* As the founder's site tracks its 24 px headings; -0.045em is for 40 px and up. */
+  letter-spacing: var(--d-track);
+}
+/* Two short lines, the position over the title (TeamGrid's roleLines), so a
+   role never runs into its neighbour's; a role with no title wraps, balanced,
+   inside the same measure. */
+.tm-role {
+  display: grid;
+  justify-items: center;
+  max-width: 18em;
+  margin-top: 0.95rem;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  color: var(--c-muted);
+  transition: color 300ms ease;
+}
+
+/* Active person (hover, keyboard focus or a tap): the other circles fade to
+   half, the active one takes the teal glow. Names stay as they are. */
+.tm-cell[data-open] .tm-portrait {
+  box-shadow: 0 4px 30px var(--tm-glow);
+}
+.tm-grid[data-active] .tm-cell:not([data-open]) .tm-portrait {
+  opacity: 0.5;
+}
+.tm-cell[data-open] .tm-role {
+  color: var(--c-ink);
+}
+
+/* ---------- Popup: emerges above the active person ----------
+   Inside the member, not a portal. TeamGrid measures --tm-pop-x on open so it
+   centres over the person but stays 12 px inside the viewport; before that
+   (and without script) it simply centres. The horizontal place lives in `left`
+   and `translate`, which never transition, so a first open does not slide
+   sideways from the centred default; only the 4 px rise (`transform`) does. */
+.tm-pop {
+  position: absolute;
+  bottom: calc(100% + 16px);
+  left: var(--tm-pop-x, 50%);
+  translate: var(--tm-pop-shift, -50%) 0;
+  display: grid;
+  gap: 10px;
+  /* 320 px until 8 Oct 2026; wider for the longer bios, so they stay six lines or fewer */
+  width: 400px;
+  padding: 12px 12px 13px;
+  border-radius: 4px;
+  /* Paper lifted a step towards white, so the frosted card reads as a layer
+     over the paper rather than a smudge in it. */
+  background: rgb(253 251 248 / 84%);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  color: var(--c-ink);
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition:
+    opacity 200ms ease-out,
+    transform 200ms ease-out,
+    visibility 0s linear 200ms;
+}
+/* Bridges the gap down to the portrait, so the pointer can travel up into
+   the popup without closing it. */
+.tm-pop::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 18px;
+}
+.tm-cell[data-open] .tm-pop {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  transition:
+    opacity 200ms ease-out,
+    transform 200ms ease-out,
+    visibility 0s;
+}
+.tm-pop-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 12px;
+  min-height: 28px;
+}
+.tm-pop-logos {
+  --tm-logo: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+.tm-pop-role {
+  flex: none;
+  font-family: var(--f-serif);
+  font-size: 1.125rem;
+  font-style: italic;
+  line-height: 1;
+}
+.tm-pop-bio {
+  margin: 0;
+  font-family: var(--f-serif);
+  font-size: 1rem;
+  line-height: 1.3;
+  letter-spacing: 0.005em;
+  text-wrap: pretty;
+}
+
+/* ---------- Credentials and backers ---------- */
+.tm-block {
+  max-width: 1200px;
+  margin-inline: auto;
+  text-align: center;
+}
+.tm-from {
+  margin-top: clamp(4.5rem, 2.5rem + 5vw, 7.5rem);
+}
+.tm-backed,
+.tm-advisors {
+  margin-top: clamp(4.5rem, 3rem + 4vw, 7rem);
+}
+/* #team sits right above "Backed by". The root's scroll-padding (header +
+   16 px) plus this margin is one viewport less the block's top margin and a
+   little air, so the link scrolls until the "Backed by" heading sits just
+   below the bottom edge. */
+.tm-anchor {
+  display: block;
+  scroll-margin-top: calc(100lvh - var(--s-header) - 16px - clamp(4.5rem, 3rem + 4vw, 7rem) + 12px);
+}
+.tm-rule {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  color: var(--c-muted);
+  font-weight: 400;
+}
+.tm-rule::before,
+.tm-rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--c-line-2));
+}
+.tm-rule::after {
+  background: linear-gradient(90deg, var(--c-line-2), transparent);
+}
+.tm-rule span {
+  white-space: nowrap;
+}
+
+.tm-logos {
+  /* 36 px top until 6 Oct 2026; 32 px since Valneva made eight marks, so
+     they keep one row in the 1200 px column. */
+  --tm-logo: clamp(22px, 1rem + 1.4vw, 32px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem 1.5rem;
+  max-width: 1200px;
+  margin: 3rem auto 0;
+  padding: 0;
+  list-style: none;
+}
+.tm-logos li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Fixed columns below 1280 px: a wide mark may overhang its column a little
+     rather than push the row into another line. */
+  min-width: 0;
+}
+/* One logo at its optical height (--s); LMU shows its first box only (--ar). */
+.tm-mark {
+  display: block;
+  flex: none;
+  overflow: hidden;
+  height: calc(var(--tm-logo) * var(--s));
+  width: calc(var(--tm-logo) * var(--s) * var(--ar));
+}
+.tm-mark img {
+  display: block;
+  width: auto;
+  max-width: none;
+  height: 100%;
+}
+.tm-logos .tm-mark {
+  opacity: 0.88;
+}
+
+/* The backers: two large linked marks split by a hairline, each with a soft
+   glow on hover (mint for FR8, sand for EWOR). */
+.tm-backers {
+  display: flex;
+  justify-content: center;
+  margin: 2.5rem auto 0;
+  padding: 0;
+  list-style: none;
+}
+.tm-backers li {
+  display: flex;
+}
+.tm-backers li + li {
+  border-left: 1px solid var(--c-line-2);
+}
+.tm-backers li:nth-child(1) {
+  --tm-accent: rgb(162 208 190 / 85%);
+}
+.tm-backers li:nth-child(2) {
+  --tm-accent: rgb(239 201 138 / 80%);
+}
+.tm-backer {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: clamp(200px, 22vw, 340px);
+  min-height: 96px;
+  padding: 1.5rem clamp(1.5rem, 4vw, 4rem);
+}
+.tm-backer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(closest-side, var(--tm-accent), transparent);
+  opacity: 0;
+  transform: scale(0.7);
+  transition:
+    opacity 400ms ease,
+    transform 700ms var(--e-out);
+}
+/* The FR8 mark ships white: both marks are drawn in ink. */
+.tm-backer img {
+  display: block;
+  width: auto;
+  height: calc(var(--h) * 1px);
+  filter: brightness(0);
+  opacity: 0.72;
+  transition: opacity 200ms ease;
+}
+.tm-backer svg {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 14px;
+  height: 14px;
+  opacity: 0;
+  transform: translate(-4px, 4px);
+  transition:
+    opacity 250ms ease,
+    transform 400ms var(--e-out);
+}
+.tm-backer:hover::before,
+.tm-backer:focus-visible::before {
+  opacity: 1;
+  transform: none;
+}
+.tm-backer:hover img,
+.tm-backer:focus-visible img {
+  opacity: 1;
+}
+.tm-backer:hover svg,
+.tm-backer:focus-visible svg {
+  opacity: 1;
+  transform: none;
+}
+.tm-backer:focus-visible {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: -6px;
+}
+
+/* Named investors and advisors, "Name, Role" (render only once cleared). */
+.tm-people {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.25rem 2.5rem;
+  margin: 2.5rem auto 0;
+  padding: 0;
+  list-style: none;
+}
+.tm-people li {
+  display: grid;
+  gap: 0.3rem;
+  max-width: 220px;
+}
+.tm-people-name {
+  font-family: var(--f-serif);
+  font-size: 1.375rem;
+  line-height: 1.05;
+}
+.tm-people-role {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+
+/* ---------- Narrower desktops: eight marks as 4 + 4, centred ---------- */
+@media (max-width: 1279px) {
+  .tm-logos {
+    --tm-logo: clamp(22px, 2.6vw, 32px);
+    justify-content: center;
+    gap: 2.25rem 0;
+    max-width: 920px;
+  }
+  .tm-logos li {
+    flex: 0 0 25%;
+  }
+}
+
+/* ---------- Tablet: portraits 3 + 2, marks three a row ---------- */
+@media (max-width: 900px) {
+  .tm {
+    --tm-d: min(
+      clamp(132px, 6rem + 9vw, 200px),
+      calc((100vw - 2 * var(--s-gutter)) / 3 - 2.5rem)
+    );
+  }
+  .tm-cell {
+    flex-basis: 33.333%;
+  }
+  .tm-logos {
+    max-width: 640px;
+  }
+  .tm-logos li {
+    flex-basis: 33.333%;
+  }
+}
+
+/* ---------- Phone: portraits two a row (2 + 2 + 1) ---------- */
+@media (max-width: 720px) {
+  .tm {
+    --tm-d: min(36vw, 156px);
+  }
+  .tm-grid {
+    row-gap: 2.75rem;
+  }
+  .tm-cell {
+    flex-basis: 50%;
+  }
+  .tm-name {
+    margin-top: 1.1rem;
+    font-size: 1.3125rem;
+  }
+  .tm-role {
+    margin-top: 0.75rem;
+    font-size: 0.6875rem;
+  }
+  .tm-glow {
+    inset: -25% -30%;
+  }
+  .tm-glow > span {
+    width: 120vw;
+  }
+  /* Row gap only: the marks sit in fixed thirds, so a column gap would wrap them. */
+  .tm-logos {
+    --tm-logo: 21px;
+    gap: 2rem 0;
+  }
+  .tm-rule {
+    gap: 1rem;
+  }
+  .tm-backer {
+    min-width: 0;
+    min-height: 104px;
+    padding: 1.25rem 1.75rem;
+  }
+  .tm-backer img {
+    height: calc(var(--h) * 0.72px);
+  }
+  .tm-backer svg {
+    top: 0.6rem;
+    right: 0.6rem;
+  }
+}
+
+/* Capable's phone popup: the viewport's width less 12 px a side. The longer
+   bios of 8 Oct 2026 run to seven or eight lines there (~185 px), so the row
+   keeps that much room under the heading. */
+@media (max-width: 639px) {
+  .tm-band {
+    margin-top: 6.5rem; /* halved from 13rem, 14 Oct 2026 */
+  }
+  .tm-pop {
+    width: calc(100vw - 2 * 12px);
+    /* Nearly opaque: at full width the names and roles behind it would
+       otherwise ghost through under the bio. */
+    background: rgb(253 251 248 / 95%);
+  }
+}
+
+/* Small phones: two marks a row, so the two-line wordmarks stay legible
+   (24 px keeps the Max Planck lockup inside its half of the row). */
+@media (max-width: 520px) {
+  .tm-logos {
+    --tm-logo: 24px;
+    max-width: 360px;
+  }
+  .tm-logos li {
+    flex-basis: 50%;
+  }
+}
+
+/* ---------- Motion off ---------- */
+html[data-motion='paused'] .tm-glow > span {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tm-glow > span {
+    animation: none;
+  }
+  .tm-portrait {
+    transition-duration: 1ms;
+  }
+  /* The popup still fades (briefly) but no longer rises. */
+  .tm-pop,
+  .tm-cell[data-open] .tm-pop {
+    transform: none;
+  }
+  .tm-pop {
+    transition:
+      opacity 120ms ease,
+      visibility 0s linear 120ms;
+  }
+  .tm-cell[data-open] .tm-pop {
+    transition:
+      opacity 120ms ease,
+      visibility 0s;
+  }
+}
+
+/* Without script, hover and keyboard focus still show the popup. */
+@media (scripting: none) {
+  .tm-member:hover .tm-pop,
+  .tm-member:focus-within .tm-pop {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+}

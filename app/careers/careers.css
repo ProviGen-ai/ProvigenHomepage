@@ -1,0 +1,22 @@
+/*
+ * /careers (3 Oct 2026). All classes cr-*; the skeleton (hero, section
+ * labels, ledgers, close) is components/pages/Subpage.css. The three lines of
+ * "How we work" are the page's statement, set in the display face (the
+ * founder's font swap, 3 Oct 2026).
+ */
+/* No measure cap: on a wide screen each line holds on one line, as written. */
+.cr-principles .sp-lines-text {
+  max-width: none;
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(1.3rem, 0.9rem + 1.3vw, 2.25rem);
+  line-height: 1.14;
+  letter-spacing: var(--d-track-l);
+}
+@media (max-width: 900px) {
+  .cr-principles .sp-lines-text {
+    font-weight: 400;
+    letter-spacing: var(--d-track-s);
+  }
+}

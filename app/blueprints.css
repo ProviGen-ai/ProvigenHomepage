@@ -1,0 +1,621 @@
+/* One schematic language for the model, physical system, and next batch. */
+.blueprint {
+  --bp-grid: #b7e4cc25;
+  --bp-line: #b7e4cc73;
+  --bp-strong: #b7e4ccc4;
+  color: var(--accent);
+  min-width: 0;
+}
+.blueprint > figure {
+  margin: 0;
+}
+.blueprint-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.blueprint-heading > .eyebrow {
+  color: #c1cfc5;
+  letter-spacing: 0.06em;
+  font-size: 12px;
+}
+.blueprint-motion-toggle {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 7px;
+  min-height: 36px;
+  padding: 5px 0;
+  font: 12px/1.4 var(--font-mono);
+  color: var(--accent);
+  background: transparent;
+  border: 0;
+}
+.blueprint-motion-toggle:hover {
+  color: var(--paper);
+}
+.blueprint-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  color: var(--accent);
+}
+.blueprint-svg :is(path, line, polygon, rect, circle, ellipse) {
+  vector-effect: non-scaling-stroke;
+}
+.bp-construction,
+.bp-grid-line {
+  fill: none;
+  stroke: var(--bp-grid);
+  stroke-width: 0.65;
+  stroke-dasharray: 2 4;
+}
+.bp-plane {
+  fill: #10211b;
+  stroke: var(--bp-line);
+  stroke-width: 0.75;
+}
+.bp-plate-depth {
+  fill: none;
+  stroke: var(--bp-line);
+  stroke-width: 0.7;
+}
+.bp-flow-line,
+.bp-feedback-line,
+.bp-label-leader {
+  fill: none;
+  stroke: var(--bp-strong);
+  stroke-width: 0.8;
+}
+.bp-label-leader {
+  stroke: var(--bp-line);
+}
+.bp-feedback-line {
+  stroke: var(--bp-line);
+  stroke-dasharray: 2 4;
+}
+.bp-arrow {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 0.9;
+}
+.bp-stipple-plane {
+  color: var(--accent);
+  opacity: 0.64;
+}
+.bp-selected-plane {
+  fill: var(--accent);
+  stroke: var(--paper);
+  stroke-width: 0.65;
+}
+.bp-well {
+  fill: #18382b;
+  stroke: #b7e4cc55;
+  stroke-width: 0.65;
+}
+.bp-well.is-selected {
+  fill: #94c9ac;
+  stroke: var(--accent);
+  animation: bp-well-sample 12s ease-in-out infinite;
+  animation-delay: var(--well-delay, 0s);
+}
+.bp-svg-note {
+  fill: #b4c8bb;
+  font: 16px var(--font-mono);
+  letter-spacing: 1px;
+}
+.bp-flow-packet {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 94;
+  stroke-dashoffset: 6;
+  opacity: 0;
+}
+.stack-design-packet {
+  animation: bp-send-down 12s linear infinite;
+}
+.stack-measure-packet {
+  animation: bp-send-down 12s linear 3.5s infinite;
+}
+.stack-return-packet {
+  animation: bp-send-back 12s linear infinite;
+}
+.bp-selected-plane {
+  animation: bp-design-select 12s ease-in-out infinite;
+}
+.bp-motion {
+  animation-play-state: paused;
+}
+[data-running='true'] .bp-motion {
+  animation-play-state: running;
+}
+[data-running='false'] .bp-motion,
+html[data-motion='paused'] .bp-motion {
+  animation-play-state: paused;
+}
+.blueprint-caption {
+  display: block;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  color: #b9c9bf;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.blueprint-caption-kind {
+  display: block;
+  margin-bottom: 8px;
+  color: #91ad9e;
+  font: 12px/1.5 var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+/* The stack sits opposite the thesis, then opens out on the Platform page. */
+.pg-bridge {
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 7%;
+}
+.experiment-stack {
+  padding: 22px 26px 28px;
+  background: var(--ink);
+}
+.stack-blueprint-canvas {
+  position: relative;
+  margin: 20px -8px 8px;
+}
+.stack-blueprint-labels {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.stack-blueprint-labels li {
+  position: absolute;
+  left: 3%;
+  transform: translateY(-50%);
+  width: 25%;
+}
+.stack-blueprint-labels span {
+  display: block;
+  margin-bottom: 7px;
+  font: 12px/1 var(--font-mono);
+  color: #87a595;
+}
+.stack-blueprint-labels strong {
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 400;
+  color: var(--paper);
+  letter-spacing: -0.015em;
+}
+.pg-bridge .experiment-stack .blueprint-caption {
+  max-width: none;
+}
+.platform-hero {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 6%;
+  background: var(--ink);
+}
+.platform-hero-aside {
+  max-width: 660px;
+  padding: 0;
+  background: transparent;
+}
+.platform-hero .experiment-stack {
+  padding: 0;
+  background: transparent;
+}
+
+/* The feedback circuit replaces the previous concentric orbit graphic. */
+.engine-section {
+  background: var(--ink);
+}
+.pg-loop-wrap .experiment-loop {
+  background: var(--ink);
+  border: 1px solid var(--line);
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
+  gap: 5%;
+  padding: 44px;
+}
+.loop-visual {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.loop-schematic {
+  position: relative;
+  margin: 26px 0 25px;
+}
+.bp-loop-track {
+  fill: none;
+  stroke: var(--bp-line);
+  stroke-width: 0.8;
+}
+.bp-loop-edge.is-active .bp-loop-track {
+  stroke: var(--bp-strong);
+}
+.bp-loop-direction {
+  fill: none;
+  stroke: var(--bp-line);
+  stroke-width: 0.8;
+}
+.bp-loop-packet {
+  fill: none;
+  stroke: var(--paper);
+  stroke-width: 1.4;
+  stroke-dasharray: 7 93;
+  stroke-dashoffset: calc(7 - var(--loop-progress) * 100);
+}
+.bp-model-surface,
+.bp-model-label-field {
+  fill: var(--ink);
+}
+.bp-model-stipple {
+  opacity: 0.6;
+}
+.bp-model-membrane {
+  fill: none;
+  stroke: var(--bp-strong);
+  stroke-width: 0.8;
+}
+.bp-model-inner {
+  fill: none;
+  stroke: var(--bp-line);
+  stroke-width: 0.55;
+}
+.bp-model-connection .bp-flow-line {
+  stroke: var(--bp-grid);
+}
+.bp-model-connection.is-active .bp-flow-line {
+  stroke: var(--bp-strong);
+}
+.loop-model-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--paper);
+  font: clamp(14px, 2.2vw, 22px)/1.2 var(--font-mono);
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+.loop-model-label small {
+  display: block;
+  margin-top: 8px;
+  color: #b1c6b9;
+  font-size: 12px;
+}
+.bp-model-packet {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.15;
+  stroke-dasharray: 8 92;
+  animation: bp-model-flow 3.25s ease-in-out infinite;
+}
+.bp-node-point {
+  fill: #b2c9bd;
+}
+.bp-loop-node.is-active .bp-node-point {
+  fill: var(--paper);
+}
+.bp-node-bracket {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 0.65;
+}
+.loop-schematic-label {
+  position: absolute;
+  color: #acc1b3;
+  font-size: 14px;
+  line-height: 1.25;
+}
+.loop-schematic-label small {
+  display: block;
+  margin-bottom: 6px;
+  font: 12px/1 var(--font-mono);
+  color: #87a595;
+}
+.loop-schematic-label.is-active {
+  color: var(--paper);
+}
+.loop-schematic-label.is-active small {
+  color: var(--accent);
+}
+.loop-schematic-label.label-0 {
+  top: 11%;
+  left: 50%;
+  text-align: center;
+  transform: translate(-50%, -100%);
+}
+.loop-schematic-label.label-1 {
+  top: 50%;
+  left: 84%;
+  transform: translateY(-50%);
+}
+.loop-schematic-label.label-2 {
+  top: 91%;
+  left: 50%;
+  text-align: center;
+  transform: translateX(-50%);
+}
+.loop-schematic-label.label-3 {
+  top: 50%;
+  right: 84%;
+  text-align: right;
+  transform: translateY(-50%);
+}
+
+@keyframes bp-send-down {
+  0%,
+  6% {
+    opacity: 0;
+    stroke-dashoffset: 6;
+  }
+  8% {
+    opacity: 1;
+    stroke-dashoffset: 6;
+  }
+  28% {
+    opacity: 1;
+    stroke-dashoffset: -94;
+  }
+  31%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: -94;
+  }
+}
+@keyframes bp-send-back {
+  0%,
+  62% {
+    opacity: 0;
+    stroke-dashoffset: 6;
+  }
+  64% {
+    opacity: 1;
+    stroke-dashoffset: 6;
+  }
+  95% {
+    opacity: 1;
+    stroke-dashoffset: -94;
+  }
+  98%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: -94;
+  }
+}
+@keyframes bp-design-select {
+  0%,
+  12%,
+  94%,
+  100% {
+    fill: #d3efdf;
+  }
+  25%,
+  82% {
+    fill: #5e907a;
+  }
+}
+@keyframes bp-well-sample {
+  0%,
+  20%,
+  80%,
+  100% {
+    fill: #618f76;
+  }
+  38%,
+  59% {
+    fill: #c8ebd8;
+  }
+}
+@keyframes bp-model-flow {
+  0% {
+    stroke-dashoffset: 8;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -92;
+    opacity: 0;
+  }
+}
+@media (max-width: 1100px) {
+  .pg-bridge {
+    gap: 5%;
+  }
+  .experiment-stack {
+    padding: 18px;
+  }
+  .pg-loop-wrap .experiment-loop {
+    padding: 28px;
+    gap: 4%;
+  }
+}
+@media (max-width: 980px) {
+  .pg-bridge {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .pg-bridge .experiment-stack {
+    grid-row: 2;
+    max-width: 640px;
+    width: 100%;
+  }
+  .pg-bridge-answer {
+    grid-row: 1;
+  }
+  .platform-hero {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+  .platform-hero-aside {
+    justify-self: start;
+    max-width: 620px;
+  }
+  .experiment-loop,
+  .pg-loop-wrap .experiment-loop {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .loop-visual {
+    width: 100%;
+    max-width: 660px;
+    justify-self: center;
+  }
+  .loop-explanation {
+    min-height: 270px;
+  }
+  .loop-schematic {
+    margin-bottom: 25px;
+  }
+}
+@media (max-width: 600px) {
+  .pg-loop-wrap .experiment-loop {
+    padding: 24px 18px;
+  }
+  .loop-visual {
+    padding: 0;
+  }
+  .loop-schematic-label {
+    font-size: 14px;
+  }
+  .loop-schematic-label.label-1 {
+    top: 44%;
+    left: auto;
+    right: 0;
+    transform: translateY(-100%);
+  }
+  .loop-schematic-label.label-3 {
+    top: 44%;
+    right: auto;
+    left: 0;
+    transform: translateY(-100%);
+  }
+  .loop-schematic-label small {
+    margin-bottom: 4px;
+  }
+  .loop-model-label small {
+    display: none;
+  }
+  .loop-schematic-label.label-2 {
+    top: 90%;
+  }
+  .loop-explanation {
+    min-height: 320px;
+  }
+  .experiment-stack {
+    padding: 18px 16px 22px;
+  }
+  .stack-blueprint-canvas {
+    margin: 26px -8px 14px;
+  }
+  .stack-blueprint-labels li {
+    left: 1.5%;
+    width: 29%;
+  }
+  .stack-blueprint-labels strong {
+    font-size: 12px;
+  }
+  .stack-blueprint-labels span {
+    margin-bottom: 4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bp-motion {
+    animation: none !important;
+  }
+  .loop-output-copy {
+    animation: none;
+  }
+}
+
+/*
+ * Evidence informs the next batch (CandidateSelection): a canvas on a dark
+ * plate. It draws at one logical px per CSS px, so the box reserves each
+ * layout's height: 304 px wide, 702 px stacked under 760 px of plate width
+ * (the component makes the same test).
+ */
+.candidate-blueprint .cs-plate {
+  container-type: inline-size;
+  margin: 18px 0 4px;
+}
+.cs-plate .cs-box {
+  aspect-ratio: auto;
+  height: 304px;
+}
+@container (max-width: 759px) {
+  .cs-plate .cs-box {
+    height: 702px;
+  }
+}
+
+/* Pause / Play set on a dark plate (CycleBar, CandidateSelection): the same
+   hairline mono control as the homepage plates (Build.css .b-play, Stakes.css
+   .st-play), in the bottom-right corner, over a strip the drawing keeps
+   clear. 44px of target from an inset overlay, so the visible box stays small. */
+.pl-controls {
+  position: absolute;
+  right: 14px;
+  bottom: 10px;
+  z-index: 3;
+}
+.pl-motion-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  min-height: 28px;
+  padding: 0.35em 0.8em 0.35em 0.6em;
+  border: 1px solid rgb(248 244 239 / 14%);
+  background: none;
+  color: rgb(248 244 239 / 58%);
+  font-family: var(--f-mono, var(--font-mono));
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
+}
+.pl-motion-btn svg {
+  width: 11px;
+  height: 11px;
+  flex: none;
+}
+.pl-motion-btn::before {
+  content: '';
+  position: absolute;
+  inset: 50% -1px auto;
+  translate: 0 -50%;
+  height: 44px;
+}
+@media (hover: hover) {
+  .pl-motion-btn:hover {
+    color: var(--c-paper, #f8f4ef);
+    border-color: rgb(248 244 239 / 34%);
+  }
+}
+.pl-motion-btn:focus-visible {
+  outline: 1px solid #a2d0be;
+  outline-offset: 3px;
+}
+@media (scripting: none) {
+  .pl-motion-btn {
+    display: none;
+  }
+}

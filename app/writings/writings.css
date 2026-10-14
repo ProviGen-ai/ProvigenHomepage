@@ -1,0 +1,2404 @@
+/*
+ * /writings and /writings/* · v3 "paper lab".
+ * Index: living-gradient hero, two featured cards with drawn visuals, a ledger
+ * of earlier essays. Articles: dawn-glow hero, centred EB Garamond reading
+ * column, sticky mono contents, references ledger, "Next" card.
+ * Every new class is w-*. Legacy names that live inside article content
+ * (p-writings-*, pg-timing, pg-animation*, the Figure component's .figure-*)
+ * are restyled here, scoped under .w-prose. Tokens come from app/site.css;
+ * data-theme="ivory" on <main> keeps the legacy --fg/--signal variables alive
+ * for embedded v2 figures (Figure, CycleBar, Blueprint).
+ */
+
+.w-index,
+.w-article {
+  --frame-bg: var(--c-paper);
+  --w-col: 680px;
+}
+/* Tablet: the body type is a step smaller, so a narrower column keeps lines
+   near 70 characters (680 px held 84–93). */
+@media (max-width: 960px) {
+  .w-article {
+    --w-col: 580px;
+  }
+}
+
+/* ================================================================
+   Shared: cards, framed visuals, citations
+   ================================================================ */
+.w-card {
+  position: relative;
+  min-width: 0;
+}
+.w-card-tag {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.9rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.w-card-index {
+  color: var(--c-teal-ink);
+}
+.w-card .w-card-title {
+  margin-top: 1rem;
+  /* Headings in the display mono since the founder's font swap (3 Oct 2026):
+     weight 200, about 0.75× the serif size (the mono runs a third wider). */
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(1.6rem, 1rem + 1.75vw, 2.6rem);
+  line-height: 1.08;
+  letter-spacing: var(--d-track-l);
+  text-wrap: balance;
+  max-width: 24ch;
+}
+.w-card-title em,
+.w-row-title em,
+.w-hero-title em,
+.w-prose h2 em {
+  /* The display face has no italic: the teal carries the accent. */
+  font-family: inherit;
+  font-weight: inherit;
+  font-style: normal;
+  letter-spacing: inherit;
+  color: var(--c-teal-ink);
+}
+.w-card-link {
+  color: inherit;
+  text-decoration: none;
+}
+/* The whole card is the target; the title link carries the name. */
+.w-card-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+.w-card-link > span {
+  background: linear-gradient(currentColor, currentColor) 0 96% / 0 1px no-repeat;
+  transition: background-size 600ms var(--e-out);
+}
+.w-card:hover .w-card-link > span {
+  background-size: 100% 1px;
+}
+.w-card .w-card-link:focus-visible {
+  outline: none;
+}
+.w-card:has(.w-card-link:focus-visible) {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 10px;
+}
+.w-card .w-card-dek {
+  margin-top: 1.1rem;
+  font-size: clamp(1.125rem, 1.04rem + 0.3vw, 1.3125rem);
+  line-height: 1.45;
+  color: var(--c-muted);
+  max-width: 42ch;
+  text-wrap: pretty;
+}
+.w-card .w-card-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1.6rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--c-line);
+}
+.w-card-source {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--c-faint);
+}
+.w-card-read {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+}
+.w-card-read svg {
+  width: 14px;
+  height: 14px;
+  transition: translate 400ms var(--e-out);
+}
+.w-card:hover .w-card-read svg {
+  translate: 4px 0;
+}
+
+/* Framed visual: sharp frame with registration ticks (Frame), a faint
+   drafting grid and the brand light in opposite corners. */
+.w-visual {
+  background: rgb(255 255 255 / 22%);
+  transition: border-color 400ms ease;
+}
+.w-card:hover .w-visual {
+  border-color: var(--c-line-3);
+}
+.w-visual-stage {
+  position: relative;
+  aspect-ratio: 16 / 11;
+  overflow: hidden;
+  background:
+    radial-gradient(circle, rgb(19 19 18 / 13%) 0.7px, transparent 1px) 0 0 / 22px 22px,
+    radial-gradient(70% 80% at 100% 100%, rgb(226 159 55 / 15%), transparent 62%),
+    radial-gradient(65% 75% at 0% 0%, rgb(162 208 190 / 32%), transparent 62%);
+}
+.w-visual-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(60% 70% at 50% 110%, rgb(226 159 55 / 18%), transparent 70%);
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+.w-card:hover .w-visual-stage::after {
+  opacity: 1;
+}
+.w-visual--membrane .w-visual-stage {
+  background: var(--c-ink);
+}
+.w-visual-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1200ms var(--e-out);
+}
+.w-card:hover .w-visual-img {
+  transform: scale(1.03);
+}
+/* A recorded conversation (components/writings/EpisodeCover): the show's own
+   16:9 thumbnail, whole, on the bottom edge of the stage, toned into the
+   palette (greyscale screened onto deep teal, whites multiplied to paper)
+   under the drafting dots and the brand light. */
+.w-visual--episode .w-visual-stage {
+  background: #164143;
+  isolation: isolate;
+}
+.w-visual--episode .w-visual-stage::after {
+  display: none;
+}
+.w-ep {
+  position: absolute;
+  inset: 0;
+}
+.w-ep-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: 50% 100%;
+  filter: grayscale(1) contrast(1.08) brightness(0.96);
+  mix-blend-mode: screen;
+  transform-origin: 50% 100%;
+  transition: transform 1200ms var(--e-out);
+}
+.w-card:hover .w-ep-img {
+  transform: scale(1.03);
+}
+/* Paper whites, then drafting dots, mint light top left, orange bottom right. */
+.w-ep::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--c-paper);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.w-ep-light {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, rgb(248 244 239 / 16%) 0.7px, transparent 1px) 0 0 / 22px 22px,
+    radial-gradient(60% 75% at 0% 0%, rgb(162 208 190 / 38%), transparent 62%),
+    radial-gradient(55% 70% at 100% 100%, rgb(226 159 55 / 36%), transparent 64%);
+  mix-blend-mode: screen;
+}
+
+/* In-text citations and evidence labels (footnote register: mono, small). */
+.w-cite {
+  font-family: var(--f-mono);
+  font-size: 0.62em;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  vertical-align: 0.38em;
+  line-height: 0;
+  color: var(--c-teal-ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+a.w-cite:hover {
+  color: var(--c-ink);
+}
+
+/* ================================================================
+   Forecast timeline (figure and card)
+   ================================================================ */
+.w-tl {
+  --tl-h: 240px;
+  --tl-bg: var(--c-paper);
+  position: relative;
+  padding-top: 2.25rem;
+  color: var(--c-ink);
+}
+.w-tl-plot {
+  position: relative;
+  height: var(--tl-h);
+}
+.w-tl-axis {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--c-teal) 0%,
+    rgb(19 19 18 / 38%) 28%,
+    rgb(19 19 18 / 38%) 72%,
+    var(--c-orange) 100%
+  );
+  transform-origin: left;
+}
+.w-tl-guide {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 1px dashed var(--c-line-2);
+}
+.w-tl-guide i {
+  position: absolute;
+  left: 0;
+  bottom: 5px;
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--c-faint);
+}
+.w-tl-now {
+  position: absolute;
+  bottom: 0;
+  width: 7px;
+  height: 7px;
+  background: var(--c-ink);
+  transform: translate(-50%, 50%);
+}
+.w-tl-now i {
+  position: absolute;
+  left: 0;
+  bottom: 13px;
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  font-style: normal;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--c-muted);
+}
+.w-tl-col {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--x) + var(--dx) * var(--dxk, 1));
+  width: 22px;
+  margin-left: -11px;
+  color: inherit;
+  text-decoration: none;
+}
+.w-tl-band,
+.w-tl-stem,
+.w-tl-head,
+.w-tl-label {
+  position: absolute;
+  left: 50%;
+}
+.w-tl-band {
+  bottom: var(--lo);
+  width: 9px;
+  margin-left: -4.5px;
+  height: max(2px, calc(var(--hi) - var(--lo)));
+  background: rgb(162 208 190 / 55%);
+  border-inline: 1px solid rgb(66 145 149 / 35%);
+  box-sizing: border-box;
+}
+.w-tl-stem {
+  bottom: 0;
+  width: 1px;
+  margin-left: -0.5px;
+  height: var(--p);
+  background: rgb(19 19 18 / 62%);
+  transform-origin: 50% 100%;
+}
+.w-tl-head {
+  bottom: var(--p);
+  width: 9px;
+  height: 9px;
+  margin: 0 0 -4.5px -4.5px;
+  background: var(--c-teal);
+  transition:
+    background-color 200ms ease,
+    transform 300ms var(--e-out);
+}
+.w-tl-label {
+  z-index: 1;
+  bottom: calc(var(--p) + 11px);
+  transform: translateX(-50%);
+  padding: 1px 4px;
+  background: var(--tl-bg);
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--c-ink);
+}
+.w-tl-label b {
+  font-weight: 400;
+  color: var(--c-faint);
+  margin-right: 0.45em;
+}
+.w-tl-label {
+  left: auto;
+  right: calc(50% + 8px);
+  bottom: calc(var(--p) - 7.5px);
+  transform: none;
+}
+.w-tl-label.is-end {
+  right: calc(50% - 6px);
+  bottom: calc(var(--p) + 11px);
+}
+.w-tl-label.is-right {
+  right: auto;
+  left: calc(50% + 8px);
+}
+a.w-tl-col:hover .w-tl-head,
+a.w-tl-col:focus-visible .w-tl-head {
+  background: var(--c-orange);
+  transform: scale(1.25);
+}
+a.w-tl-col:hover .w-tl-stem,
+a.w-tl-col:focus-visible .w-tl-stem {
+  background: var(--c-ink);
+}
+a.w-tl-col:focus-visible {
+  outline: none;
+}
+a.w-tl-col:focus-visible .w-tl-label {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 2px;
+}
+.w-tl-years {
+  position: relative;
+  height: 1.75rem;
+}
+.w-tl-year {
+  position: absolute;
+  top: 0.7rem;
+  transform: translateX(-50%);
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--c-faint);
+}
+.w-tl-year::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -0.7rem;
+  width: 1px;
+  height: 5px;
+  background: var(--c-line-3);
+}
+/* Card motif: fills its stage, quieter labels. */
+.w-tl--card {
+  --tl-bg: rgb(248 244 239 / 88%);
+  position: absolute;
+  inset: 17% 7% 3% 7%;
+  display: flex;
+  flex-direction: column;
+  padding-top: 0;
+}
+.w-tl--card .w-tl-plot {
+  flex: 1;
+  height: auto;
+}
+.w-tl--card .w-tl-head {
+  width: 7px;
+  height: 7px;
+  margin: 0 0 -3.5px -3.5px;
+}
+.w-tl--card .w-tl-band {
+  width: 5px;
+  margin-left: -2.5px;
+  background: rgb(162 208 190 / 45%);
+}
+.w-tl--card .w-tl-label {
+  right: calc(50% + 6px);
+  font-size: 0.625rem;
+  color: var(--c-muted);
+}
+.w-tl--card .w-tl-label.is-right {
+  right: auto;
+  left: calc(50% + 6px);
+}
+.w-tl--card .w-tl-label.is-end {
+  right: calc(50% - 5px);
+  bottom: calc(var(--p) + 8px);
+}
+.w-tl--card .w-tl-year.is-odd {
+  visibility: hidden;
+}
+.w-card:hover .w-tl--card .w-tl-head {
+  background: var(--c-orange);
+}
+.w-card:hover .w-tl--card .w-tl-band {
+  background: rgb(162 208 190 / 85%);
+}
+
+/* Rise once in view (Reveal adds .is-in). Motion off: final state. */
+:where(html[data-reveal='js']) .w-tl-stem {
+  transform: scaleY(0);
+  transition: transform 1200ms var(--e-out) calc(var(--i, 0) * 110ms + 250ms);
+}
+:where(html[data-reveal='js']) :is(.w-tl-head, .w-tl-label, .w-tl-band) {
+  opacity: 0;
+  transition:
+    opacity 700ms ease calc(var(--i, 0) * 110ms + 900ms),
+    background-color 200ms ease,
+    transform 300ms var(--e-out);
+}
+.is-in .w-tl-stem {
+  transform: none;
+}
+.is-in :is(.w-tl-head, .w-tl-label, .w-tl-band) {
+  opacity: 1;
+}
+
+/* ================================================================
+   Plate motif (closed-loop field note)
+   ================================================================ */
+.w-plate {
+  position: absolute;
+  inset: 13% 7% 5% 7%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.85rem;
+}
+.w-plate-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+.w-plate-body {
+  fill: rgb(255 255 255 / 45%);
+  stroke: var(--c-line-2);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.w-plate-well {
+  stroke: rgb(19 19 18 / 10%);
+  stroke-width: 0.5;
+  vector-effect: non-scaling-stroke;
+}
+.w-plate-well.b0 {
+  fill: #ebe5dc;
+}
+.w-plate-well.b1 {
+  fill: #d4e6dc;
+}
+.w-plate-well.b2 {
+  fill: #b2d8c7;
+}
+.w-plate-well.b3 {
+  fill: #86bdb4;
+}
+.w-plate-well.b4 {
+  fill: #5aa1a3;
+}
+.w-plate-well.b5 {
+  fill: #2f7477;
+}
+.w-plate-next {
+  fill: var(--c-orange);
+  fill-opacity: 1;
+  stroke: var(--c-orange);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+:where(html[data-reveal='js']) .w-plate-next {
+  fill-opacity: 0;
+  transition: fill-opacity 500ms ease calc(var(--i, 0) * 140ms + 700ms);
+}
+.is-in .w-plate-next {
+  fill-opacity: 1;
+}
+.w-plate-scan {
+  stroke: var(--c-teal-ink);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+}
+.w-card:hover .w-plate-scan {
+  opacity: 0.8;
+  animation: w-scan 2.4s var(--e-in-out) infinite;
+}
+@keyframes w-scan {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(288px);
+  }
+}
+.w-plate-legend,
+.w-cycle-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.w-plate-legend > span,
+.w-cycle-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.w-plate-ramp i {
+  width: 44px;
+  height: 6px;
+  background: linear-gradient(90deg, #ebe5dc, #b2d8c7, #5aa1a3, #2f7477);
+}
+.w-plate-key i {
+  width: 8px;
+  height: 8px;
+  background: var(--c-orange);
+}
+
+/* ================================================================
+   Cycle motif (The bottleneck moved)
+   ================================================================ */
+.w-cycle {
+  position: absolute;
+  inset: 14% 8% 6% 8%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.9rem;
+}
+.w-cycle-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.w-cycle-svg :is(path, rect) {
+  vector-effect: non-scaling-stroke;
+  fill: none;
+  stroke-width: 1;
+}
+.w-cycle-svg .w-cycle-faint {
+  stroke: var(--c-line-3);
+  stroke-dasharray: 2 4;
+}
+.w-cycle-svg .w-cycle-day {
+  stroke: var(--c-ink);
+  stroke-opacity: 0.8;
+}
+.w-cycle-svg .w-cycle-think {
+  fill: rgb(66 145 149 / 24%);
+  stroke: var(--c-teal);
+}
+.w-cycle-svg .w-cycle-planned {
+  stroke: var(--c-ink);
+  stroke-opacity: 0.5;
+  stroke-dasharray: 5 4;
+}
+.w-cycle-svg .w-cycle-tick {
+  stroke: var(--c-ink);
+  stroke-opacity: 0.45;
+}
+.w-cycle-legend {
+  justify-content: flex-start;
+  gap: 0.4rem 1.4rem;
+}
+.w-cycle-legend i {
+  width: 12px;
+  height: 8px;
+  border: 1px solid var(--c-ink);
+  box-sizing: border-box;
+}
+.w-cycle-legend i.is-think {
+  border-color: var(--c-teal);
+  background: rgb(66 145 149 / 24%);
+}
+.w-cycle-legend i.is-planned {
+  border-style: dashed;
+  opacity: 0.6;
+}
+
+/* ================================================================
+   Index
+   ================================================================ */
+/* Shorter since 3 Oct 2026 (competitor review R25): the featured cards start
+   inside the first screen instead of below it. */
+.w-index-hero {
+  min-height: clamp(400px, 48svh, 520px);
+  display: grid;
+  align-items: end;
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
+  --grain: 0.12;
+  --grain-blend: overlay;
+}
+/* The hero grain fades out before the hero ends, so no seam shows where the
+   hero meets the plain paper below. */
+.w-index-hero.s-grain::after,
+.w-hero.s-grain::after {
+  -webkit-mask-image: linear-gradient(180deg, #000 48%, transparent 64%);
+  mask-image: linear-gradient(180deg, #000 48%, transparent 64%);
+}
+.w-index-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.w-index-wash {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgb(248 244 239 / 72%) 0%, rgb(248 244 239 / 0%) 62%),
+    linear-gradient(180deg, rgb(248 244 239 / 55%) 0%, rgb(248 244 239 / 0%) 30%, rgb(248 244 239 / 0%) 62%, var(--c-paper) 100%);
+}
+.w-index-hero-inner {
+  position: relative;
+  z-index: 4;
+}
+.w-index-hero .w-index-title {
+  margin-top: 0;
+  max-width: none;
+}
+.w-index-hero .w-index-dek {
+  margin-top: 1.5rem;
+  max-width: 36ch;
+  color: rgb(19 19 18 / 78%);
+  text-wrap: balance;
+}
+.w-featured {
+  padding-block: clamp(1.5rem, 3vw, 2.5rem) clamp(4rem, 8vw, 8rem);
+}
+.w-featured-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--c-line-2);
+  border-bottom: 1px solid var(--c-line-2);
+}
+.w-card--featured {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(2rem, 3.5vw, 3.25rem) clamp(1.5rem, 3.5vw, 3.5rem) clamp(2rem, 3vw, 2.75rem);
+}
+/* Deks follow their titles; the provenance rules of both cards share a line. */
+.w-card--featured .w-card-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+/* Two to a row (four featured pieces since 4 Oct 2026): odd cards on the
+   left edge, even cards on the right behind a rule, rows split by a rule. */
+.w-card--featured:nth-child(odd) {
+  padding-left: 0;
+}
+.w-card--featured:nth-child(even) {
+  padding-right: 0;
+  border-left: 1px solid var(--c-line-2);
+}
+.w-card--featured:nth-child(n + 3) {
+  border-top: 1px solid var(--c-line-2);
+}
+.w-card--featured .w-card-visual {
+  margin-bottom: clamp(1.75rem, 3vw, 2.5rem);
+}
+.w-card--featured .w-card-foot {
+  margin-top: auto;
+}
+.w-card--featured .w-card-dek {
+  margin-bottom: 1.6rem;
+}
+
+.w-earlier {
+  padding-bottom: clamp(5rem, 9vw, 9rem);
+}
+.w-earlier .w-earlier-title {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--c-line-2);
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.w-earlier-list {
+  list-style: none;
+  padding: 0;
+}
+.w-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 13rem) minmax(0, 1fr) auto 2.5rem;
+  align-items: baseline;
+  gap: 0.5rem 2rem;
+  padding: clamp(1.25rem, 2vw, 1.75rem) 0;
+  border-bottom: 1px solid var(--c-line-2);
+  transition: background-color 300ms ease;
+}
+.w-row::before {
+  content: '';
+  position: absolute;
+  inset: 0 calc(-1 * var(--s-gutter));
+  z-index: -1;
+  background: linear-gradient(90deg, rgb(162 208 190 / 0%), rgb(162 208 190 / 22%) 30%, rgb(230 217 171 / 30%));
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+.w-row:hover::before {
+  opacity: 1;
+}
+.w-earlier-list {
+  position: relative;
+  isolation: isolate;
+}
+.w-row-date,
+.w-row-kind {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-faint);
+}
+.w-row-link {
+  color: inherit;
+  text-decoration: none;
+}
+.w-row-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.w-row-link:focus-visible {
+  outline: none;
+}
+.w-row:has(.w-row-link:focus-visible) {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 4px;
+}
+.w-row-title {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(1.125rem, 0.86rem + 0.9vw, 1.8rem);
+  line-height: 1.12;
+  letter-spacing: var(--d-track-l);
+  text-wrap: balance;
+}
+/* Under ~22 px the ultralight thins out: the regular weight takes over. */
+@media (max-width: 900px) {
+  .w-row-title {
+    font-weight: 400;
+    letter-spacing: var(--d-track-s);
+  }
+}
+.w-row-title em {
+  font-style: normal;
+}
+.w-row-arrow {
+  justify-self: end;
+  align-self: center;
+  display: inline-flex;
+}
+.w-row-arrow svg {
+  width: 18px;
+  height: 18px;
+  transition: translate 400ms var(--e-out);
+}
+.w-row:hover .w-row-arrow svg {
+  translate: 5px 0;
+}
+
+/* ================================================================
+   Article
+   ================================================================ */
+.w-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  height: 2px;
+  pointer-events: none;
+}
+.w-progress > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--c-teal), var(--c-sand) 55%, var(--c-orange));
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.w-hero {
+  position: relative;
+  padding: calc(var(--s-header) + clamp(3.5rem, 7vw, 7rem)) 0 clamp(3rem, 5vw, 4.5rem);
+  text-align: center;
+  overflow: hidden;
+  --grain: 0.12;
+  --grain-blend: overlay;
+}
+.w-hero-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(42% 75% at 8% -8%, rgb(162 208 190 / 62%), transparent 70%),
+    radial-gradient(38% 65% at 94% -4%, rgb(230 217 171 / 80%), transparent 70%),
+    radial-gradient(26% 40% at 100% 0%, rgb(226 159 55 / 30%), transparent 72%),
+    linear-gradient(180deg, transparent 55%, var(--c-paper));
+}
+.w-hero-inner {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+}
+.w-hero .w-hero-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 0;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.w-hero-kicker > * + *::before {
+  content: '·';
+  margin: 0 0.75rem;
+  color: var(--c-faint);
+}
+.w-hero .w-hero-title {
+  margin-top: 1.75rem;
+  max-width: 22ch;
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(1.95rem, 1.125rem + 3.3vw, 4.3rem);
+  line-height: 1.06;
+  letter-spacing: var(--d-track-xl);
+  text-wrap: balance;
+  font-variant-numeric: lining-nums;
+}
+.w-hero-title em {
+  font-style: normal;
+}
+.w-hero .w-hero-dek {
+  margin-top: 1.75rem;
+  max-width: 40ch;
+  font-size: clamp(1.2rem, 1.08rem + 0.5vw, 1.55rem);
+  line-height: 1.38;
+  color: rgb(19 19 18 / 78%);
+  text-wrap: pretty;
+  /* A \n in a dek starts a new line (the manifesto's, 14 Oct 2026). */
+  white-space: pre-line;
+}
+.w-hero .w-hero-banner {
+  margin-top: 1.5rem;
+  max-width: 100%;
+  white-space: normal;
+  line-height: 1.35;
+  text-align: left;
+}
+/* Layout: one centred reading column; on wide screens the contents rail
+   takes the left track and the column stays centred while there is room. */
+.w-layout {
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  padding-block: clamp(1.5rem, 3vw, 3rem) clamp(4rem, 7vw, 6.5rem);
+}
+.w-body {
+  width: 100%;
+  max-width: var(--w-col);
+  margin-inline: auto;
+  min-width: 0;
+  /* How far a wide object may step out of the column on each side. */
+  --w-o: clamp(0px, (100cqw - var(--w-col)) / 2, 96px);
+}
+.w-toc {
+  display: none;
+}
+.w-toc-m {
+  width: 100%;
+  max-width: var(--w-col);
+  margin: 0 auto clamp(2rem, 5vw, 3rem);
+  border-block: 1px solid var(--c-line-2);
+  font-family: var(--f-mono);
+}
+@media (min-width: 1100px) {
+  .w-layout {
+    grid-template-columns: minmax(184px, 1fr) minmax(0, var(--w-col)) minmax(0, 1fr);
+    column-gap: 40px;
+  }
+  .w-toc {
+    display: block;
+    grid-column: 1;
+    grid-row: 1;
+    position: sticky;
+    top: calc(var(--s-header) + 28px);
+    align-self: start;
+    max-width: 200px;
+    max-height: calc(100svh - var(--s-header) - 56px);
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .w-toc-m {
+    display: none;
+  }
+  .w-body {
+    grid-column: 2;
+    grid-row: 1;
+    max-width: none;
+    --w-o: clamp(0px, (100cqw - var(--w-col) - 80px) / 2 - 200px, 96px);
+  }
+}
+
+/* Contents (rail and disclosure share the list). */
+.w-toc-label {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--c-line-2);
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-faint);
+}
+.w-toc-list,
+.w-toc-sub {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.w-toc-list > li > a {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.1rem minmax(0, 1fr);
+  align-items: baseline;
+  padding: 0.62rem 0;
+  border-bottom: 1px solid var(--c-line);
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--c-muted);
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+.w-toc-t em {
+  font-style: normal;
+}
+.w-toc-n {
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  color: var(--c-faint);
+  transition: color 200ms ease;
+}
+.w-toc-list a:hover {
+  color: var(--c-ink);
+}
+.w-toc-list > li.is-current > a {
+  color: var(--c-ink);
+}
+.w-toc-list > li.is-current > a .w-toc-n {
+  color: var(--c-teal-ink);
+}
+.w-toc-sub {
+  padding: 0.3rem 0 0.5rem 2.1rem;
+  border-bottom: 1px solid var(--c-line);
+}
+.w-toc-sub a {
+  position: relative;
+  display: block;
+  padding: 0.22rem 0;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--c-faint);
+  text-decoration: none;
+}
+.w-toc-sub li.is-current a {
+  color: var(--c-ink);
+}
+.w-toc-sub a::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 0.55rem;
+  vertical-align: 0.12em;
+  border: 1px solid currentColor;
+  box-sizing: border-box;
+}
+.w-toc-sub li.is-current a::before {
+  background: var(--c-orange);
+  border-color: var(--c-orange);
+}
+.w-toc-list > li:has(.w-toc-sub) > a {
+  border-bottom: 0;
+}
+.w-toc-m summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.95rem 0;
+  list-style: none;
+  cursor: pointer;
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+}
+.w-toc-m summary::-webkit-details-marker {
+  display: none;
+}
+.w-toc-m-count {
+  color: var(--c-faint);
+}
+.w-toc-m-icon {
+  position: relative;
+  margin-left: auto;
+  width: 11px;
+  height: 11px;
+}
+.w-toc-m-icon::before,
+.w-toc-m-icon::after {
+  content: '';
+  position: absolute;
+  background: currentColor;
+}
+.w-toc-m-icon::before {
+  left: 0;
+  right: 0;
+  top: 5px;
+  height: 1px;
+}
+.w-toc-m-icon::after {
+  top: 0;
+  bottom: 0;
+  left: 5px;
+  width: 1px;
+  transition: transform 300ms var(--e-out);
+}
+.w-toc-m[open] .w-toc-m-icon::after {
+  transform: scaleY(0);
+}
+.w-toc-m nav {
+  padding-bottom: 0.75rem;
+}
+.w-toc-m .w-toc-list > li:last-child > a,
+.w-toc-m .w-toc-list > li:last-child .w-toc-sub {
+  border-bottom: 0;
+}
+
+/* Disclaimer / provenance box: hairline frame with the site's registration
+   ticks, a 9px "+" centred on each corner exactly like the Frame component
+   (.s-frame > .s-tick). Drawn on ::after because .w-fc-rule is a <dl> group,
+   which cannot hold the tick spans. */
+.w-note,
+.w-fc-rule,
+.w-aside {
+  position: relative;
+  border: 1px solid var(--c-line-2);
+  background: rgb(255 255 255 / 34%);
+}
+.w-note::after,
+.w-fc-rule::after,
+.w-aside::after {
+  --k: var(--c-ink);
+  content: '';
+  position: absolute;
+  inset: -5px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--k) 0 0) 0 4px / 9px 1px,
+    linear-gradient(var(--k) 0 0) 4px 0 / 1px 9px,
+    linear-gradient(var(--k) 0 0) 100% 4px / 9px 1px,
+    linear-gradient(var(--k) 0 0) calc(100% - 4px) 0 / 1px 9px,
+    linear-gradient(var(--k) 0 0) 0 calc(100% - 4px) / 9px 1px,
+    linear-gradient(var(--k) 0 0) 4px 100% / 1px 9px,
+    linear-gradient(var(--k) 0 0) 100% calc(100% - 4px) / 9px 1px,
+    linear-gradient(var(--k) 0 0) calc(100% - 4px) 100% / 1px 9px;
+  background-repeat: no-repeat;
+}
+.w-body .w-note {
+  padding: 1.15rem 1.4rem 1.3rem;
+  margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+}
+.w-note-label,
+.w-aside-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-amber-ink);
+}
+.w-note .w-note-text {
+  margin-top: 0.65rem;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: rgb(19 19 18 / 86%);
+  text-wrap: pretty;
+}
+
+/* Figures and the wide measure. */
+.w-wide,
+.w-prose .p-writings-fig-wide,
+.w-prose .p-writings-plate,
+.w-prose .p-writings-tiers {
+  margin-inline: calc(-1 * var(--w-o, 0px));
+}
+.w-figure {
+  margin-block: 0 clamp(3rem, 6vw, 4.5rem);
+}
+.w-figure .s-frame {
+  padding: clamp(1.75rem, 3vw, 2.5rem) clamp(1rem, 2.6vw, 2rem) 0.75rem;
+  background: rgb(255 255 255 / 26%);
+}
+.w-figcap {
+  margin-top: 0.9rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: var(--c-faint);
+}
+
+/* ---------- Prose ---------- */
+.w-prose {
+  font-family: var(--f-serif);
+  font-size: clamp(1.1875rem, 1.1rem + 0.3vw, 1.3125rem);
+  line-height: 1.55;
+  color: var(--c-ink);
+  counter-reset: wsec wfig;
+  font-variant-numeric: oldstyle-nums proportional-nums;
+}
+.w-prose :is(h2, h3, .w-fc-p, table, .w-cite) {
+  font-variant-numeric: lining-nums;
+}
+.w-prose p {
+  text-wrap: pretty;
+}
+.w-prose > * + *,
+.w-prose section > * + *,
+.w-prose .p-writings-counted > * + * {
+  margin-top: 1em;
+}
+/* The root already clears the header (site.css: scroll-padding-top, header +
+   16 px); adding the header here again landed headings ~190 px down (3 Oct 2026). */
+.w-prose section,
+.w-prose h2,
+.w-prose .w-fc,
+.w-prose p[id^='fn'] {
+  scroll-margin-top: 8px;
+}
+.w-prose h2 {
+  counter-increment: wsec;
+  margin-top: clamp(4rem, 7vw, 5.75rem);
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(1.5rem, 1.125rem + 1.2vw, 2.15rem);
+  line-height: 1.12;
+  letter-spacing: var(--d-track-l);
+  text-wrap: balance;
+}
+.w-prose h2::before {
+  content: counter(wsec, decimal-leading-zero);
+  display: block;
+  margin-bottom: 1.4rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--c-line-2);
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0.14em;
+  color: var(--c-teal-ink);
+}
+.w-prose h2 em,
+.w-prose h3 em {
+  font-style: normal;
+}
+.w-prose > section:first-child > h2,
+.w-prose > .p-writings-counted:first-child > h2:first-child {
+  margin-top: 0;
+}
+.w-prose h2 + * {
+  margin-top: 1.4rem;
+}
+.w-prose h3 {
+  margin-top: 2.5rem;
+  /* Under ~22 px: the display face at its regular weight. */
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-synthesis: none;
+  font-size: clamp(1.05rem, 0.9rem + 0.45vw, 1.3rem);
+  line-height: 1.25;
+  letter-spacing: var(--d-track-s);
+}
+.w-prose a:not([class]) {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: rgb(42 102 105 / 60%);
+  overflow-wrap: anywhere;
+  transition: color 160ms ease, text-decoration-color 160ms ease;
+}
+.w-prose a:not([class]):hover {
+  color: var(--c-teal-ink);
+  text-decoration-color: currentColor;
+}
+.w-prose strong {
+  font-weight: 600;
+}
+.w-prose em {
+  font-style: italic;
+}
+.w-prose :is(ul, ol):not([class]) {
+  padding-left: 0;
+  list-style: none;
+}
+.w-prose :is(ul, ol):not([class]) > li {
+  position: relative;
+  padding-left: 2.25rem;
+}
+.w-prose :is(ul, ol):not([class]) > li + li {
+  margin-top: 0.6em;
+}
+.w-prose ul:not([class]) > li::before {
+  content: '';
+  position: absolute;
+  left: 0.4rem;
+  top: 0.78em;
+  width: 9px;
+  height: 1px;
+  background: var(--c-ink);
+}
+.w-prose ol:not([class]) {
+  counter-reset: wli;
+}
+.w-prose ol:not([class]) > li {
+  counter-increment: wli;
+}
+.w-prose ol:not([class]) > li::before {
+  content: counter(wli, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0.42em;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--c-teal-ink);
+}
+.w-prose blockquote {
+  margin-block: 2.75rem;
+  padding: 0.2rem 0 0.3rem 1.6rem;
+  border-left: 1px solid var(--c-teal);
+  font-size: clamp(1.6rem, 1.3rem + 1vw, 2.2rem);
+  font-style: italic;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.w-prose hr {
+  height: 1px;
+  margin-block: 3rem;
+  border: 0;
+  background: var(--c-line-2);
+}
+/* A table already closes on a hairline; the break after it keeps its space,
+   not a second rule. */
+.w-prose .p-writings-table-scroll + hr {
+  background: transparent;
+}
+.w-prose sup {
+  line-height: 0;
+  vertical-align: 0.38em;
+  font-family: var(--f-mono);
+  font-size: 0.62em;
+}
+.w-prose sup a,
+.w-prose sup a:not([class]) {
+  color: var(--c-teal-ink);
+  text-decoration: none;
+}
+/* Footnotes (field note): mono, small, on a hairline. */
+.w-prose p[id^='fn'] {
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  color: var(--c-muted);
+}
+.w-prose p[id^='fn'] + p[id^='fn'] {
+  margin-top: 0.75rem;
+}
+.w-prose p#fn1 {
+  margin-top: 3rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--c-line-2);
+}
+.w-prose p[id^='fn'] a {
+  color: var(--c-teal-ink);
+}
+
+/* Raw figures in content strings: sharp frames, mono provenance over a serif
+   caption. Fig. numbers run across the whole article (wfig). */
+.w-prose figure:not(.figure) {
+  margin-block: 2.75rem;
+  counter-increment: wfig;
+}
+.w-prose figure > img,
+.w-prose .pg-animation-wrap {
+  --k: var(--c-ink);
+  --kl: 9px;
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--c-line-2);
+  background:
+    linear-gradient(var(--k) 0 0) 0 0 / var(--kl) 1px,
+    linear-gradient(var(--k) 0 0) 0 0 / 1px var(--kl),
+    linear-gradient(var(--k) 0 0) 100% 0 / var(--kl) 1px,
+    linear-gradient(var(--k) 0 0) 100% 0 / 1px var(--kl),
+    linear-gradient(var(--k) 0 0) 0 100% / var(--kl) 1px,
+    linear-gradient(var(--k) 0 0) 0 100% / 1px var(--kl),
+    linear-gradient(var(--k) 0 0) 100% 100% / var(--kl) 1px,
+    linear-gradient(var(--k) 0 0) 100% 100% / 1px var(--kl),
+    var(--c-paper);
+  background-repeat: no-repeat;
+  background-origin: border-box;
+}
+/* Plot exports carry a baked white ground; multiply drops it into the paper. */
+.w-prose figure > img,
+.w-prose .pg-animation-wrap img {
+  mix-blend-mode: multiply;
+}
+.w-prose figcaption {
+  margin-top: 0.9rem;
+  font-size: 0.8em;
+  line-height: 1.5;
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+.w-prose figcaption[data-kind]::before {
+  content: 'Fig. ' counter(wfig, decimal-leading-zero) ' · ' attr(data-kind);
+  display: block;
+  margin-bottom: 0.4rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-faint);
+}
+.w-prose figcaption a {
+  color: inherit;
+}
+
+/* Field note: the three timing columns. */
+.w-prose .pg-timing {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-block: 2rem;
+  padding: 0.9rem 0;
+  border-block: 1px solid var(--c-line-2);
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.w-prose .pg-timing span {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+.w-prose .pg-timing span::before {
+  content: '';
+  flex: none;
+  width: 7px;
+  height: 7px;
+  box-sizing: border-box;
+  border: 1px solid var(--c-teal);
+}
+.w-prose .pg-timing span:first-child::before {
+  background: var(--c-teal);
+}
+.w-prose .pg-timing span:nth-child(2)::before {
+  background: linear-gradient(90deg, var(--c-teal) 50%, transparent 50%);
+}
+.w-prose .pg-timing span:last-child::before {
+  border-color: var(--c-orange);
+  border-style: dashed;
+}
+/* Field note: the optimisation still and its play/pause disclosure. */
+.w-prose .pg-animation-wrap {
+  position: relative;
+}
+.w-prose .pg-animation-wrap img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 460px;
+  object-fit: contain;
+}
+.w-prose .pg-animation summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem;
+  border-top: 1px solid var(--c-line-2);
+  list-style: none;
+  cursor: pointer;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-teal-ink);
+  transition: color 160ms ease;
+}
+.w-prose .pg-animation summary::-webkit-details-marker {
+  display: none;
+}
+.w-prose .pg-animation summary::before {
+  content: '';
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 4px 0 4px 7px;
+  border-color: transparent transparent transparent currentColor;
+}
+.w-prose .pg-animation[open] summary::before {
+  width: 7px;
+  height: 7px;
+  border: 0;
+  background: currentColor;
+}
+.w-prose .pg-animation summary:hover {
+  color: var(--c-ink);
+}
+.w-prose .pg-animation .pg-pause-label,
+.w-prose .pg-animation[open] .pg-play-label {
+  display: none;
+}
+.w-prose .pg-animation[open] .pg-pause-label {
+  display: inline;
+}
+.w-prose .pg-animation-wrap:has(details[open]) .pg-animation-still {
+  display: none;
+}
+
+/* Tables: mono, hairlines only; the wrapper scrolls, the page never does. */
+.w-prose .p-writings-table-scroll {
+  margin-block: 2rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  background:
+    linear-gradient(to right, var(--c-paper) 60%, transparent) 0 0 / 36px 100% no-repeat local,
+    linear-gradient(to left, var(--c-paper) 60%, transparent) 100% 0 / 36px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgb(19 19 18 / 20%), transparent) 0 0 / 14px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgb(19 19 18 / 20%), transparent) 100% 0 / 14px 100% no-repeat scroll;
+}
+.w-prose table {
+  width: 100%;
+  min-width: 560px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border-top: 1px solid var(--c-ink);
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+}
+.w-prose th {
+  padding: 0.75rem 0.9rem 0.65rem 0;
+  border-bottom: 1px solid var(--c-line-2);
+  text-align: left;
+  font-weight: 400;
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.w-prose td {
+  padding: 0.75rem 0.9rem 0.75rem 0;
+  border-bottom: 1px solid var(--c-line);
+  vertical-align: top;
+}
+
+/* The candidate blueprint: its canvas brings its own dark plate
+   (components/plate), so the wrapper only spaces it on the page. */
+.w-prose .p-writings-plate {
+  margin-block: 3rem;
+}
+.w-prose .p-writings-plate .candidate-blueprint,
+.w-prose .p-writings-plate .candidate-blueprint figure {
+  margin: 0;
+}
+.w-prose .p-writings-plate .blueprint-caption {
+  margin-top: 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--c-muted);
+}
+.w-prose .p-writings-plate .blueprint-caption-kind {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-faint);
+}
+.w-prose .p-writings-plate .blueprint-caption-kind::before {
+  content: 'Fig. ' counter(wfig, decimal-leading-zero) ' · ';
+}
+.w-prose .p-writings-plate .blueprint-caption-kind::after {
+  content: ' · Not a live record';
+}
+.w-prose .p-writings-plate .blueprint-heading > .eyebrow {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+
+/* The Figure component (essay figures): v3 frame and caption register. */
+.w-prose .figure {
+  margin-block: 2.75rem;
+}
+.w-prose .figure-frame {
+  border-color: var(--c-line-2);
+  background: rgb(255 255 255 / 24%);
+}
+/* A bare frame holds a plate that brings its own ground (the ten-day cycle). */
+.w-prose .figure-frame.bare {
+  background: none;
+}
+.w-prose .figure-head .eyebrow,
+.w-prose .figure-btn {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+}
+.w-prose .figure .figure-caption {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.4rem;
+  margin-top: 0.9rem;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  color: var(--c-faint);
+}
+.w-prose .figure .figure-caption > span + span {
+  font-family: var(--f-serif);
+  font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.05rem);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+.w-prose .figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* The long game: three tiers with line samples (solid / dashed / dotted). */
+.w-prose .p-writings-tiers {
+  list-style: none;
+  margin-top: 1.75rem;
+  padding: 0;
+  border-top: 1px solid var(--c-ink);
+}
+.w-prose .p-writings-tier {
+  display: grid;
+  grid-template-columns: 32px 9rem minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  margin: 0;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--c-line-2);
+}
+.w-prose .p-writings-tier .line-sample {
+  margin-top: 0.7em;
+  color: var(--c-teal);
+}
+.w-prose .p-writings-tier .line-sample.dashed,
+.w-prose .p-writings-tier .line-sample.dotted {
+  color: var(--c-muted);
+}
+.w-prose .p-writings-tier-label,
+.w-prose .eyebrow {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.w-prose .p-writings-tier-label {
+  padding-top: 0.4em;
+}
+.w-prose .p-writings-tier-label small {
+  display: block;
+  font-size: inherit;
+  color: var(--c-faint);
+}
+.w-prose .p-writings-tier p {
+  margin: 0;
+}
+.w-prose .p-writings-tier strong {
+  font-weight: 500;
+}
+
+/* ---------- Forecast blocks ---------- */
+.w-fcs {
+  display: grid;
+  gap: clamp(3.5rem, 6vw, 5rem);
+  margin-top: 2.25rem;
+}
+.w-prose .w-fc {
+  position: relative;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--c-ink);
+}
+.w-prose .w-fc-title {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  align-items: baseline;
+  margin: 0;
+  font-size: clamp(1.5rem, 1.25rem + 0.9vw, 2rem);
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.w-fc-n {
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: var(--c-teal-ink);
+}
+.w-prose .w-fc-meter {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  gap: 0.5rem clamp(1.25rem, 3vw, 2.25rem);
+  margin-top: 1.6rem;
+  padding: 0 0 1.25rem 2.75rem;
+  border-bottom: 1px solid var(--c-line);
+}
+.w-prose .w-fc-p {
+  display: flex;
+  align-items: flex-start;
+  margin: 0;
+  font-family: var(--f-serif);
+  font-size: clamp(3.75rem, 2.6rem + 4.4vw, 6.25rem);
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  font-variant-numeric: lining-nums;
+  min-width: 2.2ch;
+}
+.w-fc-pct {
+  margin: 0.06em 0 0 0.05em;
+  font-size: 0.4em;
+  letter-spacing: 0;
+  color: var(--c-teal-ink);
+}
+.w-fc-scale {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'when range'
+    'bar bar';
+  align-items: baseline;
+  column-gap: 1rem;
+  min-width: 0;
+}
+.w-prose .w-fc-when {
+  grid-area: when;
+}
+.w-prose .w-fc-range-label {
+  grid-area: range;
+  text-align: right;
+}
+.w-fc-bar {
+  grid-area: bar;
+}
+.w-prose .w-fc-when,
+.w-prose .w-fc-range-label {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.w-fc-q {
+  color: var(--c-muted);
+}
+.w-fc-deadline {
+  color: var(--c-ink);
+  white-space: nowrap;
+}
+.w-prose .w-fc-range-label {
+  color: var(--c-muted);
+}
+.w-fc-range-label .w-cite {
+  font-size: 1em;
+  vertical-align: 0;
+  letter-spacing: 0.04em;
+}
+.w-fc-bar {
+  position: relative;
+  height: 28px;
+  margin: 0.75rem 0 1.1rem;
+}
+.w-fc-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--c-line-3);
+}
+.w-fc-range {
+  position: absolute;
+  top: calc(50% - 7px);
+  left: var(--lo);
+  width: max(3px, calc(var(--hi) - var(--lo)));
+  height: 14px;
+  box-sizing: border-box;
+  background: rgb(162 208 190 / 55%);
+  border-inline: 1px solid rgb(66 145 149 / 55%);
+}
+.w-fc-fill {
+  position: absolute;
+  top: calc(50% - 1px);
+  left: 0;
+  width: var(--p);
+  height: 2px;
+  background: var(--c-teal);
+  transform-origin: left;
+}
+.w-fc-mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--p);
+  width: 1px;
+  margin-left: -0.5px;
+  background: var(--c-ink);
+}
+.w-fc-mark::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3.5px;
+  width: 8px;
+  height: 8px;
+  background: var(--c-teal);
+}
+.w-fc-tick {
+  position: absolute;
+  top: calc(50% + 10px);
+  transform: translateX(-50%);
+}
+.w-fc-tick:first-of-type {
+  transform: none;
+}
+.w-fc-tick:last-of-type {
+  transform: translateX(-100%);
+}
+.w-fc-tick i {
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  color: var(--c-faint);
+}
+:where(html[data-reveal='js']) .w-fc-fill {
+  transform: scaleX(0);
+  transition: transform 1300ms var(--e-out) 250ms;
+}
+:where(html[data-reveal='js']) :is(.w-fc-mark, .w-fc-range) {
+  opacity: 0;
+  transition: opacity 700ms ease 900ms;
+}
+.is-in .w-fc-fill {
+  transform: none;
+}
+.is-in :is(.w-fc-mark, .w-fc-range) {
+  opacity: 1;
+}
+.w-fc-body {
+  margin-top: 1.5rem;
+  padding-left: 2.75rem;
+}
+.w-fc-body p + p {
+  margin-top: 1em;
+}
+.w-prose .w-fc-rules {
+  display: grid;
+  gap: 1.25rem;
+  margin: 1.75rem 0 0 2.75rem;
+}
+.w-fc-rules dt {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.w-fc-rules dt::before {
+  content: '';
+  flex: none;
+  width: 7px;
+  height: 7px;
+  box-sizing: border-box;
+}
+.w-fc-rules dd {
+  margin: 0.55rem 0 0;
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+.w-fc-rules dd p + p {
+  margin-top: 0.75em;
+  color: var(--c-muted);
+}
+.w-fc-rule {
+  padding: 1rem 1.2rem 1.15rem;
+}
+.w-fc-rule dt {
+  color: var(--c-teal-ink);
+}
+.w-fc-rule dt::before {
+  border: 1px solid var(--c-teal-ink);
+}
+.w-fc-wrong {
+  padding: 0.15rem 0 0.2rem 1.2rem;
+  border-left: 2px solid var(--c-orange);
+}
+.w-fc-wrong dt {
+  color: var(--c-amber-ink);
+}
+.w-fc-wrong dt::before {
+  background: var(--c-orange);
+}
+
+/* ---------- Status line, asides ---------- */
+.w-prose .w-status-line,
+.w-prose .w-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+.w-prose .w-status-line {
+  margin-top: 1.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--c-line);
+}
+.w-status-label {
+  margin-right: 0.4rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-faint);
+}
+.w-prose .w-aside {
+  margin-top: 2.5rem;
+  padding: 1rem 1.2rem 1.15rem;
+}
+.w-aside-label {
+  color: var(--c-muted);
+}
+.w-prose .w-aside-text {
+  margin-top: 0.55rem;
+  font-size: 0.9em;
+  line-height: 1.5;
+  color: rgb(19 19 18 / 84%);
+}
+
+/* ---------- References ---------- */
+.w-refs {
+  margin-top: clamp(4.5rem, 8vw, 6.5rem);
+  padding-top: 1rem;
+  border-top: 1px solid var(--c-ink);
+}
+.w-body .w-refs-title {
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.w-refs-run + .w-refs-run,
+.w-refs-title + .w-refs-run {
+  margin-top: 1.5rem;
+}
+.w-body .w-ref-group {
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--c-line-2);
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-faint);
+}
+.w-refs-list {
+  list-style: none;
+  padding: 0;
+}
+.w-ref {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: 0.25rem 0.75rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--c-line);
+  scroll-margin-top: 8px;
+  transition: background-color 600ms ease;
+}
+.w-ref:target {
+  background: linear-gradient(90deg, rgb(162 208 190 / 40%), rgb(162 208 190 / 0%));
+}
+.w-ref-n {
+  padding-top: 0.25rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--c-teal-ink);
+}
+.w-ref-body {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+.w-ref-label {
+  font-family: var(--f-serif);
+  font-size: 1.0625rem;
+  line-height: 1.45;
+  color: var(--c-ink);
+  text-decoration: none;
+}
+a.w-ref-label:hover {
+  color: var(--c-teal-ink);
+}
+.w-ref-label em {
+  font-style: italic;
+}
+.w-ref-url {
+  justify-self: start;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  color: var(--c-teal-ink);
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+.w-ref-url:hover {
+  color: var(--c-ink);
+}
+.w-ref-note {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+  color: var(--c-faint);
+}
+
+/* One quiet line after the essay: the matching next step (R22, 3 Oct 2026). */
+.w-body .w-cta {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--c-line);
+  font-family: var(--f-serif);
+  font-size: 1.2rem;
+  line-height: 1.5;
+  text-wrap: balance;
+}
+.w-cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  color: var(--c-teal-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  white-space: nowrap;
+}
+.w-cta-link svg {
+  width: 0.8em;
+  height: 0.8em;
+}
+.w-cta-link:hover {
+  color: var(--c-ink);
+}
+.w-body .w-return {
+  margin-top: 3rem;
+}
+.w-return a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+  text-decoration: none;
+}
+.w-return a:hover {
+  color: var(--c-teal-ink);
+}
+.w-return-arrow {
+  display: inline-flex;
+  rotate: 180deg;
+}
+.w-return-arrow svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ---------- Next ---------- */
+.w-next {
+  --frame-bg: var(--c-paper-2);
+  position: relative;
+  padding-block: clamp(3.5rem, 7vw, 6.5rem) clamp(4rem, 8vw, 7.5rem);
+  background: var(--c-paper-2);
+  border-top: 1px solid var(--c-line-2);
+}
+.w-next-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: clamp(2rem, 4vw, 3.25rem);
+  border-bottom: 1px solid var(--c-line-2);
+}
+.w-next .w-next-label {
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.w-next-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+  text-decoration: none;
+}
+.w-next-all:hover {
+  color: var(--c-ink);
+}
+.w-next-all svg {
+  width: 14px;
+  height: 14px;
+}
+.w-card--next {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 5rem);
+}
+.w-card--next .w-visual {
+  background: rgb(248 244 239 / 60%);
+}
+
+/* ================================================================
+   Responsive
+   ================================================================ */
+@media (max-width: 1099px) {
+  .w-hero .w-hero-title {
+    max-width: 16ch;
+  }
+}
+@media (max-width: 900px) {
+  .w-featured-grid {
+    grid-template-columns: minmax(0, 1fr);
+    border-bottom: 0;
+  }
+  .w-card--featured,
+  .w-card--featured:nth-child(odd),
+  .w-card--featured:nth-child(even) {
+    padding: 2rem 0 2.5rem;
+    border-top: 0;
+    border-left: 0;
+    border-bottom: 1px solid var(--c-line-2);
+  }
+  .w-card--next {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+  .w-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem 1rem;
+  }
+  .w-row-date {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .w-row-kind {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+  .w-row-link {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .w-row-arrow {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}
+@media (max-width: 640px) {
+  .w-index-hero {
+    min-height: clamp(460px, 70svh, 600px);
+  }
+  .w-tl {
+    --tl-h: 210px;
+    --dxk: 0.6;
+  }
+  /* The three 2030 forecasts fan out by half a year's width (the plot spans
+     10.65 years), each on a hit column that wide and a narrower band, so no
+     stem, band or tap target overlaps its neighbour or the 2029 forecast. */
+  .w-tl--figure .w-tl-col {
+    left: calc(var(--x) + var(--fan, 0) * 100% / 21.3);
+    width: calc(100% / 21.3);
+    margin-left: calc(-100% / 42.6);
+  }
+  .w-tl--figure .w-tl-band {
+    width: 5px;
+    margin-left: -2.5px;
+  }
+  .w-hero .w-hero-kicker {
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+  }
+  .w-hero-kicker > * + *::before {
+    margin: 0 0.55rem;
+  }
+  .w-tl--figure .w-tl-label b {
+    display: none;
+  }
+  /* Phone: every label sits centred above its own head (a right-hand label
+     would lie across the next stem of the 2030 fan). */
+  .w-tl--figure .w-tl-label:not(.is-end) {
+    right: auto;
+    left: 50%;
+    bottom: calc(var(--p) + 9px);
+    transform: translateX(-50%);
+    padding-inline: 2px;
+  }
+  .w-tl--figure .w-tl-year.is-odd {
+    visibility: hidden;
+  }
+  .w-tl-now i {
+    display: none;
+  }
+  /* One label on the frame line at phone width; the caption carries the rest. */
+  .w-figure .s-frame-index {
+    display: none;
+  }
+  .w-tl--card .w-tl-label {
+    display: none;
+  }
+  .w-prose .w-fc-meter,
+  .w-fc-body,
+  .w-prose .w-fc-rules {
+    padding-left: 0;
+    margin-left: 0;
+  }
+  .w-prose .w-fc-title {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+  }
+  .w-prose .w-fc-meter {
+    gap: 0.5rem 1.1rem;
+  }
+  .w-fc-scale {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'when'
+      'range'
+      'bar';
+  }
+  .w-prose .w-fc-range-label {
+    margin-top: 0.2rem;
+    text-align: left;
+  }
+  .w-prose .pg-timing {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+  .w-prose .p-writings-tier {
+    grid-template-columns: 32px minmax(0, 1fr);
+  }
+  .w-prose .p-writings-tier p {
+    grid-column: 1 / -1;
+  }
+  .w-ref {
+    grid-template-columns: 2rem minmax(0, 1fr);
+  }
+  .w-plate-legend,
+  .w-cycle-legend {
+    font-size: 0.5625rem;
+  }
+  /* The cycle legend wraps to two lines on a phone: let the stage grow with
+     its content instead of clipping the last key. */
+  .w-visual--cycle .w-visual-stage {
+    aspect-ratio: auto;
+  }
+  .w-visual--cycle .w-cycle {
+    position: relative;
+    inset: auto;
+    padding: 2.75rem 7% 1.25rem;
+  }
+}
+
+/* ================================================================
+   Motion off
+   ================================================================ */
+html[data-motion='paused'] :is(.w-tl-stem, .w-fc-fill) {
+  transform: none;
+  transition: none;
+}
+html[data-motion='paused'] :is(.w-tl-head, .w-tl-label, .w-tl-band, .w-fc-mark, .w-fc-range) {
+  opacity: 1;
+  transition: none;
+}
+html[data-motion='paused'] .w-plate-next {
+  fill-opacity: 1;
+  transition: none;
+}
+html[data-motion='paused'] .w-card:hover .w-plate-scan {
+  animation: none;
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .w-card:hover .w-plate-scan {
+    animation: none;
+  }
+  :where(html[data-reveal='js']) :is(.w-tl-stem, .w-fc-fill) {
+    transform: none;
+    transition: none;
+  }
+  :where(html[data-reveal='js'])
+    :is(.w-tl-head, .w-tl-label, .w-tl-band, .w-fc-mark, .w-fc-range) {
+    opacity: 1;
+    transition: none;
+  }
+  :where(html[data-reveal='js']) .w-plate-next {
+    fill-opacity: 1;
+    transition: none;
+  }
+  .w-card-link > span,
+  .w-visual-img,
+  .w-ep-img,
+  .w-card-read svg,
+  .w-row-arrow svg {
+    transition: none;
+  }
+}
+@media (scripting: none) {
+  .w-tl-stem,
+  .w-fc-fill {
+    transform: none !important;
+  }
+  .w-tl-head,
+  .w-tl-label,
+  .w-tl-band,
+  .w-fc-mark,
+  .w-fc-range {
+    opacity: 1 !important;
+  }
+  .w-plate-next {
+    fill-opacity: 1 !important;
+  }
+}

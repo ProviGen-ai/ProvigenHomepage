@@ -1,0 +1,33 @@
+/* Hairline figures in the site's palette: white plates on a white panel, warm
+   greys for the strokes, teal-ink for the one bright stroke (rule 04: the
+   stroke is the only highlight). The plate colour must be the panel's. */
+.hl-plate {
+  --hairline-plate: #ffffff;
+  --hairline-hi: var(--c-teal-ink);
+  --hairline-edge: #9b968e;
+  --hairline-mid: #c8c3bb;
+  --hairline-lo: #e7e3dc;
+  --hairline-stroke: 0.9;
+  position: relative;
+  background: #ffffff;
+  border: 1px solid var(--c-line-2);
+}
+.hl-stage {
+  width: 100%;
+}
+.hl-tag {
+  position: absolute;
+  top: 12px;
+  z-index: 1;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--c-muted);
+  pointer-events: none;
+}
+.hl-read {
+  right: 14px;
+  color: var(--c-ink);
+  font-variant-numeric: tabular-nums;
+}

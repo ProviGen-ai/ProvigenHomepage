@@ -1,0 +1,177 @@
+<!doctype html>
+<!-- Contact sheet for make-share-assets.mjs --review: every card at full size and at
+     LinkedIn's feed size, every icon at its real size on light and dark tabs and zoomed. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Share assets · contact sheet</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 32px;
+        background: #e9e6e1;
+        font:
+          12px/1.4 ui-monospace,
+          Menlo,
+          monospace;
+        color: #131312;
+      }
+      h2 {
+        margin: 8px 0 14px;
+        font-size: 12px;
+        font-weight: 400;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .row {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+        margin-bottom: 28px;
+      }
+      .side {
+        display: grid;
+        gap: 12px;
+      }
+      figure {
+        margin: 0;
+      }
+      figcaption {
+        margin-top: 4px;
+        color: #5e5a55;
+      }
+      img {
+        display: block;
+        box-shadow: 0 0 0 1px rgb(19 19 18 / 18%);
+      }
+      .icons {
+        display: flex;
+        gap: 28px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+      }
+      .tab {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        padding: 10px 14px;
+        border-radius: 8px;
+      }
+      .tab img {
+        box-shadow: none;
+      }
+      .light {
+        background: #ffffff;
+      }
+      .grey {
+        background: #dee1e6;
+      }
+      .dark {
+        background: #202124;
+        color: #e8eaed;
+      }
+      .zoom img {
+        image-rendering: pixelated;
+        box-shadow: none;
+      }
+    </style>
+    <script>
+      window.showSheet = async (data) => {
+        const el = (tag, attrs = {}, kids = []) => {
+          const node = document.createElement(tag);
+          Object.assign(node, attrs);
+          node.append(...kids);
+          return node;
+        };
+        const img = (src, width, height) => el('img', { src, width, height });
+        const body = document.body;
+        body.append(
+          el('h2', {
+            textContent:
+              'Share cards: 1200×630, and as LinkedIn (552) and a chat preview (360) show them',
+          }),
+        );
+        for (const c of data.cards) {
+          body.append(
+            el('div', { className: 'row' }, [
+              el('figure', {}, [
+                img(c.src, 1200, 630),
+                el('figcaption', {
+                  textContent: `${c.label} · ${(c.bytes / 1024).toFixed(1)} KB`,
+                }),
+              ]),
+              el('div', { className: 'side' }, [
+                el('figure', {}, [
+                  img(c.src, 552, 290),
+                  el('figcaption', { textContent: '552 px' }),
+                ]),
+                el('figure', {}, [
+                  img(c.src, 360, 189),
+                  el('figcaption', { textContent: '360 px' }),
+                ]),
+              ]),
+            ]),
+          );
+        }
+        if (data.icons.length) {
+          body.append(
+            el('h2', {
+              textContent:
+                'Icons at real size: browser tabs (light, grey, dark), the SVG favicon at 16 and 32',
+            }),
+          );
+          const small = data.icons.filter((i) => i.size <= 48);
+          const tabs = ['light', 'grey', 'dark'].map((tone) =>
+            el('div', { className: `tab ${tone}` }, [
+              ...small.map((i) => img(i.src, i.size, i.size)),
+              ...(data.svg
+                ? [img(data.svg, 16, 16), img(data.svg, 32, 32)]
+                : []),
+            ]),
+          );
+          body.append(el('div', { className: 'icons' }, tabs));
+          body.append(el('h2', { textContent: 'Zoomed 8×: ico 16, 32, 48' }));
+          body.append(
+            el(
+              'div',
+              { className: 'icons zoom' },
+              small.map((i) =>
+                el('div', { className: 'tab dark' }, [
+                  img(i.src, i.size * 8, i.size * 8),
+                ]),
+              ),
+            ),
+          );
+          body.append(
+            el('h2', {
+              textContent:
+                'apple-touch-icon 180, icon-192, icon-512 (shown at 256)',
+            }),
+          );
+          body.append(
+            el(
+              'div',
+              { className: 'icons' },
+              data.icons
+                .filter((i) => i.size > 48)
+                .map((i) =>
+                  el('figure', {}, [
+                    img(i.src, Math.min(i.size, 256), Math.min(i.size, 256)),
+                    el('figcaption', { textContent: `${i.size} px` }),
+                  ]),
+                ),
+            ),
+          );
+        }
+        await Promise.all(
+          [...document.images].map((i) => i.decode().catch(() => {})),
+        );
+        await new Promise((r) =>
+          requestAnimationFrame(() => requestAnimationFrame(r)),
+        );
+        return Math.ceil(document.documentElement.scrollHeight);
+      };
+    </script>
+  </head>
+  <body></body>
+</html>

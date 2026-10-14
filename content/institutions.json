@@ -1,0 +1,50 @@
+{
+  "harvard": {
+    "name": "Harvard University",
+    "image": "/assets/institutions/mono/harvard.svg",
+    "width": 280.3,
+    "height": 70.4
+  },
+  "tum": {
+    "name": "Technical University of Munich",
+    "image": "/assets/institutions/mono/tum.svg",
+    "width": 73.0,
+    "height": 38.0
+  },
+  "lmu": {
+    "name": "LMU Munich",
+    "image": "/assets/institutions/mono/lmu.svg",
+    "width": 362.0,
+    "height": 171.0
+  },
+  "meduni-vienna": {
+    "name": "Medical University of Vienna",
+    "image": "/assets/institutions/mono/meduni-vienna.svg",
+    "width": 395.0,
+    "height": 84.0
+  },
+  "imperial": {
+    "name": "Imperial College London",
+    "image": "/assets/institutions/mono/imperial.svg",
+    "width": 727.0,
+    "height": 80.0
+  },
+  "uw-madison": {
+    "name": "University of Wisconsin–Madison",
+    "image": "/assets/institutions/mono/uw-madison.svg",
+    "width": 598.0,
+    "height": 201.37
+  },
+  "max-planck": {
+    "name": "Max Planck Society",
+    "image": "/assets/institutions/mono/max-planck.svg",
+    "width": 696.67,
+    "height": 81.32
+  },
+  "valneva": {
+    "name": "Valneva",
+    "image": "/assets/institutions/mono/valneva.png",
+    "width": 1886.0,
+    "height": 261.0
+  }
+}

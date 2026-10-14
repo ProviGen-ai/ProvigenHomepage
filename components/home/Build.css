@@ -1,0 +1,282 @@
+/* Section 4a · How it works (prefix b-) */
+.b-build {
+  position: relative;
+  /* clip, not hidden (14 Oct 2026): a hidden box is still a scroll container,
+     and the #build anchor inside it scrolled the section's own content up,
+     under the problem stage and off its background. */
+  overflow: clip;
+  padding-block: calc(var(--s-section) * 0.65) clamp(5rem, 3rem + 6vw, 9rem);
+  /* White, all of it, figure included (founder, 3 Oct 2026). The top eases
+     out of Problem's paper over the head (smoothstep stops, so neither end of
+     the blend shows as an edge); the foot stays white into Dawn, which starts
+     at #fff. Grain is invisible on pure white (overlay keeps 255 at 255). */
+  /* Shorter since 14 Oct 2026 (was clamp(14rem, 8rem + 14vw, 24rem)): it
+     reaches white by the title's foot, where the figure now starts. */
+  --b-blend: clamp(10rem, 5.5rem + 10vw, 16rem);
+  background: linear-gradient(
+    180deg,
+    var(--c-paper) 0,
+    #f9f6f2 calc(var(--b-blend) * 0.25),
+    #fcfaf7 calc(var(--b-blend) * 0.5),
+    #fefdfd calc(var(--b-blend) * 0.75),
+    #fff var(--b-blend)
+  );
+  color: var(--c-ink);
+}
+
+/* ---------- Head ---------- */
+.b-head {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(1rem, 2vw, 2rem);
+  row-gap: 1.75rem;
+}
+.b-eyebrow {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+.b-title {
+  grid-column: 1 / -1;
+  max-width: 21ch;
+}
+.b-title-turn {
+  display: block;
+}
+.b-title em {
+  color: var(--c-teal-ink);
+}
+
+/* ---------- Fig. 02 · the loop ---------- */
+.b-loop-wrap {
+  /* Tighter (founder, 14 Oct 2026; was clamp(3rem, 1.5rem + 4vw, 5.5rem),
+     then three quarters of that). The section's blend (--b-blend) is shorter
+     to match, so the white figure still starts on white. */
+  margin-top: clamp(1.25rem, 0.6rem + 1.6vw, 2.25rem);
+}
+/* The figure is drawn straight on the section's white: no panel colour, no
+   tint, no shadow, and since 4 Oct 2026 no frame or label either (founder).
+   It stays lifted over the section's grain (.s-grain::after, z-index 3):
+   noise over the figure's hairlines and small text reads as blur. */
+.b-frame {
+  position: relative;
+  z-index: 4;
+  background: #fff;
+}
+/* Reserve the plate's height before the first frame. The canvas picks its
+   layout from its own width (Loop.tsx pickLayout: wide from 900 CSS px,
+   medium from 680, tablet from 600, phone below, each a fixed shape), so the
+   reserved ratio is chosen from the same width with container queries, not
+   the viewport. */
+.b-plate {
+  container: b-plate / inline-size;
+}
+/* The kit's plate (Plate.css) is a dark panel; this one takes the section's
+   white and drops its inner hairline (the frame's line is the only edge). */
+.pl-plate.b-plate {
+  --pl-ground: #fff;
+  color: var(--c-ink);
+}
+.pl-plate.b-plate::after {
+  border-color: transparent;
+}
+.b-plate > .pl-canvas-box {
+  --pl-ratio: 360 / 622;
+}
+@container b-plate (min-width: 600px) {
+  .b-plate > .pl-canvas-box {
+    --pl-ratio: 640 / 806;
+  }
+}
+@container b-plate (min-width: 680px) {
+  .b-plate > .pl-canvas-box {
+    --pl-ratio: 860 / 384;
+  }
+}
+@container b-plate (min-width: 900px) {
+  .b-plate > .pl-canvas-box {
+    --pl-ratio: 1200 / 440;
+  }
+}
+
+/* Pause / Play: a hairline icon button in the plate's top-left corner (the
+   drawing keeps that corner clear in every layout); its name is aria-label. */
+.b-play {
+  position: absolute;
+  z-index: 3;
+  top: clamp(14px, 1.6vw, 24px);
+  left: clamp(14px, 1.6vw, 24px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  /* on white: a hairline border, the icon in muted ink (6.8:1) */
+  border: 1px solid var(--c-line-2);
+  background: none;
+  color: var(--c-muted);
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
+}
+.b-play svg {
+  width: 12px;
+  height: 12px;
+  flex: none;
+}
+@media (hover: hover) {
+  .b-play:hover {
+    color: var(--c-ink);
+    border-color: var(--c-line-3);
+  }
+}
+/* the steps' focus ring (mint was for the dark plate; it is 1.6:1 on white) */
+.b-play:focus-visible {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 3px;
+}
+/* touch: a 44 px target around the same 30 px mark, so the drawing's corner
+   stays as it is */
+@media (pointer: coarse) {
+  .b-play::before {
+    content: '';
+    position: absolute;
+    inset: -7px;
+  }
+}
+
+/* ---------- The five steps, on the same white ---------- */
+.b-steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  column-gap: clamp(1rem, 0.5rem + 1.4vw, 2rem);
+  row-gap: 2.5rem;
+  /* A little tighter under the figure (founder, 14 Oct 2026; was
+     clamp(2.5rem, 1.75rem + 2vw, 3.5rem)). */
+  margin: clamp(1.5rem, 1rem + 1.4vw, 2.25rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+/* Each step spans three rows of the list (name, line, status) as a subgrid,
+   so the names, lines and status chips of a row share their tops. */
+.b-step {
+  position: relative;
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+  align-content: start;
+  min-width: 0;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--c-line-2);
+}
+/* The step the comet is at: a teal hairline draws in over the rule. */
+.b-step-rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 1px;
+  background: var(--c-teal);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 700ms var(--e-out);
+}
+.b-step[data-on] .b-step-rule {
+  transform: scaleX(1);
+}
+.b-step-title {
+  margin: 0;
+  font: inherit;
+}
+.b-step-btn {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-ink);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.b-step-btn:focus-visible {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 4px;
+}
+.b-step-name {
+  font-family: var(--f-display);
+  font-size: clamp(1.5rem, 1.1rem + 0.8vw, 2rem);
+  font-weight: 200;
+  font-synthesis: none;
+  line-height: 1.05;
+  /* The founder's site tracks its 24 px headings at -0.03em; -0.045em is for 40 px and up. */
+  letter-spacing: var(--d-track);
+  transition: color 300ms ease;
+}
+.b-step[data-on] .b-step-name,
+.b-step-btn[aria-pressed='true'] .b-step-name {
+  color: var(--c-teal-ink);
+}
+.b-step-line {
+  margin: 0.7rem 0 1.1rem;
+  max-width: 28ch;
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+
+/* ---------- Entrance (first time in view) ---------- */
+:where(html[data-reveal='js']) .b-step {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 800ms ease,
+    transform 1000ms var(--e-out);
+  transition-delay: calc(500ms + var(--k, 0) * 90ms);
+}
+.is-in .b-step {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  :where(html[data-reveal='js']) .b-step {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .b-step-rule {
+    transition: none;
+  }
+}
+
+/* ---------- Tablet and phone ---------- */
+@media (max-width: 1100px) {
+  .b-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .b-steps {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 2rem;
+  }
+  .b-step-line {
+    max-width: 34ch;
+  }
+}
+
+/* #build sits under the steps, about 38 px below the last step line. The
+   root's scroll-padding (header + 16 px) plus this margin puts it just past
+   the bottom edge, so the header's How it works link scrolls until the last
+   step line sits about 24 px above the bottom, which leaves the title whole on
+   a 900 px tall screen (14 Oct 2026). */
+.b-anchor {
+  display: block;
+  scroll-margin-top: calc(100lvh - var(--s-header) - 16px + 0.875rem);
+}

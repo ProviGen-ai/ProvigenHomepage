@@ -1,47 +1,22 @@
-import { Resend } from "resend";
-import { NextResponse } from "next/server";
+import { handleContact } from '@/lib/contact/handler';
 
-export async function POST(req: Request) {
-  try {
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    const { email, message, website, inquiryType } = await req.json();
+/*
+ * /api/contact (3 Oct 2026, competitor review R17): the contact form posts
+ * here. Everything lives in lib/contact/handler.ts, which the static deploy
+ * reuses as a Vercel Function; `output: 'export'` skips this route with a
+ * warning, which is expected.
+ *
+ * NODE_ENV is spelled out so the bundler's build-time replacement reaches it.
+ * In the Worker, process.env holds only the vars and secrets: a spread alone
+ * would leave NODE_ENV unset and let CONTACT_DRY_RUN through in production.
+ */
+const env = () => ({ ...process.env, NODE_ENV: process.env.NODE_ENV });
 
-    // Honeypot check — bots fill this hidden field, real users don't
-    if (website) {
-      // Return success to not reveal the check to bots
-      return NextResponse.json({ success: true });
-    }
+export function POST(request: Request) {
+  return handleContact(request, env());
+}
 
-    if (!email || !message) {
-      return NextResponse.json(
-        { error: "Email and message are required" },
-        { status: 400 },
-      );
-    }
-
-    // Send inquiry to ProviGen
-    await resend.emails.send({
-      from: "Contact Form <noreply@provigen.ai>",
-      to: "contact@provigen.ai",
-      replyTo: email,
-      subject: `Contact form inquiry from ${email}`,
-      text: `Email: ${email}\nInquiry type: ${inquiryType || "Not specified"}\n\nMessage:\n${message}`,
-    });
-
-    // Send confirmation to the sender
-    await resend.emails.send({
-      from: "ProviGen <noreply@provigen.ai>",
-      to: email,
-      subject: "We received your message - ProviGen",
-      text: `Hi,\n\nThank you for reaching out to ProviGen! We have received your message and will get back to you within 24 hours during business days.\n\nHere is a copy of your inquiry:\n\n${message}\n\nBest regards,\nThe ProviGen Team\nhttps://provigen.ai`,
-    });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Failed to send email:", error);
-    return NextResponse.json(
-      { error: "Failed to send message" },
-      { status: 500 },
-    );
-  }
+/** Anything but POST is answered 405, as the v1 endpoint did. */
+export function GET(request: Request) {
+  return handleContact(request, env());
 }

@@ -1,0 +1,979 @@
+/*
+ * ProviGen v3 "Paper lab" design system (1 Oct 2026).
+ * Loaded last in app/layout.tsx. Every v3 class is prefixed s- so it never
+ * collides with the legacy v2 classes that the long-form pages still use.
+ *
+ * Palette (brand package): paper #F8F4EF · stone #E3DED7 · ink #131312 ·
+ * teal #429195 · mint #A2D0BE · sand #E6D9AB · orange #E29F37.
+ * Paper is the ground; teal and orange are accents; mint and sand only appear
+ * inside gradients. Text colours are tuned for WCAG AA on paper and stone.
+ */
+:root {
+  --c-paper: #f8f4ef;
+  --c-paper-2: #f2ede6;
+  --c-stone: #e3ded7;
+  --c-ink: #131312;
+  --c-ink-2: #1d1d1b;
+  --c-teal: #429195; /* lines, fills, large text only (3.4:1 on paper) */
+  --c-teal-ink: #2a6669; /* teal text on paper 6.0:1, on stone 4.9:1 */
+  --c-mint: #a2d0be;
+  --c-sand: #e6d9ab;
+  --c-orange: #e29f37; /* fills and marks only (2.1:1 on paper) */
+  --c-amber-ink: #8a5509; /* orange text on paper 5.7:1 */
+  --c-muted: #5e5a55; /* secondary text, 6.3:1 on paper */
+  --c-faint: #6b6762; /* captions, 5.1:1 on paper */
+  --c-line: rgb(19 19 18 / 12%);
+  --c-line-2: rgb(19 19 18 / 24%);
+  --c-line-3: rgb(19 19 18 / 42%);
+
+  --f-serif: 'EB Garamond', 'EB Garamond Fallback', Garamond, 'Times New Roman', serif;
+  --f-mono: 'PP Supply Mono', 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* Headings: Kessler Display since 7 Oct 2026 (founder; PP Supply Mono Ultralight
+     from 3 Oct). EB Garamond stands in for the characters the trial cut lacks
+     (’ “ ” – — : ; ( ) …; public/assets/fonts/fonts.css). Labels stay mono. */
+  --f-display: 'Kessler Display', 'EB Garamond', 'EB Garamond Fallback', Garamond, 'Times New Roman', serif;
+  /* Display tracking, by size: an inscriptional serif wants far less than the
+     -0.03 to -0.045em the mono headings used. */
+  --d-track-xl: -0.012em;
+  --d-track-l: -0.008em;
+  --d-track: -0.004em;
+  --d-track-s: 0em;
+
+  --s-gutter: clamp(16px, 4vw, 64px);
+  --s-max: 1440px;
+  --s-read: 720px;
+  --s-header: 76px;
+  --s-section: clamp(6rem, 4rem + 9vw, 12rem);
+
+  --e-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --e-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Named gradients. "dawn" is the brand gradient: mint sky into sand into an orange horizon. */
+  --g-dawn: linear-gradient(
+    180deg,
+    #a9cdc2 0%,
+    #cfe0d4 22%,
+    #ece4c9 48%,
+    #efc98a 70%,
+    #e29f37 100%
+  );
+  --g-glow-teal: radial-gradient(
+    closest-side,
+    rgb(66 145 149 / 55%),
+    rgb(162 208 190 / 30%) 45%,
+    transparent 100%
+  );
+  --g-glow-orange: radial-gradient(
+    closest-side,
+    rgb(226 159 55 / 70%),
+    rgb(230 217 171 / 40%) 50%,
+    transparent 100%
+  );
+  --g-paper-wash: linear-gradient(
+    180deg,
+    rgb(248 244 239 / 0%) 0%,
+    rgb(248 244 239 / 100%) 100%
+  );
+}
+
+html {
+  background: var(--c-paper);
+  scroll-padding-top: calc(var(--s-header) + 16px);
+}
+body {
+  background: var(--c-paper);
+  color: var(--c-ink);
+  font-family: var(--f-serif);
+  font-size: 1.125rem;
+  line-height: 1.5;
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+::selection {
+  background: var(--c-mint);
+  color: var(--c-ink);
+}
+
+/* ---------- Layout ---------- */
+.s-page {
+  position: relative;
+  background: var(--c-paper);
+  color: var(--c-ink);
+  overflow-x: clip;
+}
+.s-wrap {
+  width: 100%;
+  max-width: var(--s-max);
+  margin-inline: auto;
+  padding-inline: var(--s-gutter);
+}
+.s-read {
+  width: 100%;
+  max-width: calc(var(--s-read) + 2 * var(--s-gutter));
+  margin-inline: auto;
+  padding-inline: var(--s-gutter);
+}
+.s-section {
+  position: relative;
+  padding-block: var(--s-section);
+}
+.s-center {
+  text-align: center;
+  margin-inline: auto;
+}
+:where(.s-page) :where(h1, h2, h3, h4, p, ul, ol, figure, blockquote, dl, dd) {
+  margin: 0;
+}
+
+/* ---------- Type ---------- */
+/* Headings in Kessler Display (founder, 7 Oct 2026), after PP Supply Mono
+   Ultralight (3 Oct). The sizes below were set for the mono at about three
+   quarters of the Garamond-era sizes; the face's size-adjust in fonts.css
+   matches its x-height to the mono's, so they hold. The accent of a heading
+   stays its teal-ink colour, upright (Kessler has an italic; the turn lines
+   keep the upright look the founder approved). Rules still ask for weight
+   200; Kessler has one weight, declared for the whole range. */
+.s-display,
+.s-h1,
+.s-h2,
+.s-h3 {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  text-wrap: balance;
+  font-variant-numeric: lining-nums;
+}
+.s-display {
+  font-size: clamp(2.4rem, 1.05rem + 5vw, 6.5rem);
+  line-height: 1.02;
+  letter-spacing: var(--d-track-xl);
+}
+.s-h1 {
+  font-size: clamp(2rem, 1.15rem + 3.2vw, 4.5rem);
+  line-height: 1.04;
+  letter-spacing: var(--d-track-xl);
+}
+.s-h2 {
+  font-size: clamp(1.7rem, 1.05rem + 2.2vw, 3.25rem);
+  line-height: 1.1;
+  letter-spacing: var(--d-track-l);
+}
+.s-h3 {
+  font-size: clamp(1.375rem, 1.1rem + 0.8vw, 1.75rem);
+  line-height: 1.18;
+  letter-spacing: var(--d-track);
+}
+/* The accent word keeps the heading's face (the legacy design.css sets
+   h1–h3 em in the serif). */
+.s-display em,
+.s-h1 em,
+.s-h2 em,
+.s-h3 em {
+  font-family: inherit;
+  font-weight: inherit;
+  font-style: normal;
+  letter-spacing: inherit;
+}
+/* MonoMarks (components/site) wraps full stops and apostrophes in headings.
+   The mono face centred them in their own cells and these classes pulled
+   them back (-0.16em, -0.12em); Kessler spaces them itself, so no shift. */
+.s-stop {
+  margin-left: 0;
+}
+.s-apos {
+  margin-inline: 0;
+}
+.s-lede {
+  font-size: clamp(1.25rem, 1.1rem + 0.55vw, 1.625rem);
+  line-height: 1.38;
+  text-wrap: pretty;
+}
+.s-body {
+  font-size: clamp(1.125rem, 1.06rem + 0.25vw, 1.3125rem);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.s-muted {
+  color: var(--c-muted);
+}
+/* Mono register (PP Supply Mono Regular): labels, nav, buttons, captions. */
+.s-label,
+.s-caps,
+.s-mono {
+  font-family: var(--f-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'zero' 1;
+}
+.s-label {
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.s-caps {
+  font-size: clamp(0.95rem, 0.82rem + 0.45vw, 1.3rem);
+  /* 400: PP Supply Mono has 200 and 400 only, and 300 would resolve to the ultralight. */
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.s-mono {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+}
+.s-source {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: var(--c-faint);
+}
+.s-source a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+/* Section eyebrow: one treatment site-wide. Mono caps in muted, no marker (the
+   coloured squares were cut on 1 Oct 2026); alignment follows the section's h2. */
+.s-eyebrow {
+  display: inline-block;
+  color: var(--c-muted);
+}
+.s-square {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  background: currentColor;
+  vertical-align: 0.12em;
+}
+
+/* ---------- Links and buttons ---------- */
+.s-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  transition: color 160ms ease;
+}
+.s-link:hover {
+  color: var(--c-teal-ink);
+}
+.s-btn {
+  --btn-fg: var(--c-ink);
+  --btn-bg: transparent;
+  --btn-bd: var(--c-ink);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75em;
+  padding: 0.95em 1.45em 0.9em;
+  border: 1px solid var(--btn-bd);
+  border-radius: 0;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    border-color 200ms ease;
+}
+.s-btn:hover {
+  --btn-bg: var(--c-ink);
+  --btn-fg: var(--c-paper);
+}
+.s-btn--solid {
+  --btn-bg: var(--c-ink);
+  --btn-fg: var(--c-paper);
+}
+.s-btn--solid:hover {
+  --btn-bg: var(--c-teal-ink);
+  --btn-bd: var(--c-teal-ink);
+}
+.s-btn--sand {
+  --btn-bg: var(--c-sand);
+  --btn-bd: var(--c-sand);
+}
+.s-btn--sand:hover {
+  --btn-bg: var(--c-paper);
+  --btn-bd: var(--c-paper);
+  --btn-fg: var(--c-ink);
+}
+.s-btn--light {
+  --btn-fg: var(--c-paper);
+  --btn-bd: rgb(248 244 239 / 70%);
+}
+.s-btn--light:hover {
+  --btn-bg: var(--c-paper);
+  --btn-fg: var(--c-ink);
+}
+.s-btn svg {
+  width: 1.05em;
+  height: 1.05em;
+  flex: none;
+}
+:where(.s-page, .s-header, .s-footer) :focus-visible {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 3px;
+}
+
+/* ---------- Status chips (claims discipline: every capability carries one) ---------- */
+.s-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  padding: 0.42em 0.62em 0.38em;
+  border: 1px solid currentColor;
+  font-family: var(--f-mono);
+  font-size: 0.65625rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.s-status--running {
+  color: var(--c-teal-ink);
+}
+.s-status--dev {
+  color: var(--c-amber-ink);
+  border-style: dashed;
+}
+.s-status--planned {
+  color: var(--c-muted);
+  border-style: dashed;
+}
+.s-status--ambition {
+  color: var(--c-muted);
+  border-style: dotted;
+}
+.s-tag {
+  font-family: var(--f-mono);
+  font-size: 0.65625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-faint);
+}
+
+/* ---------- Texture: grain, hairlines, frames ---------- */
+.s-grain {
+  position: relative;
+  isolation: isolate;
+}
+.s-grain::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  z-index: 3;
+  pointer-events: none;
+  background: url(/assets/textures/grain-128.png) repeat;
+  background-size: 128px 128px;
+  /* Overlay is neutral at the texture's mean grey: tooth without dimming the paper. */
+  opacity: var(--grain, 0.16);
+  mix-blend-mode: var(--grain-blend, overlay);
+  animation: s-grain 0.9s steps(5) infinite;
+}
+.s-grain--light::after {
+  --grain-blend: soft-light;
+  --grain: 0.35;
+}
+@keyframes s-grain {
+  0% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-7%, 4%);
+  }
+  40% {
+    transform: translate(5%, -9%);
+  }
+  60% {
+    transform: translate(-3%, 8%);
+  }
+  80% {
+    transform: translate(8%, 2%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+.s-rule {
+  height: 1px;
+  border: 0;
+  background: var(--c-line-2);
+}
+/* Sharp frame with registration ticks at the corners. */
+.s-frame {
+  position: relative;
+  border: 1px solid var(--c-line-2);
+}
+.s-frame > .s-tick {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  pointer-events: none;
+}
+.s-tick::before,
+.s-tick::after {
+  content: '';
+  position: absolute;
+  background: var(--c-ink);
+}
+.s-tick::before {
+  inset: 4px 0 auto 0;
+  height: 1px;
+}
+.s-tick::after {
+  inset: 0 auto 0 4px;
+  width: 1px;
+}
+.s-tick--tl {
+  top: -5px;
+  left: -5px;
+}
+.s-tick--tr {
+  top: -5px;
+  right: -5px;
+}
+.s-tick--bl {
+  bottom: -5px;
+  left: -5px;
+}
+.s-tick--br {
+  bottom: -5px;
+  right: -5px;
+}
+/* Label and index straddle the frame line: z-index keeps them over a
+   positioned stage that follows them in the DOM (an image would cut them). */
+.s-frame-label {
+  position: absolute;
+  z-index: 1;
+  top: -0.6em;
+  left: 14px;
+  padding-inline: 8px;
+  background: var(--frame-bg, var(--c-paper));
+  font-family: var(--f-mono);
+  font-size: 0.65625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.s-frame-index {
+  position: absolute;
+  z-index: 1;
+  top: -0.6em;
+  right: 14px;
+  padding-inline: 8px;
+  background: var(--frame-bg, var(--c-paper));
+  font-family: var(--f-mono);
+  font-size: 0.65625rem;
+  letter-spacing: 0.14em;
+  color: var(--c-muted);
+}
+
+/* ---------- Media ---------- */
+.s-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.s-media > video,
+.s-media > img,
+.s-media > picture > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- Motion ---------- */
+:where(html[data-reveal='js']) .s-rise {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 900ms var(--e-out),
+    transform 1100ms var(--e-out);
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+.is-in .s-rise,
+.s-rise.is-in {
+  opacity: 1;
+  transform: none;
+}
+:where(html[data-reveal='js']) .s-fade {
+  opacity: 0;
+  transition: opacity 1200ms var(--e-out);
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+.is-in .s-fade,
+.s-fade.is-in {
+  opacity: 1;
+}
+/*
+ * Masked line rise for display type: <span class="s-line"><span>…</span></span>.
+ * The mask is a clip-path reaching past the line box (competitor review R08,
+ * 3 Oct 2026): overflow:hidden cut the descenders of italic y and p and the
+ * overhang of italic letters at the line's ends. The line starts far enough
+ * down (140 %) to sit wholly below the widened mask.
+ */
+.s-line {
+  display: block;
+  clip-path: inset(-0.15em -0.2em -0.32em -0.2em);
+}
+.s-line > span {
+  display: block;
+  transform: translateY(140%);
+  animation: s-line-rise 1.2s var(--e-out) forwards;
+  animation-delay: calc(var(--i, 0) * 110ms + 150ms);
+}
+@keyframes s-line-rise {
+  to {
+    transform: none;
+  }
+}
+html[data-motion='paused'] .s-grain::after,
+html[data-motion='paused'] .s-marquee-track {
+  animation-play-state: paused;
+}
+/* Reduced motion stills the loops (html[data-motion] is 'paused' under reduced motion,
+   set before first paint; without scripting the media query alone applies). */
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion='playing']) .s-grain::after,
+  html:not([data-motion='playing']) .s-marquee-track {
+    animation: none !important;
+  }
+  .s-line > span {
+    animation: none;
+    transform: none;
+  }
+  :where(html[data-reveal='js']) .s-rise,
+  :where(html[data-reveal='js']) .s-fade {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+@media (scripting: none) {
+  .s-rise,
+  .s-fade {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ---------- Marquee ---------- */
+.s-marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.s-marquee-track {
+  display: inline-flex;
+  gap: 2.5rem;
+  padding-right: 2.5rem;
+  animation: s-marquee var(--marquee-dur, 48s) linear infinite;
+}
+.s-marquee-track > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+@keyframes s-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.s-marquee-dot {
+  opacity: 0.55;
+}
+
+/* ---------- Header ---------- */
+.s-skip {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  padding: 10px 14px;
+  background: var(--c-ink);
+  color: var(--c-paper);
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transform: translateY(-160%);
+  transition: transform 160ms ease;
+}
+.s-skip:focus {
+  transform: none;
+}
+.s-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  height: var(--s-header);
+  color: var(--c-ink);
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease,
+    backdrop-filter 300ms ease,
+    transform 360ms var(--e-out);
+  border-bottom: 1px solid transparent;
+}
+.s-header.is-scrolled {
+  background: rgb(248 244 239 / 82%);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom-color: var(--c-line);
+}
+.s-header.is-hidden {
+  transform: translateY(-100%);
+}
+.s-header-inner {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+/* The horizontal lockup (founder, 8 Oct 2026): mark left, wordmark right. */
+.s-brand {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  width: clamp(128px, 10.5vw, 160px);
+}
+.s-brand img {
+  width: 100%;
+  height: auto;
+}
+.s-nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.25rem, 2.6vw, 2.75rem);
+}
+.s-nav a {
+  position: relative;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding-block: 0.4rem;
+}
+.s-nav a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 300ms var(--e-out);
+}
+.s-nav a:hover::after,
+.s-nav a[aria-current='page']::after {
+  transform: scaleX(1);
+}
+.s-header-cta {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.s-header-cta .s-btn {
+  padding: 0.85em 1.25em 0.8em;
+}
+.s-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 44px;
+  min-height: 44px;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.7rem 0;
+  background: none;
+  border: 0;
+  color: inherit;
+}
+.s-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+  overflow-y: auto;
+  padding: calc(var(--s-header) + 2rem) var(--s-gutter) 2rem;
+  background: var(--c-paper);
+}
+.s-sheet[hidden] {
+  display: none;
+}
+.s-sheet nav {
+  display: grid;
+  gap: 0.25rem;
+}
+.s-sheet nav a {
+  /* The display face, like the headings since the font swap (3 Oct 2026). */
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(1.9rem, 7.5vw, 3rem);
+  letter-spacing: var(--d-track-l);
+  line-height: 1.15;
+  border-bottom: 1px solid var(--c-line);
+  padding-block: 0.5rem;
+}
+/* The header button stays beside Menu on phones (competitor review R11, 3 Oct 2026). */
+.s-sheet-foot {
+  display: grid;
+  justify-items: start;
+  gap: 1.25rem;
+}
+.s-sheet-mail {
+  font-family: var(--f-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
+}
+/* Five nav items and the long button need the room: the menu takes over below
+   1100 px (it took over at 820 px with three items). */
+@media (max-width: 1100px) {
+  .s-header-inner {
+    grid-template-columns: 1fr auto;
+  }
+  .s-nav {
+    display: none;
+  }
+  .s-menu-btn {
+    display: inline-flex;
+  }
+}
+@media (max-width: 560px) {
+  .s-header-cta .s-btn {
+    padding: 0.7em 0.9em 0.65em;
+  }
+}
+
+/* ---------- Footer ---------- */
+/*
+ * The dawn horizon (founder, 3 Oct 2026: "den orangenen Verlauf besser"). One
+ * broad glow instead of a crest: the orange holds as a short plateau around
+ * the marquee and eases off on both sides along a sine-like curve, mixed in
+ * oklab so the warm tones stay clean (no grey or muddy band) and no kink
+ * reads as a stripe. On the homepage Join (Join.css) carries the rise and
+ * meets the plateau at the footer's top; inner pages rise inside the footer.
+ */
+.s-footer {
+  --dawn: #e9a54a;
+  --dawn-ground: var(--c-paper);
+  --dawn-plateau: 3.6rem;
+  position: relative;
+  overflow: hidden;
+  color: var(--c-ink);
+  background: linear-gradient(
+    180deg in oklab,
+    var(--dawn) 0,
+    var(--dawn) var(--dawn-plateau),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 92%) calc(var(--dawn-plateau) + 3rem),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 74%) calc(var(--dawn-plateau) + 7rem),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 50%) calc(var(--dawn-plateau) + 12rem),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 27%) calc(var(--dawn-plateau) + 18rem),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 10%) calc(var(--dawn-plateau) + 25rem),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 2%) calc(var(--dawn-plateau) + 31rem),
+    var(--dawn-ground) calc(var(--dawn-plateau) + 36rem)
+  );
+}
+/* Inner pages have no Join to hand over from: the same horizon rises out of
+   the paper inside the footer, eased, so its top never shows as an edge. */
+body:not(:has(.j-join)) .s-footer {
+  --foot-rise: clamp(9rem, 4rem + 9vw, 14rem);
+  padding-top: var(--foot-rise);
+  background: linear-gradient(
+    180deg in oklab,
+    var(--dawn-ground) 0,
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 3%) calc(var(--foot-rise) * 0.2),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 13%) calc(var(--foot-rise) * 0.4),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 35%) calc(var(--foot-rise) * 0.6),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 66%) calc(var(--foot-rise) * 0.8),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 92%) calc(var(--foot-rise) * 0.95),
+    var(--dawn) calc(var(--foot-rise) + 0.6rem),
+    var(--dawn) calc(var(--foot-rise) + var(--dawn-plateau)),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 92%) calc(var(--foot-rise) + var(--dawn-plateau) + 3rem),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 74%) calc(var(--foot-rise) + var(--dawn-plateau) + 7rem),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 50%) calc(var(--foot-rise) + var(--dawn-plateau) + 12rem),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 27%) calc(var(--foot-rise) + var(--dawn-plateau) + 18rem),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 10%) calc(var(--foot-rise) + var(--dawn-plateau) + 25rem),
+    color-mix(in oklab, var(--dawn-ground), var(--dawn) 2%) calc(var(--foot-rise) + var(--dawn-plateau) + 31rem),
+    var(--dawn-ground) calc(var(--foot-rise) + var(--dawn-plateau) + 36rem)
+  );
+}
+/* The grain layer is twice the footer's height (inset -50%): the footer's top sits at 25%. */
+body:not(:has(.j-join)) .s-footer.s-grain::after {
+  -webkit-mask-image: linear-gradient(180deg, transparent 25%, #000 calc(25% + 8rem));
+  mask-image: linear-gradient(180deg, transparent 25%, #000 calc(25% + 8rem));
+}
+.s-footer-marquee {
+  padding-block: 1.6rem;
+}
+.s-footer-marquee .s-marquee-track > span {
+  font-family: var(--f-mono);
+  font-size: clamp(0.8rem, 0.7rem + 0.35vw, 1rem);
+  /* 400: PP Supply Mono has 200 and 400 only, and 300 resolved to the ultralight. */
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.s-footer-main {
+  display: grid;
+  justify-items: center;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  padding-block: clamp(4rem, 9vw, 8rem) 2.5rem;
+}
+/* The vertical lockup (founder, 8 Oct 2026): mark above, wordmark below. */
+.s-footer-logo {
+  width: min(52vw, 360px);
+}
+.s-footer-logo img {
+  width: 100%;
+  height: auto;
+}
+.s-footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 2.25rem;
+  font-size: clamp(1.125rem, 1rem + 0.4vw, 1.375rem);
+}
+.s-footer-nav a:hover {
+  color: var(--c-teal-ink);
+}
+.s-footer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  padding-block: 1.5rem 2rem;
+  border-top: 1px solid var(--c-line);
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--c-muted);
+}
+.s-footer-meta a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.s-footer-colophon {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.5rem;
+}
+
+/* ---------- Generic page hero for inner pages (writings, contact, legal) ---------- */
+.s-page-hero {
+  position: relative;
+  padding-block: calc(var(--s-header) + clamp(4rem, 9vw, 9rem)) clamp(3rem, 6vw, 6rem);
+  overflow: hidden;
+}
+.s-page-hero .s-label {
+  color: var(--c-muted);
+}
+.s-page-hero h1 {
+  margin-top: 1.5rem;
+  max-width: 16ch;
+}
+.s-page-hero .s-lede {
+  margin-top: 1.75rem;
+  max-width: 40ch;
+  color: var(--c-muted);
+}
+.s-glow {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(10px);
+}
+
+/* Screen-reader only. */
+.s-sr {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Shader field ---------- */
+.s-shader {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.s-shader[data-fallback='true'] {
+  background:
+    radial-gradient(60% 55% at 50% 75%, rgb(226 159 55 / 45%), transparent 70%),
+    radial-gradient(70% 60% at 30% 30%, rgb(162 208 190 / 55%), transparent 70%),
+    var(--c-paper);
+}
+.s-footer-nav {
+  text-wrap: balance;
+}
+.s-header-cta .s-btn[aria-current='page'] {
+  --btn-bg: var(--c-ink);
+  --btn-fg: var(--c-paper);
+}
+
+/* ---------- Touch: every control at least 44 px tall ----------
+   Buttons and footer links grow their box; the inline legal links keep their
+   look and take a taller hit area instead. */
+@media (pointer: coarse) {
+  .s-btn {
+    min-height: 44px;
+  }
+  .s-footer-nav {
+    row-gap: 0;
+  }
+  .s-footer-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 8px;
+    margin-inline: -8px;
+  }
+  .s-footer-meta a {
+    position: relative;
+  }
+  .s-footer-meta a::after {
+    content: '';
+    position: absolute;
+    inset: -15px -4px;
+  }
+}

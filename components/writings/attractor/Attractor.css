@@ -1,0 +1,196 @@
+/*
+ * Toggle-switch figure (Attractor.tsx). A centred column: the square phase
+ * plane with its axis labels, the push trace, the slider and the readout.
+ * Type comes from .eyebrow and .mono (app/type.css, restyled in .w-prose);
+ * this file only places things. --att-pad is the gutter the Gene Y label
+ * stands in, and every row below the plane aligns to it.
+ */
+.w-att {
+  --att-pad: 20px;
+  width: min(100%, 440px);
+  margin-inline: auto;
+}
+
+/* ---------- Phase plane ---------- */
+.w-att-plane {
+  position: relative;
+  padding: 0 0 26px var(--att-pad);
+}
+.w-att-field {
+  position: relative;
+  aspect-ratio: 1;
+}
+.w-att-field canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.w-att .w-att-tag,
+.w-att .w-att-axis {
+  position: absolute;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.w-att .w-att-tag {
+  transform: translate(-50%, -50%);
+  transition: color 0.6s var(--e-in-out);
+}
+/* A sits under its ring, in the margin below zero; B, by symmetry, left of its ring. */
+.w-att .w-att-tag--a {
+  margin-top: 21px;
+}
+.w-att .w-att-tag--b {
+  margin-left: -21px;
+}
+/* Set along the diagonal, a hair above it. */
+.w-att .w-att-tag--sep {
+  transform: translate(-50%, -50%) rotate(-45deg) translateY(-9px);
+}
+.w-att[data-phase='hold'] .w-att-tag--a,
+.w-att[data-phase='still'] .w-att-tag--a {
+  color: var(--c-amber-ink);
+}
+.w-att[data-phase='hold'] .w-att-tag--b,
+.w-att[data-phase='still'] .w-att-tag--b {
+  color: var(--c-teal-ink);
+}
+.w-att .w-att-axis--x {
+  right: 0;
+  bottom: 6px;
+}
+.w-att .w-att-axis--y {
+  left: 0;
+  top: 0;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+/* ---------- Push trace ---------- */
+.w-att-strip {
+  padding-left: var(--att-pad);
+}
+.w-att .w-att-strip-label {
+  display: block;
+  margin-bottom: 10px;
+}
+.w-att-strip-canvas {
+  display: block;
+  width: 100%;
+  height: 28px;
+}
+
+/* ---------- Controls ---------- */
+.w-att-controls {
+  margin-top: 22px;
+  padding-left: var(--att-pad);
+}
+.w-att-push {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.w-att-push label {
+  flex: none;
+  cursor: pointer;
+}
+.w-att .w-att-value {
+  flex: none;
+  min-width: 4ch;
+  text-align: right;
+  color: var(--c-ink);
+}
+.w-att-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px 16px;
+  margin-top: 6px;
+}
+.w-att .w-att-readout {
+  color: var(--c-muted);
+}
+.w-att-n {
+  transition: color 0.6s var(--e-in-out);
+}
+.w-att-n--a {
+  color: var(--c-amber-ink);
+}
+.w-att-n--b {
+  color: var(--c-teal-ink);
+}
+/* Stale counts lose their A/B colour, as the dots do, but keep text contrast (faint is 5.1:1). */
+.w-att .w-att-readout[data-pending='true'] .w-att-n {
+  color: var(--c-faint);
+}
+.w-att-sep {
+  margin-inline: 0.7em;
+}
+
+/* The slider: a hairline track and a ring for a thumb, like the attractors. */
+.w-att-range {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.w-att-range::-webkit-slider-runnable-track {
+  height: 1px;
+  background: var(--c-line-3);
+}
+.w-att-range::-webkit-slider-thumb {
+  width: 15px;
+  height: 15px;
+  margin-top: -7px;
+  border: 1px solid var(--c-ink);
+  border-radius: 50%;
+  background: var(--c-paper);
+  -webkit-appearance: none;
+  appearance: none;
+}
+.w-att-range::-moz-range-track {
+  height: 1px;
+  background: var(--c-line-3);
+}
+.w-att-range::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border: 1px solid var(--c-ink);
+  border-radius: 50%;
+  background: var(--c-paper);
+}
+.w-att-range:focus-visible {
+  outline: none;
+}
+.w-att-range:focus-visible::-webkit-slider-thumb {
+  box-shadow:
+    0 0 0 3px var(--c-paper),
+    0 0 0 4px var(--c-teal-ink);
+}
+.w-att-range:focus-visible::-moz-range-thumb {
+  box-shadow:
+    0 0 0 3px var(--c-paper),
+    0 0 0 4px var(--c-teal-ink);
+}
+/* Fingers: a 44px row and a larger thumb. */
+@media (pointer: coarse) {
+  .w-att-range {
+    height: 44px;
+  }
+  .w-att-range::-webkit-slider-thumb {
+    width: 21px;
+    height: 21px;
+    margin-top: -10px;
+  }
+  .w-att-range::-moz-range-thumb {
+    width: 19px;
+    height: 19px;
+  }
+}

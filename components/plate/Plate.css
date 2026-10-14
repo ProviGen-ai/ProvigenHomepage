@@ -1,0 +1,43 @@
+/*
+ * Plate: the dark instrument panel every animated figure sits on (see
+ * components/plate/kit.ts). The canvas sizes itself from its parent's width
+ * (usePlate); --pl-ratio (logical w / h of the widest layout) reserves the
+ * height before the first frame so nothing below it moves.
+ */
+.pl-plate {
+  --pl-ground: #0e1d1a;
+  position: relative;
+  background: var(--pl-ground);
+  color: var(--c-paper);
+  overflow: hidden;
+  isolation: isolate;
+}
+.pl-plate--paper {
+  --pl-ground: var(--c-paper);
+  color: var(--c-ink);
+}
+.pl-canvas-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--pl-ratio, 1200 / 440);
+}
+.pl-canvas-box > canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+}
+/* A hairline just inside the edge, so the plate reads as a mounted panel. */
+.pl-plate::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgb(248 244 239 / 7%);
+  pointer-events: none;
+  z-index: 2;
+}
+.pl-plate--paper::after {
+  border-color: var(--c-line);
+}

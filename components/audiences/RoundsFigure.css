@@ -1,0 +1,158 @@
+/*
+ * The worked example's four rounds (RoundsFigure.tsx). All classes rf-*.
+ * Hairlines at 1 CSS px whatever the panel's size (vector-effect), ink for
+ * structure at low alpha, teal for the round being run, orange for the
+ * chosen candidates, amber hatching for the region a late readout rules out.
+ */
+.rf {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(0.75rem, 0.25rem + 1.5vw, 2rem);
+  margin-block: clamp(2rem, 1.5rem + 2vw, 3.5rem) clamp(1rem, 0.5rem + 1vw, 1.75rem);
+}
+.rf-defs {
+  position: absolute;
+}
+.rf-defs line {
+  stroke: rgb(226 159 55 / 55%);
+  stroke-width: 1;
+}
+.rf-panel {
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.rf-panel svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.rf-panel :is(rect, ellipse, line, path, circle) {
+  vector-effect: non-scaling-stroke;
+}
+.rf-frame {
+  fill: rgb(255 255 255 / 55%);
+  stroke: rgb(19 19 18 / 22%);
+  stroke-width: 1;
+}
+.rf-contours ellipse {
+  fill: none;
+  stroke: rgb(42 102 105 / 16%);
+  stroke-width: 1;
+}
+.rf-contours ellipse:first-child {
+  fill: rgb(162 208 190 / 22%);
+}
+.rf-now circle {
+  fill: var(--c-teal);
+  stroke: var(--c-paper);
+  stroke-width: 1;
+}
+.rf-past circle {
+  fill: none;
+  stroke: rgb(19 19 18 / 32%);
+  stroke-width: 1;
+}
+.rf-ref {
+  fill: none;
+  stroke: var(--c-ink);
+  stroke-width: 1;
+}
+.rf-swap line,
+.rf-swap path {
+  fill: none;
+  stroke: var(--c-amber-ink);
+  stroke-width: 1;
+}
+.rf-swap path {
+  stroke-dasharray: 2 3;
+}
+.rf-dropped {
+  fill: url(#rf-hatch);
+}
+.rf-dropped-edge {
+  fill: none;
+  stroke: rgb(138 85 9 / 55%);
+  stroke-width: 1;
+}
+.rf-pick-ring {
+  fill: rgb(226 159 55 / 18%);
+  stroke: var(--c-orange);
+  stroke-width: 1.25;
+}
+.rf-pick-rep {
+  fill: var(--c-amber-ink);
+}
+
+.rf-cap {
+  display: grid;
+  gap: 0.3rem;
+}
+.rf-cap .s-label {
+  color: var(--c-muted);
+}
+.rf-cap-line {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(1.05rem, 0.9rem + 0.5vw, 1.4rem);
+  letter-spacing: var(--d-track);
+  line-height: 1.15;
+}
+
+/* The axes and the key, once, under all four panels. */
+.rf-axes {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1.75rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--c-line);
+  color: var(--c-muted);
+  font-size: 0.6875rem;
+}
+.rf-axes > span:nth-child(2) {
+  margin-right: auto;
+}
+.rf-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+.rf-key::before {
+  content: '';
+  flex: none;
+  width: 7px;
+  height: 7px;
+  box-sizing: border-box;
+}
+.rf-key--ref::before {
+  border: 1px solid var(--c-ink);
+}
+.rf-key--now::before {
+  border-radius: 50%;
+  background: var(--c-teal);
+}
+.rf-key--past::before {
+  border-radius: 50%;
+  border: 1px solid rgb(19 19 18 / 40%);
+}
+.rf-key--pick::before {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1px solid var(--c-orange);
+  background: rgb(226 159 55 / 18%);
+}
+
+@media (max-width: 760px) {
+  .rf {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 1.5rem;
+  }
+  .rf-axes > span:nth-child(2) {
+    margin-right: 0;
+  }
+}

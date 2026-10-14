@@ -1,0 +1,43 @@
+/*
+ * The field runs the full width, in bands that drift on a slight diagonal
+ * (cool lingers on the left, warm arrives first on the right, as the team's
+ * portrait light sweeps teal to sand). No colour sits beside the film frame
+ * on its own: the frame stands on the field, not on a halo.
+ */
+.d-dawn {
+  position: relative;
+  /* The grain's blend group is the whole field (see .d-dawn .s-grain below). */
+  isolation: isolate;
+  /* A long, eased white lead-in over the diagonal, so How it works' white foot
+     runs on into the mist with no visible edge (4 Oct 2026: the founder saw a
+     band where the old 10rem linear fade met the field). */
+  background:
+    linear-gradient(
+      180deg,
+      #fff 0,
+      rgb(255 255 255 / 92%) 5rem,
+      rgb(255 255 255 / 74%) 11rem,
+      rgb(255 255 255 / 48%) 18rem,
+      rgb(255 255 255 / 22%) 25rem,
+      rgb(255 255 255 / 6%) 31rem,
+      rgb(255 255 255 / 0%) 36rem
+    ),
+    linear-gradient(
+      168deg,
+      #fff 0%,
+      #f7f9f7 5%,
+      #eff4f1 13%,
+      #ecf2ee 22%,
+      #f0f2eb 32%,
+      #f5f0e5 44%,
+      #f6ebd8 58%,
+      #f4e4c8 74%,
+      #f2dcb8 100%
+    );
+}
+/* The sections on the field are transparent: isolated on their own, their
+   grain (an overlay blend) would have nothing beneath it and paint as grey
+   noise over the light. Blended against the field instead, it only adds tooth. */
+.d-dawn .s-grain {
+  isolation: auto;
+}

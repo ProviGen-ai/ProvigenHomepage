@@ -1,0 +1,36 @@
+<!doctype html>
+<!-- Rasteriser page for make-share-assets.mjs: one image at an exact size, on a transparent ground. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Raster</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: transparent;
+      }
+      img {
+        display: block;
+      }
+    </style>
+    <script>
+      const show = (src, width, height) =>
+        new Promise((resolve, reject) => {
+          const img = new Image(width, height);
+          img.onload = async () => {
+            document.body.replaceChildren(img);
+            await img.decode().catch(() => {});
+            requestAnimationFrame(() =>
+              requestAnimationFrame(() => resolve(true)),
+            );
+          };
+          img.onerror = () => reject(new Error('image did not load'));
+          img.src = src;
+        });
+      window.showIcon = (src, size) => show(src, size, size);
+      window.showImage = (src, width, height) => show(src, width, height);
+    </script>
+  </head>
+  <body></body>
+</html>

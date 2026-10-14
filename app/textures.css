@@ -1,0 +1,329 @@
+/* ProviGen v2 surfaces: bands, plates, grain, gradients, drafting marks, buttons. */
+.band {
+  position: relative;
+  background: var(--bg);
+  color: var(--fg);
+  isolation: isolate;
+}
+/* Below the fold, skip layout and paint until the band is near the viewport. The first two
+   bands stay eager so the LCP element is never deferred. contain-intrinsic-size keeps the
+   scrollbar honest with a placeholder close to the real band height: measured on the home
+   page, the deferred bands average 1850px at 1440 and 2315px at 390, which keeps the
+   unrendered document within ~1% of the rendered one. The `auto` keyword then remembers
+   each band's true size once it has been rendered. */
+main > .band:nth-of-type(n + 3) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1850px;
+}
+@media (max-width: 760px) {
+  main > .band:nth-of-type(n + 3) {
+    contain-intrinsic-size: auto 2300px;
+  }
+}
+.band::after,
+.plate::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url('/assets/textures/grain-128.png') repeat;
+  background-size: 128px 128px;
+  opacity: var(--grain-a);
+  mix-blend-mode: var(--grain-blend);
+}
+.band > *,
+.plate > * {
+  position: relative;
+  z-index: 1;
+}
+.band-wash::before,
+.plate-wash::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--wash);
+}
+.band-inner {
+  width: 100%;
+  max-width: calc(var(--content) + 2 * var(--margin));
+  margin-inline: auto;
+  padding: var(--band-pad) var(--margin);
+  box-sizing: border-box;
+}
+.band-inner.tight {
+  padding-block: calc(var(--band-pad) * 0.62);
+}
+.band-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--s-5);
+  padding-bottom: var(--s-4);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: clamp(2.5rem, 2rem + 2vw, 4rem);
+  color: var(--fg-muted);
+}
+.band-head .eyebrow b {
+  font-weight: 500;
+  color: var(--fg);
+}
+.band-head > .eyebrow:last-child:not(:first-child) {
+  text-align: right;
+}
+
+/* Plate: an inset dark tile on the ivory page (hero and closing bookends). */
+.plate-wrap {
+  padding: 0 var(--plate-gap) var(--plate-gap);
+  background: var(--ivory);
+}
+.plate {
+  position: relative;
+  isolation: isolate;
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+}
+.no-grain {
+  isolation: isolate;
+  background: var(--bg);
+}
+
+/* Drafting marks. */
+.hatch {
+  height: 8px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--line) 0 1px,
+    transparent 1px 8px
+  );
+}
+.dotgrid {
+  background-image: radial-gradient(
+    circle,
+    var(--line-2) 0.8px,
+    transparent 1.05px
+  );
+  background-size: 24px 24px;
+}
+.rule {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 0;
+}
+.hairgrid {
+  display: grid;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+.hairgrid > * {
+  background: var(--bg);
+  min-width: 0;
+}
+.reg-mark {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  pointer-events: none;
+  z-index: 3;
+  background:
+    linear-gradient(var(--mark), var(--mark)) center / 1px 100% no-repeat,
+    linear-gradient(var(--mark), var(--mark)) center / 100% 1px no-repeat;
+}
+.reg-mark.tl {
+  top: -6px;
+  left: -6px;
+}
+.reg-mark.tr {
+  top: -6px;
+  right: -6px;
+}
+.reg-mark.bl {
+  bottom: -6px;
+  left: -6px;
+}
+.reg-mark.br {
+  bottom: -6px;
+  right: -6px;
+}
+.bracket {
+  --arm: 10px;
+  background:
+    linear-gradient(var(--mark), var(--mark)) top left / var(--arm) 1px
+      no-repeat,
+    linear-gradient(var(--mark), var(--mark)) top left / 1px var(--arm)
+      no-repeat,
+    linear-gradient(var(--mark), var(--mark)) top right / var(--arm) 1px
+      no-repeat,
+    linear-gradient(var(--mark), var(--mark)) top right / 1px var(--arm)
+      no-repeat,
+    linear-gradient(var(--mark), var(--mark)) bottom left / var(--arm) 1px
+      no-repeat,
+    linear-gradient(var(--mark), var(--mark)) bottom left / 1px var(--arm)
+      no-repeat,
+    linear-gradient(var(--mark), var(--mark)) bottom right / var(--arm) 1px
+      no-repeat,
+    linear-gradient(var(--mark), var(--mark)) bottom right / 1px var(--arm)
+      no-repeat;
+}
+
+/* Glass, chrome only. */
+.glass {
+  background: rgb(243 240 231 / 74%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--ivory);
+  }
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .glass {
+    background: var(--ivory);
+  }
+}
+
+/* Line-status legend: solid = operating, dashed = planned, dotted = ambition. */
+.line-sample {
+  display: inline-block;
+  width: 32px;
+  height: 0;
+  vertical-align: middle;
+  border-top: 1.5px solid currentColor;
+}
+.line-sample.dashed {
+  border-top-style: dashed;
+}
+.line-sample.dotted {
+  border-top-style: dotted;
+  border-top-width: 2px;
+}
+
+/* Buttons and links. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-6);
+  min-height: 48px;
+  padding: 0 var(--s-5);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.2;
+  border: 1px solid var(--btn-bg);
+  border-radius: 0;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background var(--dur-1),
+    color var(--dur-1),
+    border-color var(--dur-1);
+}
+.btn:hover {
+  background: var(--btn-bg-hover);
+  border-color: var(--btn-bg-hover);
+}
+.btn-outline {
+  background: transparent;
+  color: var(--fg);
+  border-color: var(--line-2);
+}
+.btn-outline:hover {
+  background: transparent;
+  color: var(--fg);
+  border-color: var(--fg);
+}
+.btn .arrow,
+.link .arrow {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  transition: translate var(--dur-2) var(--ease-out);
+}
+.btn:hover .arrow,
+.link:hover .arrow {
+  translate: 3px 0;
+}
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-4);
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--line-2);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--fg);
+  text-decoration: none;
+  transition:
+    gap var(--dur-2) var(--ease-out),
+    border-color var(--dur-1);
+}
+.link:hover {
+  gap: calc(var(--s-4) + 8px);
+  border-color: var(--fg);
+}
+.pv :is(a, button):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* Status chips. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 9px 4px;
+  border: 1px solid var(--fg);
+  color: var(--fg);
+  white-space: nowrap;
+}
+.chip::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+}
+.chip-running {
+  background: var(--fg);
+  color: var(--bg);
+}
+.chip-partial {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.chip-development {
+  border-color: var(--line-2);
+  color: var(--fg-muted);
+}
+.chip-development::before {
+  background: transparent;
+  border: 1px solid currentColor;
+  box-sizing: border-box;
+}
+.chip-planned {
+  border-style: dashed;
+  border-color: var(--line-2);
+  color: var(--fg-muted);
+}
+.chip-planned::before {
+  background: transparent;
+  border: 1px dashed currentColor;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .band-head > .eyebrow:last-child:not(:first-child) {
+    display: none;
+  }
+}

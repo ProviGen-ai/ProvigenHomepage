@@ -1,21 +1,20 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
-pnpm-lock.yaml
-yarn.lock
 /.pnp
-.pnp.js
-.vscode
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
 # testing
 /coverage
 
 # next.js
 /.next/
+/.vinext/
 /out/
-
-# production
-/build
 
 # misc
 .DS_Store
@@ -27,38 +26,22 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# local env files
-.env*.local
+# local environment
+.env*
+.dev.vars*
 
-# vercel
+# deployment and generated files
 .vercel
+next-env.d.ts
+/dist/
+/.wrangler/
+/outputs/
+/work/
 
-# claude code
-.claude/
+# TypeScript incremental cache
+*.tsbuildinfo
 
-# local archives / scratch
-frontend.zip
-archive/
-logo-export/
-
-# confidential pitch materials (do not publish)
-ProviGenAI Deck.pdf
-pitch/
-
-# typescript build info
-tsconfig.tsbuildinfo
-
-# blog working images (not used in published posts)
-public/images/blog/gaussian_vis_*.PNG
-public/images/blog/media-cytokine-composition.png
-public/images/blog/media-response-surface-pbmc-v3.png
-public/images/blog/media-response-surface-v2.png
-public/images/blog/data-timeline.png
-public/images/blog/data-timeline.svg
-.env
-__pycache__/
-*.pyc
-*.db
-
-# WSL Zone.Identifier metadata files
-*:Zone.Identifier
+# generated before every build (scripts/make-public-files.mjs)
+/public/feed.xml
+/public/robots.txt
+/public/sitemap.xml
