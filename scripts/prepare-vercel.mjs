@@ -2,9 +2,9 @@
 //
 // usage: node --experimental-strip-types scripts/prepare-vercel.mjs --target=preview|production [--no-build]
 //   preview     → ../output/provigen-preview-vercel  provigen.convalexius.space, noindex
-//   production  → ../output/provigen-site-vercel     provigen.ai, indexable; the claims gate blocks the build
+//   production  → ../output/provigen-site-vercel     provigen.ai, indexable
 //
-// 1. Static build with the target's SITE_URL and SITE_ENV (npm run build: feed, vinext, claims gate).
+// 1. Static build with the target's SITE_URL and SITE_ENV (npm run build: feed, vinext).
 // 2. dist/client → <out>/public (without vinext's _headers and client manifest).
 // 3. The contact form's Vercel Function: <out>/api/contact.js around lib/contact/handler.ts,
 //    transpiled to plain JS (static export skips app/api routes; this is the same handler).
