@@ -775,8 +775,11 @@ export function drawScene(ctx: CanvasRenderingContext2D, scene: Scene, frame: Fr
   }
 
   // The confident path: A over the saddle into B, a glowing teal line that
-  // draws on with scroll, a comet head at its leading end.
-  const q = easeInOut(clamp01((p - PATH_FROM) / (PATH_TO - PATH_FROM)));
+  // draws on with scroll, a comet head at its leading end. A sine ease, so it
+  // draws at a near-even pace with the scroll (13 Oct 2026: the cubic ease
+  // drew some 80% of the line in 40% of its scroll and read as a jump).
+  const u = clamp01((p - PATH_FROM) / (PATH_TO - PATH_FROM));
+  const q = 0.5 - Math.cos(Math.PI * u) / 2;
   const glowW = wide ? 1.6 : 1.4;
   if (q > 0) {
     const xy = scene.path.xy;

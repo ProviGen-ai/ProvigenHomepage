@@ -84,14 +84,14 @@ export const build = {
       {
         id: 'design',
         name: 'Design',
-        line: 'We pick the experiments worth running.',
+        line: 'Pick the protocol parameters worth running.',
         status: 'Running',
         kind: 'running',
       },
       {
         id: 'implement',
         name: 'Implement',
-        line: 'Each design becomes a protocol for your instruments.',
+        line: 'Each design automatically becomes an executable protocol variant.',
         status: 'Running for supported workflows and instruments',
         kind: 'running',
       },
@@ -103,21 +103,21 @@ export const build = {
          * "Scheduled and run on your instruments, in your lab." read as a live
          * capability. Who runs it (your team) is kept apart from what is automated.
          */
-        line: 'Runs on your instruments, in your lab, with your team. Automated scheduling and execution are in development.',
+        line: 'Run the protocol on your instruments with selected parameters.',
         status: 'In development',
         kind: 'dev',
       },
       {
         id: 'measure',
         name: 'Measure',
-        line: 'Every result keeps its full record.',
+        line: 'Results are automatically acquired and compared to your target metrics.',
         status: 'Running',
         kind: 'running',
       },
       {
         id: 'revise',
         name: 'Revise',
-        line: 'The model updates. A scientist decides what runs next.',
+        line: 'The model updates and predicts which parameters are most likely to reach your targets in the next run.',
         status: 'Running',
         kind: 'running',
       },

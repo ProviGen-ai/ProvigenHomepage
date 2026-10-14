@@ -65,3 +65,10 @@ export const filmCaptions: [start: number, end: number, text: string][] = [
   [57.93, 63.03, 'We’re on a mission to make biology reproducible, one process at a time.'],
   [63.37, 65.03, 'Let’s start with yours.'],
 ];
+
+/**
+ * The transcript's paragraphs (14 Oct 2026), as the index of the caption that
+ * opens each one after the first: the problem · what ProviGen does · mapping
+ * the variance · optimising · what you keep · the mission.
+ */
+export const transcriptBreaks = [2, 5, 7, 12, 15];

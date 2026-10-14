@@ -29,10 +29,10 @@ const c = (...ns: number[]) =>
 export const manifesto = {
   slug: 'manifesto',
   title: 'The <em>Manifesto</em>.',
-  dek: 'Biotech is entering a new era. Lab-in-the-loop is becoming the new operating model for biotechnology.',
+  dek: 'Biotech is entering a new era.\nLab-in-the-loop is becoming the new operating model for biotechnology.',
   date: '2026-10-04',
   category: 'Perspective' as const,
-  readingMinutes: 6,
+  readingMinutes: 3, // 6 before sections 4–9 left (14 Oct 2026)
   sections: [
     {
       id: 'new-era',
@@ -79,99 +79,27 @@ export const manifesto = {
         'That constraint is weakening.',
         'Modern laboratory automation increasingly exposes APIs or machine-readable interfaces.',
         'Schedulers and orchestration platforms abstract much of the underlying hardware complexity, allowing ProviGen to integrate at the workflow layer rather than writing direct drivers for every instrument.',
-        'At the same time, AI coding agents materially reduce the engineering cost of connecting heterogeneous software systems',
+        'At the same time, AI coding agents materially reduce the engineering cost of connecting heterogeneous software systems.',
       ],
     },
+    /* 14 Oct 2026, the founder: sections 4 to 9 (The network is the upside,
+       Transfer only needs to work partially, Why this can compound, Why now,
+       We will prove three things, The bet) are for investors and shared
+       privately, so they are not in the public site's source. */
     {
-      id: 'network',
-      title: 'The network is the <em>upside</em>',
+      /* 14 Oct 2026, the founder: a short close in place of sections 4 to 9,
+         ending on the mission: freedom over one's own biology (the film's
+         "make biology reproducible" is now the first step). */
+      id: 'mission',
+      title: '<em>Mission</em>',
       blocks: [
-        'The larger opportunity begins once ProviGen operates across multiple experimental environments.',
-        'If experience from previous campaigns helps the system solve the next related problem with fewer experiments, every deployment can improve future deployments.',
-        'The critical comparison is:',
-        '<strong>ProviGen starting cold</strong><br>vs.<br><strong>ProviGen starting warm with relevant prior experimental experience</strong>',
-        'If the second requires materially fewer experiments, ProviGen begins to accumulate critical process data that cannot be easily recreated',
-        'That data includes not only successful outcomes, but failed interventions, parameter sensitivities, uncertainty, and process behavior that is often unpublished or never systematically captured.',
+        'The instruments are in place. The models keep getting better. What is missing is the connection between scientific intent and the infrastructure that carries it out.',
+        'Scientists should be able to state what they want to learn, and the lab should immediately run it, collect the evidence and improve.',
+        'That is how biotechnology will enter an era of widely accessible cures, regenerative medicine and choice over lifespan.',
+        'Together with the brightest minds of our time, we want to push that frontier.<br><strong>We will give people freedom over their own biology.</strong>',
       ],
     },
-    {
-      id: 'transfer',
-      title: 'Transfer only needs to work <em>partially</em>',
-      blocks: [
-        'We do not assume that knowledge transfers arbitrarily across biology.',
-        'We expect the strongest transfer within recurring experimental families such as:',
-        {
-          list: [
-            'plate-based liquid-handling workflows',
-            'bacterial bioreactor processes',
-            'mammalian bioreactor processes',
-          ],
-        },
-        'The relevant question is therefore whether experience from related campaigns allows the next similar campaign to reach its target with fewer experimental cycles.',
-        'That is the network effect we intend to prove.',
-      ],
-    },
-    {
-      id: 'compound',
-      title: 'Why this can <em>compound</em>',
-      blocks: [
-        'Scientific AI models will continue to improve.',
-        'That makes access to experiments more valuable.',
-        'A frontier model can absorb the world’s published scientific knowledge.',
-        'But much of the information required to make better experimental decisions is generated only through interaction with the physical world.',
-        'Over time, ProviGen can accumulate:',
-        { list: ['process dynamics', 'failure patterns', 'uncertainty models', 'intervention strategies'] },
-        'If this experience transfers within valuable workflow families, node 20 should start from a better position than node 1.',
-        'Reproducing that advantage requires comparable experimental access, accumulated interventions, time, and physical-world feedback. Essentially doing exactly what we are already doing.',
-        'In addition, biology as an application domain makes our moat inherently more defensible given that biological processes can’t be sped up arbitrarily.',
-        'There is a structural advantage to the distributed model:',
-        'An infrastructure network spanning different instruments, biological systems, protocols, and operating environments produces much more diverse experimental data than a single institution could.',
-        'By doing that, we are giving smaller labs access to the same closed-loop AI capabilities that would otherwise require massive proprietary infrastructure.',
-        'This levels the playing field between organizations that can afford large-scale in-house laboratories and those that cannot build their own AI-native experimental infrastructure.',
-        'We are convinced that a distributed laboratory network can produce more generalizable and robust scientific intelligence than models trained purely on in-house experimental data.',
-      ],
-    },
-    {
-      id: 'why-now',
-      title: 'Why <em>now</em>',
-      blocks: [
-        'Several technological shifts make this possible now.',
-        `<strong>Scientific decision-making algorithms are already useful in closed-loop systems.</strong> Bayesian optimization, active learning, multimodal models, and increasingly capable scientific agents can now select experiments and update decisions as results arrive.&nbsp;${c(3, 10, 11)}`,
-        '<strong>Laboratories are becoming software-addressable.</strong> Modern automation systems increasingly expose APIs, schedulers, structured data streams, and machine-readable interfaces that make programmatic experimentation possible.',
-        '<strong>AI coding agents reduce the cost of integration.</strong> Connecting heterogeneous laboratory software has historically required substantial engineering work. Coding agents increasingly compress the time required to build and maintain those interfaces.',
-        `<strong>Scientific AI is approaching an experimental data bottleneck.</strong> As models improve on publicly available scientific knowledge, differentiated performance increasingly depends on access to proprietary experimental feedback and interaction with real biological systems.&nbsp;${c(11)}`,
-      ],
-    },
-    {
-      id: 'prove',
-      title: 'We will prove three <em>things</em>',
-      blocks: [
-        '<strong>1. Product value</strong>',
-        'We will show that closed-loop optimization reaches the same or better target with materially fewer experimental cycles, less time, or better outcomes than the existing approach.',
-        'We have already shown approximately 5× sample efficiency in a preliminary pilot.',
-        'The next step is to reproduce that advantage in commercial workflows.',
-        '<strong>2. Repeatability</strong>',
-        'We will show that ProviGen can integrate and create similar value across additional sites and workflows without deployment costs overwhelming site economics.',
-        'The current target is approximately 1 to 2 weeks of integration per site, with increasing reuse of scheduler integrations, data interfaces, workflow representations, and optimization components.',
-        '<strong>3. Transfer</strong>',
-        'We will show how relevant process data from previous campaigns allows a new campaign to reach its target faster than the same system starting cold.',
-        'The progression is:',
-        '<strong>better experiments → repeatable deployments → transferable experience → compounding intelligence</strong>',
-      ],
-    },
-    {
-      id: 'bet',
-      title: 'The <em>bet</em>',
-      blocks: [
-        'Biotech already has increasingly capable AI models and automated laboratories.',
-        'What is missing is the system that connects the two into a learning loop.',
-        'ProviGen makes individual laboratories adaptive today and turns them into nodes of a distributed learning network over time.',
-        'That network gives existing laboratories access to the autonomous-science revolution without requiring each of them to build an AI Science Factory of their own.',
-        'And every experiment can make the network better at choosing the next one.',
-        'The laboratory automation infrastructure already exists. It is waiting for its intelligence upgrade.',
-      ],
-    },
-  ] satisfies ManifestoSection[],
+  ] as ManifestoSection[], // as, not satisfies: no section left uses a list block (14 Oct 2026)
   references: [
     {
       n: 1,
@@ -227,17 +155,6 @@ export const manifesto = {
       href: 'https://www.anthropic.com/news/claude-discovers-novel-enzyme-system',
       note: 'Company announcement with a preprint: a computational search over about 200,000 reverse-transcriptase clusters, followed by early characterisation in Anthropic’s own lab.',
     },
-    {
-      n: 10,
-      label: 'DeMeo et al. · Active learning framework leveraging transcriptomics identifies modulators of disease phenotypes · Science · 2025',
-      href: 'https://doi.org/10.1126/science.adi8577',
-      note: 'Peer-reviewed. A lab-in-the-loop framework, in the authors’ own words, tested in vitro in human blood stem and progenitor cells; one refinement round.',
-    },
-    {
-      n: 11,
-      label: 'Noori et al. · World models for biomedicine · Cell · 2026',
-      href: 'https://doi.org/10.1016/j.cell.2026.08.032',
-      note: 'Perspective in Cell, no new experiments: deciding which experiments merit physical execution, and the data such models need.',
-    },
+    /* References 10 and 11 went with Why now, the only section that cited them. */
   ] satisfies ManifestoReference[],
 };

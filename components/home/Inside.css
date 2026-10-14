@@ -252,9 +252,20 @@
 .in-transcript summary:hover {
   color: var(--c-ink);
 }
-.in-transcript p {
-  max-width: 64ch;
+/* Paragraphs across the width (14 Oct 2026): two columns on wide screens,
+   so the lines stay readable while the text uses the row. */
+.in-transcript-text {
   margin-top: 0.9rem;
+}
+@media (min-width: 900px) {
+  .in-transcript-text {
+    columns: 2;
+    column-gap: clamp(2rem, 1rem + 3vw, 4.5rem);
+  }
+}
+.in-transcript p {
+  margin: 0 0 0.9em;
+  break-inside: avoid;
   font-family: var(--f-serif);
   font-size: 1.05rem;
   line-height: 1.6;

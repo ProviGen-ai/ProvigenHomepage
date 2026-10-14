@@ -20,7 +20,7 @@ const cssVars = (vars: Record<string, string | number>) =>
  */
 export default function Team() {
   return (
-    <section id="team" className="tm s-grain" aria-labelledby="tm-title">
+    <section className="tm s-grain" aria-labelledby="tm-title">
       <Reveal className="s-wrap tm-inner" threshold={0.08}>
         <header className="tm-head">
           <h2 id="tm-title" className="s-label s-eyebrow tm-eyebrow s-rise">
@@ -49,6 +49,10 @@ export default function Team() {
           </ul>
         </div>
 
+        {/* The Team link's target (14 Oct 2026, the founder): it lands just
+            short of "Backed by", so the portraits and the institutions fill
+            the screen. Team.css sets the offset. */}
+        <span id="team" className="tm-anchor" aria-hidden="true" />
         <div className="tm-block tm-backed s-rise" style={cssVars({ '--i': 3 })}>
           <h3 id="tm-backed" className="s-label tm-rule">
             <span>{team.backedBy}</span>

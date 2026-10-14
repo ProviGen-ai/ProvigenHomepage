@@ -17,12 +17,14 @@ import './Build.css';
  */
 export default function Build() {
   return (
-    <section id="build" className="b-build s-grain" aria-labelledby="b-build-title">
+    <section className="b-build s-grain" aria-labelledby="b-build-title">
       <div className="s-wrap">
         <Reveal className="b-head">
+          {/* The "How it works" eyebrow is hidden (founder, 14 Oct 2026).
           <p className="s-label s-eyebrow b-eyebrow s-rise">
             {build.eyebrow}
           </p>
+          */}
           <h2 id="b-build-title" className="s-h2 b-title s-rise" style={{ ['--i' as string]: 1 }}>
             {build.title.lead}{' '}
             <span className="b-title-turn">
@@ -35,6 +37,10 @@ export default function Build() {
         <Reveal className="b-loop-wrap" threshold={0.2}>
           <Loop />
         </Reveal>
+        {/* The header's How it works link lands here (14 Oct 2026, the
+            founder): scrolled until the steps' last line, Revise included, sits
+            at the bottom of the screen. Build.css sets the offset. */}
+        <span id="build" className="b-anchor" aria-hidden="true" />
       </div>
     </section>
   );

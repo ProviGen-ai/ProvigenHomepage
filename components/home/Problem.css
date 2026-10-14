@@ -121,6 +121,10 @@
     display: block;
   }
 }
+/* A phrase marked to stand alone (content `ownLine`) does so at every width. */
+.p-phrase--own {
+  display: block;
+}
 .p-swap-source {
   display: grid;
   justify-items: start;
@@ -321,8 +325,10 @@ html[data-motion='paused'] .p-ctl {
 /* html[data-motion] decides (it follows the OS reduced-motion preference). */
 @media (min-width: 821px) {
   /* The stage's 100vh plus the pinned range, RANGE_VH in problem/timeline.ts
-     (written as --range): 426vh since the founder's longer hold on the
-     solution, 4 Oct 2026; 340vh before. */
+     (written as --range): 571vh since the slower attempts and path and the shorter hold,
+     13 Oct 2026;
+     426vh after the founder's longer hold on the solution, 4 Oct 2026; 340vh
+     before. */
   html[data-motion='playing'] .p-track {
     height: calc(100vh + var(--range) * 1vh);
   }
@@ -360,26 +366,41 @@ html[data-motion='paused'] .p-ctl {
       );
   }
 
-  /* Notes: written word by word with the scroll, in reading order; each word
-     eases in from the left over its window (--a, --k), so a line fills left to
-     right. When the solution lands they lift away as one block. */
+  /* Notes: each block fades in whole with the scroll over its window (--a, --k,
+     set on every word), in reading order, in a column centred on the stage.
+     When the solution lands (step 4) the column slides to the left edge and
+     stays, the solution taking the right (13 Oct 2026; until then the notes
+     lifted away and the solution stood alone in their place). Docked, the
+     column's type steps down where the left part of the stage is narrower
+     than the statement, its widest line (about 28.5 times --note). */
+  html[data-motion='playing'] .p-stage {
+    --dock-l: calc(var(--s-gutter) + 28px);
+    --dock-split: 56vw;
+    /* The solution's width (the 44vw right of the split, less its margins) over its longest line
+       (about 10 em, measured, with room to spare). */
+    --sol-cap: calc((44vw - 1.5rem - var(--s-gutter) - 28px) / 10.6);
+  }
   html[data-motion='playing'] .p-head {
     position: absolute;
     top: calc(var(--s-header) + clamp(1.5rem, 6vh, 4rem));
-    left: 0;
-    right: 0;
-    margin-inline: auto;
-    --off: clamp(0, calc(var(--step) - 3), 1);
-    opacity: calc(1 - var(--off));
-    transform: translateY(calc(var(--off) * -36px));
-    filter: blur(calc(var(--off) * 8px));
+    left: 50%;
+    right: auto;
+    margin-inline: 0;
+    transform: translateX(-50%);
     transition:
-      opacity 700ms cubic-bezier(0.6, 0, 0.2, 1),
-      transform 900ms var(--e-out),
-      filter 700ms ease;
+      left 900ms var(--e-out),
+      transform 900ms var(--e-out);
   }
   html[data-motion='playing'] .p-track[data-step='4'] .p-head {
-    pointer-events: none;
+    left: var(--dock-l);
+    transform: none;
+    --note: min(
+      clamp(1.25rem, 0.9rem + 0.75vw, 1.75rem),
+      calc((var(--dock-split) - var(--dock-l) - 1.5rem) / 28.5)
+    );
+  }
+  html[data-motion='playing'] :is(.p-statement, .p-turn, .p-swap-text) {
+    transition: font-size 900ms var(--e-out);
   }
   html[data-motion='playing'] .p-w {
     /* --q runs over the whole track, hold included; the windows are story progress. */
@@ -421,17 +442,22 @@ html[data-motion='paused'] .p-ctl {
     right: calc(var(--s-gutter) + 28px);
     bottom: 38px;
   }
-  /* The solution lands where the notes stood, as the path reaches B (step 4). */
+  /* The solution lands on the right of the docked notes, as the path reaches
+     B (step 4), left-aligned and sized to the space there (its longest line,
+     "ProviGen helps you get", is about 10 em). */
   html[data-motion='playing'] .p-solution {
     position: absolute;
     top: calc(var(--s-header) + clamp(1.5rem, 6vh, 4rem));
-    left: 0;
-    right: 0;
+    left: calc(var(--dock-split) + 1.5rem);
+    right: var(--dock-l);
     margin: 0;
+    padding-inline: 0;
+    justify-items: start;
+    text-align: left;
     pointer-events: none;
     --o: clamp(0, calc(4 - var(--step)), 1);
     opacity: calc(1 - var(--o));
-    transform: translateY(calc(var(--o) * 36px));
+    transform: translateX(calc(var(--o) * 48px));
     filter: blur(calc(var(--o) * 8px));
     transition:
       opacity 700ms cubic-bezier(0.6, 0, 0.2, 1),
@@ -442,8 +468,15 @@ html[data-motion='paused'] .p-ctl {
     pointer-events: auto;
   }
   html[data-motion='playing'] .p-solution-line {
+    max-width: min(42ch, 100%);
+    /* Steps down sooner than the centred layout did, to stay clear of B's label in a narrower column. */
+    font-size: clamp(1.05rem, 0.35rem + 1.2vw, 1.6rem);
     transition: opacity 900ms var(--e-out) 250ms;
     opacity: calc(1 - var(--o));
+  }
+  html[data-motion='playing'] .p-solution-main {
+    justify-items: start;
+    font-size: min(clamp(1.7rem, 1rem + 2.3vw, 3.4rem), var(--sol-cap));
   }
 
   /* Rail: three mono steps on a hairline that fills with the scroll. */
@@ -509,7 +542,7 @@ html[data-motion='paused'] .p-ctl {
 /* Short desktop windows: keep the type clear of the landscape. */
 @media (min-width: 821px) and (max-height: 760px) {
   html[data-motion='playing'] .p-solution-main {
-    font-size: clamp(1.6rem, 0.5rem + 4.4vh, 2.75rem);
+    font-size: min(clamp(1.6rem, 0.5rem + 4.4vh, 2.75rem), var(--sol-cap));
   }
 }
 

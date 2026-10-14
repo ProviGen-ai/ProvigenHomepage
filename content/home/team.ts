@@ -116,8 +116,12 @@ export const members: Member[] = [
     last: 'Lang',
     suffix: '',
     role: 'Co-founder · CEO',
-    /* The founder's text of 8 Oct 2026. */
-    bio: 'Strategy, operations, fundraising. Background spans medicine and biomedical neuroscience (TU Munich), genome editing research at Harvard Medical School, and doctoral research at Boston Children’s Hospital. Turns deep bioprocess pain into a fundable product wedge.',
+    /* 14 Oct 2026: the founder's brief merged with the text of 8 Oct 2026
+       ('Strategy, operations, fundraising. Background spans medicine and
+       biomedical neuroscience (TU Munich), genome editing research at Harvard
+       Medical School, and doctoral research at Boston Children’s Hospital.
+       Turns deep bioprocess pain into a fundable product wedge.'). */
+    bio: 'Strategy, operations, fundraising. Background in medicine × biomedical neuroscience (TU Munich), with genome editing research at Harvard Medical School and Boston Children’s Hospital. Brings a blend of business and product perspective, turning deep bioprocess pain into a fundable product. Co-founded ProviGen with Lucas Mair.',
     crop: { size: 660, x: 100, y: -8 },
     ...fromData('Magdalena'),
   },
@@ -127,8 +131,11 @@ export const members: Member[] = [
     last: 'Mair',
     suffix: '',
     role: 'Co-founder · CTO',
-    /* The founder's text of 8 Oct 2026. */
-    bio: 'AI, automation, product. MD-PhD candidate at TU Munich / Helmholtz Munich. Builds the closed-loop intelligence layer connecting biological readouts, decision-making, and existing lab automation infrastructure.',
+    /* 14 Oct 2026: the founder's brief merged with the text of 8 Oct 2026
+       ('AI, automation, product. MD-PhD candidate at TU Munich / Helmholtz
+       Munich. Builds the closed-loop intelligence layer connecting biological
+       readouts, decision-making, and existing lab automation infrastructure.'). */
+    bio: 'AI, automation, product. Background in medicine × neuroengineering (TU Munich / Helmholtz Munich). A polymath who has built drone swarm software and researched stem cells, he approaches biology as a reverse-engineering discipline, driven by the belief that people should be free to choose and modify their own biology rather than have it decided at birth.',
     crop: { size: 820, x: -38, y: 40 },
     ...fromData('Lucas'),
   },

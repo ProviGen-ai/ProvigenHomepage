@@ -9,7 +9,12 @@
  *
  * Thejas Nagaraju's critique of 4 Oct 2026 ("who is the 'you'?") is answered
  * here: the reader picks who they are before the problem section speaks to
- * them. Founder rules hold on every door: no own lab, no use of partners'
+ * them. 13 Oct 2026: the door lines say what we do, with nothing marked as
+ * planned (Pharma & Biotech: the right parameters found automatically, data
+ * from past runs, sources of variation, with the workflows of the /biopharma
+ * page named as examples; AI Labs: from model prediction to physical execution on
+ * partners' autonomous labs, a loop that can serve as a post-training
+ * environment). Founder rules hold on every door: no own lab, no use of partners'
  * data, no metrics.
  */
 export type Audience = {
@@ -19,6 +24,10 @@ export type Audience = {
   readonly title: string;
   /** One sentence: what the reader finds behind it. */
   readonly line: string;
+  /** Optional second paragraph under the line. */
+  readonly more?: string;
+  /** Optional examples under the line: a lead-in, then one bullet per item. */
+  readonly examples?: { readonly lead: string; readonly items: readonly string[] };
   /** The mono call under it. */
   readonly cta: string;
 };
@@ -31,14 +40,19 @@ export const audiences = {
       id: 'biopharma',
       href: '/biopharma',
       title: 'Pharma & Biotech',
-      line: 'What the software does for process development, assay development and manufacturing, with a worked example.',
+      line: 'Lab-in-the-loop assay and process development: find the right parameters automatically, use data from past runs and characterise sources of variation.',
+      examples: {
+        lead: 'For example:',
+        items: ['LNP formulation', 'iPSC differentiation', 'CHO cultures', 'Fermentation'],
+      },
       cta: 'For your lab',
     },
     {
       id: 'ai-labs',
       href: '/ai-labs',
       title: 'AI Labs',
-      line: 'Experimental data for models of biology, from protein prediction to virtual cells. Planned for our next phase.',
+      line: 'Physically execute and validate your model’s predictions, fully automated, on your own infrastructure or that of our partners.',
+      more: 'Each round of prediction, experiment and measurement yields ground truth validation data, which makes the loop a natural environment for post-training.',
       cta: 'For AI labs',
     },
   ] satisfies readonly Audience[],

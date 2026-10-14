@@ -9,7 +9,7 @@
  * opens a card that plays 1^10 … 10^10; the 3^11 line was cut for it); results from other labs do not carry over to yours
  * (swap 2, no LLM name-drop; its last word cycles through what ProviGen
  * optimises, components/home/problem/RotatingWord.tsx); nobody can test them
- * all, but together we can learn which ones matter (turn); ProviGen helps you
+ * all, but you can learn which parameters matter most (turn); ProviGen helps you
  * get to your target faster (solution, the founder's words of 4 Oct 2026,
  * "exponentially" cut on his word of 8 Oct 2026; before it, "ProviGen is AI
  * with your lab in the loop"). No multipliers on
@@ -29,14 +29,18 @@
  * swap line, `{word}` marks the cycling word.
  */
 export const problem = {
-  rail: ['Problem', 'The turn', 'What we do'],
+  /* 'The turn' removed from the rail (founder, 14 Oct 2026). */
+  rail: ['Problem', 'What we do'],
   /** No-break space: "or assay" stays together, so the first sentence breaks after "experiment" or not at all. */
   statement: ['Every experiment or\u00a0assay follows a protocol.', 'Every setting in it is a choice.'],
   swaps: [
     /** `peek`: the blinking arrow and hover card that play 3^n, setting by setting (problem/PowerPeek.tsx). The 3^11 line was cut for it. */
     { lines: ['Ten settings, three values each:', '3^10 = 59,049 possible protocols.'], peek: true },
     {
-      lines: ['What works in other labs', 'may not work for your {word}.'],
+      lines: ['Reproducibility is notoriously hard to get right.', 'What works in other labs may not work for your {word}.'],
+      /** `ownLine`: the first N lines stand on a line of their own (13 Oct 2026), so this fact never
+          outgrows the statement and the column keeps its width while the word cycles. */
+      ownLine: 1,
       /** The cycling word: what ProviGen optimises. The first is the default (reduced motion, screen readers). */
       rotate: {
         interval: 1300,
@@ -61,10 +65,10 @@ export const problem = {
     /* "them" points back to the protocols of swaps 1 and 2. Problem.tsx sets
        the punch's last character (here ".") in ink. */
     lead: 'You can’t test them all,',
-    punch: 'but together we can learn which ones matter.',
+    punch: 'but you can learn which parameters matter most.',
   },
   /** The founder's lines of 4 Oct 2026 (they replace "ProviGen is AI with your
-      lab in the loop."). One heading line per entry; `em` is the last line, in teal. */
+      lab in the loop."). One heading line per entry; `em` ends the last line, in teal (13 Oct 2026; it was a line of its own). */
   solution: {
     lines: ['ProviGen helps you get', 'to your target'],
     em: 'faster',

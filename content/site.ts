@@ -23,7 +23,8 @@ export const site = {
     { href: '/#build', label: 'How it works' },
     { href: '/#team', label: 'Team' },
     { href: '/writings', label: 'Writings' },
-    { href: '/careers', label: 'Careers' },
+    /* Careers hidden for now (founder, 14 Oct 2026); the page stays at /careers. */
+    // { href: '/careers', label: 'Careers' },
   ],
   /** The call to action in every header (R11; the founder's "Contact us", 3 Oct 2026). */
   cta: { href: '/contact', label: 'Contact us' },
@@ -32,7 +33,8 @@ export const site = {
     { href: '/', label: 'Home' },
     { href: '/writings', label: 'Writings' },
     { href: '/contact', label: 'Contact' },
-    { href: '/careers', label: 'Careers' },
+    /* Careers hidden for now (founder, 14 Oct 2026). */
+    // { href: '/careers', label: 'Careers' },
   ],
   /**
    * The footer's running line. The category line leads (R05). 4 Oct 2026, the

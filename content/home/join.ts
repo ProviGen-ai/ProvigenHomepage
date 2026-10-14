@@ -9,8 +9,12 @@
  * Earlier versions are in git (title from copy deck v3, arc from R09).
  */
 export const join = {
-  /** Where we stand, in one sentence: status written in, no figure, dates or market numbers. */
-  line: 'Today we work with partner labs, on their own instruments.',
+  /**
+   * 14 Oct 2026, the founder: an inspiring line in the manifesto's words, the
+   * close of its "adaptive" section, in place of where we stand ("Today we
+   * work with partner labs, on their own instruments.").
+   */
+  line: 'The hardware is already there. We make it adaptive.',
   /* "The long game" was archived on 4 Oct 2026 (founder); the button now opens the manifesto. */
   link: { href: '/writings/manifesto', label: 'The Manifesto' },
   /**

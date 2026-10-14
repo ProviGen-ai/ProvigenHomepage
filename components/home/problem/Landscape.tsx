@@ -23,7 +23,7 @@ const INTRO_S = 1.9;
 export default function Landscape({
   a,
   b,
-  label,
+  label: _label, // the hidden control's name
   description,
 }: {
   a: string;
@@ -32,7 +32,7 @@ export default function Landscape({
   label: string;
   description: string;
 }) {
-  const { progress, mode, still: stageStill, paused, setPaused } = useStage();
+  const { progress, mode, still: stageStill, paused, setPaused: _setPaused } = useStage();
   const wrap = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const live = useRef({ progress, mode, paused });
@@ -162,9 +162,11 @@ export default function Landscape({
       <div ref={wrap} className="p-landscape">
         <canvas ref={canvas} className="p-canvas" role="img" aria-label={description} />
       </div>
-      {/* Under reduced motion the figure is a still: nothing to pause, no control.
+      {/* The Pause/Play control is hidden (founder, 14 Oct 2026). Kept below,
+        commented out, to restore it.
+      {/~ Under reduced motion the figure is a still: nothing to pause, no control.
         The name swaps with the state (as Build's loop control does), so no
-        aria-pressed on top of it. */}
+        aria-pressed on top of it. ~/}
       {stageStill ? null : (
         <button
           type="button"
@@ -182,6 +184,7 @@ export default function Landscape({
           <span>{paused ? 'Play' : 'Pause'}</span>
         </button>
       )}
+      */}
     </>
   );
 }

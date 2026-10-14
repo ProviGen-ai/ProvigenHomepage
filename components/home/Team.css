@@ -62,10 +62,12 @@
    the heading and the row instead of over (and seemingly cutting) the heading:
    the tallest popup plus its 16 px gap and some air. Since 8 Oct 2026 the
    bios are the founder's longer texts (up to six lines in the 400 px card,
-   ~190 px), so the room grew from 9rem. Phones get their own value below. */
+   ~190 px), so the room grew from 9rem. Phones get their own value below.
+   14 Oct 2026, the founder: half the gap (12rem → 6rem); a tall bio's popup
+   may now reach over the heading. */
 .tm-band {
   position: relative;
-  margin-top: 12rem;
+  margin-top: 6rem;
 }
 .tm-glow {
   position: absolute;
@@ -366,6 +368,14 @@
 .tm-advisors {
   margin-top: clamp(4.5rem, 3rem + 4vw, 7rem);
 }
+/* #team sits right above "Backed by". The root's scroll-padding (header +
+   16 px) plus this margin is one viewport less the block's top margin and a
+   little air, so the link scrolls until the "Backed by" heading sits just
+   below the bottom edge. */
+.tm-anchor {
+  display: block;
+  scroll-margin-top: calc(100lvh - var(--s-header) - 16px - clamp(4.5rem, 3rem + 4vw, 7rem) + 12px);
+}
 .tm-rule {
   display: flex;
   align-items: center;
@@ -622,7 +632,7 @@
    keeps that much room under the heading. */
 @media (max-width: 639px) {
   .tm-band {
-    margin-top: 13rem;
+    margin-top: 6.5rem; /* halved from 13rem, 14 Oct 2026 */
   }
   .tm-pop {
     width: calc(100vw - 2 * 12px);

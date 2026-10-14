@@ -1,13 +1,18 @@
 /* Section 4a · How it works (prefix b-) */
 .b-build {
   position: relative;
-  overflow: hidden;
+  /* clip, not hidden (14 Oct 2026): a hidden box is still a scroll container,
+     and the #build anchor inside it scrolled the section's own content up,
+     under the problem stage and off its background. */
+  overflow: clip;
   padding-block: calc(var(--s-section) * 0.65) clamp(5rem, 3rem + 6vw, 9rem);
   /* White, all of it, figure included (founder, 3 Oct 2026). The top eases
      out of Problem's paper over the head (smoothstep stops, so neither end of
      the blend shows as an edge); the foot stays white into Dawn, which starts
      at #fff. Grain is invisible on pure white (overlay keeps 255 at 255). */
-  --b-blend: clamp(14rem, 8rem + 14vw, 24rem);
+  /* Shorter since 14 Oct 2026 (was clamp(14rem, 8rem + 14vw, 24rem)): it
+     reaches white by the title's foot, where the figure now starts. */
+  --b-blend: clamp(10rem, 5.5rem + 10vw, 16rem);
   background: linear-gradient(
     180deg,
     var(--c-paper) 0,
@@ -43,7 +48,10 @@
 
 /* ---------- Fig. 02 · the loop ---------- */
 .b-loop-wrap {
-  margin-top: clamp(3rem, 1.5rem + 4vw, 5.5rem);
+  /* Tighter (founder, 14 Oct 2026; was clamp(3rem, 1.5rem + 4vw, 5.5rem),
+     then three quarters of that). The section's blend (--b-blend) is shorter
+     to match, so the white figure still starts on white. */
+  margin-top: clamp(1.25rem, 0.6rem + 1.6vw, 2.25rem);
 }
 /* The figure is drawn straight on the section's white: no panel colour, no
    tint, no shadow, and since 4 Oct 2026 no frame or label either (founder).
@@ -144,7 +152,9 @@
   grid-template-columns: repeat(5, minmax(0, 1fr));
   column-gap: clamp(1rem, 0.5rem + 1.4vw, 2rem);
   row-gap: 2.5rem;
-  margin: clamp(2.5rem, 1.75rem + 2vw, 3.5rem) 0 0;
+  /* A little tighter under the figure (founder, 14 Oct 2026; was
+     clamp(2.5rem, 1.75rem + 2vw, 3.5rem)). */
+  margin: clamp(1.5rem, 1rem + 1.4vw, 2.25rem) 0 0;
   padding: 0;
   list-style: none;
 }
@@ -259,4 +269,14 @@
   .b-step-line {
     max-width: 34ch;
   }
+}
+
+/* #build sits under the steps, about 38 px below the last step line. The
+   root's scroll-padding (header + 16 px) plus this margin puts it just past
+   the bottom edge, so the header's How it works link scrolls until the last
+   step line sits about 24 px above the bottom, which leaves the title whole on
+   a 900 px tall screen (14 Oct 2026). */
+.b-anchor {
+  display: block;
+  scroll-margin-top: calc(100lvh - var(--s-header) - 16px + 0.875rem);
 }

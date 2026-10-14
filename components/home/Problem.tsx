@@ -4,8 +4,8 @@ import ProblemScroll from './problem/ProblemScroll';
 import ProblemShader from './problem/ProblemShader';
 import Landscape from './problem/Landscape';
 import RotatingWord from './problem/RotatingWord';
-import PowerPeek from './problem/PowerPeek';
-import { BEATS, wordWindows } from './problem/timeline';
+// import PowerPeek from './problem/PowerPeek'; // hidden for now, 14 Oct 2026
+import { BEATS, lineWindow } from './problem/timeline';
 import './Problem.css';
 
 /*
@@ -84,20 +84,26 @@ type Word = { readonly node: ReactNode; readonly em?: boolean };
 const words = (text: string, em?: boolean): Word[] => text.split(' ').map((node) => ({ node, em }));
 
 /**
- * One beat of the notes, as phrases of words. Pinned, each word appears in
- * reading order as the scroll crosses its window (--a: where it starts, --k:
- * the inverse of its fade, both from timeline.ts); phrases run on as one line
- * there and stack on phones.
+ * One beat of the notes, as phrases of words. Pinned, the beat is one block
+ * that appears whole as the scroll enters it (--a: where it starts, --k: the
+ * inverse of its fade, both from timeline.ts); phrases stack on phones. The
+ * first `ownLine` phrases take a line of their own everywhere.
  */
-function Beat({ phrases, at }: { phrases: readonly Word[][]; at: readonly [number, number] }) {
-  const windows = wordWindows(at, phrases.reduce((sum, phrase) => sum + phrase.length, 0));
-  const starts = phrases.map((_, index) => phrases.slice(0, index).reduce((sum, phrase) => sum + phrase.length, 0));
+function Beat({
+  phrases,
+  at,
+  ownLine = 0,
+}: {
+  phrases: readonly Word[][];
+  at: readonly [number, number];
+  ownLine?: number;
+}) {
+  const { a, k } = lineWindow(at);
   return phrases.map((phrase, index) => (
     <Fragment key={index}>
       {index > 0 ? ' ' : null}
-      <span className="p-phrase">
+      <span className={index < ownLine ? 'p-phrase p-phrase--own' : 'p-phrase'}>
         {phrase.map((word, position) => {
-          const { a, k } = windows[starts[index] + position];
           return (
             <Fragment key={position}>
               {position > 0 ? ' ' : null}
@@ -149,11 +155,15 @@ export default function Problem() {
                 <span className="p-swap-text">
                   <Beat
                     at={BEATS[index + 1]}
-                    phrases={swap.lines.map((line, lineIndex) =>
-                      line.split(' ').map((text, position, all): Word => {
+                    ownLine={'ownLine' in swap ? swap.ownLine : 0}
+                    phrases={swap.lines.map((line, _lineIndex) =>
+                      line.split(' ').map((text, _position, _all): Word => {
+                        /* The arrow that opens the 3^n card is hidden for now (founder,
+                           14 Oct 2026); the arithmetic line ends on its plain word.
                         // The arithmetic line ends on the arrow that opens the 3^n card.
                         const peek = 'peek' in swap && lineIndex === swap.lines.length - 1 && position === all.length - 1;
                         if (peek) return { node: <span className="p-peek-end">{text}<PowerPeek /></span> };
+                        */
                         if (text.includes('^')) return { node: <Power text={text} /> };
                         if (!('rotate' in swap) || !text.includes('{word}')) return { node: text };
                         const [before, after] = text.split('{word}');
@@ -185,13 +195,17 @@ export default function Problem() {
 
         <p className="p-solution">
           <span className="p-solution-main">
-            {solution.lines.map((line) => (
-              <span key={line}>{line} </span>
-            ))}
-            <span>
-              <em>{solution.em}</em>
-              <span className="s-stop">{solution.after}</span>
-            </span>
+            {/* The em word ends the last line, on the same line (13 Oct 2026). */}
+            {solution.lines.map((line, index) =>
+              index < solution.lines.length - 1 ? (
+                <span key={line}>{line} </span>
+              ) : (
+                <span key={line}>
+                  {line} <em>{solution.em}</em>
+                  <span className="s-stop">{solution.after}</span>
+                </span>
+              ),
+            )}
           </span>{' '}
           <span className="p-solution-line">{solution.line}</span>
         </p>

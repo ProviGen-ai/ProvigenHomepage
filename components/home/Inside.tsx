@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import Reveal from '@/components/Reveal';
 import FilmPlayer from '@/components/home/inside/FilmPlayer';
 import MonoMarks from '@/components/site/MonoMarks';
-import { filmCaptions, inside } from '@/content/home/inside';
+import { filmCaptions, inside, transcriptBreaks } from '@/content/home/inside';
 import './Inside.css';
 
 const i = (n: number) => ({ ['--i' as string]: n }) as CSSProperties;
@@ -49,7 +49,16 @@ export default function Inside() {
             </div>
             <details className="in-transcript s-rise" style={i(1)}>
               <summary className="s-label">{film.transcript}</summary>
-              <p>{filmCaptions.map(([, , text]) => text).join(' ')}</p>
+              <div className="in-transcript-text">
+                {[0, ...transcriptBreaks].map((from, index, starts) => (
+                  <p key={from}>
+                    {filmCaptions
+                      .slice(from, starts[index + 1])
+                      .map(([, , text]) => text)
+                      .join(' ')}
+                  </p>
+                ))}
+              </div>
             </details>
           </figure>
         </Reveal>
