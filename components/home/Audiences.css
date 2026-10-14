@@ -89,6 +89,13 @@
   opacity: 1;
   transform: none;
 }
+/* Unlinked doors (audiences.linked off): no wash, no hover colour. */
+.a-door-link--static::before {
+  content: none;
+}
+.a-door-link--static:hover .a-door-title {
+  color: inherit;
+}
 .a-door-link:focus-visible {
   outline: 2px solid var(--c-teal-ink);
   outline-offset: -2px;

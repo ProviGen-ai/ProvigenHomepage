@@ -33,6 +33,12 @@ export type Audience = {
 };
 
 export const audiences = {
+  /**
+   * Whether the doors link to /biopharma and /ai-labs. Off on the live site for
+   * now (founder, 14 Oct 2026): the cards stay, without their call or link;
+   * the website-fork branch keeps them on.
+   */
+  linked: false as boolean,
   /** The section's h2, set as a mono label. */
   label: 'Start here',
   doors: [

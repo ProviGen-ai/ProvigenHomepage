@@ -53,8 +53,8 @@ write(
     : 'User-agent: *\nDisallow: /\n',
 );
 
-// '/careers' is left out while the page is hidden (14 Oct 2026).
-const pages = ['/', '/biopharma', '/ai-labs', /* '/careers', */ '/writings', '/contact'];
+// '/careers', '/biopharma' and '/ai-labs' are left out while nothing links to them (14 Oct 2026).
+const pages = ['/', /* '/biopharma', '/ai-labs', '/careers', */ '/writings', '/contact'];
 const urls = indexable
   ? [
       ...pages.map((path) => ({ loc: `${site}${path}` })),

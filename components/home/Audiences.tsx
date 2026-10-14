@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import Reveal from '@/components/Reveal';
 import { ArrowIcon } from '@/components/site/Header';
 import { audiences } from '@/content/home/audiences';
@@ -12,6 +12,17 @@ import './Audiences.css';
  * the opening's paper foot, as the problem section did until now, so its
  * first line shows on the first screen.
  */
+/** The door's box: a link while the doors are linked, a plain block (no wash, no call) while not. */
+function DoorShell({ href, children }: { href: string; children: ReactNode }) {
+  return audiences.linked ? (
+    <a className="a-door-link" href={href}>
+      {children}
+    </a>
+  ) : (
+    <div className="a-door-link a-door-link--static">{children}</div>
+  );
+}
+
 export default function Audiences() {
   return (
     <section id="start" className="a-start" aria-labelledby="a-start-title">
@@ -23,7 +34,7 @@ export default function Audiences() {
         <ul className="a-doors">
           {audiences.doors.map((door, index) => (
             <li key={door.id} className="a-door s-rise" style={{ '--i': index + 1 } as CSSProperties}>
-              <a className="a-door-link" href={door.href}>
+              <DoorShell href={door.href}>
                 <span className="a-door-title">{door.title}</span>
                 <span className={'examples' in door ? 'a-door-line a-door-line--split' : 'a-door-line a-door-line--wide'}>
                   <span className="a-door-text">{door.line}</span>
@@ -40,11 +51,13 @@ export default function Audiences() {
                     </span>
                   ) : null}
                 </span>
-                <span className="a-door-cta" aria-hidden="true">
-                  {door.cta}
-                  <ArrowIcon />
-                </span>
-              </a>
+                {audiences.linked ? (
+                  <span className="a-door-cta" aria-hidden="true">
+                    {door.cta}
+                    <ArrowIcon />
+                  </span>
+                ) : null}
+              </DoorShell>
             </li>
           ))}
         </ul>
