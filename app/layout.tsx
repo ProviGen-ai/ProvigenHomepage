@@ -24,7 +24,8 @@ import { site } from '@/content/site';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'ProviGen · Lab-in-the-loop AI for experimental biology',
+    /* The old site's tab text, kept on the founder's call (14 Oct 2026). */
+    default: 'ProviGen | Autonomous Life Science Infrastructure',
     template: '%s | ProviGen',
   },
   /* The hero's subline (content/home/hero.ts; the founder's call of 4 Oct 2026). */
