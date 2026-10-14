@@ -109,7 +109,8 @@ function FeaturedCard({ card, index }: { card: WritingCard; index: number }) {
         </h3>
         <p className="w-card-dek">{card.dek}</p>
         <p className="w-card-foot">
-          <span className="w-card-source">{card.provenance}</span>
+          {/* Provenance line hidden (founder, 15 Oct 2026). */}
+          {/* <span className="w-card-source">{card.provenance}</span> */}
           <span className="w-card-read" aria-hidden="true">
             Read
             <ArrowIcon />
