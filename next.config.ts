@@ -25,10 +25,10 @@ export const retired: [source: string, destination: string][] = [
    * field note. /demo (v1's Bayesian-optimisation demo) lands on the field
    * note's live simulation. More specific sources first.
    */
-  ['/blog/closed-loop-optimization', '/writings/closed-loop-optimization'],
+  ['/blog/closed-loop-optimization', '/writings'], // the field note is off the live site for now (14 Oct 2026)
   /* The old site's use-case pages and manifesto, now essays (4 Oct 2026). */
-  ['/use-cases/dna-assembly', '/writings/deciding-what-to-assemble-next'],
-  ['/use-cases/antibody-discovery', '/writings/antibody-discovery'],
+  ['/use-cases/dna-assembly', '/writings'], // off the live site for now (14 Oct 2026)
+  ['/use-cases/antibody-discovery', '/writings'], // off the live site for now (14 Oct 2026)
   ['/use-cases', '/writings'],
   ['/manifesto', '/writings/manifesto'],
   /* Taken off the site on 4 Oct 2026 (founder): the long game archived, the bottleneck essay deleted. */
@@ -39,7 +39,7 @@ export const retired: [source: string, destination: string][] = [
   ['/writings/as-fast-as-its-experiments', '/writings'],
   ['/blog/:slug', '/writings'],
   ['/blog', '/writings'],
-  ['/demo', '/writings/closed-loop-optimization#simulation'],
+  ['/demo', '/writings'], // off the live site for now (14 Oct 2026)
   /* The Start-here doors (founder, 7 Oct 2026): the Investors door was removed,
      and the Frontier labs door became AI Labs. */
   ['/investors', '/contact'],

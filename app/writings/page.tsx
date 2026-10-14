@@ -40,7 +40,7 @@ export default function WritingsIndex() {
           </h1>
           <p className="s-lede w-index-dek">
             {/* No-break spaces keep the category phrase on one line. */}
-            {'Field notes on building the\u00a0AI\u00a0that\u00a0steers\u00a0biology.'}
+            {'Writing on building the\u00a0AI\u00a0that\u00a0steers\u00a0biology.'}
           </p>
         </div>
       </header>
@@ -59,6 +59,8 @@ export default function WritingsIndex() {
         </div>
       </section>
 
+      {/* Only when there is something to list: the field notes are off the live site for now (14 Oct 2026). */}
+      {earlier.length > 0 ? (
       <section className="w-earlier" aria-labelledby="w-earlier-title">
         <div className="s-wrap">
           {/* "More writing" since 3 Oct 2026 (R22): the newest essay is listed here too. */}
@@ -83,6 +85,7 @@ export default function WritingsIndex() {
           </ol>
         </div>
       </section>
+      ) : null}
     </main>
   );
 }

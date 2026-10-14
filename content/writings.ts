@@ -84,32 +84,36 @@ export const writings: WritingCard[] = [
   /* Data-room material as essays (4 Oct 2026): the old site's two use-case
      pages, reworked under the public rules, and a reading note on the three
      papers the founder named. Each ends with its own invitation. */
-  {
-    slug: 'deciding-what-to-assemble-next',
-    href: '/writings/deciding-what-to-assemble-next',
-    title: 'Deciding what to <em>assemble</em> next.',
-    dek: 'Much of plasmid construction can run on automation. The decisions between the stages (ratios, cycles, which colonies to carry forward) are still made by hand, and that is where a decision loop earns its place.',
-    date: '2026-06-08',
-    dateLabel: '8 June 2026',
-    category: 'Field note',
-    tag: 'Field note · Use case · June 2026',
-    featured: false,
-    visual: 'plate',
-    provenance: 'Illustrative plate, not data',
-  },
-  {
-    slug: 'antibody-discovery',
-    href: '/writings/antibody-discovery',
-    title: 'Which antibody to test <em>next</em>.',
-    dek: 'An antibody program narrows a large pool gate by gate, under several properties at once. A note on how a decision loop chooses the next batch, and what a published lab-in-the-loop campaign by others actually shows.',
-    date: '2026-06-08',
-    dateLabel: '8 June 2026',
-    category: 'Field note',
-    tag: 'Field note · Use case · June 2026',
-    featured: false,
-    visual: 'plate',
-    provenance: 'Illustrative plate, not data',
-  },
+  /* Field note off the live site for now (founder, 14 Oct 2026); website-fork keeps it.
+    {
+      slug: 'deciding-what-to-assemble-next',
+      href: '/writings/deciding-what-to-assemble-next',
+      title: 'Deciding what to <em>assemble</em> next.',
+      dek: 'Much of plasmid construction can run on automation. The decisions between the stages (ratios, cycles, which colonies to carry forward) are still made by hand, and that is where a decision loop earns its place.',
+      date: '2026-06-08',
+      dateLabel: '8 June 2026',
+      category: 'Field note',
+      tag: 'Field note · Use case · June 2026',
+      featured: false,
+      visual: 'plate',
+      provenance: 'Illustrative plate, not data',
+    },
+  */
+  /* Field note off the live site for now (founder, 14 Oct 2026); website-fork keeps it.
+    {
+      slug: 'antibody-discovery',
+      href: '/writings/antibody-discovery',
+      title: 'Which antibody to test <em>next</em>.',
+      dek: 'An antibody program narrows a large pool gate by gate, under several properties at once. A note on how a decision loop chooses the next batch, and what a published lab-in-the-loop campaign by others actually shows.',
+      date: '2026-06-08',
+      dateLabel: '8 June 2026',
+      category: 'Field note',
+      tag: 'Field note · Use case · June 2026',
+      featured: false,
+      visual: 'plate',
+      provenance: 'Illustrative plate, not data',
+    },
+  */
   /* Cheap thought, costly evidence: off the live site for now (founder, 14 Oct 2026);
      the website-fork branch keeps it.
     {
@@ -126,19 +130,21 @@ export const writings: WritingCard[] = [
       provenance: 'Provisional forecasts, not a completed expert study',
     },
   */
-  {
-    slug: 'closed-loop-optimization',
-    href: '/writings/closed-loop-optimization',
-    title: 'Closed-loop experimental campaigns in <em>practice</em>.',
-    dek: 'How a lab learns between rounds, from assays to media, with peer-reviewed evidence and the data that arrives last.',
-    date: '2026-04-13',
-    dateLabel: 'April 2026',
-    category: 'Field note',
-    tag: 'Field note · Evidence · April 2026',
-    featured: true,
-    visual: 'plate',
-    provenance: 'Illustrative figures and published external data',
-  },
+  /* Field note off the live site for now (founder, 14 Oct 2026); website-fork keeps it.
+    {
+      slug: 'closed-loop-optimization',
+      href: '/writings/closed-loop-optimization',
+      title: 'Closed-loop experimental campaigns in <em>practice</em>.',
+      dek: 'How a lab learns between rounds, from assays to media, with peer-reviewed evidence and the data that arrives last.',
+      date: '2026-04-13',
+      dateLabel: 'April 2026',
+      category: 'Field note',
+      tag: 'Field note · Evidence · April 2026',
+      featured: true,
+      visual: 'plate',
+      provenance: 'Illustrative figures and published external data',
+    },
+  */
 ];
 
 /** Newest first, whatever order the list above is written in. */
