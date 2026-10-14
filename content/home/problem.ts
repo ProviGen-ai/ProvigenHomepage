@@ -51,7 +51,7 @@ export const problem = {
           'assay',
           'cell line',
           'culture medium',
-          'fermentation',
+          'downstream purification',
           'catalyst',
           'enzymes',
           'formulation',
