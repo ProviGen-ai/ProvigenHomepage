@@ -30,7 +30,7 @@ export const manifesto = {
   slug: 'manifesto',
   title: 'The <em>Manifesto</em>.',
   dek: 'Biotech is entering a new era.\nLab-in-the-loop is becoming the new operating model for biotechnology.',
-  date: '2026-10-04',
+  date: '2026-09-25', // first published on the old site, 25 Sep 2026
   category: 'Perspective' as const,
   readingMinutes: 3, // 6 before sections 4–9 left (14 Oct 2026)
   sections: [

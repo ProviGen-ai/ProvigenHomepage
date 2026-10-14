@@ -37,6 +37,8 @@ export type WritingCard = {
   cta?: { text: string; label: string; href: string };
 };
 
+/* Dates are first publication (14 Oct 2026): the use cases and the manifesto
+   as the old site published them, the episode as it aired. */
 export const writings: WritingCard[] = [
   {
     /* Lucas Mair on the Frameshifts podcast, read for the company (4 Oct
@@ -45,10 +47,10 @@ export const writings: WritingCard[] = [
     href: '/writings/frameshifts-episode-15',
     title: 'Biology is a steering <em>problem</em>.',
     dek: 'Our co-founder and CTO Lucas Mair on the Frameshifts podcast. Our reading: biology is a steering problem, the experiment is the bottleneck, and that is where lab-in-the-loop AI comes in.',
-    date: '2026-10-04',
-    dateLabel: '4 October 2026',
+    date: '2026-08-31',
+    dateLabel: '31 August 2026',
     category: 'Conversation',
-    tag: 'Conversation · Frameshifts podcast · October 2026',
+    tag: 'Conversation · Frameshifts podcast · August 2026',
     featured: true,
     visual: 'episode',
     poster: '/assets/writings/frameshifts-episode-15/poster-1280.webp',
@@ -66,10 +68,10 @@ export const writings: WritingCard[] = [
     href: '/writings/manifesto',
     title: 'The <em>Manifesto</em>.',
     dek: 'Biotech is entering a new era. Lab-in-the-loop is becoming the new operating model for biotechnology.',
-    date: '2026-10-04',
-    dateLabel: '4 October 2026',
+    date: '2026-09-25',
+    dateLabel: '25 September 2026',
     category: 'Perspective',
-    tag: 'Perspective · Manifesto · October 2026',
+    tag: 'Perspective · Manifesto · September 2026',
     featured: true,
     visual: 'cycle',
     provenance: 'Illustrative cycle, not a measurement',
@@ -86,11 +88,11 @@ export const writings: WritingCard[] = [
     slug: 'deciding-what-to-assemble-next',
     href: '/writings/deciding-what-to-assemble-next',
     title: 'Deciding what to <em>assemble</em> next.',
-    dek: 'Much of plasmid construction can run on automation. The decisions between the stages — ratios, cycles, which colonies to carry forward — are still made by hand, and that is where a decision loop earns its place.',
-    date: '2026-10-04',
-    dateLabel: '4 October 2026',
+    dek: 'Much of plasmid construction can run on automation. The decisions between the stages (ratios, cycles, which colonies to carry forward) are still made by hand, and that is where a decision loop earns its place.',
+    date: '2026-06-08',
+    dateLabel: '8 June 2026',
     category: 'Field note',
-    tag: 'Field note · Use case · October 2026',
+    tag: 'Field note · Use case · June 2026',
     featured: false,
     visual: 'plate',
     provenance: 'Illustrative plate, not data',
@@ -100,10 +102,10 @@ export const writings: WritingCard[] = [
     href: '/writings/antibody-discovery',
     title: 'Which antibody to test <em>next</em>.',
     dek: 'An antibody program narrows a large pool gate by gate, under several properties at once. A note on how a decision loop chooses the next batch, and what a published lab-in-the-loop campaign by others actually shows.',
-    date: '2026-10-04',
-    dateLabel: '4 October 2026',
+    date: '2026-06-08',
+    dateLabel: '8 June 2026',
     category: 'Field note',
-    tag: 'Field note · Use case · October 2026',
+    tag: 'Field note · Use case · June 2026',
     featured: false,
     visual: 'plate',
     provenance: 'Illustrative plate, not data',
