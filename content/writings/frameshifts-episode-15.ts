@@ -61,7 +61,7 @@ export const episode = {
   category: 'Conversation' as const,
   readingMinutes: 6,
   disclaimer:
-    'Quotes are from YouTube’s auto-generated captions, lightly edited; […] marks words left out. Every time stamp plays the episode from that point.<br>The views in the quotes are Lucas’s own. ProviGen is not named in the conversation, so the links to what we build are ours. Where the talk turns to fully automated labs, Lucas describes where the field could go, not what we build today.',
+    'Quotes are from YouTube’s auto-generated captions, lightly edited; […] marks words left out. Every time stamp plays the episode from that point.<br>The views in the quotes are Lucas’s own. ProviGen is not named in the conversation. Where the talk turns to fully automated labs, Lucas describes where the field could go, not what we build today.',
   video: {
     id: VIDEO,
     title: 'Lucas Mair on AI, Robotics, and the Future of Fully Automated Biology | Frameshifts Episode #15',
