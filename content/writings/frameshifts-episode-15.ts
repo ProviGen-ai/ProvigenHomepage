@@ -57,7 +57,7 @@ export const episode = {
   slug: 'frameshifts-episode-15',
   title: 'Biology is a steering <em>problem</em>.',
   dek: 'Our co-founder and CTO Lucas Mair on the Frameshifts podcast. Our reading: biology is a steering problem, the experiment is the bottleneck, and that is where lab-in-the-loop AI comes in.',
-  date: '2026-10-04',
+  date: '2026-08-31', // the episode's release, 31 Aug 2026
   category: 'Conversation' as const,
   readingMinutes: 6,
   disclaimer:

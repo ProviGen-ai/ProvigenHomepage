@@ -23,11 +23,10 @@
  * - the platform anomalies named in the source (stale acoustic surveys,
  *   equipment reservation conflicts, retry loops): one installation's
  *   observations.
- * - "sits at the orchestration layer and reads every data source" — breaks
+ * - "sits at the orchestration layer and reads every data source": breaks
  *   the positioning rule and the no-data-taking rule in one sentence. The
  *   category line is lab-in-the-loop; the record stays in the lab that makes
- *   it. The only cross-partner sentence on the site is used once, in
- *   "loop" ("With each experiment run on ProviGen …").
+ *   it. No cross-partner learning sentence is used anywhere in this note.
  * - "teams accept suboptimal outcomes", "decisions are based on fixed
  *   defaults, SOPs, or operator intuition": never a verdict on the reader's
  *   lab. Rewritten as the cost of another troubleshooting round.
@@ -56,8 +55,8 @@
  * - BayBE: Fitzner M, Sosic A, Hopp AV et al., Digital Discovery 4(8),
  *   1991-2000, 2025, doi 10.1039/D5DD00050E (the source page's
  *   10.1039/D4DD00316K does not resolve). Peer-reviewed, but a software
- *   paper, not a wet-lab result. Open-sourced by Merck KGaA — not Merck & Co.
- *   — announced with the University of Toronto's Acceleration Consortium,
+ *   paper, not a wet-lab result. Open-sourced by Merck KGaA (not Merck & Co.)
+ *   and announced with the University of Toronto's Acceleration Consortium,
  *   6 Dec 2023. "Dozens of use cases" is Merck's own press-release wording
  *   and is attributed as such; "internal R&D use cases" is not what the
  *   release says.
@@ -78,7 +77,7 @@
  * named here: Compile running for supported workflows, Integrate running per
  * instrument, Record running, Decide running, Review running, Schedule in
  * development. The six decision points are written as how a decision loop
- * applies to this workflow — they have no confirmed status as ProviGen
+ * applies to this workflow; they have no confirmed status as ProviGen
  * features, and the closing section says so in as many words.
  */
 
@@ -109,10 +108,10 @@ export type FieldNote = {
 export const decidingWhatToAssembleNext: FieldNote = {
   slug: 'deciding-what-to-assemble-next',
   title: 'Deciding what to <em>assemble</em> next.',
-  dek: 'Much of plasmid construction can run on automation. The decisions between the stages — ratios, cycles, which colonies to carry forward — are still made by hand, and that is where a decision loop earns its place.',
-  date: '2026-10-04',
+  dek: 'Much of plasmid construction can run on automation. The decisions between the stages (ratios, cycles, which colonies to carry forward) are still made by hand, and that is where a decision loop earns its place.',
+  date: '2026-06-08', // the old site's use-case page, 8 Jun 2026
   category: 'Field note',
-  readingMinutes: 10,
+  readingMinutes: 7,
   disclaimer:
     'The workflow here is described generically, as public protocols describe it; no laboratory’s setup is being described, and nothing in this note is a ProviGen result. ProviGen capabilities carry their status as set by our engineering team in September 2026: protocol compilation runs for supported workflows, instrument integration runs per instrument, recording and decision-making run, and automated scheduling and execution are in development. The six decision points are written as how a decision loop applies to this workflow, not as features we run for DNA assembly today. Third-party findings are labelled by type and attributed.',
   sections: [
@@ -120,78 +119,76 @@ export const decidingWhatToAssembleNext: FieldNote = {
       id: 'pipeline',
       title: 'The shape of the <em>pipeline</em>.',
       paragraphs: [
-        'Plasmid construction is a pipeline of stages, and each stage hands an intermediate to the next. DNA is purified; parts go into an assembly reaction; the product is transformed into competent cells; the cells go onto selective plates; colonies are picked and checked; verified clones are grown up and quantified. Sequencing comes last.',
-        'A Golden Gate workflow runs in that order whatever the hardware. Modular Cloning (MoClo) and the standards around it use Type IIS restriction enzymes, which cut outside their own recognition sequence and leave short defined overhangs, so several parts can be cut and joined in one reaction and the overhangs — not the order of pipetting — decide what ends up next to what. Digest and ligation cycles run on a thermal cycler. The design work happens before any of it, in the choice of parts, junctions and conditions.',
-        'Most of the physical work can run on automation that many laboratories already own: liquid handling, thermal cycling, colony picking, moving plates between instruments. Where that hardware is in place, the hands-on time per plate is small, and the stage boundaries are where a person is needed again.',
-        'What is not automated is the decision at those boundaries: what to assemble, at which ratios, under which conditions, and which clones to carry forward. Those calls rest on defaults, standard operating procedures and hard-won experience. They work. They are also rarely written down in a form the next project can use, so when an assembly fails someone reads the plate data and the run logs and decides again from first principles — adjust the ratios, redesign the junctions, change the cycling programme, repeat with fresh enzyme. When the result is ambiguous, another troubleshooting round competes with everything else the team owes that week, and the ambiguity often has to stand.',
+        'Plasmid construction is a pipeline of stages, each handing an intermediate to the next. Parts go into an assembly reaction; the product is transformed into competent cells; the cells go onto selective plates; colonies are picked and checked; verified clones are grown up. Sequencing comes last.',
+        'A Golden Gate workflow runs in that order whatever the hardware. Modular Cloning (MoClo) and the standards around it use Type IIS enzymes, which cut outside their recognition sequence and leave short defined overhangs, so several parts join in one reaction and the overhangs, not the pipetting order, decide what ends up next to what.',
+        'Most of the physical work can run on automation many laboratories already own. The decisions at the stage boundaries cannot: what to assemble, at which ratios, under which conditions, which clones to carry forward. Those calls rest on defaults, SOPs and experience. They work, but are rarely written down in a form the next project can use, so when an assembly fails someone decides again from first principles.',
       ],
     },
     {
       id: 'loop',
       title: 'Where the lab enters the <em>loop</em>.',
       paragraphs: [
-        'That boundary is where we work, and the shape of it is lab-in-the-loop AI: the laboratory stays in the loop, and so do the scientists in it. Each stage of an assembly run already leaves a record — dispensed volumes, device logs, colony counts, screening results, sequencing outcomes — and that record stays in the laboratory where it is made. What we add is the machinery that turns it into the next set of conditions and hands those conditions back as something the instruments can actually run.',
-        '<strong>Compile.</strong> <em>Running for supported workflows.</em> Proposed conditions become versioned, executable protocols for a named instrument set: layouts, controls, replicates, timing. <strong>Integrate.</strong> <em>Running per instrument.</em> Liquid handlers, cyclers, readers and arms are driven through vendor APIs and open frameworks, on the hardware a laboratory already has. <strong>Record.</strong> <em>Running.</em> Every result is stored with its conditions, protocol version, device logs and deviations, so a finding can be told apart from an artefact.',
+        'That boundary is where we work, and the shape of it is lab-in-the-loop: the laboratory stays in the loop, and so do its scientists. Each stage already leaves a record (dispensed volumes, device logs, colony counts, screening results, sequencing outcomes) and it stays in the laboratory that made it. What we add turns it into the next set of conditions.',
+        '<strong>Compile.</strong> <em>Running for supported workflows.</em> Proposed conditions become versioned, executable protocols for a named instrument set: layouts, controls, replicates, timing. <strong>Integrate.</strong> <em>Running per instrument.</em> Liquid handlers, cyclers, readers and arms are driven through vendor APIs and open frameworks, on hardware a laboratory already has. <strong>Record.</strong> <em>Running.</em> Every result is stored with its conditions, protocol version, device logs and deviations, so a finding can be told apart from an artefact.',
         '<strong>Schedule.</strong> <em>In development.</em> Ordering runs across shared instruments, with incubation windows respected and a failed step caught before its result reaches the model, is being built; today a scientist approves a batch before it runs. <strong>Review.</strong> <em>Running.</em> Scientists set the targets, approve the batch, override a recommendation and say which deviations matter.',
-        'The method underneath — design of experiments, Bayesian optimisation, active learning, and what counts as one sample — is set out in <a href="/writings/closed-loop-optimization">Closed-loop experimental campaigns in practice</a> and is not repeated here. This note is about one workflow and the decisions inside it. With each experiment run on ProviGen, anywhere in the world, we improve our pipeline.',
+        'The method underneath (design of experiments, Bayesian optimisation, active learning, what counts as one sample) is set out in <a href="/writings/closed-loop-optimization">Closed-loop experimental campaigns in practice</a>.',
       ],
     },
     {
       id: 'decisions',
       title: 'Six decisions between the <em>stages</em>.',
       paragraphs: [
-        'The decisions below are the ones a team makes on the way from parts to verified clones. They are also the ones a decision loop is for: each is a variable with a range, each has a consequence that becomes measurable a stage or two later, and none of them is settled once for every construct.',
-        '<strong>1. Part ratios.</strong> The molar ratio of backbone to insert is usually taken from a protocol and held fixed, while the ratio that actually works depends on the number of parts, the junction set and the fragment lengths. In a loop the ratio is a variable rather than a default: it is proposed per construct, and the colony count, the share of screened colonies that look right and the sequencing result say whether the proposal was any good.',
-        '<strong>2. Cycle count.</strong> Digest-and-ligation cycle counts are commonly scaled to the number of parts by a rule in a protocol. A loop treats the rule as a starting point and lets the outcomes observed for a given part count and junction set move it, for those parts on those instruments.',
-        '<strong>3. Process parameters.</strong> Reaction volume, enzyme amount, ligation temperature, inactivation time. Each is unremarkable on its own and they are decisive together, because small differences compound across stages that each have their own yield. A loop proposes combinations instead of moving one factor at a time, and keeps every combination attached to the result it produced.',
-        '<strong>4. Colony screening.</strong> After picking, the useful question is comparative: is the positive rate for this construct lower than for the assemblies most like it? A loop can ask that as a matter of course, because the project’s own earlier assemblies were recorded the same way, with their conditions beside their outcomes. The payoff is catching a transformation or assembly problem on the screening plate rather than at sequence verification.',
-        '<strong>5. Failure response.</strong> When an assembly fails, the decision is retry or redesign, and the evidence is in the shape of the failure: no colonies at all points at the transformation step; colonies that all carry empty vector point at the assembly reaction; mixed products point at partial assembly. Recorded as a classification rather than kept as a hunch, that distinction is also what tells the loop which variable to move next.',
-        '<strong>6. Which clones to advance.</strong> Cherry-picking happens on partial information, because the sequencing result for this plate is not back yet. Band quality from colony PCR, growth, and how similar constructs behaved are what there is. Ranking on them explicitly is better than ranking on them implicitly.',
-        'Around the reaction sit further variables with their own ranges — electroporation voltage and pulse length, recovery volume, time and temperature — and batch-level ones that drift quietly: competent cell lot and time since thaw, enzyme lot, media batch, how fresh the antibiotic plates are. Teams note these because they are the usual suspects when a week of runs goes wrong. Recorded next to the result rather than in a troubleshooting note, a drift can be seen instead of inferred afterwards.',
+        'Each decision below is a variable with a range, with a consequence measurable a stage or two later, and none is settled once for every construct.',
+        '<strong>1. Part ratios.</strong> The molar ratio of backbone to insert is usually taken from a protocol and held fixed, while the ratio that works depends on the parts, junctions and fragment lengths. In a loop it is proposed per construct, and the colony count, screening rate and sequencing result say whether the proposal was any good.',
+        '<strong>2. Cycle count.</strong> Digest-and-ligation cycle counts are commonly scaled to the number of parts by a rule in a protocol. A loop treats the rule as a starting point and lets observed outcomes move it.',
+        '<strong>3. Process parameters.</strong> Reaction volume, enzyme amount, ligation temperature, inactivation time: unremarkable alone, decisive together, because small differences compound across stages. A loop proposes combinations rather than moving one factor at a time.',
+        '<strong>4. Colony screening.</strong> After picking, the useful question is comparative: is the positive rate for this construct lower than for the assemblies most like it? A loop asks that as a matter of course, because earlier assemblies were recorded the same way, and catches the problem on the screening plate rather than at verification.',
+        '<strong>5. Failure response.</strong> Retry or redesign, and the evidence is in the shape of the failure: no colonies points at transformation; empty vector points at the assembly reaction; mixed products point at partial assembly. Recorded as a classification rather than a hunch, that tells the loop which variable to move next.',
+        '<strong>6. Which clones to advance.</strong> Cherry-picking happens before the sequencing result is back. Band quality from colony PCR, growth and how similar constructs behaved are what there is, and ranking on them explicitly beats doing it implicitly.',
+        'Around the reaction sit further variables, and batch-level ones that drift quietly: cell lot, enzyme lot, media batch, plate freshness. Recorded next to the result, a drift can be seen instead of inferred afterwards.',
       ],
     },
     {
       id: 'evidence',
       title: 'Evidence arrives out of <em>order</em>.',
       paragraphs: [
-        'The signals from one assembly run do not arrive together. Dispense confirmations are immediate. Colony counts follow transformation and overnight growth. Screening results follow picking. Sequencing is last, and often lands after the point where the next batch has to be designed.',
-        'A loop that can act only on complete evidence therefore waits for the slowest signal — which is usually the one that would have told it most. The alternative is to update on each signal as it arrives and let the next design use what is known: a colony count can change the ratios for the next plate before sequencing has confirmed which clones were correct, provided the later signal is still attached to the run it came from when it does arrive. <strong>Decide.</strong> <em>Running.</em> Active learning chooses the next batch under several objectives, from heterogeneous data, including signals that arrive weeks later.',
-        'This is the part of the problem that looks like bookkeeping and is not. A result whose conditions, protocol version and deviations have been lost is a number rather than evidence, and a model that learns from it learns the missing context along with the finding.',
+        'The signals do not arrive together. Dispense confirmations are immediate, colony counts follow overnight growth, screening follows picking, and sequencing is last, often landing after the next batch has to be designed.',
+        'A loop that can act only on complete evidence waits for the slowest signal, usually the one that would have told it most. The alternative is to update on each signal as it arrives: a colony count can change the ratios for the next plate before sequencing confirms which clones were correct, provided the later signal is still attached to the run it came from. <strong>Decide.</strong> <em>Running.</em> Active learning chooses the next batch under several objectives, from heterogeneous data, including signals that arrive weeks later.',
+        'A result whose conditions and deviations have been lost is a number, not evidence.',
       ],
     },
     {
       id: 'priors',
       title: 'A prior from the <em>published</em> record.',
       paragraphs: [
-        'Not all of this has to be learned from your own plates. Potapov and colleagues at New England Biolabs profiled four-base overhang ligation fidelity with T4 DNA ligase, covering every one of the 256 possible four-base overhangs and the mismatched combinations between them, read out by long-read sequencing (ACS Synthetic Biology, 2018; peer-reviewed wet-lab data). Some pairs ligate efficiently, some mismatched pairs ligate well enough to cause trouble, and some barely ligate at all. The same profile predicted the fidelity of ten-fragment Golden Gate assemblies, and the authors used it to build a cassette from up to 24 fragments.',
-        'A published matrix is a prior, not an answer: it was measured with one ligase at defined temperatures and incubation times, and your reaction has its own parts, lots and instruments. What it buys is a first design that avoids the junctions already known to behave badly, before a single plate is poured. Results from the runs that follow refine it for the parts and reagents actually in use.',
-        'Fragment count is the main driver of difficulty, and the reason is arithmetic rather than mystery: every additional junction is another opportunity for a poor pair, so success falls as the number of fragments rises. Hierarchical builds compound it, because a construct assembled from sub-assemblies inherits the failure probability of each. And not every failure is a junction failure; the quiet ones are the expensive ones, because they are found late.',
-        'The space is also too large to walk. A modest parts library already implies more combinations than anyone would test in advance, and a new construct can behave unlike its neighbours because of its own junctions, fragment lengths and part interactions. That is the case for a model: generalising from the assemblies a project has already run to constructs that have never been built, so the first attempt at a new one starts from something better than the default. Golden Braid, Gibson assembly and BASIC differ in the enzymes, the junctions and how hierarchical levels are built — and not in the shape of the decision, which stays a set of variables with ranges, a result that arrives in pieces, and a choice about what to build next.',
+        'Not all of this has to be learned from your own plates. Potapov and colleagues at New England Biolabs profiled four-base overhang ligation fidelity with T4 DNA ligase, covering all 256 possible overhangs and the mismatched combinations between them, read out by long-read sequencing (ACS Synthetic Biology, 2018; peer-reviewed wet-lab data). Some pairs ligate efficiently, some mismatched pairs ligate well enough to cause trouble, and some barely at all. The profile predicted the fidelity of ten-fragment Golden Gate assemblies, and the authors used it to build a cassette from up to 24 fragments.',
+        'A published matrix is a prior, not an answer: it was measured with one ligase at defined temperatures, and your reaction has its own parts and lots. What it buys is a first design that avoids junctions already known to behave badly; later runs refine it.',
+        'Fragment count is the main driver of difficulty, and the reason is arithmetic: every extra junction is another opportunity for a poor pair, and hierarchical builds compound it.',
+        'The space is also too large to walk, and a new construct can behave unlike its neighbours. That is the case for a model: generalising from the assemblies a project has run to constructs never built. Golden Braid, Gibson assembly and BASIC differ in enzymes, junctions and how levels are built, not in the shape of the decision.',
       ],
     },
     {
       id: 'trade-offs',
       title: 'More than one thing <em>matters</em>.',
       paragraphs: [
-        'A plasmid preparation is not graded on one axis. Yield matters, and so does how much of the yield is in the form the next step needs; so do reproducibility between operators and batches, turnaround time, and cost per batch. They pull against each other. Conditions that raise yield can cost quality; a faster route usually means less checking.',
-        'Optimising one of them and hoping about the rest produces a process that passes one test and disappoints at the next step. The more useful move is to say up front what matters and how much, and then to look for the set of conditions in which nothing can be improved without giving something up elsewhere — and to choose inside that set deliberately, rather than leaving the choice implicit in the defaults. <strong>Review.</strong> <em>Running.</em> The targets, their weights and the approval of each batch stay with the scientists.',
+        'A plasmid preparation is not graded on one axis. Yield matters, and so does how much of it is in the form the next step needs; so do reproducibility, turnaround and cost. Conditions that raise yield can cost quality, and a faster route means less checking.',
+        'The useful move is to say up front what matters and how much, then find the conditions where nothing can improve without giving something up elsewhere, and choose inside that set deliberately. <strong>Review.</strong> <em>Running.</em> The targets, their weights and the approval of each batch stay with the scientists.',
       ],
     },
     {
       id: 'precedent',
       title: 'What others have <em>shown</em>.',
       paragraphs: [
-        'Model-guided experiment planning is not a novel proposition in this field. BayBE, a Bayesian experiment-planning framework built at Merck KGaA, is described in a peer-reviewed paper in Digital Discovery (2025) and released as open source, announced together with the University of Toronto’s Acceleration Consortium. Merck says it already powers dozens of use cases at the company; that is the company’s own account rather than independent evidence, and the paper is a tool description rather than a wet-lab result.',
-        'Foundry teams in industry have described the same loop for strain engineering: a Zymergen technology blog post set out pipelines that recommend genetic edits and update as results come back — a company blog, so self-description with no performance data — and Ginkgo Bioworks acquired Zymergen in 2022, saying the deal would integrate its automation and software capabilities.',
-        'The peer-reviewed wet-lab anchor in this note is the overhang fidelity work above. Everything else here is either the shape of a decision or an account of what other people have published, and we mark which is which.',
+        'Model-guided experiment planning is not new here. BayBE, a Bayesian experiment-planning framework built at Merck KGaA, is described in a peer-reviewed Digital Discovery paper (2025) and released as open source, announced with the University of Toronto’s Acceleration Consortium. Merck says it already powers dozens of use cases at the company: the company’s own account, not independent evidence, and the paper is a tool description, not a wet-lab result.',
+        'Foundry teams have described the same loop for strain engineering. A Zymergen technology blog post set out pipelines that recommend genetic edits and update as results come back; it is a company blog, self-description with no performance data. Ginkgo Bioworks acquired Zymergen in 2022, saying the deal would integrate its automation and software capabilities. The peer-reviewed wet-lab anchor here is still the overhang fidelity work above.',
       ],
     },
     {
       id: 'fit',
       title: 'Whether this fits your <em>workflow</em>.',
       paragraphs: [
-        'If your assemblies already run on automation and the decisions between the stages still live in a notebook and a conversation, that gap is what this note describes. What we can do about it today, plainly: protocols compile for supported workflows, instruments are integrated one at a time, every result is recorded with the context needed to read it later, and the next batch is chosen with active learning under the targets you set and approved by your scientists before it runs. Automated scheduling and execution are in development.',
-        'Everything beyond that in this note — a classifier for assembly failure modes, a screening flag, a ranking for cherry-picking — describes how a decision loop applies to this workflow. It is not something we run for DNA assembly today, and we would rather say so than let you find out later.',
+        'If your assemblies already run on automation and the decisions between the stages still live in a notebook and a conversation, that gap is what this note describes. Today: protocols compile for supported workflows, instruments are integrated one at a time, results are recorded with the context needed to read them later, and the next batch is chosen with active learning under your targets, approved by your scientists. Automated scheduling and execution are in development.',
+        'Everything beyond that (a classifier for assembly failure modes, a screening flag, a ranking for cherry-picking) describes how a decision loop applies to this workflow. It is not something we run for DNA assembly today, and we would rather say so now.',
         'If you want to work out which of the six decisions in your own pipeline is worth closing the loop on first, <a href="/contact">Contact us</a>.',
       ],
     },
