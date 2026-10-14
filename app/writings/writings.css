@@ -120,6 +120,8 @@
   color: var(--c-faint);
 }
 .w-card-read {
+  /* Stays at the right edge now the provenance line is hidden (15 Oct 2026). */
+  margin-left: auto;
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
