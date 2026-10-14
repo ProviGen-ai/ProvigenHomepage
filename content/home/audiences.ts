@@ -43,7 +43,7 @@ export const audiences = {
       line: 'Lab-in-the-loop assay and process development: find the right parameters automatically, use data from past runs and characterise sources of variation.',
       examples: {
         lead: 'For example:',
-        items: ['LNP formulation', 'iPSC differentiation', 'CHO cultures', 'Fermentation'],
+        items: ['LNP formulation', 'iPSC differentiation', 'CHO cultures', 'Downstream purification'],
       },
       cta: 'For your lab',
     },
