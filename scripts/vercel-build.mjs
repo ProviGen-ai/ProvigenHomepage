@@ -94,10 +94,11 @@ const config = {
     { src: '^/(.+)/$', headers: { Location: '/$1' }, status: 308 },
     { src: '^/(.*)$', headers: security, continue: true },
     { src: '^/_next/static/(.*)$', headers: { 'Cache-Control': 'public, max-age=31536000, immutable' }, continue: true },
+    // Static files and the Function (api/contact) are both served from here.
     { handle: 'filesystem' },
-    { src: '^/api/contact$', dest: '/api/contact' },
-    { handle: 'miss' },
-    { src: '^/(.*)$', dest: '/404', status: 404 },
+    // Anything else is the 404 page, with a 404 status.
+    { handle: 'error' },
+    { src: '^/.*$', dest: '/404', status: 404 },
   ],
   overrides,
 };
