@@ -20,7 +20,7 @@ export const site = {
    */
   nav: [
     /* The homepage section: the /how-it-works page was removed (founder, 3 Oct 2026, late). */
-    { href: '/#build', label: 'How it works' },
+    { href: '/#how-it-works', label: 'How it works' },
     { href: '/#team', label: 'Team' },
     { href: '/writings', label: 'Writings' },
     /* Careers hidden for now (founder, 14 Oct 2026); the page stays at /careers. */

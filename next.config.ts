@@ -10,10 +10,10 @@ export const retired: [source: string, destination: string][] = [
   /* v2 pages. /how-it-works was removed on the founder's call (3 Oct 2026,
      late): it and the pages that pointed at it land on the homepage's How it
      works section. */
-  ['/how-it-works', '/#build'],
-  ['/platform', '/#build'],
-  ['/direction', '/#build'],
-  ['/programs', '/#build'],
+  ['/how-it-works', '/#how-it-works'],
+  ['/platform', '/#how-it-works'],
+  ['/direction', '/#how-it-works'],
+  ['/programs', '/#how-it-works'],
   ['/company', '/#team'],
   ['/about', '/#team'],
   /* The partner page was removed on the founder's call (3 Oct 2026, evening). */
