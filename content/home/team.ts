@@ -135,7 +135,7 @@ export const members: Member[] = [
        ('AI, automation, product. MD-PhD candidate at TU Munich / Helmholtz
        Munich. Builds the closed-loop intelligence layer connecting biological
        readouts, decision-making, and existing lab automation infrastructure.'). */
-    bio: 'AI, automation, product. Background in medicine × neuroengineering (TU Munich / Helmholtz Munich). A polymath who built drone swarm software, pursued stem-cell research and treats biology as a reverse-engineering discipline. His driving belief: people should be able to choose and modify their own biology, rather than have it determined at birth.',
+    bio: 'AI, automation, product. Background in medicine × computer science × neuroengineering (LMU Munich, TU Munich, Helmholtz Munich). A polymath who built drone swarm software, pursued stem-cell research and treats biology as a reverse-engineering discipline. His driving belief: people should be able to choose and modify their own biology, rather than have it determined at birth.',
     crop: { size: 820, x: -38, y: 40 },
     ...fromData('Lucas'),
   },
