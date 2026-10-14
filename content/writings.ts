@@ -110,19 +110,22 @@ export const writings: WritingCard[] = [
     visual: 'plate',
     provenance: 'Illustrative plate, not data',
   },
-  {
-    slug: 'cheap-thought-costly-evidence',
-    href: '/writings/cheap-thought-costly-evidence',
-    title: 'Cheap thought, costly <em>evidence</em>.',
-    dek: 'Six dated forecasts for AI in experimental biology, each with a probability and the observation that would prove us wrong.',
-    date: '2026-10-01',
-    dateLabel: 'October 2026',
-    category: 'Perspective',
-    tag: 'Perspective · Forecast · October 2026',
-    featured: true,
-    visual: 'forecast',
-    provenance: 'Provisional forecasts, not a completed expert study',
-  },
+  /* Cheap thought, costly evidence: off the live site for now (founder, 14 Oct 2026);
+     the website-fork branch keeps it.
+    {
+      slug: 'cheap-thought-costly-evidence',
+      href: '/writings/cheap-thought-costly-evidence',
+      title: 'Cheap thought, costly <em>evidence</em>.',
+      dek: 'Six dated forecasts for AI in experimental biology, each with a probability and the observation that would prove us wrong.',
+      date: '2026-10-01',
+      dateLabel: 'October 2026',
+      category: 'Perspective',
+      tag: 'Perspective · Forecast · October 2026',
+      featured: true,
+      visual: 'forecast',
+      provenance: 'Provisional forecasts, not a completed expert study',
+    },
+  */
   {
     slug: 'closed-loop-optimization',
     href: '/writings/closed-loop-optimization',
