@@ -130,21 +130,19 @@ export const writings: WritingCard[] = [
       provenance: 'Provisional forecasts, not a completed expert study',
     },
   */
-  /* Field note off the live site for now (founder, 14 Oct 2026); website-fork keeps it.
-    {
-      slug: 'closed-loop-optimization',
-      href: '/writings/closed-loop-optimization',
-      title: 'Closed-loop experimental campaigns in <em>practice</em>.',
-      dek: 'How a lab learns between rounds, from assays to media, with peer-reviewed evidence and the data that arrives last.',
-      date: '2026-04-13',
-      dateLabel: 'April 2026',
-      category: 'Field note',
-      tag: 'Field note · Evidence · April 2026',
-      featured: true,
-      visual: 'plate',
-      provenance: 'Illustrative figures and published external data',
-    },
-  */
+  {
+    slug: 'closed-loop-optimization',
+    href: '/writings/closed-loop-optimization',
+    title: 'Closed-loop experimental campaigns in <em>practice</em>.',
+    dek: 'How a lab learns between rounds, from assays to media, with peer-reviewed evidence and the data that arrives last.',
+    date: '2026-04-13',
+    dateLabel: 'April 2026',
+    category: 'Field note',
+    tag: 'Field note · Evidence · April 2026',
+    featured: true,
+    visual: 'plate',
+    provenance: 'Illustrative figures and published external data',
+  },
 ];
 
 /** Newest first, whatever order the list above is written in. */
