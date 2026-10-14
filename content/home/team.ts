@@ -121,7 +121,7 @@ export const members: Member[] = [
        biomedical neuroscience (TU Munich), genome editing research at Harvard
        Medical School, and doctoral research at Boston Children’s Hospital.
        Turns deep bioprocess pain into a fundable product wedge.'). */
-    bio: 'Strategy, operations, fundraising. Background in medicine × biomedical neuroscience (TU Munich), with genome editing research at Harvard Medical School and Boston Children’s Hospital. Brings a blend of business and product perspective, turning deep bioprocess pain into a fundable product. Co-founded ProviGen with Lucas Mair.',
+    bio: 'Strategy, operations, fundraising. Background in medicine × biomedical neuroscience (TU Munich), with genome editing research at Harvard Medical School and Boston Children’s Hospital. Brings a blend of business and product perspective. Co-founded ProviGen with Lucas Mair.',
     crop: { size: 660, x: 100, y: -8 },
     ...fromData('Magdalena'),
   },
@@ -135,7 +135,7 @@ export const members: Member[] = [
        ('AI, automation, product. MD-PhD candidate at TU Munich / Helmholtz
        Munich. Builds the closed-loop intelligence layer connecting biological
        readouts, decision-making, and existing lab automation infrastructure.'). */
-    bio: 'AI, automation, product. Background in medicine × neuroengineering (TU Munich / Helmholtz Munich). A polymath, he has built drone swarm software and researched stem cells. He approaches biology as a reverse-engineering discipline. He believes people should be free to choose and modify their own biology rather than have it decided at birth.',
+    bio: 'AI, automation, product. Background in medicine × neuroengineering (TU Munich / Helmholtz Munich). A polymath who built drone swarm software, pursued stem-cell research and treats biology as a reverse-engineering discipline. His driving belief: people should be able to choose and modify their own biology, rather than have it determined at birth.',
     crop: { size: 820, x: -38, y: 40 },
     ...fromData('Lucas'),
   },
