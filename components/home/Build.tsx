@@ -40,6 +40,8 @@ export default function Build() {
         {/* The header's How it works link lands here (14 Oct 2026, the
             founder): scrolled until the steps' last line, Revise included, sits
             at the bottom of the screen. Build.css sets the offset. */}
+        <span id="how-it-works" className="b-anchor" aria-hidden="true" />
+        {/* The old name of the anchor, so links to /#build still land here. */}
         <span id="build" className="b-anchor" aria-hidden="true" />
       </div>
     </section>

@@ -2,7 +2,7 @@
 .b-build {
   position: relative;
   /* clip, not hidden (14 Oct 2026): a hidden box is still a scroll container,
-     and the #build anchor inside it scrolled the section's own content up,
+     and the #how-it-works anchor inside it scrolled the section's own content up,
      under the problem stage and off its background. */
   overflow: clip;
   padding-block: calc(var(--s-section) * 0.65) clamp(5rem, 3rem + 6vw, 9rem);
@@ -271,7 +271,7 @@
   }
 }
 
-/* #build sits under the steps, about 38 px below the last step line. The
+/* #how-it-works sits under the steps, about 38 px below the last step line. The
    root's scroll-padding (header + 16 px) plus this margin puts it just past
    the bottom edge, so the header's How it works link scrolls until the last
    step line sits about 24 px above the bottom, which leaves the title whole on
