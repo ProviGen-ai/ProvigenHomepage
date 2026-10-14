@@ -96,7 +96,7 @@ Two rules apply to everything the site says:
 1. Public pages never say or imply that ProviGen builds a lab of its own or takes, keeps or reuses partners' data.
 2. No ProviGen metrics, multipliers, partner names or raise sizes. Every figure carries a source line.
 
-`npm run build` ends with `scripts/check-claims.mjs`. Every figure in the built pages must be listed in `claims-ledger.json`. A production build fails on any `[TBC]`, any unlisted figure and any figure that is not signed off. Capability statuses live in `content/home/build.ts`.
+`npm run check:claims` (no longer part of `npm run build` since 14 Oct 2026, founder) scans the built pages: every figure should be listed in `claims-ledger.json`, and with `SITE_ENV=production` it exits 1 on any `[TBC]`, unlisted figure or figure not signed off. Run it by hand after a static build. Capability statuses live in `content/home/build.ts`.
 
 ## Tooling
 

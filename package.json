@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "vinext dev",
     "prebuild": "node --experimental-strip-types --no-warnings scripts/make-public-files.mjs",
-    "build": "vinext build && node scripts/check-claims.mjs",
+    "build": "vinext build",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "lint": "oxlint",
     "format": "oxfmt",
