@@ -63,7 +63,7 @@ import './BoSim.css';
 const ALT =
   'Simulation on the Branin function, a standard optimization test landscape with three equally good low points, each marked with a plus, drawn twice as contour lines. ' +
   'Left, planned up front: all twenty experiments appear at the start as rings, a Latin hypercube spread evenly over the landscape, and fill one by one as they run. ' +
-  'Right, chosen one at a time: three spread-out experiments, then seventeen more, each placed where a Gaussian-process model fitted to all measurements so far expects the most improvement. ' +
+  'Right, chosen one at a time: three spread-out experiments, then seventeen more, each placed where a model fitted to all measurements so far expects the most improvement. ' +
   'Under the right panel the model\'s own picture is drawn: a soft teal light where it expects low values, a field of dots where it is still unsure, which clears around each measurement, and before each pick amber lines closing in on where an experiment is worth most, with a ring closing on the chosen place. ' +
   'The model probes edges and corners where it knows least, then gathers its experiments near a low point. Each panel rings its best experiment so far. ' +
   'Below, a chart of the best value so far for both, on a log scale from the worst value on the landscape down to the optimum, with each experiment\'s own value as a dot. ' +
@@ -217,7 +217,7 @@ export default function BoSim() {
       </div>
       <figcaption data-kind="Simulation">
         Branin function. Left: twenty experiments planned up front. Right: three to start, then
-        each next one chosen by a Gaussian-process model for expected improvement. Measurements carry a little noise;
+        each next one chosen by a model for expected improvement. Measurements carry a little noise;
         real lab problems are noisier and have more dimensions.
         <sup>
           <a href="#fn2">[2]</a>
