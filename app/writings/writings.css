@@ -1664,6 +1664,14 @@ a.w-tl-col:focus-visible .w-tl-label {
   background: #fff;
 }
 
+/* The timing figure under the evidence strip (from the earlier site's
+   article, restyled 23 Oct 2026): drawn on paper, at the column's width. */
+.w-prose .p-writings-timeline img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 /* The Figure component (essay figures): v3 frame and caption register. */
 .w-prose .figure {
   margin-block: 2.75rem;
