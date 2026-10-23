@@ -89,7 +89,9 @@ export default function CampaignArticle() {
       }}
       toc={toc}
       tocLabel="In this field note"
+      /* Provenance box hidden (founder, 23 Oct 2026).
       note="An account of the approach and its applications. The media example reconstructs published research by Narayanan and colleagues; it is attributed literature evidence, rather than a ProviGen experimental result."
+      */
       references={references}
       referencesLabel="References and credits"
     >
