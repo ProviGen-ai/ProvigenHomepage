@@ -216,7 +216,7 @@ export default function BoSim() {
         </p>
       </div>
       <figcaption data-kind="Simulation">
-        A standard test function, not lab data. Left: twenty experiments planned up front. Right: three to start, then
+        Branin function. Left: twenty experiments planned up front. Right: three to start, then
         each next one chosen by a Gaussian-process model for expected improvement. Measurements carry a little noise;
         real lab problems are noisier and have more dimensions.
         <sup>

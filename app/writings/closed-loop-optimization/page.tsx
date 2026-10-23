@@ -65,7 +65,7 @@ const references = [
   {
     label: 'AnotherSamWilson · GpParBayesAnimationSmall.gif · Wikimedia Commons · CC BY-SA 4.0',
     href: 'https://commons.wikimedia.org/wiki/File:GpParBayesAnimationSmall.gif',
-    note: 'External. The one-input animation of Bayesian optimization in The core loop, shown unaltered.',
+    note: 'External. The one-input animation of Bayesian optimization in The core loop, cropped to its top panel.',
   },
   {
     label: 'PyLabRobot · open-source laboratory automation framework',
