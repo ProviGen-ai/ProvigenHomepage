@@ -63,16 +63,23 @@ const references = [
     note: 'External. Definition, domain and minima of the test function the simulation runs on.',
   },
   {
+    label: 'AnotherSamWilson · GpParBayesAnimationSmall.gif · Wikimedia Commons · CC BY-SA 4.0',
+    href: 'https://commons.wikimedia.org/wiki/File:GpParBayesAnimationSmall.gif',
+    note: 'External. The one-input animation of Bayesian optimization in The core loop, shown unaltered.',
+  },
+  {
     label: 'PyLabRobot · open-source laboratory automation framework',
     href: 'https://github.com/PyLabRobot/pylabrobot',
     note: 'External. One of the open frameworks through which instruments can be driven programmatically.',
   },
+  /* Hidden (founder, 23 Oct 2026).
   {
-    /* No href: the earlier posting is not a live destination, and this page is
-       where the field note now lives. Provenance stays as plain text. */
+    // No href: the earlier posting is not a live destination, and this page is
+    // where the field note now lives. Provenance stays as plain text.
     label: 'Original publication · ProviGen field note',
     note: 'First published April 2026.',
   },
+  */
 ];
 
 export default function CampaignArticle() {

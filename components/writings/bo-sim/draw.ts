@@ -1055,7 +1055,13 @@ function titles(ctx: Ctx, g: Geo, snap: Grid) {
   const ls = fit(ctx, ['all twenty fixed before the first result', 'all fixed before the first result'], l.size, SUB);
   text(ctx, l.x, snap.at(l.subY), ls, L.ink(L.a.sub), 'left', SUB);
   spaced(ctx, r.x, snap.at(r.titleY), 'CHOSEN ONE AT A TIME', L.chosenText(L.a.title), 'left', TITLE, 0.26);
-  const rs = fit(ctx, ['each picked by a model of the results so far', 'each picked by a model of results so far'], r.size, SUB);
+  // the first N_START are spread out, not picked by the model (23 Oct 2026)
+  const rs = fit(
+    ctx,
+    ['three to start, then each picked by a model of the results so far', 'three to start, then each picked by a model of the results', 'three to start, then each picked by a model'],
+    r.size,
+    SUB,
+  );
   text(ctx, r.x, snap.at(r.subY), rs, L.ink(L.a.sub), 'left', SUB);
 }
 

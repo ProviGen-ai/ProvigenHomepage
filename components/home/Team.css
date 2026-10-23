@@ -11,7 +11,11 @@
   --tm-settle: 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
   --tm-glow: rgb(66 145 149);
   position: relative;
-  overflow: clip;
+  /* Sideways only (23 Oct 2026): clipping both axes cut the top of a tall
+     bio popup, logos first, at some sizes (1024 px, 360 px phones). The glow
+     stays inside the section vertically; popups are kept in the viewport
+     sideways by TeamGrid. */
+  overflow-x: clip;
   /* Neighbouring sections bring their own air; a full --s-section on both
      sides would leave a screen of empty paper between them. */
   /* Foot: 0.6 (was 0.8), founder 3 Oct 2026: 30% less air between the

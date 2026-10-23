@@ -1278,6 +1278,10 @@ a.w-tl-col:focus-visible .w-tl-label {
   letter-spacing: 0.14em;
   color: var(--c-teal-ink);
 }
+/* Closed-loop field note: the section numbers go, the rule above each heading stays (founder, 23 Oct 2026). */
+.w-prose .p-writings-counted h2::before {
+  content: '';
+}
 .w-prose h2 em,
 .w-prose h3 em {
   font-style: normal;
@@ -1629,6 +1633,32 @@ a.w-tl-col:focus-visible .w-tl-label {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--c-muted);
+}
+
+/* Wide screens: the closed-loop plates start at the column's left edge, under
+   their headings, and take the extra width on the right instead (founder,
+   23 Oct 2026: the plate read as shifted left of its title). The right
+   column is always at least twice --w-o wide there. */
+@media (min-width: 1100px) {
+  .w-prose .p-writings-plate,
+  .w-prose figure.bo {
+    margin-inline: 0 calc(-2 * var(--w-o, 0px));
+  }
+  .w-prose figure.bo > figcaption {
+    padding-inline: 0 calc(2 * var(--w-o, 0px));
+  }
+}
+
+/* The Wikimedia animation in the closed-loop field note (restored 23 Oct
+   2026): set narrower than the column, on its own white ground. */
+.w-prose .p-writings-gif img {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  margin-inline: auto;
+  border: 1px solid var(--c-line-2);
+  background: #fff;
 }
 
 /* The Figure component (essay figures): v3 frame and caption register. */
