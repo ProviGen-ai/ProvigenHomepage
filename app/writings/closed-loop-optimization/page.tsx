@@ -54,7 +54,7 @@ const references = [
     label:
       'Narayanan et al. · Accelerating cell culture media development using Bayesian optimization-based iterative experimental design · Nature Communications · 2025',
     href: 'https://www.nature.com/articles/s41467-025-61113-5',
-    note: 'External. The media example reconstructs this published study; attributed literature evidence, not a ProviGen result. Source data: figshare 27715134.',
+    note: 'External. The media example reconstructs this published study. Source data: figshare 27715134.',
   },
   {
     label:
