@@ -5,7 +5,8 @@
  * functions the picks themselves are made with (predict, incumbentOf,
  * augmentedEI), so the picture is the model's own state, not a stand-in:
  *
- *   mean  its estimate of the function, in the function's units;
+ *   mean  its estimate of the function, in the function's units (the model
+ *         works in log units; exp of its posterior mean);
  *   sd    how unsure it is, standardised (1 = it knows nothing there);
  *   aim   augmented expected improvement, as a share of its largest value on
  *         the lattice: where the next experiment is worth most. The pick
@@ -58,7 +59,8 @@ export function beliefAt(run: Run, s: number): Belief {
     for (let j = 0; j < NODES; j++) {
       const k = i * NODES + j;
       predict(m, i / G, j / G, p);
-      mean[k] = m.mean + m.sd * p.mu;
+      // the model is fitted to log measurements (model.ts): back to the function's units
+      mean[k] = Math.exp(m.mean + m.sd * p.mu);
       sd[k] = p.sd;
       const e = augmentedEI(m, p.mu, p.sd, incumbent);
       aim[k] = e;

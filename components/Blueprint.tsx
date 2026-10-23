@@ -617,7 +617,8 @@ const PICKS = CANDS.filter((c) => c.pick >= 0).sort((a, b) => a.pick - b.pick);
  * the controls label); controls in column 1.
  */
 const TRIPLET_AT = [3, 5, 2, 4, 2, 5];
-const CONTROLS = [1, 2, 3, 4];
+/* One control per replicate row (founder, 23 Oct 2026; was rows 2–5 only). */
+const CONTROLS = [0, 1, 2, 3, 4, 5];
 
 /* ---------- clock (seconds) ---------- */
 const CS_IN = (i: number) => 0.3 + i * 0.45; // station i lights

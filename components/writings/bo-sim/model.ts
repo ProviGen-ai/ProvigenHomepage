@@ -18,12 +18,12 @@
  * the order it was drawn. Chosen one at a time: a maximin Latin hypercube of
  * N_START = 3 points, then 17 points, each the maximiser of expected
  * improvement under a Gaussian-process model of everything measured so far.
- * Every measurement carries Gaussian noise of NOISE × the function's range
- * on the domain (sd 6.2), drawn from the seed; the planned design never looks
- * at its measurements, so only the model sees the noise.
+ * Every measurement carries noise proportional to its value (NOISE, a 5 %
+ * coefficient of variation; see NOISE), drawn from the seed; the planned
+ * design never looks at its measurements, so only the model sees the noise.
  *
  * The model, refitted after every measurement:
- *   - inputs scaled to [0, 1]², measurements standardised (mean 0, sd 1);
+ *   - inputs scaled to [0, 1]², log measurements standardised (mean 0, sd 1);
  *   - Matérn 5/2 kernel with one lengthscale per input, signal variance 1;
  *   - the noise term is the known measurement noise in standardised units;
  *   - lengthscales by maximum a posteriori on a 10 × 10 log grid (LENGTHS)
@@ -102,13 +102,22 @@ export const RANGE = F_MAX - F_STAR;
 export const N = 20;
 /** Spread-out experiments the model starts from. */
 export const N_START = 3;
-/** Measurement noise, as a share of the function's range on the domain. */
-export const NOISE = 0.02;
-export const NOISE_SD = NOISE * RANGE;
+/**
+ * Measurement noise, as a coefficient of variation: each measurement is the
+ * true value times exp(NOISE · z), z standard normal, so the error scales
+ * with the value as an assay's CV does (23 Oct 2026; until then additive,
+ * sd 2 % of the range, 6.2: fifteen times the optimum, so a lucky draw beside
+ * the third minimum made the domain's edge look as good as the minimum and
+ * the model stacked its picks there, in half the runs five or more on one
+ * edge). The model is fitted to log measurements, where this noise is
+ * Gaussian with sd NOISE.
+ */
+export const NOISE = 0.05;
+export const NOISE_SD = NOISE;
 /** Random Latin hypercubes drawn per design; the most spread out is kept. */
 export const LHS_TRIES = 64;
 /** The first run on the page (scripts/calibrate-bo-sim.mjs picks it). */
-export const SEED = 2101025223;
+export const SEED = 3582980631;
 
 /* ---------- random numbers ---------- */
 
@@ -487,7 +496,7 @@ export function simulate(seed: number, { fog = true, noise = NOISE }: { fog?: bo
   const designRng = mulberry32(seed ^ 0x2545f491);
   const startRng = mulberry32(seed ^ 0x6c8e9cf5);
   const noiseRng = mulberry32(seed ^ 0x1b873593);
-  const noiseSd = noise * RANGE;
+  const noiseSd = noise;
 
   const planned = latinHypercube(N, designRng);
   const plannedF = new Float64Array(N);
@@ -499,14 +508,20 @@ export function simulate(seed: number, { fog = true, noise = NOISE }: { fog?: bo
   const chosenY = new Float64Array(N);
   const measure = (i: number) => {
     chosenF[i] = braninAt(chosen[2 * i], chosen[2 * i + 1]);
-    chosenY[i] = chosenF[i] + noiseSd * gaussian(noiseRng);
+    chosenY[i] = chosenF[i] * Math.exp(noiseSd * gaussian(noiseRng));
   };
+  // the model works on log measurements, where the noise is Gaussian
+  const logY = new Float64Array(N);
   for (let i = 0; i < N_START; i++) measure(i);
+  const logs = (n: number) => {
+    for (let i = 0; i < n; i++) logY[i] = Math.log(chosenY[i]);
+    return logY;
+  };
 
   const models: Model[] = [];
   for (let n = N_START; ; n++) {
     // a noise-free run still keeps a hair of nugget (JITTER) in the kernel
-    const m = fit(chosen, chosenY, n, noiseSd);
+    const m = fit(chosen, logs(n), n, noiseSd);
     if (fog) models.push(m);
     if (n === N) break;
     const [u1, u2] = nextExperiment(m);
