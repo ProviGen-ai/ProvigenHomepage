@@ -34,28 +34,26 @@ import './BoSim.css';
  * came closer.
  *
  * Calibration (node --experimental-strip-types scripts/calibrate-bo-sim.mjs,
- * 3 Oct 2026, reproduced to the digit 4 Oct 2026 after the acquisition was
- * split out for the figure; 200 seeds of the sequence the figure walks, from
- * 20261003; noise sd 2 % of the range):
+ * 23 Oct 2026, after the noise became proportional to the value and the
+ * model moved to log measurements (model.ts, NOISE); 200 seeds of the
+ * sequence the figure walks, from 20261003; CV 5 %):
  *
  *   best true value after k experiments, median (IQR)
  *   k    planned up front      chosen one at a time   chosen lower
- *   5    7.77 (3.83–13.57)     4.31 (2.39–7.72)       65 % of seeds
- *   10   3.69 (1.88–6.97)      2.15 (1.94–2.83)       65 %
- *   20   2.13 (1.12–3.41)      1.57 (0.88–1.97)       70 %
+ *   5    7.77 (3.83–13.57)     3.20 (2.13–6.77)       68 % of seeds
+ *   10   3.69 (1.88–6.97)      1.94 (0.60–2.03)       80 %
+ *   20   2.13 (1.12–3.41)      0.48 (0.43–0.60)       91 %
  *
  *   optimum 0.398. Gap the chart draws, log10(planned) − log10(chosen),
- *   after 20: median 0.153 decades (IQR −0.073 to 0.408).
+ *   after 20: median 0.535 decades (IQR 0.247–0.799). Model picks on the
+ *   domain's edge: 52 % (65 % before), and runs with five or more picks
+ *   stacked on one edge fell from 51 % to 32 % (100 seeds).
  *
- * The first seed, SEED = 2101025223, is typical, not picked for show: its
- * gap (0.168) is among the eight within 0.02 decades of the median, and of
- * those its two staircases stay closest to the median staircases (mean
- * distance 0.141 decades; next 0.143). Planned 2.22 (54th percentile), chosen
- * 1.51 (49th). The next seed, the first "Run again" or the second cycle, is
- * one where the planned design ends closer: three runs in ten do. Noise moves
- * the comparison (100 seeds): noise-free the chosen median is 0.57 and it
- * ends lower in 90 % of seeds; at 5 % of the range, 1.95 and 60 %. The
- * planned design does not see the noise (2.21 throughout). So the copy says
+ * The first seed, SEED = 3582980631, is typical, not picked for show: the
+ * script's choice among the seeds within 0.02 decades of the median gap
+ * (gap 0.538), closest to the median staircases. Planned 1.96 (48th
+ * percentile), chosen 0.57 (70th). In about one run in ten the planned
+ * design ends closer. So the copy says
  * what the figure shows, the principle, and never that one approach beats
  * the other in general.
  */
@@ -67,7 +65,7 @@ const ALT =
   'Under the right panel the model\'s own picture is drawn: a soft teal light where it expects low values, a field of dots where it is still unsure, which clears around each measurement, and before each pick amber lines closing in on where an experiment is worth most, with a ring closing on the chosen place. ' +
   'The model probes edges and corners where it knows least, then gathers its experiments near a low point. Each panel rings its best experiment so far. ' +
   'Below, a chart of the best value so far for both, on a log scale from the worst value on the landscape down to the optimum, with each experiment\'s own value as a dot. ' +
-  'Measurements carry a little noise, and the result differs from run to run: in most runs the experiments chosen one at a time end closer to the optimum, in some the planned ones do.';
+  'Measurements carry a little noise, proportional to the value, and the result differs from run to run: in most runs the experiments chosen one at a time end closer to the optimum, in some the planned ones do.';
 
 const describe = (r: Run) =>
   r.bestChosen[N - 1] < r.bestPlanned[N - 1]

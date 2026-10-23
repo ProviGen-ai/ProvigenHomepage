@@ -1572,7 +1572,7 @@ a.w-tl-col:focus-visible .w-tl-label {
 }
 .w-prose table {
   width: 100%;
-  min-width: 560px;
+  min-width: 520px;
   table-layout: fixed;
   border-collapse: collapse;
   border-top: 1px solid var(--c-ink);
@@ -1623,9 +1623,11 @@ a.w-tl-col:focus-visible .w-tl-label {
 .w-prose .p-writings-plate .blueprint-caption-kind::before {
   content: 'Fig. ' counter(wfig, decimal-leading-zero) ' · ';
 }
+/* " · Not a live record" hidden (founder, 23 Oct 2026).
 .w-prose .p-writings-plate .blueprint-caption-kind::after {
   content: ' · Not a live record';
 }
+*/
 .w-prose .p-writings-plate .blueprint-heading > .eyebrow {
   font-family: var(--f-mono);
   font-size: 0.6875rem;
@@ -1664,12 +1666,76 @@ a.w-tl-col:focus-visible .w-tl-label {
   background: #fff;
 }
 
-/* The timing figure under the evidence strip (from the earlier site's
-   article, restyled 23 Oct 2026): drawn on paper, at the column's width. */
-.w-prose .p-writings-timeline img {
+/* The timing figure under the evidence strip (the earlier site's article,
+   redrawn 23 Oct 2026 as inline SVG in the strip's symbols: solid teal for
+   immediate QC, half-filled teal for assay readouts, dashed orange for later
+   characterization). Text is set in the site's mono at a readable size, so
+   on narrow screens the drawing keeps 520 px and scrolls sideways. */
+.w-prose .p-writings-timeline .tl-scroll {
+  overflow-x: auto;
+  padding-block: 0.5rem;
+}
+.w-prose .tl-svg {
   display: block;
   width: 100%;
+  min-width: 520px;
   height: auto;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-variant-numeric: lining-nums;
+}
+.tl-axis {
+  stroke: var(--c-line-2);
+  stroke-width: 1;
+}
+.tl-arrow,
+.tl-t {
+  fill: var(--c-faint);
+}
+.tl-dot {
+  fill: var(--c-ink);
+}
+.tl-round {
+  fill: var(--c-ink);
+  font-size: 12px;
+}
+.tl-plan,
+.tl-note {
+  fill: var(--c-faint);
+  font-size: 10px;
+  font-style: italic;
+}
+.tl-note {
+  font-style: normal;
+  letter-spacing: 0.04em;
+}
+.tl-chip rect:first-child {
+  stroke-width: 1;
+}
+.tl-chip text {
+  fill: var(--c-ink);
+}
+.tl-qc rect:first-child,
+.tl-assay rect:first-child {
+  fill: rgb(66 145 149 / 8%);
+  stroke: rgb(66 145 149 / 55%);
+}
+.tl-later rect:first-child {
+  fill: rgb(226 159 55 / 10%);
+  stroke: var(--c-orange);
+  stroke-dasharray: 2 2;
+}
+.tl-g {
+  fill: var(--c-teal);
+}
+.tl-g-o {
+  fill: none;
+  stroke: var(--c-teal);
+  stroke-width: 1;
+}
+.tl-later .tl-g-o {
+  stroke: var(--c-orange);
+  stroke-dasharray: 1.5 1.5;
 }
 
 /* The Figure component (essay figures): v3 frame and caption register. */
