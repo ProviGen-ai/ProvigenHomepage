@@ -1058,7 +1058,7 @@ function titles(ctx: Ctx, g: Geo, snap: Grid) {
   // the first N_START are spread out, not picked by the model (23 Oct 2026)
   const rs = fit(
     ctx,
-    ['three to start, then each picked by a model of the results so far', 'three to start, then each picked by a model of the results', 'three to start, then each picked by a model'],
+    ['3 starting points, then picked by active learning model', '3 starts, then picked by active learning model'],
     r.size,
     SUB,
   );
