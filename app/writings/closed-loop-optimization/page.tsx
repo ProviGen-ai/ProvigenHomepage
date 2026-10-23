@@ -54,23 +54,23 @@ const references = [
     label:
       'Narayanan et al. · Accelerating cell culture media development using Bayesian optimization-based iterative experimental design · Nature Communications · 2025',
     href: 'https://www.nature.com/articles/s41467-025-61113-5',
-    note: 'External. The media example reconstructs this published study. Source data: figshare 27715134.',
+    note: 'The media example reconstructs this published study. Source data: figshare 27715134.',
   },
   {
     label:
       'Surjanovic & Bingham · Branin function · Virtual Library of Simulation Experiments: Test Functions and Datasets · Simon Fraser University',
     href: 'https://www.sfu.ca/~ssurjano/branin.html',
-    note: 'External. Definition, domain and minima of the test function the simulation runs on.',
+    note: 'Definition, domain and minima of the test function the simulation runs on.',
   },
   {
     label: 'AnotherSamWilson · GpParBayesAnimationSmall.gif · Wikimedia Commons · CC BY-SA 4.0',
     href: 'https://commons.wikimedia.org/wiki/File:GpParBayesAnimationSmall.gif',
-    note: 'External. The one-input animation of Bayesian optimization in The core loop, cropped to its top panel.',
+    note: 'The one-input animation of Bayesian optimization in The core loop, cropped to its top panel.',
   },
   {
     label: 'PyLabRobot · open-source laboratory automation framework',
     href: 'https://github.com/PyLabRobot/pylabrobot',
-    note: 'External. One of the open frameworks through which instruments can be driven programmatically.',
+    note: 'One of the open frameworks through which instruments can be driven programmatically.',
   },
   /* Hidden (founder, 23 Oct 2026).
   {
