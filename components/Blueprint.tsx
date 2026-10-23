@@ -616,7 +616,8 @@ const PICKS = CANDS.filter((c) => c.pick >= 0).sort((a, b) => a.pick - b.pick);
  * per row, staggered; the last row ends at the right so its label clears
  * the controls label); controls in column 1.
  */
-const TRIPLET_AT = [3, 5, 2, 4, 2, 5];
+/* Two placements only, alternating: columns 4–6 and 6–8 (founder, 23 Oct 2026; was 3, 5, 2, 4, 2, 5). */
+const TRIPLET_AT = [3, 5, 3, 5, 3, 5];
 /* One control per replicate row (founder, 23 Oct 2026; was rows 2–5 only). */
 const CONTROLS = [0, 1, 2, 3, 4, 5];
 
