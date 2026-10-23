@@ -88,7 +88,7 @@ export default function CampaignArticle() {
       slug="closed-loop-optimization"
       eyebrow="Field note"
       title="Closed-loop experimental campaigns in <em>practice</em>."
-      dek="How assay optimisation, therapeutic design and media formulation become closed-loop projects that learn from each round, including the round whose decisive data arrives last."
+      dek="How assay optimisation, therapeutic design and media formulation become closed-loop projects that learn from each round."
       meta={{
         date: '2026-04-13',
         dateLabel: '13 April 2026',
