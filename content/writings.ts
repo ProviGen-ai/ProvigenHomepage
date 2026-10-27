@@ -136,7 +136,7 @@ export const writings: WritingCard[] = [
     slug: 'use-case-dna-assembly',
     href: '/use-cases/dna-assembly',
     title: 'DNA Assembly & Plasmid <em>Manufacturing</em>',
-    dek: 'How ProviGen turns plasmid manufacturing into a decision loop: from construct design through assembly, screening, production, purification, and QC.',
+    dek: 'How ProviGen turns plasmid manufacturing into a decision loop.',
     date: '2026-06-08',
     dateLabel: '8 June 2026',
     category: 'Use case',
