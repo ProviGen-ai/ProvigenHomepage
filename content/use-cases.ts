@@ -14,7 +14,7 @@ export type UseCase = {
   slug: string;
   path: string;
   title: string;
-  /** The old page's meta description, which now opens the page. */
+  /** The old page's meta description, which now opens the page (the DNA one cut at its colon, 27 Oct 2026). */
   dek: string;
   readingMinutes: number;
   toc: ArticleToc[];
@@ -29,7 +29,7 @@ export const dnaAssembly: UseCase = {
   slug: 'use-case-dna-assembly',
   path: '/use-cases/dna-assembly',
   title: 'DNA Assembly & Plasmid <em>Manufacturing</em>',
-  dek: 'How ProviGen turns plasmid manufacturing into a decision loop: from construct design through assembly, screening, production, purification, and QC.',
+  dek: 'How ProviGen turns plasmid manufacturing into a decision loop.',
   readingMinutes: 7,
   toc: [
     { id: 'the-workflow', title: 'The workflow' },
