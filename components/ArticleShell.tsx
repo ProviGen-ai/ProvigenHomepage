@@ -98,8 +98,9 @@ export default function ArticleShell({
     datePublished: meta.date,
     author: { '@type': 'Organization', name: 'ProviGen', url: `${SITE_URL}/` },
     publisher: { '@id': `${SITE_URL}/#organization` },
-    mainEntityOfPage: `${SITE_URL}/writings/${slug}`,
-    image: `${SITE_URL}/og/${slug}.png`,
+    mainEntityOfPage: `${SITE_URL}${card?.href ?? `/writings/${slug}`}`,
+    /* The use-case pages have no share card of their own yet; the site's stands in. */
+    image: card && !card.href.startsWith('/writings/') ? `${SITE_URL}/og.png` : `${SITE_URL}/og/${slug}.png`,
   };
 
   return (

@@ -4,7 +4,7 @@
    the manifesto joined the forecast and the field note on 4 Oct 2026, on the
    founder's call); the rest form the compact "More writing" list. Every entry keeps a provenance line for its visual. */
 
-export type WritingCategory = 'Perspective' | 'Field note' | 'Conversation';
+export type WritingCategory = 'Perspective' | 'Field note' | 'Conversation' | 'Use case';
 
 /**
  * Which visual a card carries (components/writings/WritingVisual). 'episode'
@@ -122,6 +122,34 @@ export const writings: WritingCard[] = [
     featured: true,
     visual: 'forecast',
     provenance: 'Provisional forecasts, not a completed expert study',
+  },
+  /* The old site's use-case pages, back at their own URLs with their own text
+     (founder, 27 Oct 2026; content/use-cases.ts). */
+  {
+    slug: 'use-case-dna-assembly',
+    href: '/use-cases/dna-assembly',
+    title: 'DNA Assembly & Plasmid <em>Manufacturing</em>',
+    dek: 'How ProviGen turns plasmid manufacturing into a decision loop: from construct design through assembly, screening, production, purification, and QC.',
+    date: '2026-06-08',
+    dateLabel: '8 June 2026',
+    category: 'Use case',
+    tag: 'Use case · June 2026',
+    featured: false,
+    visual: 'plate',
+    provenance: 'Illustrative plate, not data',
+  },
+  {
+    slug: 'use-case-antibody-discovery',
+    href: '/use-cases/antibody-discovery',
+    title: 'Antibody <em>Discovery</em>',
+    dek: 'How ProviGen turns antibody discovery into a decision loop across design, build, test, and learn.',
+    date: '2026-06-08',
+    dateLabel: '8 June 2026',
+    category: 'Use case',
+    tag: 'Use case · June 2026',
+    featured: false,
+    visual: 'plate',
+    provenance: 'Illustrative plate, not data',
   },
   {
     slug: 'closed-loop-optimization',
