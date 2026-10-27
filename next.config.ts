@@ -27,8 +27,11 @@ export const retired: [source: string, destination: string][] = [
    */
   ['/blog/closed-loop-optimization', '/writings/closed-loop-optimization'],
   /* The old site's use-case pages and manifesto, now essays (4 Oct 2026). */
-  ['/use-cases/dna-assembly', '/writings'], // off the live site for now (14 Oct 2026)
-  ['/use-cases/antibody-discovery', '/writings'], // off the live site for now (14 Oct 2026)
+  /* Off the live site from 14 Oct 2026; since 27 Oct 2026 the old pages are back at
+     these URLs (app/use-cases), so they no longer redirect.
+  ['/use-cases/dna-assembly', '/writings'],
+  ['/use-cases/antibody-discovery', '/writings'],
+  */
   ['/use-cases', '/writings'],
   ['/manifesto', '/writings/manifesto'],
   /* Taken off the site on 4 Oct 2026 (founder): the long game archived, the bottleneck essay deleted. */
