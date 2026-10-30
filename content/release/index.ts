@@ -80,6 +80,8 @@ export type ReleaseData = {
   headline_candidates: Headline[];
   benchmarks: Benchmark[];
   capabilities: { name: string; text: string; evidence?: string }[];
+  /** What the model makes possible in a lab: descriptive, no figures. */
+  enables: { title: string; text: string }[];
   limitations: string[];
 };
 

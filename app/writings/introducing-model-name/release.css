@@ -53,7 +53,14 @@
   color: var(--c-faint);
 }
 .r-hero-scope {
-  margin-top: 1rem;
+  margin-top: 0.6rem;
+}
+/* What this enables: the capability list's layout, the name in the serif. */
+.w-prose .r-caps.r-enables dt {
+  font-family: var(--f-serif);
+  font-size: 1.05rem;
+  letter-spacing: 0;
+  line-height: 1.4;
 }
 
 .w-prose .r-question {

@@ -36,7 +36,7 @@ import './release.css';
  * sentences that carry a figure are filled from it (fill()). The prose written
  * here carries no numbers. Outline after the model team's brief: claim and
  * number, why, how, results (where the baselines win too), real lab data,
- * limits, capabilities, model card, a call to contact.
+ * what it enables, limits, capabilities, model card, a call to contact.
  */
 
 const { model } = release;
@@ -57,6 +57,7 @@ const toc = [
   { id: 'how', title: 'How it works' },
   { id: 'results', title: 'Results' },
   { id: 'lab-data', title: 'Real lab data' },
+  { id: 'enables', title: 'What this enables' },
   { id: 'limits', title: 'Where it is not ahead' },
   { id: 'capabilities', title: 'What it handles' },
   { id: 'model-card', title: 'Model card' },
@@ -122,11 +123,12 @@ export default function ReleasePage() {
           <p className="r-hero-figure">
             {hero.values.wins} <span>of</span> {hero.values.runs}
           </p>
-          <p className="r-hero-claim">{fill(hero)}</p>
-          <p className="r-hero-second">{fill(second)}</p>
+          {/* The scope sits right under the figure, so the count is not read as lab campaigns (model team, 30 Oct 2026). */}
           <p className="r-hero-scope">
             {heldout.scope} {isDraft ? `Stand-in: ${heldout.measured_on}.` : ''}
           </p>
+          <p className="r-hero-claim">{fill(hero)}</p>
+          <p className="r-hero-second">{fill(second)}</p>
         </section>
       }
       references={references}
@@ -138,12 +140,12 @@ export default function ReleasePage() {
         <h2 id="why-h">Why the next <em>experiment</em></h2>
         <p>
           In a lab campaign every experiment costs a plate, reagents, instrument time and days of waiting. How many a
-          campaign needs depends mostly on one recurring decision: which experiments to run next. Often it is settled by
+          campaign needs depends heavily on one recurring decision: which experiments to run next. Often it is settled by
           a fixed screen planned up front, or by judgement between rounds.
         </p>
         <p>
-          Methods that make that decision from data exist. Bayesian optimisation is the standard one, but each campaign
-          needs its own model fitted, its assumptions chosen and its settings tuned, and it expects responses to change
+          Methods that make that decision from data exist. Bayesian optimisation is the standard one, but it fits a fresh
+          model to every campaign from scratch, starting from assumptions chosen up front, chiefly that responses change
           smoothly. Lab responses often do not: a formulation precipitates past a threshold, nothing grows under some
           conditions, a readout saturates.
         </p>
@@ -228,6 +230,20 @@ export default function ReleasePage() {
         <ResultsTable benchmark={discovery} />
         <Caveats benchmark={discovery} />
         <BenchmarkFacts benchmark={discovery} />
+      </section>
+
+      <section id="enables" aria-labelledby="enables-h">
+        <h2 id="enables-h">
+          What this <em>enables</em>
+        </h2>
+        <dl className="r-caps r-enables">
+          {release.enables.map((e) => (
+            <div key={e.title}>
+              <dt>{e.title}</dt>
+              <dd>{e.text}</dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
       <section id="limits" aria-labelledby="limits-h">
