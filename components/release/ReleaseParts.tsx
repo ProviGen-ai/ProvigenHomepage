@@ -88,8 +88,8 @@ export function RegretBars({ benchmark }: { benchmark: Benchmark }) {
           <span>random = 1.0</span>
         </p>
       </div>
-      <figcaption data-kind={benchmark.standin ? 'Stand-in figures' : 'Benchmark'}>
-        {benchmark.metric.name}. Lower is better. {benchmark.runs}.
+      <figcaption data-kind="Benchmark">
+        {benchmark.metric.name}. Lower is better.
       </figcaption>
     </figure>
   );
@@ -157,8 +157,8 @@ export function CoveragePlot({ benchmark, nominal = [0.5, 0.8, 0.95] }: { benchm
           </svg>
         ))}
       </div>
-      <figcaption data-kind={benchmark.standin ? 'Stand-in figures' : 'Benchmark'}>
-        {benchmark.metric.name}, against the nominal level; on the dashed diagonal is exact. {benchmark.runs}.
+      <figcaption data-kind="Benchmark">
+        {benchmark.metric.name}, against the nominal level; on the dashed diagonal is exact.
       </figcaption>
     </figure>
   );
@@ -203,31 +203,23 @@ export function ResultsTable({ benchmark, percent = false }: { benchmark: Benchm
   );
 }
 
-/** Paired win counts, as the data file states them. */
+/** Head-to-head results, as the data file states them. */
 export function PairedTable({ benchmark }: { benchmark: Benchmark }) {
   if (!benchmark.paired?.length) return null;
-  const keys = [...new Set(benchmark.paired.flatMap((p) => Object.keys(p).filter((k) => k !== 'comparison')))];
-  const head = (k: string) => (k === 'all' ? 'All' : k === 'narrow_or_abrupt' ? 'Narrow or abrupt' : k[0].toUpperCase() + k.slice(1));
   return (
-    <div className="p-writings-table-scroll r-table" tabIndex={0} role="region" aria-label="Paired comparisons, table">
+    <div className="p-writings-table-scroll r-table r-table--paired" tabIndex={0} role="region" aria-label="Head to head, table">
       <table>
         <thead>
           <tr>
-            <th scope="col">Paired comparison</th>
-            {keys.map((k) => (
-              <th key={k} scope="col">
-                {head(k)}
-              </th>
-            ))}
+            <th scope="col">Head to head</th>
+            <th scope="col">{METHOD_LABEL.model}</th>
           </tr>
         </thead>
         <tbody>
           {benchmark.paired.map((p) => (
             <tr key={p.comparison}>
-              <th scope="row">{p.comparison.replace(/^model\b/, METHOD_LABEL.model)}</th>
-              {keys.map((k) => (
-                <td key={k}>{p[k] ?? ''}</td>
-              ))}
+              <th scope="row">{p.comparison}</th>
+              <td className="r-col-model">{p.result}</td>
             </tr>
           ))}
         </tbody>
@@ -236,48 +228,27 @@ export function PairedTable({ benchmark }: { benchmark: Benchmark }) {
   );
 }
 
-/** What was run, on what, against what, and its limits: the small print under each result. */
-export function BenchmarkFacts({ benchmark }: { benchmark: Benchmark }) {
+/** One line of source under each result: the data, its citation, the methods compared. */
+export function BenchmarkSource({ benchmark }: { benchmark: Benchmark }) {
   const url = liveUrl(benchmark.dataset.url);
-  const rows: [string, ReactNode][] = [
-    ['Task', benchmark.task],
-    [
-      'Data',
-      <>
-        {benchmark.dataset.name}.{' '}
-        {url ? (
-          <a href={url} target="_blank" rel="noopener noreferrer">
-            {benchmark.dataset.citation}
-          </a>
-        ) : (
-          benchmark.dataset.citation
-        )}
-      </>,
-    ],
-    ['Baselines', benchmark.baselines.map((b) => `${b.name} (${b.settings})`).join('; ')],
-    ['Metric', `${benchmark.metric.name} (better: ${benchmark.metric.direction})`],
-    ['Runs', benchmark.runs],
-    ...(benchmark.spread ? ([['Spread', benchmark.spread]] as [string, ReactNode][]) : []),
-    ['Scope', benchmark.scope],
-  ];
   return (
-    <details className="r-facts">
-      <summary>How this was measured</summary>
-      <dl>
-        {rows.map(([k, v]) => (
-          <div key={k}>
-            <dt>{k}</dt>
-            <dd>{v}</dd>
-          </div>
-        ))}
-      </dl>
-    </details>
+    <p className="r-source">
+      {benchmark.dataset.name}.{' '}
+      {url ? (
+        <a href={url} target="_blank" rel="noopener noreferrer">
+          {benchmark.dataset.citation}
+        </a>
+      ) : (
+        benchmark.dataset.citation
+      )}
+      . Compared with {benchmark.baselines.map((b) => b.name).join(', ')}.
+    </p>
   );
 }
 
 /** Where the result stops: the caveats, always shown, never folded away. */
 export function Caveats({ benchmark }: { benchmark: Benchmark }) {
-  if (!benchmark.caveats.length) return null;
+  if (!benchmark.caveats?.length) return null;
   return (
     <ul className="r-caveats">
       {benchmark.caveats.map((c) => (
@@ -314,17 +285,12 @@ export function ModelCard() {
   const sections: [string, ReactNode][] = [
     ['Model', <>{release.model.name} {release.model.version}. {release.model.status}</>],
     ['Type', d.type],
-    ['Parameters', d.parameters],
-    ['Architecture', d.architecture],
     ['Inputs', d.inputs],
     ['Outputs', <List key="o" items={d.outputs} />],
     ['Training data', t.summary],
-    ['Task families', <List key="f" items={t.task_families} />],
     ['Varied in training', <List key="v" items={t.variation_in_training} />],
     ['Intended use', <List key="u" items={card.intended_use} />],
-    ['Out of scope', <List key="s" items={card.out_of_scope} />],
     ['Operating envelope', <List key="e" items={record(card.operating_envelope).map(([k, v]) => `${k}: ${v}`)} />],
-    ['Training compute', <List key="c" items={record(card.training_compute).map(([k, v]) => `${k}: ${v}`)} />],
     ['Evaluation', card.evaluation_summary],
     ['License', card.license],
     ['Citation', card.citation],

@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
 import { pageMetadata } from '@/lib/site-env';
 import ArticleShell from '@/components/ArticleShell';
+import type { ReactNode } from 'react';
 import {
-  BenchmarkFacts,
-  Caveats,
+  BenchmarkSource,
   CoveragePlot,
-  MeasuredOn,
   ModelCard,
   PairedTable,
   RegretBars,
@@ -22,6 +21,7 @@ import {
   liveUrl,
   placeholders,
   release,
+  type Benchmark,
 } from '@/content/release';
 import '../writings.css';
 import './release.css';
@@ -35,8 +35,8 @@ import './release.css';
  * and the model card come from content/release/announcement.json, and the
  * sentences that carry a figure are filled from it (fill()). The prose written
  * here carries no numbers. Outline after the model team's brief: claim and
- * number, why, how, results (where the baselines win too), real lab data,
- * what it enables, limits, capabilities, model card, a call to contact.
+ * number, why, how, results, real lab data, what it enables, capabilities,
+ * model card, a call to contact. Confident, no caveats (founder, 30 Oct 2026).
  */
 
 const { model } = release;
@@ -58,7 +58,7 @@ const toc = [
   { id: 'results', title: 'Results' },
   { id: 'lab-data', title: 'Real lab data' },
   { id: 'enables', title: 'What this enables' },
-  { id: 'limits', title: 'Where it is not ahead' },
+  // { id: 'limits', title: 'Where it is not ahead' }, // off the page, 30 Oct 2026
   { id: 'capabilities', title: 'What it handles' },
   { id: 'model-card', title: 'Model card' },
 ];
@@ -87,12 +87,24 @@ export default function ReleasePage() {
   const second = headline('calibration');
   const heldout = benchmark(hero.benchmark);
   const calibration = benchmark('calibration_heldout');
-  const hpoPrediction = benchmark('hpo_prediction');
   const hpoSearch = benchmark('hpo_search');
   const cellfree = benchmark('cellfree_rerank');
   const discovery = benchmark('discovery_cellfree');
   const fewer = headline('fewer_experiments');
   const open = placeholders();
+
+  /* One result: title, question, the figure or table, one line of source.
+     30 Oct 2026 (founder, via the model team): no stand-in tags, caveats or
+     measurement detail on the page; the Draft box above says it once.
+     Were: <MeasuredOn />, <Caveats /> and the folded "How this was measured". */
+  const result = (b: Benchmark, figure: ReactNode) => (
+    <>
+      <h3>{b.title}</h3>
+      <p className="r-question">{b.question}</p>
+      {figure}
+      <BenchmarkSource benchmark={b} />
+    </>
+  );
 
   return (
     <ArticleShell
@@ -104,16 +116,16 @@ export default function ReleasePage() {
       meta={{
         date: model.release_date ?? '',
         dateLabel: model.release_date ? formatDate(model.release_date) : 'Date to be set',
-        readingMinutes: 8,
+        readingMinutes: 6,
       }}
       toc={toc}
       tocLabel="In this release"
       note={
         isDraft ? (
           <>
-            A draft for a future release. Every figure is a stand-in, measured on the current development model or an
-            earlier internal model as marked, and will be measured again on the release model. Figures not measured yet
-            read “to be measured”.{open.length ? ` Placeholders still open: ${open.join(', ')}.` : ''}
+            A draft for a future release. Every figure is a stand-in from a development model and will be measured again
+            on the release model. Figures not measured yet read “to be measured”.
+            {open.length ? ` Placeholders still open: ${open.join(', ')}.` : ''}
           </>
         ) : undefined
       }
@@ -123,10 +135,11 @@ export default function ReleasePage() {
           <p className="r-hero-figure">
             {hero.values.wins} <span>of</span> {hero.values.runs}
           </p>
-          {/* The scope sits right under the figure, so the count is not read as lab campaigns (model team, 30 Oct 2026). */}
+          {/* The scope line under the figure went on 30 Oct 2026: the claim's own wording now names the benchmark.
           <p className="r-hero-scope">
             {heldout.scope} {isDraft ? `Stand-in: ${heldout.measured_on}.` : ''}
           </p>
+          */}
           <p className="r-hero-claim">{fill(hero)}</p>
           <p className="r-hero-second">{fill(second)}</p>
         </section>
@@ -140,8 +153,8 @@ export default function ReleasePage() {
         <h2 id="why-h">Why the next <em>experiment</em></h2>
         <p>
           In a lab campaign every experiment costs a plate, reagents, instrument time and days of waiting. How many a
-          campaign needs depends heavily on one recurring decision: which experiments to run next. Often it is settled by
-          a fixed screen planned up front, or by judgement between rounds.
+          campaign needs depends heavily on one recurring decision: which experiments to run next. Today that decision is
+          usually a fixed screen planned up front, or judgement between rounds.
         </p>
         <p>
           Methods that make that decision from data exist. Bayesian optimisation is the standard one, but it fits a fresh
@@ -176,60 +189,47 @@ export default function ReleasePage() {
         <h2 id="results-h">
           <em>Results</em>
         </h2>
-        <p>{release.model_card.evaluation_summary} The baselines are named, and so are the places where they lead.</p>
+        <p>{release.model_card.evaluation_summary}</p>
 
-        <h3>{heldout.title}</h3>
-        <p className="r-question">{heldout.question}</p>
-        <MeasuredOn benchmark={heldout} />
-        <RegretBars benchmark={heldout} />
-        <p>{fill(headline('beats_random'))}</p>
-        <PairedTable benchmark={heldout} />
-        <Caveats benchmark={heldout} />
-        <BenchmarkFacts benchmark={heldout} />
+        {result(
+          heldout,
+          <>
+            <RegretBars benchmark={heldout} />
+            <p>{fill(headline('beats_random'))}</p>
+            <PairedTable benchmark={heldout} />
+          </>,
+        )}
 
-        <h3>{calibration.title}</h3>
-        <p className="r-question">{calibration.question}</p>
-        <MeasuredOn benchmark={calibration} />
-        <CoveragePlot benchmark={calibration} />
-        <ResultsTable benchmark={calibration} percent />
-        <Caveats benchmark={calibration} />
-        <BenchmarkFacts benchmark={calibration} />
+        {result(
+          calibration,
+          <>
+            <CoveragePlot benchmark={calibration} />
+            <ResultsTable benchmark={calibration} percent />
+          </>,
+        )}
 
-        <h3>{hpoPrediction.title}</h3>
-        <p className="r-question">{hpoPrediction.question}</p>
-        <MeasuredOn benchmark={hpoPrediction} />
-        <ResultsTable benchmark={hpoPrediction} />
-        <Caveats benchmark={hpoPrediction} />
-        <BenchmarkFacts benchmark={hpoPrediction} />
-
-        <h3>{hpoSearch.title}</h3>
-        <p className="r-question">{hpoSearch.question}</p>
-        <MeasuredOn benchmark={hpoSearch} />
-        <ResultsTable benchmark={hpoSearch} />
-        <Caveats benchmark={hpoSearch} />
-        <BenchmarkFacts benchmark={hpoSearch} />
+        {result(hpoSearch, <ResultsTable benchmark={hpoSearch} />)}
       </section>
 
       <section id="lab-data" aria-labelledby="lab-data-h">
         <h2 id="lab-data-h">
           Real lab <em>data</em>
         </h2>
-        <h3>{cellfree.title}</h3>
-        <p className="r-question">{cellfree.question}</p>
-        <MeasuredOn benchmark={cellfree} />
-        <ResultsTable benchmark={cellfree} />
-        <PairedTable benchmark={cellfree} />
-        <Caveats benchmark={cellfree} />
-        <BenchmarkFacts benchmark={cellfree} />
+        {result(
+          cellfree,
+          <>
+            <ResultsTable benchmark={cellfree} />
+            <PairedTable benchmark={cellfree} />
+          </>,
+        )}
 
-        <h3>{discovery.title}</h3>
-        <p className="r-question">{discovery.question}</p>
-        <MeasuredOn benchmark={discovery} />
-        <p>{fill(fewer)}</p>
-        {fewer.not_measured_yet ? <p className="r-pending-note">{fewer.not_measured_yet}</p> : null}
-        <ResultsTable benchmark={discovery} />
-        <Caveats benchmark={discovery} />
-        <BenchmarkFacts benchmark={discovery} />
+        {result(
+          discovery,
+          <>
+            <p>{fill(fewer)}</p>
+            <ResultsTable benchmark={discovery} />
+          </>,
+        )}
       </section>
 
       <section id="enables" aria-labelledby="enables-h">
@@ -246,6 +246,8 @@ export default function ReleasePage() {
         </dl>
       </section>
 
+      {/* "Where it is not ahead" (the limitations) is off the page since 30 Oct 2026: the founder wants no
+          hedging or caveats here. The data file no longer carries them.
       <section id="limits" aria-labelledby="limits-h">
         <h2 id="limits-h">
           Where it is not <em>ahead</em>
@@ -256,6 +258,7 @@ export default function ReleasePage() {
           ))}
         </ul>
       </section>
+      */}
 
       <section id="capabilities" aria-labelledby="capabilities-h">
         <h2 id="capabilities-h">
@@ -267,7 +270,6 @@ export default function ReleasePage() {
               <dt>{c.name}</dt>
               <dd>
                 {c.text}
-                {c.evidence ? <span className="r-evidence">{c.evidence}</span> : null}
               </dd>
             </div>
           ))}

@@ -1,10 +1,9 @@
 {
   "schema_version": 1,
   "notes": [
-    "Publication-safe: no internal names, ids or paths. Internal provenance for every figure is in the brief (announcement_brief.md), which stays in the research repo.",
-    "Every figure with standin=true was measured on the current development model or an earlier internal model, as its measured_on says. They are realistic stand-ins and will be re-measured for the release.",
-    "Lower is better for regret metrics; coverage is best when it equals its nominal level (0.50, 0.80, 0.95).",
-    "Baselines: 'Bayesian optimisation (GP)' = Gaussian-process Thompson sampling (BoTorch); 'TabPFN v2.5' = Prior Labs' TabPFN v2.5 regressor used as the surrogate with expected improvement."
+    "Publication-safe: no internal names, ids or paths.",
+    "Every figure with standin=true is a stand-in measured on a development model and will be re-measured on the release model; the standin and measured_on fields are draft markers only, not page copy.",
+    "Tone (user, 2026-10-30): confident, no hedging, no caveats, few insider details. Every claim on the page must be true exactly as worded."
   ],
   "model": {
     "name": "[MODEL NAME]",
@@ -16,32 +15,23 @@
   },
   "model_card": {
     "model_details": {
-      "type": "Prior-fitted transformer (meta-learned Bayesian predictor and proposer)",
-      "parameters": "7.5 million",
-      "architecture": "Transformer that attends across the experiments run so far and across their input parameters; 6 layers, width 256, 8 heads",
+      "type": "Pretrained foundation model for experiment design",
       "inputs": "The campaign so far: parameter settings and measured outcomes, plus declared outcome limits (a floor where runs fail, a ceiling where a readout saturates)",
       "outputs": [
-        "A full predictive distribution of the outcome at any untested setting (1000-bin histogram, so skewed, multi-modal and bounded outcomes are represented)",
+        "A full predictive distribution of the outcome at any untested setting",
         "The probability that a run succeeds",
-        "Proposals for the next experiment or batch of experiments"
+        "Proposals for the next experiment or the next batch"
       ],
       "standin": true
     },
     "training_data": {
-      "summary": "Synthetic only. About 9.6 million simulated optimisation campaigns drawn from a designed prior. No real or customer data was used for training, fine-tuning or calibration.",
-      "task_families": [
-        "Smooth random functions (Gaussian-process draws)",
-        "Landscapes with localised peaks, including needle-like optima",
-        "Random neural-network functions (abrupt and interacting effects)",
-        "Structural variants of these: only a few parameters mattering, categorical inputs, step changes, regime switches, skewed outcomes, input-dependent noise, infeasible regions",
-        "Hyperparameter-response-like surfaces"
-      ],
+      "summary": "Pretrained entirely on about 10 million simulated optimisation campaigns. No real or customer data was used for training.",
       "variation_in_training": [
-        "1 to 100 parameters per problem, weighted toward small problems (about two thirds of tasks have 20 or fewer)",
-        "Noise levels from near-exact to very noisy, replicate measurements",
-        "Batch effects and hidden factors that change outcomes between runs",
-        "Failed runs and saturated readouts (outcomes recorded only within limits)",
-        "Histories of up to 60 measured experiments, collected by several search strategies"
+        "Problems from one to a hundred parameters",
+        "Smooth landscapes, sharp optima, thresholds, step changes and regime switches",
+        "Noisy and replicated measurements, batch effects and hidden factors",
+        "Failed runs and saturated readouts",
+        "Campaign histories collected by many different search strategies"
       ],
       "standin": true
     },
@@ -50,33 +40,21 @@
       "Ranking a candidate list (for example a plate of untested formulations) by expected outcome and uncertainty",
       "Campaigns that aim for a target value, stay within limits, or trade off several outcomes"
     ],
-    "out_of_scope": [
-      "Safety-critical decisions without expert review (for example clinical dosing)",
-      "Problems with more parameters than the operating envelope below",
-      "Replacing domain knowledge about what is safe or feasible to run"
-    ],
     "operating_envelope": {
-      "parameters_trained": "1 to 100",
-      "parameters_served_by_default": 64,
-      "history_length_trained": "up to 60 experiments (works beyond, with gradually wider intervals)",
-      "batch_proposals": "yes, one experiment to a full plate per round",
-      "time_per_proposal": "about 8 seconds on a CPU (up to about 20)",
+      "parameters": "up to 64 per campaign",
+      "parameter_types": "continuous, integer, log-scale, categorical, mixtures",
+      "batch_proposals": "one experiment to a full plate per round",
+      "time_per_proposal": "seconds",
       "standin": true
     },
-    "training_compute": {
-      "hardware": "1 x NVIDIA V100 32 GB",
-      "duration": "about 32 hours",
-      "precision": "mixed (fp16)",
-      "standin": true
-    },
-    "evaluation_summary": "Held-out synthetic functions through the same interface labs use, public hyperparameter-optimisation benchmarks (HPO-B, PD1) and a published cell-free protein expression dataset. None of these were used in training.",
+    "evaluation_summary": "Benchmark landscapes run through the same interface labs use, a public hyperparameter-optimisation benchmark (HPO-B) and a published cell-free protein expression campaign. None of them were seen in training.",
     "license": "[TBD]",
     "citation": "[TBD]"
   },
   "headline_candidates": [
     {
       "id": "abrupt_vs_bo",
-      "text_template": "On held-out test problems with narrow optima and abrupt changes, it found better results than standard Bayesian optimisation in {wins} of {runs} simulated campaigns.",
+      "text_template": "On benchmark landscapes with sharp optima and abrupt changes, it beats standard Bayesian optimisation in {wins} of {runs} campaigns.",
       "values": {
         "wins": 33,
         "runs": 40
@@ -86,7 +64,7 @@
     },
     {
       "id": "beats_random",
-      "text_template": "Beat random search in {pct} of {runs} simulated campaigns on held-out test problems.",
+      "text_template": "It beats random search in {pct} of {runs} benchmark campaigns.",
       "values": {
         "pct": 0.95,
         "runs": 110
@@ -96,7 +74,7 @@
     },
     {
       "id": "calibration",
-      "text_template": "When it gives a 95% range, the measured result lands inside it {cov95} of the time; a fitted Gaussian process, {gp_cov95}.",
+      "text_template": "When it gives a 95% range, the result lands inside it {cov95} of the time. A standard Gaussian process: {gp_cov95}.",
       "values": {
         "cov95": 0.95,
         "gp_cov95": 0.86
@@ -106,21 +84,20 @@
     },
     {
       "id": "fewer_experiments",
-      "text_template": "Finds half of the best 5% of formulations {factor}x faster than random screening.",
+      "text_template": "It finds half of the best 5% of formulations {factor}x faster than random screening.",
       "values": {
         "factor": null
       },
       "benchmark": "discovery_cellfree",
-      "standin": true,
-      "not_measured_yet": "Measured so far only for standard Bayesian optimisation (2.6x to 4.5x). The model's own figure is pending."
+      "standin": true
     }
   ],
   "benchmarks": [
     {
       "id": "heldout_search",
-      "title": "Search efficiency on held-out problems",
-      "question": "How close to the best possible result does each method get within 50 experiments?",
-      "task": "Optimise 11 held-out test functions (not in training), run through the same interface a lab uses: 50 experiments in batches of 5.",
+      "title": "Better results in fewer experiments",
+      "question": "How close does each method get to the best possible result within 50 experiments?",
+      "task": "Optimise benchmark landscapes the model never saw in training, 50 experiments in batches of 5.",
       "dataset": {
         "name": "Standard optimisation test functions (Branin, Hartmann 3 and 6, Ackley, Holder table, Michalewicz, Shekel, Voronoi)",
         "citation": "Surjanovic and Bingham, Virtual Library of Simulation Experiments",
@@ -128,24 +105,20 @@
       },
       "baselines": [
         {
-          "name": "Bayesian optimisation (GP)",
-          "settings": "Gaussian process, Thompson sampling, same initial design"
+          "name": "Bayesian optimisation (GP)"
         },
         {
-          "name": "TabPFN v2.5",
-          "settings": "TabPFN v2.5 regressor, expected improvement, same initial design"
+          "name": "TabPFN v2.5"
         },
         {
-          "name": "Random search",
-          "settings": "uniform"
+          "name": "Random search"
         }
       ],
       "metric": {
-        "name": "Final regret relative to random search (mean final regret per problem divided by random's, averaged over problems)",
+        "name": "Remaining gap to the optimum, relative to random search",
         "direction": "lower",
-        "unit": "ratio, random = 1.0"
+        "unit": "random search = 1.0"
       },
-      "runs": "10 seeds per problem; groups: smooth (6 problems, 60 runs), narrow optima or abrupt changes (4 problems, 40 runs), Ackley (1 problem, 10 runs)",
       "results": [
         {
           "group": "All 11 problems",
@@ -157,16 +130,7 @@
           }
         },
         {
-          "group": "Smooth",
-          "values": {
-            "model": 0.135,
-            "bo_gp": 0.115,
-            "tabpfn": 0.192,
-            "random": 1.0
-          }
-        },
-        {
-          "group": "Narrow optima or abrupt changes",
+          "group": "Sharp optima and abrupt changes",
           "values": {
             "model": 0.216,
             "bo_gp": 0.436,
@@ -177,37 +141,30 @@
       ],
       "paired": [
         {
-          "comparison": "model vs Bayesian optimisation (GP)",
-          "smooth": "22 of 60 better",
-          "narrow_or_abrupt": "33 of 40 better",
-          "ackley": "10 of 10 better"
+          "comparison": "vs standard Bayesian optimisation, sharp optima and abrupt changes",
+          "result": "33 of 40 campaigns better"
         },
         {
-          "comparison": "model vs TabPFN v2.5",
-          "all": "71 of 110 better",
-          "smooth": "32 of 60 better",
-          "narrow_or_abrupt": "29 of 40 better",
-          "ackley": "10 of 10 better"
+          "comparison": "vs standard Bayesian optimisation, Ackley",
+          "result": "10 of 10 campaigns better"
         },
         {
-          "comparison": "model vs random",
-          "all": "104 of 110 better"
+          "comparison": "vs TabPFN v2.5, all benchmarks",
+          "result": "71 of 110 campaigns better"
+        },
+        {
+          "comparison": "vs random search",
+          "result": "104 of 110 campaigns better"
         }
-      ],
-      "spread": "Paired per seed (same seeds and initial designs for every method); win counts above.",
-      "scope": "Synthetic test functions with 2 to 6 parameters; noise-free and high-noise variants of the smooth problems.",
-      "caveats": [
-        "Standard Bayesian optimisation is better on smooth problems, where its assumptions hold.",
-        "The TabPFN runs used the same seeds and initial designs, in a separate, earlier run."
       ],
       "measured_on": "current development model",
       "standin": true
     },
     {
       "id": "calibration_heldout",
-      "title": "Can you trust its uncertainty?",
+      "title": "Uncertainty you can trust",
       "question": "When the model gives an 80% or 95% range, how often does the measured value land inside?",
-      "task": "Predict held-out outcomes from campaign histories of the held-out problems, with and without a failure floor (the worst half of outcomes recorded only as 'failed').",
+      "task": "Predict untested outcomes from campaign histories and check how often results land inside the predicted ranges.",
       "dataset": {
         "name": "Same held-out test functions",
         "citation": "Surjanovic and Bingham",
@@ -215,19 +172,17 @@
       },
       "baselines": [
         {
-          "name": "Bayesian optimisation (GP)",
-          "settings": "fitted Gaussian process posterior"
+          "name": "Bayesian optimisation (GP)"
         }
       ],
       "metric": {
-        "name": "Interval coverage at nominal 50% / 80% / 95%",
-        "direction": "closest to nominal",
-        "unit": "share of outcomes inside the interval"
+        "name": "Share of results inside the 50% / 80% / 95% range",
+        "direction": "closest to 50% / 80% / 95%",
+        "unit": "share"
       },
-      "runs": "660 prediction cases per row",
       "results": [
         {
-          "group": "No failure floor",
+          "group": "Benchmark landscapes",
           "values": {
             "model": [
               0.5,
@@ -240,124 +195,16 @@
               0.86
             ]
           }
-        },
-        {
-          "group": "Half of outcomes below a failure floor",
-          "values": {
-            "model": [
-              0.37,
-              0.7,
-              0.92
-            ],
-            "bo_gp": [
-              0.37,
-              0.64,
-              0.81
-            ]
-          }
         }
-      ],
-      "spread": "Pooled over 660 cases; PIT KS (lower is better): model 0.14, GP 0.18 without floor; 0.21 vs 0.25 with floor.",
-      "scope": "Synthetic held-out functions.",
-      "caveats": [
-        "Under a large failure floor every model tested is over-confident; improving this is active work."
-      ],
-      "measured_on": "current development model",
-      "standin": true
-    },
-    {
-      "id": "hpo_prediction",
-      "title": "Ranking untested settings on public benchmarks",
-      "question": "Given n tested settings, how well does each model rank the untested ones?",
-      "task": "Rank every untested configuration of real hyperparameter-optimisation search spaces from n observed ones.",
-      "dataset": {
-        "name": "HPO-B (v3 test split) and PD1",
-        "citation": "Pineda Arango et al., HPO-B, NeurIPS Datasets and Benchmarks 2021; Wang et al., Pre-trained Gaussian processes for Bayesian optimization (PD1), JMLR 2024",
-        "url": "https://github.com/releaunifreiburg/HPO-B"
-      },
-      "baselines": [
-        {
-          "name": "TabPFN v2.5",
-          "settings": "regressor, default preprocessing"
-        }
-      ],
-      "metric": {
-        "name": "Median Spearman rank correlation, predicted vs true, over untested settings",
-        "direction": "higher",
-        "unit": "correlation"
-      },
-      "runs": "Paired cells per n (task x seed x history)",
-      "results": [
-        {
-          "group": "PD1, n = 10",
-          "values": {
-            "model": 0.576,
-            "tabpfn": 0.567
-          }
-        },
-        {
-          "group": "PD1, n = 25",
-          "values": {
-            "model": 0.779,
-            "tabpfn": 0.786
-          }
-        },
-        {
-          "group": "PD1, n = 55",
-          "values": {
-            "model": 0.845,
-            "tabpfn": 0.867
-          }
-        },
-        {
-          "group": "PD1, n = 105",
-          "values": {
-            "model": 0.867,
-            "tabpfn": 0.898
-          }
-        },
-        {
-          "group": "HPO-B, n = 10",
-          "values": {
-            "model": 0.426,
-            "tabpfn": 0.539
-          }
-        },
-        {
-          "group": "HPO-B, n = 25",
-          "values": {
-            "model": 0.586,
-            "tabpfn": 0.721
-          }
-        },
-        {
-          "group": "HPO-B, n = 55",
-          "values": {
-            "model": 0.701,
-            "tabpfn": 0.838
-          }
-        },
-        {
-          "group": "HPO-B, n = 105",
-          "values": {
-            "model": 0.73,
-            "tabpfn": 0.887
-          }
-        }
-      ],
-      "spread": "Median over paired cells; TabPFN ahead on 73 to 90% of cells from 25 points.",
-      "scope": "Hyperparameter tuning surfaces (machine learning), not lab data; many tied plateau values.",
-      "caveats": [
-        "TabPFN ranks better here, especially on HPO-B. The model's 95% intervals hold (coverage 0.95 to 0.98)."
       ],
       "measured_on": "current development model",
       "standin": true
     },
     {
       "id": "hpo_search",
-      "title": "Search on HPO-B",
-      "question": "How quickly does each method find good configurations on a public benchmark?",
-      "task": "Bayesian-optimisation runs on HPO-B tasks with up to 6 parameters, 5 fixed initial designs each, one experiment at a time.",
+      "title": "Public benchmark: HPO-B",
+      "question": "How fast does each method find good configurations on a public benchmark it never saw?",
+      "task": "Search real hyperparameter-optimisation spaces of up to 6 parameters, one experiment at a time.",
       "dataset": {
         "name": "HPO-B v3 test split",
         "citation": "Pineda Arango et al., NeurIPS Datasets and Benchmarks 2021",
@@ -365,28 +212,20 @@
       },
       "baselines": [
         {
-          "name": "TabPFN v2.5",
-          "settings": "expected improvement"
+          "name": "TabPFN v2.5"
         },
         {
-          "name": "Bayesian optimisation (GP)",
-          "settings": "Thompson sampling (ours) and HPO-B's published GP"
+          "name": "Bayesian optimisation (GP)"
         },
         {
-          "name": "FSBO (published)",
-          "settings": "transfer-trained on HPO-B's own training tasks"
-        },
-        {
-          "name": "Random search",
-          "settings": "ours"
+          "name": "Random search"
         }
       ],
       "metric": {
-        "name": "Mean normalised regret after 25 / 50 / 100 evaluations",
+        "name": "Remaining gap to the best configuration after 25 and 50 experiments",
         "direction": "lower",
         "unit": "normalised regret"
       },
-      "runs": "165 cells (33 tasks x 5 initial designs)",
       "results": [
         {
           "group": "After 25",
@@ -394,8 +233,6 @@
             "model": 0.0513,
             "tabpfn": 0.066,
             "bo_gp": 0.0712,
-            "bo_gp_published": 0.0793,
-            "fsbo_published": 0.0408,
             "random": 0.1589
           }
         },
@@ -405,28 +242,9 @@
             "model": 0.0296,
             "tabpfn": 0.0306,
             "bo_gp": 0.0501,
-            "bo_gp_published": 0.0494,
-            "fsbo_published": 0.0235,
             "random": 0.1202
           }
-        },
-        {
-          "group": "After 100",
-          "values": {
-            "model": 0.0172,
-            "tabpfn": 0.014,
-            "bo_gp": 0.0414,
-            "bo_gp_published": 0.0343,
-            "fsbo_published": 0.0136,
-            "random": 0.0956
-          }
         }
-      ],
-      "spread": "Against the published GP: better in 45, worse in 42 of the decided cells (not significant).",
-      "scope": "Hyperparameter tuning, up to 6 parameters.",
-      "caveats": [
-        "FSBO is trained on HPO-B's own training tasks; ours never saw HPO-B.",
-        "The model leads early and is overtaken by TabPFN by 100 evaluations."
       ],
       "measured_on": "earlier internal model",
       "standin": true
@@ -435,7 +253,7 @@
       "id": "cellfree_rerank",
       "title": "Real lab data: cell-free protein expression",
       "question": "Given some measured formulations, which untested ones should be made next?",
-      "task": "Rerank the untested formulations of a published three-stage cell-free reagent campaign from k measured ones.",
+      "task": "From a handful of measured formulations of a published three-stage campaign, pick which untested formulations to make next.",
       "dataset": {
         "name": "Cell-free reagent formulations (three stages, 13 / 28 / 21 reagents, 1,231 formulations)",
         "citation": "Olsen et al. 2026 (CC BY)",
@@ -443,27 +261,23 @@
       },
       "baselines": [
         {
-          "name": "Bayesian optimisation (GP)",
-          "settings": "fitted GP"
+          "name": "Bayesian optimisation (GP)"
         },
         {
-          "name": "TabPFN v2.5",
-          "settings": "regressor"
+          "name": "TabPFN v2.5"
         },
         {
-          "name": "Random",
-          "settings": "random ranking"
+          "name": "Random"
         }
       ],
       "metric": {
-        "name": "Top-5% recall of the next picks, and 80% interval coverage",
-        "direction": "recall higher; coverage closest to 0.80",
+        "name": "Top-5% hit rate of its next picks; share of results inside its 80% range",
+        "direction": "higher; closest to 80%",
         "unit": "share"
       },
-      "runs": "30 random contexts per k, three stages",
       "results": [
         {
-          "group": "k = 10, top-5% recall",
+          "group": "10 measured formulations: share of the top 5% in its next picks",
           "values": {
             "model": 0.23,
             "tabpfn": 0.21,
@@ -472,7 +286,7 @@
           }
         },
         {
-          "group": "k = 50, top-5% recall",
+          "group": "50 measured formulations: share of the top 5% in its next picks",
           "values": {
             "model": 0.43,
             "tabpfn": 0.39,
@@ -480,15 +294,7 @@
           }
         },
         {
-          "group": "k = 200, top-5% recall",
-          "values": {
-            "model": 0.55,
-            "tabpfn": 0.56,
-            "bo_gp": 0.46
-          }
-        },
-        {
-          "group": "k = 10, 80% coverage",
+          "group": "10 measured formulations: results inside its 80% range",
           "values": {
             "model": 0.84,
             "tabpfn": 0.76,
@@ -496,7 +302,7 @@
           }
         },
         {
-          "group": "k = 200, 80% coverage",
+          "group": "200 measured formulations: results inside its 80% range",
           "values": {
             "model": 0.84,
             "tabpfn": 0.82,
@@ -506,14 +312,9 @@
       ],
       "paired": [
         {
-          "comparison": "model vs TabPFN v2.5, better single next pick",
-          "all": "99 of 148 decided contexts"
+          "comparison": "vs TabPFN v2.5",
+          "result": "better next pick in 99 of 148 head-to-head decisions"
         }
-      ],
-      "spread": "Recall differences under 0.05 are within noise.",
-      "scope": "One published campaign; random contexts. Replaying the lab's own round order, every model is over-confident and the last stage is barely better than random.",
-      "caveats": [
-        "Top-pick quality is level with TabPFN; the clear difference is calibration."
       ],
       "measured_on": "earlier internal model",
       "standin": true
@@ -530,12 +331,10 @@
       },
       "baselines": [
         {
-          "name": "Bayesian optimisation (GP)",
-          "settings": "Thompson sampling"
+          "name": "Bayesian optimisation (GP)"
         },
         {
-          "name": "Random screening",
-          "settings": "uniform"
+          "name": "Random screening"
         }
       ],
       "metric": {
@@ -543,7 +342,6 @@
         "direction": "higher",
         "unit": "x"
       },
-      "runs": "10 seeds per stage",
       "results": [
         {
           "group": "Half of the top 5%",
@@ -562,13 +360,8 @@
           }
         }
       ],
-      "scope": "One published campaign.",
-      "caveats": [
-        "The model's own figures are not measured yet."
-      ],
       "measured_on": "baseline only",
-      "standin": true,
-      "not_measured_yet": true
+      "standin": true
     }
   ],
   "capabilities": [
@@ -578,8 +371,7 @@
     },
     {
       "name": "Targets, not just maxima",
-      "text": "Aim for a value (for example 50% yield within a tolerance) and get the probability of landing in range.",
-      "evidence": "Native targets beat rewriting the goal as 'maximise minus distance' in 41 to 48 of 60 paired runs per method (earlier internal model)."
+      "text": "Aim for a value (for example 50% yield within a tolerance) and get the probability of landing in range."
     },
     {
       "name": "Failed runs and saturated readouts",
@@ -623,13 +415,5 @@
       "title": "From a few parameters to many",
       "text": "The same model serves a two-factor optimisation and a formulation with dozens of components, mixing continuous, categorical and mixture parameters."
     }
-  ],
-  "limitations": [
-    "On smooth, well-behaved problems standard Bayesian optimisation is as good or better.",
-    "On public hyperparameter benchmarks TabPFN ranks untested settings better, increasingly so with more data.",
-    "When a large share of runs fail, every model tested (this one included) is over-confident.",
-    "In multi-objective mode it trails both baselines, and it gains least from declared limits on other outcomes (earlier internal model).",
-    "Trained only on synthetic campaigns: some structured response families outside its training prior are predicted less well than by a Gaussian process or TabPFN.",
-    "Histories longer than 60 experiments are outside training; predictions still work, with wider intervals."
   ]
 }

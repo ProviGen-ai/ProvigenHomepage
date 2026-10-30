@@ -21,14 +21,16 @@ export type Benchmark = {
   question: string;
   task: string;
   dataset: { name: string; citation: string; url: string };
-  baselines: { name: string; settings: string }[];
+  baselines: { name: string; settings?: string }[];
   metric: { name: string; direction: string; unit: string };
-  runs: string;
   results: { group: string; values: Partial<Record<MethodKey, Cell>> }[];
-  paired?: ({ comparison: string } & Record<string, string>)[];
+  paired?: { comparison: string; result: string }[];
+  /* Dropped from the data file on 30 Oct 2026 (founder: no hedging, no caveats,
+     few insider details); optional so a later file may bring them back. */
+  runs?: string;
   spread?: string;
-  scope: string;
-  caveats: string[];
+  scope?: string;
+  caveats?: string[];
   measured_on: string;
   standin: boolean;
   not_measured_yet?: boolean;
@@ -57,22 +59,22 @@ export type ReleaseData = {
   model_card: {
     model_details: {
       type: string;
-      parameters: string;
-      architecture: string;
+      parameters?: string;
+      architecture?: string;
       inputs: string;
       outputs: string[];
       standin: boolean;
     };
     training_data: {
       summary: string;
-      task_families: string[];
+      task_families?: string[];
       variation_in_training: string[];
       standin: boolean;
     };
     intended_use: string[];
-    out_of_scope: string[];
+    out_of_scope?: string[];
     operating_envelope: Record<string, string | number | boolean>;
-    training_compute: Record<string, string | boolean>;
+    training_compute?: Record<string, string | boolean>;
     evaluation_summary: string;
     license: string;
     citation: string;
@@ -82,7 +84,7 @@ export type ReleaseData = {
   capabilities: { name: string; text: string; evidence?: string }[];
   /** What the model makes possible in a lab: descriptive, no figures. */
   enables: { title: string; text: string }[];
-  limitations: string[];
+  limitations?: string[];
 };
 
 /* JSON imports are typed by their literal shape; the file is checked against ReleaseData by hand (schema_version 1). */

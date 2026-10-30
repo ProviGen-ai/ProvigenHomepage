@@ -337,3 +337,32 @@
 .r-bars-axis span:last-child {
   transform: translateX(50%);
 }
+
+/* One line of source under each result (30 Oct 2026; was the folded "How this was measured"). */
+.w-prose .r-source {
+  margin-top: 0.9rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  color: var(--c-faint);
+}
+.w-prose .r-source a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+/* A single calibration panel keeps the size it had as one of two. */
+.r-panels:has(> :only-child) {
+  grid-template-columns: minmax(0, 22rem);
+}
+.w-prose .r-table--paired table {
+  min-width: 0;
+}
+/* Row labels can be a sentence (the cell-free rows): their column takes a third. */
+.w-prose .r-table thead th:first-child {
+  width: 34%;
+}
+.w-prose .r-table--paired thead th:first-child {
+  width: 50%;
+}
