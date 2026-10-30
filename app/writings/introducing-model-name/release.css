@@ -1,0 +1,332 @@
+/*
+ * The model release page (draft, 30 Oct 2026). All classes r-*. Built on the
+ * writings shell: the headline result as the lead, data figures in the site's
+ * figure frame, mono tables, small print folded under each result.
+ */
+.w-prose > .r-body > section:first-child > h2 {
+  margin-top: 0;
+}
+.w-prose .r-body h2::before {
+  content: '';
+}
+
+/* Lead: one figure, one claim, the second line, the scope in small print. */
+.r-hero {
+  margin-block: 0 3.5rem;
+  padding-block: 1.75rem 1.5rem;
+  border-block: 1px solid var(--c-line-2);
+}
+.r-hero-figure {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(3.25rem, 2rem + 5vw, 5.5rem);
+  line-height: 1;
+  letter-spacing: var(--d-track-xl);
+  color: var(--c-teal-ink);
+}
+.r-hero-figure span {
+  font-size: 0.45em;
+  color: var(--c-muted);
+}
+.r-hero-claim {
+  margin-top: 1rem;
+  font-size: clamp(1.2rem, 1.05rem + 0.5vw, 1.45rem);
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+.r-hero-second {
+  margin-top: 0.75rem;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--c-muted);
+  text-wrap: pretty;
+}
+.r-hero-scope,
+.r-standin,
+.r-pending-note,
+.r-evidence {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  color: var(--c-faint);
+}
+.r-hero-scope {
+  margin-top: 1rem;
+}
+
+.w-prose .r-question {
+  font-style: italic;
+  color: var(--c-muted);
+}
+.w-prose .r-standin span {
+  display: inline-block;
+  margin-right: 0.5em;
+  padding: 0.1em 0.5em;
+  border: 1px solid var(--c-amber-ink);
+  color: var(--c-amber-ink);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* Data figures: drawn, so no image frame; the site's caption below. */
+.w-prose .r-figure {
+  margin-block: 2rem;
+}
+.r-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--c-muted);
+}
+.r-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.r-key {
+  width: 12px;
+  height: 12px;
+}
+.r-key--ref {
+  height: 0;
+  border-top: 1.5px dashed var(--c-ink);
+  background: none !important;
+}
+.r-cov {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.r-cov text {
+  font-family: var(--f-mono);
+  fill: var(--c-muted);
+}
+.r-group {
+  font-size: 12px;
+  fill: var(--c-ink) !important;
+}
+.r-val {
+  font-size: 12px;
+}
+.r-val--pending {
+  font-style: italic;
+}
+.r-axis {
+  font-size: 10px;
+}
+.r-ref {
+  stroke: var(--c-ink);
+  stroke-width: 1.25;
+  stroke-dasharray: 4 3;
+}
+.r-grid {
+  stroke: var(--c-line);
+}
+.r-cov-line {
+  fill: none;
+  stroke-width: 1.5;
+}
+.r-panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+@media (max-width: 520px) {
+  .r-panels {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Tables: the model's column carries the teal ink; pending cells read in italic. */
+.w-prose .r-table {
+  margin-block: 1.5rem;
+}
+.w-prose .r-table th[scope='row'] {
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 0.75rem;
+  color: var(--c-ink);
+}
+.w-prose .r-col-model {
+  color: var(--c-teal-ink);
+}
+.w-prose .r-pending {
+  font-style: italic;
+  color: var(--c-faint);
+}
+
+.w-prose .r-caveats {
+  padding-left: 0;
+  list-style: none;
+  font-size: 0.95em;
+  color: var(--c-muted);
+}
+.w-prose .r-caveats li {
+  padding-left: 1.1rem;
+  border-left: 2px solid var(--c-orange);
+}
+.w-prose .r-caveats li + li {
+  margin-top: 0.5rem;
+}
+
+/* Small print and the model card: folded, a mono summary line. */
+.w-prose :is(.r-facts, .r-card) {
+  border-top: 1px solid var(--c-line);
+  border-bottom: 1px solid var(--c-line);
+}
+.w-prose :is(.r-facts, .r-card) > summary {
+  cursor: pointer;
+  padding-block: 0.7rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.w-prose .r-card > summary {
+  font-size: 0.75rem;
+  color: var(--c-ink);
+}
+.w-prose .r-card > summary span {
+  margin-left: 0.75em;
+  color: var(--c-teal-ink);
+}
+.w-prose :is(.r-facts, .r-card) > summary:hover {
+  color: var(--c-teal-ink);
+}
+.w-prose :is(.r-facts, .r-card) dl {
+  margin: 0 0 1rem;
+}
+.w-prose :is(.r-facts, .r-card, .r-caps) dl > div,
+.w-prose .r-caps > div {
+  display: grid;
+  grid-template-columns: 10rem minmax(0, 1fr);
+  gap: 0.25rem 1.25rem;
+  padding-block: 0.6rem;
+  border-top: 1px solid var(--c-line);
+}
+.w-prose :is(.r-facts, .r-card) dt,
+.w-prose .r-caps dt {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  line-height: 1.9;
+  color: var(--c-muted);
+}
+.w-prose .r-facts dd {
+  font-size: 0.92em;
+}
+.w-prose :is(.r-card, .r-caps) dd ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+.w-prose .r-caps dt {
+  color: var(--c-ink);
+}
+.r-evidence {
+  display: block;
+  margin-top: 0.35rem;
+}
+@media (max-width: 600px) {
+  .w-prose :is(.r-facts, .r-card) dl > div,
+  .w-prose .r-caps > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* How it works: three steps in a row on wide screens. */
+.w-prose .r-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  padding: 0;
+  list-style: none;
+  counter-reset: rstep;
+}
+.w-prose .r-steps li {
+  counter-increment: rstep;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--c-ink);
+  font-size: 0.95em;
+  line-height: 1.5;
+}
+.r-step-title {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-teal-ink);
+}
+.r-step-title::before {
+  content: counter(rstep, decimal-leading-zero) ' · ';
+}
+@media (max-width: 760px) {
+  .w-prose .r-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Held-out search bars: the track ends at random search (1.0), drawn dashed
+   through every group; the values sit just past their bars. */
+.r-bars {
+  position: relative;
+  margin-right: 4.5rem;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+}
+.r-bars::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 1.4rem;
+  right: 0;
+  border-right: 1.25px dashed var(--c-ink);
+}
+.r-bars-group + .r-bars-group {
+  margin-top: 1.1rem;
+}
+.w-prose .r-bars-label {
+  margin: 0 0 0.35rem;
+  color: var(--c-ink);
+}
+.r-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 1.15rem;
+  margin-top: 0.3rem;
+}
+.r-bar {
+  display: block;
+  height: 100%;
+  min-width: 1px;
+}
+.r-val {
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+.r-val--pending {
+  font-style: italic;
+}
+.w-prose .r-bars-axis {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.5rem 0 0;
+  font-size: 0.625rem;
+  color: var(--c-muted);
+}
+/* Centred under the dashed line at the track's end. */
+.r-bars-axis span:last-child {
+  transform: translateX(50%);
+}
