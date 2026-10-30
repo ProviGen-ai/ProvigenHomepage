@@ -73,7 +73,8 @@ export type ReleaseData = {
       outputs: string[];
       standin: boolean;
     };
-    training_data: {
+    /* Off the page and out of the data file since 30 Oct 2026 (founder: no training details). */
+    training_data?: {
       summary: string;
       task_families?: string[];
       variation_in_training: string[];
@@ -95,7 +96,42 @@ export type ReleaseData = {
   /** What the model makes possible in a lab: descriptive, no figures. */
   enables: { title: string; text: string }[];
   limitations?: string[];
+  /* The revamp after the survey of launch posts (30 Oct 2026). */
+  copy: {
+    kicker: string;
+    section_titles: Record<'why' | 'category' | 'how' | 'results' | 'real_lab' | 'enables' | 'handles' | 'faq' | 'model_card' | 'cta', string>;
+    results_intro_template: string;
+    results_intro_values: Record<string, number | null>;
+    cta_text: string;
+  };
+  takeaways: Templated[];
+  category_explainer: { title: string; text: string };
+  response_shapes: { title: string; families: { name: string; text: string }[] };
+  summary_chart: {
+    benchmark: string;
+    group: string;
+    reference: { key: string | null; label_template: string };
+    title_template: string;
+    /** The conclusion is shown as the chart's title only when true. */
+    title_holds: boolean | null;
+    as_of: string | null;
+  };
+  campaign_trace: {
+    title: string;
+    problem: string;
+    x_label: string;
+    y_label: string;
+    /** One line per method, experiment by experiment; null until measured. */
+    series: { key: string; y: number[] }[] | null;
+  };
+  asides: { anchor: string; title: string; text: string }[];
+  faq: { q: string; a: string }[];
+  /** Shown inside the results aside only when `holds` is true; while null it does not appear at all. */
+  contamination?: { title: string; text_template: string; values: Record<string, number | null>; holds: boolean | null; anchor: string };
 };
+
+/** Any sentence with {placeholders} and their values. */
+export type Templated = { text_template: string; values: Record<string, number | null>; benchmark?: string };
 
 /* JSON imports are typed by their literal shape; the file is checked against ReleaseData by hand (schema_version 1). */
 export const release = data as unknown as ReleaseData;
@@ -212,8 +248,14 @@ export function methodLabel(benchmark: Benchmark, key: MethodKey): string {
 /** Template keys whose values are shares of 1 and read as percentages. */
 const PERCENT_KEY = /^(pct|cov\d+|gp_cov\d+)$/;
 
+/** A section heading, verbatim from the data file. */
+export const sectionTitle = (key: keyof ReleaseData['copy']['section_titles']) => release.copy.section_titles[key];
+
+/** The collapsed aside for a section, if the data file has one. */
+export const aside = (anchor: string) => release.asides.find((a) => a.anchor === anchor);
+
 /** A headline's sentence with its values filled in from the data file. */
-export function fill(headline: Headline): string {
+export function fill(headline: Templated | Headline): string {
   return headline.text_template.replace(/\{(\w+)\}(x?)/g, (_, key: string, times: string) => {
     const value = headline.values[key];
     /* A missing factor reads "[to be measured]", not "to be measuredx". */

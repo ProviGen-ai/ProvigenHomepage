@@ -107,21 +107,44 @@ function Folded({ benchmark, shown, folded, percent = false }: { benchmark: Benc
  * whichever is longer, the line or the longest bar.
  * HTML bars, not SVG, so the labels keep their size on a phone.
  */
-export function RegretBars({ benchmark }: { benchmark: Benchmark }) {
+export function RegretBars({
+  benchmark,
+  group,
+  title,
+  reference,
+  asOf,
+}: {
+  benchmark: Benchmark;
+  /** Only this result row (the summary chart). */
+  group?: string;
+  /** A title over the chart, e.g. the conclusion it supports. */
+  title?: string;
+  /** The strongest alternative, drawn as a second line instead of a bar. */
+  reference?: { key: string; label: string };
+  asOf?: string | null;
+}) {
+  const rows = group ? benchmark.results.filter((r) => r.group === group) : benchmark.results;
   const { shown, folded } = chartMethods(benchmark);
   const line = yardstick(benchmark, shown);
-  const bars = shown.filter((m) => m !== line?.method);
+  const bars = shown.filter((m) => m !== line?.method && m.key !== reference?.key);
+  const refValue = reference ? rows[0]?.values[reference.key] : undefined;
   const colour = colours(bars);
   const decimals = decimalsOf(benchmark);
-  const numbers = benchmark.results.flatMap((r) => bars.map((m) => r.values[m.key]).filter((v): v is number => typeof v === 'number'));
-  const scale = Math.max(line?.value ?? 0, ...numbers) || 1;
+  const numbers = rows.flatMap((r) => bars.map((m) => r.values[m.key]).filter((v): v is number => typeof v === 'number'));
+  const scale = Math.max(line?.value ?? 0, typeof refValue === 'number' ? refValue : 0, ...numbers) || 1;
   const at = (v: number) => `${(v / scale) * 100}%`;
   return (
     <figure className="r-figure">
+      {title ? <p className="r-chart-title">{title}</p> : null}
       <Legend benchmark={benchmark} methods={bars} colour={colour} line={line} />
       <div className="r-bars">
         {line ? <span className="r-bars-ref" style={{ left: at(line.value) }} aria-hidden="true" /> : null}
-        {benchmark.results.map((r) => (
+        {reference && typeof refValue === 'number' ? (
+          <span className="r-bars-ref r-bars-ref--incumbent" style={{ left: at(refValue) }} aria-hidden="true">
+            <span>{reference.label}</span>
+          </span>
+        ) : null}
+        {rows.map((r) => (
           <div key={r.group} className="r-bars-group" role="group" aria-label={r.group}>
             <p className="r-bars-label">{r.group}</p>
             {bars
@@ -154,9 +177,9 @@ export function RegretBars({ benchmark }: { benchmark: Benchmark }) {
         </p>
       </div>
       <figcaption data-kind="Benchmark">
-        {benchmark.metric.name}. Lower is better.
+        {benchmark.metric.name}. Lower is better.{asOf ? ` As of ${asOf}.` : ''}
       </figcaption>
-      <Folded benchmark={benchmark} shown={shown} folded={folded} />
+      {group ? null : <Folded benchmark={benchmark} shown={shown} folded={folded} />}
     </figure>
   );
 }
@@ -301,28 +324,130 @@ export function PairedTable({ benchmark }: { benchmark: Benchmark }) {
   );
 }
 
-/** One line of source under each result: the data, its citation, the methods compared. */
-export function BenchmarkSource({ benchmark }: { benchmark: Benchmark }) {
+/**
+ * "How this was measured", collapsed inline under each result (the Odyssey
+ * pattern, 30 Oct 2026): the task, the data and its citation, the methods.
+ */
+export function BenchmarkAside({ benchmark }: { benchmark: Benchmark }) {
   const url = liveUrl(benchmark.dataset.url);
+  const compared = release.methods
+    ? methodsIn(benchmark)
+        .filter((m) => m.group !== 'ours')
+        .map((m) => m.name)
+    : benchmark.baselines.map((b) => b.name);
   return (
-    <p className="r-source">
-      {benchmark.dataset.name}.{' '}
-      {url ? (
-        <a href={url} target="_blank" rel="noopener noreferrer">
-          {benchmark.dataset.citation}
-        </a>
-      ) : (
-        benchmark.dataset.citation
-      )}
-      . Compared with{' '}
-      {(release.methods
-        ? methodsIn(benchmark)
-            .filter((m) => m.group !== 'ours')
-            .map((m) => m.name)
-        : benchmark.baselines.map((b) => b.name)
-      ).join(', ')}
-      .
-    </p>
+    <Aside title="How this was measured">
+      <p>{benchmark.task}</p>
+      <p>
+        {benchmark.dataset.name}.{' '}
+        {url ? (
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            {benchmark.dataset.citation}
+          </a>
+        ) : (
+          benchmark.dataset.citation
+        )}
+        . Compared with {compared.join(', ')}.
+      </p>
+    </Aside>
+  );
+}
+
+/** A collapsed aside inside the narrative: method detail on request, not in the way of the story. */
+export function Aside({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <details className="r-aside">
+      <summary>{title}</summary>
+      <div className="r-aside-body">{children}</div>
+    </details>
+  );
+}
+
+/* A small drawing per landscape family, matched by its name; none for a name it does not know. */
+const SHAPE_GLYPHS: [RegExp, ReactNode][] = [
+  [/smooth/i, <path key="s" d="M4 30 C 18 30, 22 8, 36 8 S 54 26, 60 26" />],
+  [/sharp|peak/i, <path key="p" d="M4 30 L 26 29 L 32 6 L 38 29 L 60 30" />],
+  [/threshold|step/i, <path key="t" d="M4 28 L 28 28 L 28 10 L 60 10" />],
+  [/fail|saturat/i, <path key="f" d="M4 30 L 18 30 C 26 30, 30 8, 40 8 L 60 8" />],
+  [
+    /noise|batch/i,
+    <g key="n">
+      {[[8, 24], [14, 18], [20, 22], [26, 14], [32, 17], [38, 11], [44, 15], [50, 9], [56, 13]].map(([x, y]) => (
+        <circle key={x} cx={x} cy={y} r={1.8} />
+      ))}
+    </g>,
+  ],
+  [
+    /parameter|dimension/i,
+    <g key="d">
+      <path d="M8 30 L 8 6 M8 30 L 34 30 M8 30 L 24 18" />
+      <path d="M40 30 L 40 6 M40 30 L 60 30 M40 30 L 52 20 M40 30 L 56 14 M40 30 L 48 10" />
+    </g>,
+  ],
+];
+
+/** The landscapes it is built for, as a grid of small drawings. */
+export function ResponseShapes() {
+  const { title, families } = release.response_shapes;
+  return (
+    <figure className="r-figure r-shapes">
+      <p className="r-chart-title">{title}</p>
+      <ul className="r-shapes-list">
+        {families.map((f) => {
+          const glyph = SHAPE_GLYPHS.find(([re]) => re.test(f.name))?.[1];
+          return (
+            <li key={f.name}>
+              {glyph ? (
+                <svg viewBox="0 0 64 36" aria-hidden="true">
+                  {glyph}
+                </svg>
+              ) : null}
+              <span className="r-shape-name">{f.name}</span>
+              <span className="r-shape-text">{f.text}</span>
+            </li>
+          );
+        })}
+      </ul>
+    </figure>
+  );
+}
+
+/** One campaign, experiment by experiment: a line per method once measured, a framed slot until then. */
+export function CampaignTrace() {
+  const t = release.campaign_trace;
+  const series = t.series ?? [];
+  const W = 640;
+  const H = 360;
+  const pad = { l: 48, r: 16, t: 16, b: 40 };
+  const n = Math.max(1, ...series.map((s) => s.y.length));
+  const ymax = Math.max(1e-9, ...series.flatMap((s) => s.y));
+  const px = (i: number) => pad.l + (i / Math.max(1, n - 1)) * (W - pad.l - pad.r);
+  const py = (v: number) => H - pad.b - (v / ymax) * (H - pad.t - pad.b);
+  const colour = colours(series.map((s) => release.methods?.find((m) => m.key === s.key) ?? { key: s.key, name: s.key, group: 'other' }));
+  return (
+    <figure className="r-figure r-trace">
+      <p className="r-chart-title">{t.title}</p>
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${t.title}. ${t.problem}. ${series.length ? '' : TO_BE_MEASURED}`}>
+        <line className="r-grid" x1={pad.l} x2={W - pad.r} y1={H - pad.b} y2={H - pad.b} />
+        <line className="r-grid" x1={pad.l} x2={pad.l} y1={pad.t} y2={H - pad.b} />
+        <text className="r-axis" x={(W + pad.l) / 2} y={H - 8} textAnchor="middle">
+          {t.x_label}
+        </text>
+        <text className="r-axis" transform={`translate(14 ${(H - pad.b + pad.t) / 2}) rotate(-90)`} textAnchor="middle">
+          {t.y_label}
+        </text>
+        {series.length ? (
+          series.map((s) => (
+            <polyline key={s.key} className="r-cov-line" stroke={colour[s.key]} points={s.y.map((v, i) => `${px(i)},${py(v)}`).join(' ')} />
+          ))
+        ) : (
+          <text className="r-axis r-trace-pending" x={(W + pad.l) / 2} y={(H - pad.b + pad.t) / 2} textAnchor="middle">
+            [{TO_BE_MEASURED}]
+          </text>
+        )}
+      </svg>
+      <figcaption data-kind="Benchmark">{t.problem}</figcaption>
+    </figure>
   );
 }
 
@@ -357,18 +482,16 @@ function List({ items }: { items: string[] }) {
 export function ModelCard() {
   const card = release.model_card;
   const d = card.model_details;
-  const t = card.training_data;
   const record = (r: Record<string, string | number | boolean>) =>
     Object.entries(r)
       .filter(([k]) => k !== 'standin')
       .map(([k, v]) => [human(k), String(v)] as const);
+  /* No training rows (founder, 30 Oct 2026: no training details on the page). */
   const sections: [string, ReactNode][] = [
     ['Model', <>{release.model.name} {release.model.version}. {release.model.status}</>],
     ['Type', d.type],
     ['Inputs', d.inputs],
     ['Outputs', <List key="o" items={d.outputs} />],
-    ['Training data', t.summary],
-    ['Varied in training', <List key="v" items={t.variation_in_training} />],
     ['Intended use', <List key="u" items={card.intended_use} />],
     ['Operating envelope', <List key="e" items={record(card.operating_envelope).map(([k, v]) => `${k}: ${v}`)} />],
     ['Evaluation', card.evaluation_summary],
@@ -377,8 +500,9 @@ export function ModelCard() {
   ];
   return (
     <details className="r-card">
+      {/* The section's heading already says "Model card". */}
       <summary>
-        Model card <span>{release.model.name} {release.model.version}</span>
+        Open the card <span>{release.model.name} {release.model.version}</span>
       </summary>
       <dl>
         {sections.map(([k, v]) => (

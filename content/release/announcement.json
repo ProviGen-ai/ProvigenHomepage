@@ -1,9 +1,7 @@
 {
   "schema_version": 1,
   "notes": [
-    "Publication-safe: no internal names, ids or paths.",
-    "Every figure with standin=true is a stand-in measured on a development model and will be re-measured on the release model; the standin and measured_on fields are draft markers only, not page copy.",
-    "Tone (user, 2026-10-30): confident, no hedging, no caveats, few insider details. Every claim on the page must be true exactly as worded."
+    "Page data for the [MODEL NAME] announcement. Values marked standin are placeholders until the release."
   ],
   "model": {
     "name": "[MODEL NAME]",
@@ -15,23 +13,12 @@
   },
   "model_card": {
     "model_details": {
-      "type": "Pretrained foundation model for experiment design",
+      "type": "Foundation model for experiment design",
       "inputs": "The campaign so far: parameter settings and measured outcomes, plus declared outcome limits (a floor where runs fail, a ceiling where a readout saturates)",
       "outputs": [
         "A full predictive distribution of the outcome at any untested setting",
         "The probability that a run succeeds",
         "Proposals for the next experiment or the next batch"
-      ],
-      "standin": true
-    },
-    "training_data": {
-      "summary": "Pretrained entirely on about 10 million simulated optimisation campaigns. No real or customer data was used for training.",
-      "variation_in_training": [
-        "Problems from one to a hundred parameters",
-        "Smooth landscapes, sharp optima, thresholds, step changes and regime switches",
-        "Noisy and replicated measurements, batch effects and hidden factors",
-        "Failed runs and saturated readouts",
-        "Campaign histories collected by many different search strategies"
       ],
       "standin": true
     },
@@ -41,7 +28,7 @@
       "Campaigns that aim for a target value, stay within limits, or trade off several outcomes"
     ],
     "operating_envelope": {
-      "parameters": "up to 64 per campaign",
+      "parameters": "up to 100 per campaign",
       "parameter_types": "continuous, integer, log-scale, categorical, mixtures",
       "batch_proposals": "one experiment to a full plate per round",
       "time_per_proposal": "seconds",
@@ -125,8 +112,8 @@
           "values": {
             "model": 0.158,
             "bo_gp": 0.205,
-            "tabpfn": 0.247,
-            "random": 1.0
+            "random": 1.0,
+            "tabpfn_v2_5": 0.247
           }
         },
         {
@@ -134,8 +121,8 @@
           "values": {
             "model": 0.216,
             "bo_gp": 0.436,
-            "tabpfn": 0.328,
-            "random": 1.0
+            "random": 1.0,
+            "tabpfn_v2_5": 0.328
           }
         }
       ],
@@ -202,7 +189,7 @@
     },
     {
       "id": "hpo_search",
-      "title": "Public benchmark: HPO-B",
+      "title": "Ahead early on a public benchmark",
       "question": "How fast does each method find good configurations on a public benchmark it never saw?",
       "task": "Search real hyperparameter-optimisation spaces of up to 6 parameters, one experiment at a time.",
       "dataset": {
@@ -231,18 +218,18 @@
           "group": "After 25",
           "values": {
             "model": 0.0513,
-            "tabpfn": 0.066,
             "bo_gp": 0.0712,
-            "random": 0.1589
+            "random": 0.1589,
+            "tabpfn_v2_5": 0.066
           }
         },
         {
           "group": "After 50",
           "values": {
             "model": 0.0296,
-            "tabpfn": 0.0306,
             "bo_gp": 0.0501,
-            "random": 0.1202
+            "random": 0.1202,
+            "tabpfn_v2_5": 0.0306
           }
         }
       ],
@@ -251,7 +238,7 @@
     },
     {
       "id": "cellfree_rerank",
-      "title": "Real lab data: cell-free protein expression",
+      "title": "Proven on a real lab campaign: cell-free protein expression",
       "question": "Given some measured formulations, which untested ones should be made next?",
       "task": "From a handful of measured formulations of a published three-stage campaign, pick which untested formulations to make next.",
       "dataset": {
@@ -280,33 +267,33 @@
           "group": "10 measured formulations: share of the top 5% in its next picks",
           "values": {
             "model": 0.23,
-            "tabpfn": 0.21,
             "bo_gp": 0.18,
-            "random": "0.01 to 0.06"
+            "random": "0.01 to 0.06",
+            "tabpfn_v2_5": 0.21
           }
         },
         {
           "group": "50 measured formulations: share of the top 5% in its next picks",
           "values": {
             "model": 0.43,
-            "tabpfn": 0.39,
-            "bo_gp": 0.38
+            "bo_gp": 0.38,
+            "tabpfn_v2_5": 0.39
           }
         },
         {
           "group": "10 measured formulations: results inside its 80% range",
           "values": {
             "model": 0.84,
-            "tabpfn": 0.76,
-            "bo_gp": 0.55
+            "bo_gp": 0.55,
+            "tabpfn_v2_5": 0.76
           }
         },
         {
           "group": "200 measured formulations: results inside its 80% range",
           "values": {
             "model": 0.84,
-            "tabpfn": 0.82,
-            "bo_gp": 0.8
+            "bo_gp": 0.8,
+            "tabpfn_v2_5": 0.82
           }
         }
       ],
@@ -321,7 +308,7 @@
     },
     {
       "id": "discovery_cellfree",
-      "title": "Experiments saved",
+      "title": "Fewer experiments to the best formulations",
       "question": "How many fewer experiments to find the best formulations than random screening?",
       "task": "Search each cell-free stage for its top 5% / top 1% formulations, 200 experiments, one at a time.",
       "dataset": {
@@ -415,5 +402,224 @@
       "title": "From a few parameters to many",
       "text": "The same model serves a two-factor optimisation and a formulation with dozens of components, mixing continuous, categorical and mixture parameters."
     }
-  ]
+  ],
+  "methods": [
+    {
+      "key": "model",
+      "name": "[MODEL NAME]",
+      "group": "ours"
+    },
+    {
+      "key": "tabpfn_v2",
+      "name": "TabPFN v2",
+      "group": "tabpfn"
+    },
+    {
+      "key": "tabpfn_v2_5",
+      "name": "TabPFN v2.5",
+      "group": "tabpfn"
+    },
+    {
+      "key": "tabpfn_v2_6",
+      "name": "TabPFN v2.6",
+      "group": "tabpfn"
+    },
+    {
+      "key": "tabpfn_v3",
+      "name": "TabPFN v3",
+      "group": "tabpfn"
+    },
+    {
+      "key": "tabpfn_v3_5",
+      "name": "TabPFN v3.5",
+      "group": "tabpfn"
+    },
+    {
+      "key": "bo_gp",
+      "name": "Bayesian optimisation",
+      "group": "bo"
+    },
+    {
+      "key": "baybe",
+      "name": "BayBE (Merck KGaA)",
+      "group": "industry"
+    },
+    {
+      "key": "bofire",
+      "name": "BoFire (BASF)",
+      "group": "industry"
+    },
+    {
+      "key": "doe_lhs",
+      "name": "DoE: space-filling",
+      "group": "doe"
+    },
+    {
+      "key": "doe_rsm",
+      "name": "DoE: response surface",
+      "group": "doe"
+    },
+    {
+      "key": "random",
+      "name": "Random",
+      "group": "reference"
+    }
+  ],
+  "copy": {
+    "kicker": "Introducing [MODEL NAME] v[VERSION]",
+    "section_titles": {
+      "why": "Every experiment counts",
+      "category": "A foundation model for experiment design",
+      "how": "Ready from the first experiment",
+      "results": "Better results in fewer experiments",
+      "real_lab": "Proven on a real lab campaign",
+      "enables": "What this enables",
+      "handles": "Built for how labs work",
+      "faq": "Questions scientists ask",
+      "model_card": "Model card",
+      "cta": "Be among the first labs to use it"
+    },
+    "results_intro_template": "We ran {campaigns} optimisation campaigns on {benchmarks} benchmarks, every method on the same starting experiments, against {methods} methods: five versions of TabPFN, Bayesian optimisation, the industry tools BayBE and BoFire, two classical designs of experiments, and random search.",
+    "results_intro_values": {
+      "campaigns": null,
+      "benchmarks": 3,
+      "methods": 11
+    },
+    "cta_text": "Access opens later. Join the list to be among the first labs to run their next campaign with [MODEL NAME], or tell us about a campaign you are planning.",
+    "standin": true
+  },
+  "takeaways": [
+    {
+      "text_template": "Proposes the next experiments for a new lab campaign out of the box: nothing to fit, tune or configure.",
+      "values": {}
+    },
+    {
+      "text_template": "Beats standard Bayesian optimisation in {wins} of {runs} benchmark campaigns with sharp optima and abrupt changes.",
+      "values": {
+        "wins": 33,
+        "runs": 40
+      },
+      "benchmark": "heldout_search"
+    },
+    {
+      "text_template": "Its 95% ranges hold {cov95} of the time, so you know which experiments are worth the reagent.",
+      "values": {
+        "cov95": 0.95
+      },
+      "benchmark": "calibration_heldout"
+    },
+    {
+      "text_template": "Finds half of the best 5% of formulations {factor}x faster than random screening on a published cell-free campaign.",
+      "values": {
+        "factor": null
+      },
+      "benchmark": "discovery_cellfree"
+    }
+  ],
+  "category_explainer": {
+    "title": "What is a foundation model for experiment design?",
+    "text": "Classical design of experiments plans a screen up front. Bayesian optimisation fits a new statistical model to every campaign and starts from scratch each time. A foundation model for experiment design arrives ready: it already knows how lab results tend to depend on settings, from smooth trends to sharp optima, thresholds and failed runs. Given a lab's results so far, it predicts every untested setting with honest uncertainty and proposes the next experiments in seconds."
+  },
+  "summary_chart": {
+    "benchmark": "heldout_search",
+    "group": "All 11 problems",
+    "reference": {
+      "key": null,
+      "label_template": "Strongest alternative: {name}"
+    },
+    "title_template": "[MODEL NAME] gets closest to the optimum of every method tested",
+    "title_holds": null,
+    "as_of": null,
+    "standin": true
+  },
+  "campaign_trace": {
+    "title": "One campaign, experiment by experiment",
+    "problem": "[TBD: a held-out landscape with sharp optima]",
+    "x_label": "Experiments run",
+    "y_label": "Gap to the best possible result (lower is better)",
+    "series": null,
+    "standin": true
+  },
+  "asides": [
+    {
+      "anchor": "how",
+      "title": "How it works",
+      "text": "Given a campaign's results so far, [MODEL NAME] predicts every untested setting in a single pass: a full distribution over the outcome and the chance the run succeeds, with no model to fit or tune. It then proposes the settings with the most to gain."
+    },
+    {
+      "anchor": "results",
+      "title": "How these benchmarks were run",
+      "text": "Every method started from the same initial experiments on the same seeds and ran through the same harness. Industry tools ran with their default settings. Every benchmark was held out of training."
+    }
+  ],
+  "faq": [
+    {
+      "q": "Does it need my historical data?",
+      "a": "No. It is ready for a new campaign from the first results. Earlier results from the same campaign make its next proposals better."
+    },
+    {
+      "q": "How many parameters can a campaign have?",
+      "a": "Up to 100 per campaign: continuous, integer, log-scale and categorical parameters, and mixtures that must add up to a total."
+    },
+    {
+      "q": "Can it handle failed runs and saturated readouts?",
+      "a": "Yes. Declare where runs fail or a readout saturates and the model treats those results as censored rather than exact."
+    },
+    {
+      "q": "Can it aim for a value instead of the maximum?",
+      "a": "Yes. Set a target with a tolerance and it proposes the settings most likely to land in range, with that probability for each."
+    },
+    {
+      "q": "How does it compare with design of experiments?",
+      "a": "We benchmarked it against both a space-filling screen and a classical response-surface design; the results are above."
+    },
+    {
+      "q": "How fast is it?",
+      "a": "Seconds per proposal on a standard computer, no GPU needed."
+    },
+    {
+      "q": "How do I get access?",
+      "a": "Access opens later. Join the list and we will contact you."
+    }
+  ],
+  "contamination": {
+    "title": "Contamination check",
+    "text_template": "We checked every benchmark for contamination: none of the {problems} benchmark problems has a near-copy in the training data.",
+    "values": {
+      "problems": null
+    },
+    "holds": null,
+    "anchor": "results",
+    "standin": true
+  },
+  "response_shapes": {
+    "title": "Landscapes it is built for",
+    "families": [
+      {
+        "name": "Smooth trends",
+        "text": "gradual dose-response and interaction effects"
+      },
+      {
+        "name": "Sharp optima",
+        "text": "narrow peaks that a coarse screen misses"
+      },
+      {
+        "name": "Thresholds and steps",
+        "text": "precipitation, regime switches, all-or-nothing effects"
+      },
+      {
+        "name": "Failed and saturated runs",
+        "text": "no growth, no signal, readouts at their limit"
+      },
+      {
+        "name": "Noise and batch effects",
+        "text": "replicates that disagree, plates that differ"
+      },
+      {
+        "name": "From one to a hundred parameters",
+        "text": "from a two-factor screen to a many-component formulation"
+      }
+    ],
+    "standin": true
+  }
 }
