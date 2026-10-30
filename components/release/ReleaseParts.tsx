@@ -19,7 +19,8 @@ import {
  * reports, in the data file's order (methodsIn, chartMethods).
  *
  * Colours by method group: the model teal, TabPFN ink, Bayesian optimisation
- * orange, design of experiments stone and mint, others faint; a second member
+ * orange, industry tools (BayBE, BoFire) slate blue, design of experiments
+ * stone and sand, others faint; a second member
  * of a group takes the group's second colour. Random search, where it is the
  * yardstick (the same value in every row), is a dashed line, not a bar. A chart
  * shows the best TabPFN version for that benchmark; the other versions are in
@@ -30,7 +31,10 @@ const PALETTE: Record<string, string[]> = {
   ours: ['var(--c-teal)'],
   tabpfn: ['var(--c-ink)', 'var(--c-line-3)'],
   bo: ['var(--c-orange)', 'var(--c-amber-ink)'],
-  doe: ['var(--c-muted)', 'var(--c-mint)'],
+  /* BayBE, BoFire: separate products, both always shown (not folded like TabPFN versions). */
+  industry: ['var(--r-industry-1)', 'var(--r-industry-2)'],
+  /* Sand, not mint, for the second DoE: mint sat too close to the model's teal. */
+  doe: ['var(--c-muted)', 'var(--c-sand)'],
   other: ['var(--c-faint)'],
 };
 

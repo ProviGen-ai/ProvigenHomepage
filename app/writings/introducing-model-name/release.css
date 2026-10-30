@@ -3,6 +3,11 @@
  * writings shell: the headline result as the lead, data figures in the site's
  * figure frame, mono tables, small print folded under each result.
  */
+/* Two slate blues for the industry tools: apart from the brand's teal, orange and ink. */
+.w-article {
+  --r-industry-1: #4d6a87;
+  --r-industry-2: #9db3c8;
+}
 .w-prose > .r-body > section:first-child > h2 {
   margin-top: 0;
 }
