@@ -7,6 +7,8 @@
 .w-article {
   --r-industry-1: #4d6a87;
   --r-industry-2: #9db3c8;
+  /* A warm stone for space-filling DoE, apart from the TabPFN greys. */
+  --r-doe-1: #8d7a5a;
 }
 .w-prose > .r-body > section:first-child > h2 {
   margin-top: 0;
@@ -478,14 +480,8 @@
 .r-bars-ref--incumbent {
   border-left-color: var(--c-teal-ink);
 }
-.r-bars-ref--incumbent span {
-  position: absolute;
-  top: -1.3rem;
-  left: 0;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  font-size: 0.625rem;
-  color: var(--c-teal-ink);
+.r-key--incumbent {
+  border-top-color: var(--c-teal-ink);
 }
 
 /* Landscapes it is built for: six small drawings. */
@@ -535,7 +531,12 @@
 }
 
 /* One campaign's trace: a framed slot until it is measured. */
+.r-trace-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
 .r-trace svg {
+  min-width: 520px;
   display: block;
   width: 100%;
   height: auto;
@@ -544,6 +545,12 @@
 .r-trace text {
   font-family: var(--f-mono);
   fill: var(--c-muted);
+}
+.r-trace svg.r-trace-drawn {
+  border: 0;
+}
+.r-trace-ref {
+  stroke-dasharray: 4 3;
 }
 .r-trace-pending {
   font-size: 13px;

@@ -42,6 +42,8 @@ export type Benchmark = {
   measured_on: string;
   standin: boolean;
   not_measured_yet?: boolean;
+  /** Which section shows it; without it, see sectionOf(). */
+  section?: 'results' | 'real_lab';
 };
 
 export type Headline = {
@@ -275,6 +277,12 @@ export const benchmark = (id: string) => {
   if (!found) throw new Error(`release: no benchmark "${id}" in announcement.json`);
   return found;
 };
+
+/* Benchmarks on real lab data before the data file carried `section`. */
+const REAL_LAB_IDS = ['cellfree_rerank', 'discovery_cellfree'];
+
+/** The section a benchmark belongs to: its own `section`, else results (the lab ones by id). */
+export const sectionOf = (b: Benchmark): 'results' | 'real_lab' => b.section ?? (REAL_LAB_IDS.includes(b.id) ? 'real_lab' : 'results');
 
 /** True while any figure on the page is a stand-in: the page then shows itself as a draft. */
 export const isDraft = JSON.stringify(release).includes('"standin":true');
