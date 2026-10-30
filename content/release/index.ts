@@ -12,7 +12,15 @@
  */
 import data from './announcement.json';
 
-export type MethodKey = 'model' | 'bo_gp' | 'tabpfn' | 'random' | 'bo_gp_published' | 'fsbo_published';
+/** A method's key in the result rows ("model", "bo_gp", "tabpfn_v2_5", ...). */
+export type MethodKey = string;
+
+/**
+ * A compared method, in display order. `group` drives colour and folding:
+ * "ours", "tabpfn", "bo", "doe", "reference" (random: drawn as a dashed line
+ * where it is the chart's yardstick), anything else drawn neutral.
+ */
+export type Method = { key: MethodKey; name: string; group: string };
 export type Cell = number | string | null | number[];
 
 export type Benchmark = {
@@ -79,6 +87,8 @@ export type ReleaseData = {
     license: string;
     citation: string;
   };
+  /** Every method the results compare, in display order (from the data file since 30 Oct 2026). */
+  methods?: Method[];
   headline_candidates: Headline[];
   benchmarks: Benchmark[];
   capabilities: { name: string; text: string; evidence?: string }[];
@@ -94,15 +104,75 @@ export const release = data as unknown as ReleaseData;
 export const RELEASE_PATH = '/writings/introducing-model-name';
 export const RELEASE_SLUG = 'introducing-model-name';
 
-/** Display names for the methods, as the data file names its baselines. */
-export const METHOD_LABEL: Record<MethodKey, string> = {
-  model: release.model.name,
-  bo_gp: 'Bayesian optimisation (GP)',
-  tabpfn: 'TabPFN v2.5',
-  random: 'Random search',
-  bo_gp_published: 'GP, HPO-B published',
-  fsbo_published: 'FSBO, published',
-};
+/* A data file without `methods` (schema of 30 Oct 2026, morning) names its
+   methods by these keys. */
+const LEGACY_METHODS: Method[] = [
+  { key: 'model', name: release.model.name, group: 'ours' },
+  { key: 'tabpfn', name: 'TabPFN v2.5', group: 'tabpfn' },
+  { key: 'bo_gp', name: 'Bayesian optimisation (GP)', group: 'bo' },
+  { key: 'bo_gp_published', name: 'GP, HPO-B published', group: 'bo' },
+  { key: 'fsbo_published', name: 'FSBO, published', group: 'other' },
+  { key: 'random', name: 'Random search', group: 'reference' },
+];
+
+/** The methods in display order: the data file's list, else the legacy names. */
+export const METHODS: Method[] = release.methods ?? LEGACY_METHODS;
+
+/** Display name by key. */
+export const METHOD_LABEL: Record<MethodKey, string> = Object.fromEntries(METHODS.map((m) => [m.key, m.name]));
+
+/**
+ * The methods one benchmark reports, in display order. Only keys present in
+ * at least one result row; a key the methods list does not know is appended
+ * under its own key, so no number is ever silently dropped.
+ */
+export function methodsIn(benchmark: Benchmark): Method[] {
+  const present = new Set(benchmark.results.flatMap((r) => Object.keys(r.values)));
+  const known = METHODS.filter((m) => present.has(m.key));
+  const unknown = [...present].filter((k) => !METHODS.some((m) => m.key === k)).map((key) => ({ key, name: key, group: 'other' }));
+  return [...known, ...unknown];
+}
+
+/**
+ * Which value is best for this benchmark's metric: lower, higher, or (rows of
+ * shares against nominal levels) closest to nominal. Undefined when the
+ * direction is mixed, e.g. "higher; closest to 80%".
+ */
+function scoreOf(benchmark: Benchmark, key: MethodKey, nominal?: number[]): number | undefined {
+  const dir = benchmark.metric.direction.toLowerCase();
+  if (dir.includes(';')) return undefined;
+  const scores = benchmark.results.flatMap((r) => {
+    const v = r.values[key];
+    if (typeof v === 'number') {
+      if (/^lower\b/.test(dir)) return [v];
+      if (/^higher\b/.test(dir)) return [-v];
+      return [];
+    }
+    if (Array.isArray(v) && nominal && /^closest\b/.test(dir)) return [v.reduce((sum, x, i) => sum + Math.abs(x - nominal[i]), 0) / v.length];
+    return [];
+  });
+  return scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : undefined;
+}
+
+/**
+ * The methods a chart draws: every method present, except that a group with
+ * several versions (TabPFN) shows only its best one for this benchmark; the
+ * others are returned as `folded`, for a table under the chart.
+ */
+export function chartMethods(benchmark: Benchmark, { nominal, foldGroups = ['tabpfn'] }: { nominal?: number[]; foldGroups?: string[] } = {}) {
+  const all = methodsIn(benchmark);
+  const folded: Method[] = [];
+  for (const group of foldGroups) {
+    const members = all.filter((m) => m.group === group);
+    if (members.length < 2) continue;
+    const scored = members.map((m) => ({ m, s: scoreOf(benchmark, m.key, nominal) }));
+    const best = scored.every((x) => x.s !== undefined)
+      ? scored.reduce((a, b) => ((b.s as number) < (a.s as number) ? b : a)).m
+      : members[0];
+    folded.push(...members.filter((m) => m !== best));
+  }
+  return { shown: all.filter((m) => !folded.includes(m)), folded };
+}
 
 export const TO_BE_MEASURED = 'to be measured';
 
@@ -120,7 +190,8 @@ export function show(value: Cell | undefined, { percent = false, decimals }: { p
  * all its numbers to the most decimals any of them carries.
  */
 export function decimalsOf(benchmark: Benchmark): number {
-  const places = (v: number) => (Number.isInteger(v) ? 0 : String(v).split('.')[1]?.length ?? 0);
+  /* toPrecision(12) drops float noise from computed values (0.30000000000000004). */
+  const places = (v: number) => (Number.isInteger(v) ? 0 : String(Number(v.toPrecision(12))).split('.')[1]?.length ?? 0);
   return Math.max(
     0,
     ...benchmark.results.flatMap((r) =>
@@ -129,10 +200,13 @@ export function decimalsOf(benchmark: Benchmark): number {
   );
 }
 
-/** A method's name in one benchmark: its own baseline name for random (search or ranking). */
+/**
+ * A method's name in one benchmark. Without a methods list in the data file,
+ * random takes the benchmark's own baseline name (search, ranking, screening).
+ */
 export function methodLabel(benchmark: Benchmark, key: MethodKey): string {
-  if (key === 'random') return benchmark.baselines.find((b) => /^random/i.test(b.name))?.name ?? METHOD_LABEL.random;
-  return METHOD_LABEL[key];
+  if (!release.methods && key === 'random') return benchmark.baselines.find((b) => /^random/i.test(b.name))?.name ?? METHOD_LABEL.random;
+  return METHOD_LABEL[key] ?? key;
 }
 
 /** Template keys whose values are shares of 1 and read as percentages. */

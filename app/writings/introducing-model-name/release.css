@@ -292,13 +292,12 @@
   font-family: var(--f-mono);
   font-size: 0.75rem;
 }
-.r-bars::after {
-  content: '';
+/* The yardstick (random search): a dashed line through every group, placed by the page. */
+.r-bars-ref {
   position: absolute;
   top: 0;
   bottom: 1.4rem;
-  right: 0;
-  border-right: 1.25px dashed var(--c-ink);
+  border-left: 1.25px dashed var(--c-ink);
 }
 .r-bars-group + .r-bars-group {
   margin-top: 1.1rem;
@@ -327,15 +326,24 @@
   font-style: italic;
 }
 .w-prose .r-bars-axis {
-  display: flex;
-  justify-content: space-between;
+  position: relative;
   margin: 0.5rem 0 0;
+  min-height: 1.2em;
   font-size: 0.625rem;
   color: var(--c-muted);
 }
-/* Centred under the dashed line at the track's end. */
-.r-bars-axis span:last-child {
-  transform: translateX(50%);
+/* Centred under the dashed line. */
+.r-bars-axis-ref {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.w-prose .r-folded {
+  margin-top: 1.25rem;
+}
+.w-prose .r-folded .r-table {
+  margin-block: 0.25rem 1rem;
 }
 
 /* One line of source under each result (30 Oct 2026; was the folded "How this was measured"). */

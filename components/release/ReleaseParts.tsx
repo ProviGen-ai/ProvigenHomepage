@@ -1,32 +1,61 @@
 import type { ReactNode } from 'react';
 import {
-  METHOD_LABEL,
   TO_BE_MEASURED,
+  chartMethods,
   decimalsOf,
   methodLabel,
+  methodsIn,
   liveUrl,
   release,
   show,
   type Benchmark,
-  type Cell,
-  type MethodKey,
+  type Method,
 } from '@/content/release';
 
 /*
  * Pieces of the model release page (app/writings/introducing-model-name).
- * Server components; every figure comes from content/release/announcement.json.
- * Colours: the model teal, Bayesian optimisation orange, TabPFN ink, random a
- * dashed reference. No "best" highlighting: the tables show the numbers, and
- * where a baseline leads is left for the reader to see.
+ * Server components; every figure comes from content/release/announcement.json,
+ * and so do the columns: each chart and table shows the methods a benchmark
+ * reports, in the data file's order (methodsIn, chartMethods).
+ *
+ * Colours by method group: the model teal, TabPFN ink, Bayesian optimisation
+ * orange, design of experiments stone and mint, others faint; a second member
+ * of a group takes the group's second colour. Random search, where it is the
+ * yardstick (the same value in every row), is a dashed line, not a bar. A chart
+ * shows the best TabPFN version for that benchmark; the other versions are in
+ * a folded table under it. No "best" highlighting in tables.
  */
 
-const COLOR: Partial<Record<MethodKey, string>> = {
-  model: 'var(--c-teal)',
-  bo_gp: 'var(--c-orange)',
-  tabpfn: 'var(--c-ink)',
+const PALETTE: Record<string, string[]> = {
+  ours: ['var(--c-teal)'],
+  tabpfn: ['var(--c-ink)', 'var(--c-line-3)'],
+  bo: ['var(--c-orange)', 'var(--c-amber-ink)'],
+  doe: ['var(--c-muted)', 'var(--c-mint)'],
+  other: ['var(--c-faint)'],
 };
 
-/** Stand-in marker, shown while the page is a draft. */
+/** Each shown method's colour: its group's palette, by order within the group. */
+function colours(methods: Method[]) {
+  const seen: Record<string, number> = {};
+  return Object.fromEntries(
+    methods.map((m) => {
+      const palette = PALETTE[m.group] ?? PALETTE.other;
+      const i = (seen[m.group] = (seen[m.group] ?? -1) + 1);
+      return [m.key, palette[Math.min(i, palette.length - 1)]];
+    }),
+  ) as Record<string, string>;
+}
+
+/** A reference method drawn as a line: the same number in every row of the benchmark. */
+function yardstick(benchmark: Benchmark, methods: Method[]) {
+  for (const m of methods.filter((x) => x.group === 'reference')) {
+    const values = benchmark.results.map((r) => r.values[m.key]);
+    if (values.every((v) => typeof v === 'number' && v === values[0])) return { method: m, value: values[0] as number };
+  }
+  return undefined;
+}
+
+/** Stand-in marker per result. Off the page since 30 Oct 2026 (the Draft box says it once); kept for reuse. */
 export function MeasuredOn({ benchmark }: { benchmark: Benchmark }) {
   if (!benchmark.standin) return null;
   return (
@@ -36,71 +65,106 @@ export function MeasuredOn({ benchmark }: { benchmark: Benchmark }) {
   );
 }
 
-function Legend({ methods }: { methods: MethodKey[] }) {
+function Legend({ benchmark, methods, colour, line }: { benchmark: Benchmark; methods: Method[]; colour: Record<string, string>; line?: { method: Method; value: number } }) {
   return (
     <ul className="r-legend">
       {methods.map((m) => (
-        <li key={m}>
-          <span className={m === 'random' ? 'r-key r-key--ref' : 'r-key'} style={{ background: COLOR[m] }} aria-hidden="true" />
-          {METHOD_LABEL[m]}
-          {m === 'random' ? ' = 1.0' : null}
+        <li key={m.key}>
+          <span className="r-key" style={{ background: colour[m.key] }} aria-hidden="true" />
+          {methodLabel(benchmark, m.key)}
         </li>
       ))}
+      {line ? (
+        <li>
+          <span className="r-key r-key--ref" aria-hidden="true" />
+          {methodLabel(benchmark, line.method.key)} = {show(line.value, { decimals: 1 })}
+        </li>
+      ) : null}
     </ul>
   );
 }
 
+/** The versions a chart leaves out, folded under it as a table. */
+function Folded({ benchmark, shown, folded, percent = false }: { benchmark: Benchmark; shown: Method[]; folded: Method[]; percent?: boolean }) {
+  if (!folded.length) return null;
+  const groups = new Set(folded.map((m) => m.group));
+  const keys = methodsIn(benchmark).filter((m) => groups.has(m.group) && (shown.includes(m) || folded.includes(m)));
+  return (
+    <details className="r-facts r-folded">
+      <summary>All {keys[0].name.split(' ')[0]} versions</summary>
+      <ResultsTable benchmark={benchmark} percent={percent} only={keys.map((m) => m.key)} />
+    </details>
+  );
+}
+
 /**
- * Held-out search: regret relative to random search, one block of bars per
- * problem group, lower is better, random search the dashed line at 1.0.
+ * Bars per result row, lower is better. A yardstick method (random search at
+ * 1.0) is the dashed line the bars are measured against; the scale reaches
+ * whichever is longer, the line or the longest bar.
  * HTML bars, not SVG, so the labels keep their size on a phone.
  */
 export function RegretBars({ benchmark }: { benchmark: Benchmark }) {
-  const methods: MethodKey[] = ['model', 'bo_gp', 'tabpfn'];
+  const { shown, folded } = chartMethods(benchmark);
+  const line = yardstick(benchmark, shown);
+  const bars = shown.filter((m) => m !== line?.method);
+  const colour = colours(bars);
   const decimals = decimalsOf(benchmark);
+  const numbers = benchmark.results.flatMap((r) => bars.map((m) => r.values[m.key]).filter((v): v is number => typeof v === 'number'));
+  const scale = Math.max(line?.value ?? 0, ...numbers) || 1;
+  const at = (v: number) => `${(v / scale) * 100}%`;
   return (
     <figure className="r-figure">
-      <Legend methods={[...methods, 'random']} />
+      <Legend benchmark={benchmark} methods={bars} colour={colour} line={line} />
       <div className="r-bars">
+        {line ? <span className="r-bars-ref" style={{ left: at(line.value) }} aria-hidden="true" /> : null}
         {benchmark.results.map((r) => (
           <div key={r.group} className="r-bars-group" role="group" aria-label={r.group}>
             <p className="r-bars-label">{r.group}</p>
-            {methods.map((m) => {
-              const v = r.values[m];
-              return (
-                <div key={m} className="r-bar-row">
-                  <span className="s-sr">{METHOD_LABEL[m]}:</span>
-                  {typeof v === 'number' ? (
-                    <>
-                      <span className="r-bar" style={{ width: `${Math.min(v, 1) * 100}%`, background: COLOR[m] }} aria-hidden="true" />
-                      <span className="r-val">{show(v, { decimals })}</span>
-                    </>
-                  ) : (
-                    <span className="r-val r-val--pending">{TO_BE_MEASURED}</span>
-                  )}
-                </div>
-              );
-            })}
+            {bars
+              .filter((m) => m.key in r.values)
+              .map((m) => {
+                const v = r.values[m.key];
+                return (
+                  <div key={m.key} className="r-bar-row">
+                    <span className="s-sr">{methodLabel(benchmark, m.key)}:</span>
+                    {typeof v === 'number' ? (
+                      <>
+                        <span className="r-bar" style={{ width: at(v), background: colour[m.key] }} aria-hidden="true" />
+                        <span className="r-val">{show(v, { decimals })}</span>
+                      </>
+                    ) : (
+                      <span className="r-val r-val--pending">{show(v)}</span>
+                    )}
+                  </div>
+                );
+              })}
           </div>
         ))}
         <p className="r-bars-axis" aria-hidden="true">
           <span>0</span>
-          <span>random = 1.0</span>
+          {line ? (
+            <span className="r-bars-axis-ref" style={{ left: at(line.value) }}>
+              {methodLabel(benchmark, line.method.key).toLowerCase()} = {show(line.value, { decimals: 1 })}
+            </span>
+          ) : null}
         </p>
       </div>
       <figcaption data-kind="Benchmark">
         {benchmark.metric.name}. Lower is better.
       </figcaption>
+      <Folded benchmark={benchmark} shown={shown} folded={folded} />
     </figure>
   );
 }
 
 /**
- * Calibration: for each condition, the share of outcomes inside the model's
- * 50 / 80 / 95% intervals against the nominal level. On the diagonal is exact.
+ * Calibration: for each condition, the share of outcomes inside each method's
+ * 50 / 80 / 95% ranges against the nominal level. On the diagonal is exact.
  */
 export function CoveragePlot({ benchmark, nominal = [0.5, 0.8, 0.95] }: { benchmark: Benchmark; nominal?: number[] }) {
-  const methods: MethodKey[] = ['model', 'bo_gp'];
+  const { shown, folded } = chartMethods(benchmark, { nominal });
+  const methods = shown.filter((m) => benchmark.results.some((r) => Array.isArray(r.values[m.key])));
+  const colour = colours(methods);
   const S = 260;
   const pad = { l: 40, r: 12, t: 12, b: 34 };
   const lo = 0.3;
@@ -111,7 +175,7 @@ export function CoveragePlot({ benchmark, nominal = [0.5, 0.8, 0.95] }: { benchm
 
   return (
     <figure className="r-figure">
-      <Legend methods={methods} />
+      <Legend benchmark={benchmark} methods={methods} colour={colour} />
       <div className="r-panels">
         {benchmark.results.map((r) => (
           <svg
@@ -120,7 +184,7 @@ export function CoveragePlot({ benchmark, nominal = [0.5, 0.8, 0.95] }: { benchm
             viewBox={`0 0 ${S} ${S + 34}`}
             role="img"
             aria-label={`${r.group}. Nominal ${nominal.map((n) => show(n, { percent: true })).join(', ')}. ${methods
-              .map((m) => `${METHOD_LABEL[m]}: ${show(r.values[m] as Cell, { percent: true })}`)
+              .map((m) => `${methodLabel(benchmark, m.key)}: ${show(r.values[m.key], { percent: true })}`)
               .join('. ')}.`}
           >
             {ticks.map((t) => (
@@ -138,15 +202,16 @@ export function CoveragePlot({ benchmark, nominal = [0.5, 0.8, 0.95] }: { benchm
             <text className="r-axis" x={(px(lo) + px(hi)) / 2} y={S - 4} textAnchor="middle">
               nominal level
             </text>
-            {methods.map((m) => {
-              const ys = r.values[m];
+            {/* The model is drawn last, on top. */}
+            {[...methods.filter((m) => m.group !== 'ours'), ...methods.filter((m) => m.group === 'ours')].map((m) => {
+              const ys = r.values[m.key];
               if (!Array.isArray(ys)) return null;
               const pts = nominal.map((n, i) => [px(n), py(ys[i])] as const);
               return (
-                <g key={m}>
-                  <polyline className="r-cov-line" points={pts.map((p) => p.join(',')).join(' ')} stroke={COLOR[m]} />
+                <g key={m.key}>
+                  <polyline className="r-cov-line" points={pts.map((p) => p.join(',')).join(' ')} stroke={colour[m.key]} />
                   {pts.map(([cx, cy], i) => (
-                    <circle key={i} cx={cx} cy={cy} r={4} fill={COLOR[m]} />
+                    <circle key={i} cx={cx} cy={cy} r={4} fill={colour[m.key]} />
                   ))}
                 </g>
               );
@@ -160,25 +225,29 @@ export function CoveragePlot({ benchmark, nominal = [0.5, 0.8, 0.95] }: { benchm
       <figcaption data-kind="Benchmark">
         {benchmark.metric.name}, against the nominal level; on the dashed diagonal is exact.
       </figcaption>
+      <Folded benchmark={benchmark} shown={shown} folded={folded} percent />
     </figure>
   );
 }
 
-/** A benchmark's results as a table: one row per group, one column per method present. */
-export function ResultsTable({ benchmark, percent = false }: { benchmark: Benchmark; percent?: boolean }) {
-  const order: MethodKey[] = ['model', 'tabpfn', 'bo_gp', 'bo_gp_published', 'fsbo_published', 'random'];
-  const methods = order.filter((m) => benchmark.results.some((r) => m in r.values));
+/**
+ * A benchmark's results as a table: one row per group, one column per method
+ * it reports, in the data file's order (or only the keys in `only`).
+ */
+export function ResultsTable({ benchmark, percent = false, only }: { benchmark: Benchmark; percent?: boolean; only?: string[] }) {
+  const methods = methodsIn(benchmark).filter((m) => !only || only.includes(m.key));
   const decimals = decimalsOf(benchmark);
   return (
     <div className="p-writings-table-scroll r-table" tabIndex={0} role="region" aria-label={`${benchmark.title}, table`}>
-      <table>
+      {/* Wider than the column when there are many methods: the wrapper scrolls. */}
+      <table style={{ minWidth: `${Math.max(520, 180 + methods.length * 96)}px` }}>
         <thead>
           <tr>
             {/* The unit heads the row labels, unless it is a bare symbol ("x"). */}
             <th scope="col">{benchmark.metric.unit.length > 2 ? benchmark.metric.unit : ''}</th>
             {methods.map((m) => (
-              <th key={m} scope="col" className={m === 'model' ? 'r-col-model' : undefined}>
-                {methodLabel(benchmark, m)}
+              <th key={m.key} scope="col" className={m.group === 'ours' ? 'r-col-model' : undefined}>
+                {methodLabel(benchmark, m.key)}
               </th>
             ))}
           </tr>
@@ -188,10 +257,10 @@ export function ResultsTable({ benchmark, percent = false }: { benchmark: Benchm
             <tr key={r.group}>
               <th scope="row">{r.group}</th>
               {methods.map((m) => {
-                const v = r.values[m];
+                const v = r.values[m.key];
                 return (
-                  <td key={m} className={[m === 'model' ? 'r-col-model' : '', v === null ? 'r-pending' : ''].join(' ').trim() || undefined}>
-                    {m in r.values ? show(v, { percent, decimals }) : ''}
+                  <td key={m.key} className={[m.group === 'ours' ? 'r-col-model' : '', v === null ? 'r-pending' : ''].join(' ').trim() || undefined}>
+                    {m.key in r.values ? show(v, { percent, decimals }) : ''}
                   </td>
                 );
               })}
@@ -212,7 +281,7 @@ export function PairedTable({ benchmark }: { benchmark: Benchmark }) {
         <thead>
           <tr>
             <th scope="col">Head to head</th>
-            <th scope="col">{METHOD_LABEL.model}</th>
+            <th scope="col">{release.model.name}</th>
           </tr>
         </thead>
         <tbody>
@@ -241,7 +310,14 @@ export function BenchmarkSource({ benchmark }: { benchmark: Benchmark }) {
       ) : (
         benchmark.dataset.citation
       )}
-      . Compared with {benchmark.baselines.map((b) => b.name).join(', ')}.
+      . Compared with{' '}
+      {(release.methods
+        ? methodsIn(benchmark)
+            .filter((m) => m.group !== 'ours')
+            .map((m) => m.name)
+        : benchmark.baselines.map((b) => b.name)
+      ).join(', ')}
+      .
     </p>
   );
 }
