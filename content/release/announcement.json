@@ -34,7 +34,7 @@
       "time_per_proposal": "seconds",
       "standin": true
     },
-    "evaluation_summary": "Benchmark landscapes run through the same interface labs use, a public hyperparameter-optimisation benchmark (HPO-B) and a published cell-free protein expression campaign. None of them were seen in training.",
+    "evaluation_summary": "Benchmark landscapes run through the same interface labs use and a published cell-free protein expression campaign. None of them were seen in training.",
     "license": "[TBD]",
     "citation": "[TBD]"
   },
@@ -983,7 +983,7 @@
     "title": "Contamination check",
     "text_template": "We checked every benchmark for contamination: none of the {problems} benchmark problems has a near-copy in the training data.",
     "values": {
-      "problems": 52
+      "problems": 14
     },
     "holds": true,
     "anchor": "results",
