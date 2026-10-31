@@ -652,3 +652,10 @@
 .w-prose .r-table--turned th[scope='row'].r-col-model {
   color: var(--c-teal-ink);
 }
+
+/* What a table measures, over it. */
+.w-prose .r-table-note {
+  margin-bottom: -0.75rem;
+  font-size: 0.9em;
+  color: var(--c-muted);
+}

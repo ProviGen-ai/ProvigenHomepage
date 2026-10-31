@@ -153,6 +153,8 @@ export default function ReleasePage() {
     ) : (
       <>
         {said}
+        {/* Charts say what they measure in their caption; a table says it here. */}
+        <p className="r-table-note">{b.metric.name}</p>
         <ResultsTable benchmark={b} />
       </>
     );
