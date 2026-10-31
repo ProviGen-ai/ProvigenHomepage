@@ -60,16 +60,6 @@
       "standin": true
     },
     {
-      "id": "calibration",
-      "text_template": "When it gives a 95% range, the result lands inside it {cov95} of the time. A standard Gaussian process: {gp_cov95}.",
-      "values": {
-        "cov95": 0.95,
-        "gp_cov95": 0.86
-      },
-      "benchmark": "calibration_heldout",
-      "standin": true
-    },
-    {
       "id": "fewer_experiments",
       "text_template": "It finds half of the best 5% of formulations {factor}x faster than random screening.",
       "values": {
@@ -189,46 +179,6 @@
         }
       ],
       "measured_on": "served model, release benchmark 2026-10-31",
-      "standin": true
-    },
-    {
-      "id": "calibration_heldout",
-      "title": "Uncertainty you can trust",
-      "question": "When the model gives an 80% or 95% range, how often does the measured value land inside?",
-      "task": "Predict untested outcomes from campaign histories and check how often results land inside the predicted ranges.",
-      "dataset": {
-        "name": "Same held-out test functions",
-        "citation": "Surjanovic and Bingham",
-        "url": "https://www.sfu.ca/~ssurjano/optimization.html"
-      },
-      "baselines": [
-        {
-          "name": "Bayesian optimisation (GP)"
-        }
-      ],
-      "metric": {
-        "name": "Share of results inside the 50% / 80% / 95% range",
-        "direction": "closest to 50% / 80% / 95%",
-        "unit": "share"
-      },
-      "results": [
-        {
-          "group": "Benchmark landscapes",
-          "values": {
-            "model": [
-              0.5,
-              0.8,
-              0.95
-            ],
-            "bo_gp": [
-              0.51,
-              0.74,
-              0.86
-            ]
-          }
-        }
-      ],
-      "measured_on": "served model, 2026-10-30",
       "standin": true
     },
     {
@@ -621,13 +571,6 @@
         "runs": 40
       },
       "benchmark": "heldout_search"
-    },
-    {
-      "text_template": "Its 95% ranges hold {cov95} of the time, so you know which experiments are worth the reagent.",
-      "values": {
-        "cov95": 0.95
-      },
-      "benchmark": "calibration_heldout"
     },
     {
       "text_template": "Finds half of the best 5% of formulations {factor}x faster than random screening on a published cell-free campaign.",

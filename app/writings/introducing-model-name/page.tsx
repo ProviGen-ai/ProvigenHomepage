@@ -118,7 +118,8 @@ const formatDate = (iso: string) =>
 
 export default function ReleasePage() {
   const hero = headline('abrupt_vs_bo');
-  const second = headline('calibration');
+  /* A second hero line, if the data file carries one (the calibration line left on 31 Oct 2026). */
+  const second = release.headline_candidates.find((h) => h.id === 'calibration');
   const summary = release.summary_chart;
   const summaryBenchmark = benchmark(summary.benchmark);
   const contamination = release.contamination;
@@ -133,7 +134,7 @@ export default function ReleasePage() {
    * rows as bars (null values as empty slots); anything else as a table. Its headline sentences (those not in the hero) and head-to-head
    * results follow, then how it was measured, folded inline.
    */
-  const inHero = [hero.id, second.id];
+  const inHero = [hero.id, second?.id];
   const result = (b: Benchmark, section: string) => {
     const sentences = release.headline_candidates.filter((h) => h.benchmark === b.id && !inHero.includes(h.id));
     const said = sentences.map((h) => <p key={h.id}>{fill(h)}</p>);
@@ -198,7 +199,7 @@ export default function ReleasePage() {
               {hero.values.wins} <span>of</span> {hero.values.runs}
             </p>
             <p className="r-hero-claim">{fill(hero)}</p>
-            <p className="r-hero-second">{fill(second)}</p>
+            {second ? <p className="r-hero-second">{fill(second)}</p> : null}
           </section>
           <aside className="r-takeaways" aria-labelledby="r-takeaways-label">
             <p id="r-takeaways-label" className="r-takeaways-label">
