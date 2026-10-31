@@ -68,16 +68,13 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-/* The self-optimisation subsection: in the draft with its slots; released only once its results hold. */
-const showSelf = isDraft || selfOptimization.holds === true;
-
 const toc = [
   { id: 'why', title: T.why },
   { id: 'category', title: T.category },
   { id: 'how', title: T.how },
   { id: 'results', title: T.results },
   { id: 'real-lab', title: T.real_lab },
-  ...(showSelf ? [{ id: 'self', title: selfOptimization.title }] : []),
+  ...(selfOptimization ? [{ id: 'self', title: selfOptimization.title }] : []),
   { id: 'enables', title: T.enables },
   { id: 'handles', title: T.handles },
   { id: 'faq', title: T.faq },
@@ -307,17 +304,10 @@ export default function ReleasePage() {
           {resultsIn('real_lab').map((b) => result(b, T.real_lab))}
         </section>
 
-        {showSelf ? (
+        {/* Founder's gated slot (31 Oct 2026): this section and its contents entry appear only once its results hold. */}
+        {selfOptimization ? (
           <section aria-labelledby="self">
             <Heading id="self" text={selfOptimization.title} />
-            {/* 31 Oct 2026, model team: this experiment has not been run. The text states it as done,
-                so the draft says so plainly; the released page shows nothing until `holds` is true. */}
-            {selfOptimization.holds !== true ? (
-              <p className="r-self-note">
-                <span>Not run yet</span> This experiment has not been run. Text and results are placeholders until it
-                has been measured.
-              </p>
-            ) : null}
             <p>{selfOptimization.intro}</p>
             <ul className="r-self">
               {selfOptimization.results.map((r) => (
