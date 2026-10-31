@@ -314,6 +314,14 @@ export default function ReleasePage() {
         {showSelf ? (
           <section aria-labelledby="self">
             <Heading id="self" text={selfOptimization.title} />
+            {/* 31 Oct 2026, model team: this experiment has not been run. The text states it as done,
+                so the draft says so plainly; the released page shows nothing until `holds` is true. */}
+            {selfOptimization.holds !== true ? (
+              <p className="r-self-note">
+                <span>Not run yet</span> This experiment has not been run. Text and results are placeholders until it
+                has been measured.
+              </p>
+            ) : null}
             <p>{selfOptimization.intro}</p>
             <ul className="r-self">
               {selfOptimization.results.map((r) => (

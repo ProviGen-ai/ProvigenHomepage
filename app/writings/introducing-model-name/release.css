@@ -632,3 +632,18 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+.w-prose .r-self-note {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  color: var(--c-amber-ink);
+}
+.w-prose .r-self-note span {
+  display: inline-block;
+  margin-right: 0.5em;
+  padding: 0.1em 0.5em;
+  border: 1px solid var(--c-amber-ink);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
