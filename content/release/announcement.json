@@ -8,7 +8,7 @@
     "version": "v[VERSION]",
     "release_date": null,
     "status": "Announced. Access by request.",
-    "one_line": "A foundation model for experiment design: it reads a campaign's results so far and proposes which experiments to run next.",
+    "one_line": "A foundation model for experiment design in biotech, biochemical and chemical development: it reads a campaign's results so far and proposes which experiments to run next.",
     "standin": true
   },
   "model_card": {
@@ -23,7 +23,7 @@
       "standin": true
     },
     "intended_use": [
-      "Choosing the next experiments in lab campaigns where each experiment is expensive: formulation, media and buffer optimisation, assay development, protocol and process parameters",
+      "Choosing the next experiments in biotech, biochemical and chemical campaigns where each experiment is expensive: formulation, media and buffer optimisation, assay development, reaction conditions, protocol and process parameters",
       "Ranking a candidate list (for example a plate of untested formulations) by expected outcome and uncertainty",
       "Campaigns that aim for a target value, stay within limits, or trade off several outcomes"
     ],
@@ -43,7 +43,7 @@
       "id": "abrupt_vs_bo",
       "text_template": "On benchmark landscapes with sharp optima and abrupt changes, it beats standard Bayesian optimisation in {wins} of {runs} campaigns.",
       "values": {
-        "wins": 33,
+        "wins": 30,
         "runs": 40
       },
       "benchmark": "heldout_search",
@@ -53,7 +53,7 @@
       "id": "beats_random",
       "text_template": "It beats random search in {pct} of {runs} benchmark campaigns.",
       "values": {
-        "pct": 0.95,
+        "pct": 0.93,
         "runs": 110
       },
       "benchmark": "heldout_search",
@@ -73,7 +73,7 @@
       "id": "fewer_experiments",
       "text_template": "It finds half of the best 5% of formulations {factor}x faster than random screening.",
       "values": {
-        "factor": null
+        "factor": "3.7 to 5.1"
       },
       "benchmark": "discovery_cellfree",
       "standin": true
@@ -92,13 +92,37 @@
       },
       "baselines": [
         {
-          "name": "Bayesian optimisation (GP)"
+          "name": "TabPFN v2"
         },
         {
           "name": "TabPFN v2.5"
         },
         {
-          "name": "Random search"
+          "name": "TabPFN v2.6"
+        },
+        {
+          "name": "TabPFN v3"
+        },
+        {
+          "name": "TabPFN v3.5"
+        },
+        {
+          "name": "Bayesian optimisation"
+        },
+        {
+          "name": "BayBE (Merck KGaA)"
+        },
+        {
+          "name": "BoFire (BASF)"
+        },
+        {
+          "name": "DoE: space-filling"
+        },
+        {
+          "name": "DoE: response surface"
+        },
+        {
+          "name": "Random"
         }
       ],
       "metric": {
@@ -110,41 +134,61 @@
         {
           "group": "All 11 problems",
           "values": {
-            "model": 0.158,
-            "bo_gp": 0.205,
-            "random": 1.0,
-            "tabpfn_v2_5": 0.247
+            "model": 0.123,
+            "tabpfn_v2": 0.24,
+            "tabpfn_v2_5": 0.234,
+            "tabpfn_v2_6": 0.378,
+            "tabpfn_v3": 0.241,
+            "tabpfn_v3_5": 0.206,
+            "bo_gp": 0.207,
+            "baybe": 0.178,
+            "bofire": 0.216,
+            "doe_lhs": 0.9,
+            "doe_rsm": 0.766,
+            "random": 1.0
           }
         },
         {
           "group": "Sharp optima and abrupt changes",
           "values": {
-            "model": 0.216,
-            "bo_gp": 0.436,
-            "random": 1.0,
-            "tabpfn_v2_5": 0.328
+            "model": 0.129,
+            "tabpfn_v2": 0.322,
+            "tabpfn_v2_5": 0.273,
+            "tabpfn_v2_6": 0.266,
+            "tabpfn_v3": 0.341,
+            "tabpfn_v3_5": 0.144,
+            "bo_gp": 0.52,
+            "baybe": 0.366,
+            "bofire": 0.491,
+            "doe_lhs": 1.015,
+            "doe_rsm": 0.591,
+            "random": 1.0
           }
         }
       ],
       "paired": [
         {
           "comparison": "vs standard Bayesian optimisation, sharp optima and abrupt changes",
-          "result": "33 of 40 campaigns better"
+          "result": "30 of 40 campaigns better"
+        },
+        {
+          "comparison": "vs BoFire, sharp optima and abrupt changes",
+          "result": "30 of 40 campaigns better"
         },
         {
           "comparison": "vs standard Bayesian optimisation, Ackley",
           "result": "10 of 10 campaigns better"
         },
         {
-          "comparison": "vs TabPFN v2.5, all benchmarks",
-          "result": "71 of 110 campaigns better"
+          "comparison": "vs TabPFN v3.5, all 11 landscapes",
+          "result": "73 of 110 campaigns better"
         },
         {
           "comparison": "vs random search",
-          "result": "104 of 110 campaigns better"
+          "result": "102 of 110 campaigns better"
         }
       ],
-      "measured_on": "current development model",
+      "measured_on": "served model, release benchmark 2026-10-31",
       "standin": true
     },
     {
@@ -184,12 +228,12 @@
           }
         }
       ],
-      "measured_on": "current development model",
+      "measured_on": "served model, 2026-10-30",
       "standin": true
     },
     {
       "id": "hpo_search",
-      "title": "Ahead early on a public benchmark",
+      "title": "On a public benchmark it never saw",
       "question": "How fast does each method find good configurations on a public benchmark it never saw?",
       "task": "Search real hyperparameter-optimisation spaces of up to 6 parameters, one experiment at a time.",
       "dataset": {
@@ -199,13 +243,37 @@
       },
       "baselines": [
         {
+          "name": "TabPFN v2"
+        },
+        {
           "name": "TabPFN v2.5"
         },
         {
-          "name": "Bayesian optimisation (GP)"
+          "name": "TabPFN v2.6"
         },
         {
-          "name": "Random search"
+          "name": "TabPFN v3"
+        },
+        {
+          "name": "TabPFN v3.5"
+        },
+        {
+          "name": "Bayesian optimisation"
+        },
+        {
+          "name": "BayBE (Merck KGaA)"
+        },
+        {
+          "name": "BoFire (BASF)"
+        },
+        {
+          "name": "DoE: space-filling"
+        },
+        {
+          "name": "DoE: response surface"
+        },
+        {
+          "name": "Random"
         }
       ],
       "metric": {
@@ -217,30 +285,48 @@
         {
           "group": "After 25",
           "values": {
-            "model": 0.0513,
-            "bo_gp": 0.0712,
-            "random": 0.1589,
-            "tabpfn_v2_5": 0.066
+            "model": null,
+            "tabpfn_v2": null,
+            "tabpfn_v2_5": null,
+            "tabpfn_v2_6": null,
+            "tabpfn_v3": null,
+            "tabpfn_v3_5": null,
+            "bo_gp": null,
+            "baybe": null,
+            "bofire": null,
+            "doe_lhs": null,
+            "doe_rsm": null,
+            "random": null
           }
         },
         {
           "group": "After 50",
           "values": {
-            "model": 0.0296,
-            "bo_gp": 0.0501,
-            "random": 0.1202,
-            "tabpfn_v2_5": 0.0306
+            "model": null,
+            "tabpfn_v2": null,
+            "tabpfn_v2_5": null,
+            "tabpfn_v2_6": null,
+            "tabpfn_v3": null,
+            "tabpfn_v3_5": null,
+            "bo_gp": null,
+            "baybe": null,
+            "bofire": null,
+            "doe_lhs": null,
+            "doe_rsm": null,
+            "random": null
           }
         }
       ],
-      "measured_on": "earlier internal model",
-      "standin": true
+      "measured_on": "to be measured on the release model",
+      "standin": true,
+      "claim_title": "Ahead early on a public benchmark",
+      "title_holds": false
     },
     {
       "id": "cellfree_rerank",
       "title": "Proven on a real lab campaign: cell-free protein expression",
-      "question": "Given some measured formulations, which untested ones should be made next?",
-      "task": "From a handful of measured formulations of a published three-stage campaign, pick which untested formulations to make next.",
+      "question": "Given a few measured formulations, which untested one should be made next?",
+      "task": "From the first measured formulations of a published three-stage campaign, pick the untested formulation to make next, and compare it with the best one still untested.",
       "dataset": {
         "name": "Cell-free reagent formulations (three stages, 13 / 28 / 21 reagents, 1,231 formulations)",
         "citation": "Olsen et al. 2026 (CC BY)",
@@ -258,59 +344,48 @@
         }
       ],
       "metric": {
-        "name": "Top-5% hit rate of its next picks; share of results inside its 80% range",
-        "direction": "higher; closest to 80%",
-        "unit": "share"
+        "name": "How far its next pick falls short of the best untested formulation",
+        "direction": "lower",
+        "unit": "share of the stage's yield range"
       },
       "results": [
         {
-          "group": "10 measured formulations: share of the top 5% in its next picks",
+          "group": "After 10 measured formulations",
           "values": {
-            "model": 0.23,
-            "bo_gp": 0.18,
-            "random": "0.01 to 0.06",
-            "tabpfn_v2_5": 0.21
+            "model": 0.39,
+            "bo_gp": 0.42,
+            "tabpfn_v2_5": 0.59,
+            "random": 0.78
           }
         },
         {
-          "group": "50 measured formulations: share of the top 5% in its next picks",
+          "group": "After 25 measured formulations",
           "values": {
-            "model": 0.43,
-            "bo_gp": 0.38,
-            "tabpfn_v2_5": 0.39
-          }
-        },
-        {
-          "group": "10 measured formulations: results inside its 80% range",
-          "values": {
-            "model": 0.84,
-            "bo_gp": 0.55,
-            "tabpfn_v2_5": 0.76
-          }
-        },
-        {
-          "group": "200 measured formulations: results inside its 80% range",
-          "values": {
-            "model": 0.84,
-            "bo_gp": 0.8,
-            "tabpfn_v2_5": 0.82
+            "model": 0.36,
+            "bo_gp": 0.4,
+            "tabpfn_v2_5": 0.41,
+            "random": 0.72
           }
         }
       ],
       "paired": [
         {
-          "comparison": "vs TabPFN v2.5",
-          "result": "better next pick in 99 of 148 head-to-head decisions"
+          "comparison": "vs TabPFN v2.5, after 10 measured formulations",
+          "result": "better next pick in 22 of 29 head-to-head decisions"
+        },
+        {
+          "comparison": "vs Bayesian optimisation, after 10 measured formulations",
+          "result": "better next pick in 13 of 22 head-to-head decisions"
         }
       ],
-      "measured_on": "earlier internal model",
+      "measured_on": "served model, release benchmark 2026-10-31",
       "standin": true
     },
     {
       "id": "discovery_cellfree",
       "title": "Fewer experiments to the best formulations",
       "question": "How many fewer experiments to find the best formulations than random screening?",
-      "task": "Search each cell-free stage for its top 5% / top 1% formulations, 200 experiments, one at a time.",
+      "task": "Search each cell-free stage for its top 5% / top 1% formulations, 200 experiments, one at a time, 10 campaigns per stage.",
       "dataset": {
         "name": "Cell-free reagent formulations",
         "citation": "Olsen et al. 2026 (CC BY)",
@@ -318,10 +393,34 @@
       },
       "baselines": [
         {
-          "name": "Bayesian optimisation (GP)"
+          "name": "TabPFN v2"
         },
         {
-          "name": "Random screening"
+          "name": "TabPFN v2.5"
+        },
+        {
+          "name": "TabPFN v2.6"
+        },
+        {
+          "name": "TabPFN v3"
+        },
+        {
+          "name": "TabPFN v3.5"
+        },
+        {
+          "name": "Bayesian optimisation"
+        },
+        {
+          "name": "BayBE (Merck KGaA)"
+        },
+        {
+          "name": "BoFire (BASF)"
+        },
+        {
+          "name": "DoE: space-filling"
+        },
+        {
+          "name": "Random"
         }
       ],
       "metric": {
@@ -331,24 +430,46 @@
       },
       "results": [
         {
-          "group": "Half of the top 5%",
+          "group": "Half of the top 5% (range over the three stages)",
           "values": {
-            "model": null,
+            "model": "3.7x to 5.1x",
+            "tabpfn_v2": "3.0x to 3.7x",
+            "tabpfn_v2_5": "1.9x to 4.3x",
+            "tabpfn_v2_6": "2.0x to 2.5x",
+            "tabpfn_v3": "2.9x to 4.5x",
+            "tabpfn_v3_5": "3.0x to 4.5x",
             "bo_gp": "2.6x to 4.5x",
+            "baybe": "2.2x to 3.3x",
+            "bofire": "2.1x to 3.7x",
+            "doe_lhs": "1.3x to 4.2x",
             "random": "1x"
           }
         },
         {
           "group": "All of the top 1% (stage 1)",
           "values": {
-            "model": null,
+            "model": "8.2x (18 vs 147 experiments)",
+            "tabpfn_v2": "6.8x (21.5 vs 147 experiments)",
+            "tabpfn_v2_5": "5.2x (28.5 vs 147 experiments)",
+            "tabpfn_v2_6": "5.8x (25.5 vs 147 experiments)",
+            "tabpfn_v3": "6.7x (22 vs 147 experiments)",
+            "tabpfn_v3_5": "8.2x (18 vs 147 experiments)",
             "bo_gp": "5.2x (28.5 vs 147 experiments)",
+            "baybe": "3.4x (43 vs 147 experiments)",
+            "bofire": "4.1x (35.5 vs 147 experiments)",
+            "doe_lhs": "4.5x (32.5 vs 147 experiments)",
             "random": "1x"
           }
         }
       ],
-      "measured_on": "baseline only",
-      "standin": true
+      "measured_on": "served model, release benchmark 2026-10-31",
+      "standin": true,
+      "paired": [
+        {
+          "comparison": "experiments to half of the top 5%, vs the fastest alternative on each stage",
+          "result": "stage 1: 18.5 vs 22.5 (DoE: space-filling); stage 2: 45 vs 55 (TabPFN v2.5); stage 3: 37 vs 41 (TabPFN v3, TabPFN v3.5, Bayesian optimisation)"
+        }
+      ]
     }
   ],
   "capabilities": [
@@ -481,8 +602,8 @@
     },
     "results_intro_template": "We ran {campaigns} optimisation campaigns on {benchmarks} benchmarks, every method on the same starting experiments, against {methods} methods: five versions of TabPFN, Bayesian optimisation, the industry tools BayBE and BoFire, two classical designs of experiments, and random search.",
     "results_intro_values": {
-      "campaigns": null,
-      "benchmarks": 3,
+      "campaigns": 1650,
+      "benchmarks": 2,
       "methods": 11
     },
     "cta_text": "Access opens later. Join the list to be among the first labs to run their next campaign with [MODEL NAME], or tell us about a campaign you are planning.",
@@ -496,7 +617,7 @@
     {
       "text_template": "Beats standard Bayesian optimisation in {wins} of {runs} benchmark campaigns with sharp optima and abrupt changes.",
       "values": {
-        "wins": 33,
+        "wins": 30,
         "runs": 40
       },
       "benchmark": "heldout_search"
@@ -511,7 +632,7 @@
     {
       "text_template": "Finds half of the best 5% of formulations {factor}x faster than random screening on a published cell-free campaign.",
       "values": {
-        "factor": null
+        "factor": "3.7 to 5.1"
       },
       "benchmark": "discovery_cellfree"
     }
@@ -524,20 +645,296 @@
     "benchmark": "heldout_search",
     "group": "All 11 problems",
     "reference": {
-      "key": null,
+      "key": "baybe",
       "label_template": "Strongest alternative: {name}"
     },
     "title_template": "[MODEL NAME] gets closest to the optimum of every method tested",
-    "title_holds": null,
-    "as_of": null,
+    "title_holds": false,
+    "as_of": "2026-10-31",
     "standin": true
   },
   "campaign_trace": {
     "title": "One campaign, experiment by experiment",
-    "problem": "[TBD: a held-out landscape with sharp optima]",
+    "problem": "Ackley function, 4 parameters, with many local optima: a typical campaign, the median of 10.",
     "x_label": "Experiments run",
     "y_label": "Gap to the best possible result (lower is better)",
-    "series": null,
+    "series": [
+      {
+        "key": "model",
+        "y": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.9272,
+          0.9272,
+          0.9272,
+          0.9272,
+          0.9073,
+          0.8207,
+          0.8207,
+          0.7305,
+          0.7305,
+          0.7305,
+          0.6579,
+          0.6589,
+          0.6589,
+          0.5237,
+          0.5237,
+          0.342,
+          0.342,
+          0.342,
+          0.342,
+          0.342,
+          0.2989,
+          0.2989,
+          0.2438,
+          0.2438,
+          0.2438,
+          0.2438,
+          0.2448,
+          0.2076,
+          0.2076,
+          0.1795,
+          0.1795,
+          0.1795,
+          0.1795,
+          0.1795,
+          0.1795,
+          0.1795,
+          0.1795,
+          0.114,
+          0.114,
+          0.114
+        ]
+      },
+      {
+        "key": "baybe",
+        "y": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.9919,
+          0.9919,
+          0.9919,
+          0.9464,
+          0.9464,
+          0.9346,
+          0.9346,
+          0.8135,
+          0.8135,
+          0.8135,
+          0.697,
+          0.6181,
+          0.6181,
+          0.6181,
+          0.6181,
+          0.4303,
+          0.4303,
+          0.4303,
+          0.3478,
+          0.3478,
+          0.271,
+          0.271,
+          0.271,
+          0.271,
+          0.1799,
+          0.1799,
+          0.1799,
+          0.1799,
+          0.1799,
+          0.1799,
+          0.1799,
+          0.1799,
+          0.1799,
+          0.1799,
+          0.1799,
+          0.1799,
+          0.1799,
+          0.1799,
+          0.1799,
+          0.1799
+        ]
+      },
+      {
+        "key": "bo_gp",
+        "y": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.9477,
+          0.9477,
+          0.9477,
+          0.9477,
+          0.9477,
+          0.9477,
+          0.9477,
+          0.9477,
+          0.9477,
+          0.9477,
+          0.9477,
+          0.9477,
+          0.8171,
+          0.8171,
+          0.7799,
+          0.616,
+          0.616,
+          0.616,
+          0.5943,
+          0.5943,
+          0.5943,
+          0.5337,
+          0.4927,
+          0.4233,
+          0.4233,
+          0.2371,
+          0.2371,
+          0.2371,
+          0.2371,
+          0.2371,
+          0.2371,
+          0.2371,
+          0.2371,
+          0.2371,
+          0.2371,
+          0.2371,
+          0.2371,
+          0.2371,
+          0.1705,
+          0.1705
+        ]
+      },
+      {
+        "key": "bofire",
+        "y": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.9014,
+          0.9014,
+          0.9014,
+          0.9014,
+          0.9014,
+          0.9014,
+          0.9014,
+          0.9014,
+          0.8721,
+          0.8721,
+          0.8721,
+          0.8721,
+          0.8721,
+          0.7288,
+          0.7288,
+          0.7288,
+          0.7288,
+          0.7288,
+          0.7288,
+          0.7288,
+          0.7288,
+          0.5399,
+          0.5399,
+          0.5399,
+          0.5399,
+          0.5399,
+          0.5399,
+          0.4966,
+          0.4966,
+          0.4966,
+          0.4966,
+          0.4966
+        ]
+      },
+      {
+        "key": "random",
+        "y": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.9178,
+          0.9178,
+          0.9178,
+          0.9178,
+          0.9178
+        ]
+      }
+    ],
     "standin": true
   },
   "asides": [
@@ -586,9 +983,9 @@
     "title": "Contamination check",
     "text_template": "We checked every benchmark for contamination: none of the {problems} benchmark problems has a near-copy in the training data.",
     "values": {
-      "problems": null
+      "problems": 52
     },
-    "holds": null,
+    "holds": true,
     "anchor": "results",
     "standin": true
   },

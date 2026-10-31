@@ -158,7 +158,9 @@ export function RegretBars({
   fold?: boolean;
 }) {
   const rows = group ? benchmark.results.filter((r) => r.group === group) : benchmark.results;
-  const { shown, folded } = chartMethods(benchmark, { foldGroups: fold ? ['tabpfn'] : [] });
+  /* Nothing measured yet: every method keeps its slot (no best version to pick). */
+  const measured = rows.some((r) => Object.values(r.values).some((v) => typeof v === 'number'));
+  const { shown, folded } = chartMethods(benchmark, { foldGroups: fold && measured ? ['tabpfn'] : [] });
   const line = yardstick(benchmark, shown);
   const bars = shown.filter((m) => m !== line?.method && m.key !== reference?.key);
   const refValue = reference ? rows[0]?.values[reference.key] : undefined;
@@ -189,17 +191,22 @@ export function RegretBars({
               .filter((m) => m.key in r.values)
               .map((m) => {
                 const v = r.values[m.key];
+                /* Null is an empty slot, never a bar of zero. */
+                if (typeof v !== 'number') {
+                  return (
+                    <div key={m.key} className="r-bar-row r-bar-row--empty">
+                      <span className="s-sr">
+                        {methodLabel(benchmark, m.key)}: {show(v)}
+                      </span>
+                      <span className="r-bar-slot" style={{ borderColor: colour[m.key] }} aria-hidden="true" />
+                    </div>
+                  );
+                }
                 return (
                   <div key={m.key} className="r-bar-row">
                     <span className="s-sr">{methodLabel(benchmark, m.key)}:</span>
-                    {typeof v === 'number' ? (
-                      <>
-                        <span className="r-bar" style={{ width: at(v), background: colour[m.key] }} aria-hidden="true" />
-                        <span className="r-val">{show(v, { decimals })}</span>
-                      </>
-                    ) : (
-                      <span className="r-val r-val--pending">{show(v)}</span>
-                    )}
+                    <span className="r-bar" style={{ width: at(v), background: colour[m.key] }} aria-hidden="true" />
+                    <span className="r-val">{show(v, { decimals })}</span>
                   </div>
                 );
               })}
@@ -215,9 +222,12 @@ export function RegretBars({
         </p>
       </div>
       <figcaption data-kind="Benchmark">
-        {benchmark.metric.name}. Lower is better.{asOf ? ` As of ${asOf}.` : ''}
+        {benchmark.metric.name}
+        {/* The unit, unless the legend already gives the yardstick ("random search = 1.0"). */}
+        {line ? '' : ` (${benchmark.metric.unit})`}. Lower is better.{measured ? '' : ` Values ${TO_BE_MEASURED}.`}
+        {asOf ? ` As of ${asOf}.` : ''}
       </figcaption>
-      {group ? null : <Folded benchmark={benchmark} shown={shown} folded={folded} />}
+      {group || !measured ? null : <Folded benchmark={benchmark} shown={shown} folded={folded} />}
     </figure>
   );
 }
@@ -302,6 +312,42 @@ export function CoveragePlot({ benchmark, nominal = [0.5, 0.8, 0.95] }: { benchm
 export function ResultsTable({ benchmark, percent = false, only }: { benchmark: Benchmark; percent?: boolean; only?: string[] }) {
   const methods = methodsIn(benchmark).filter((m) => !only || only.includes(m.key));
   const decimals = decimalsOf(benchmark);
+  /* Many methods over few rows read better turned on their side: one row per method. */
+  if (methods.length > 6 && benchmark.results.length <= 3) {
+    return (
+      <div className="p-writings-table-scroll r-table r-table--turned" tabIndex={0} role="region" aria-label={`${benchmark.title}, table`}>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">{benchmark.metric.unit.length > 2 ? benchmark.metric.unit : ''}</th>
+              {benchmark.results.map((r) => (
+                <th key={r.group} scope="col">
+                  {r.group}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {methods.map((m) => (
+              <tr key={m.key}>
+                <th scope="row" className={m.group === 'ours' ? 'r-col-model' : undefined}>
+                  {methodLabel(benchmark, m.key)}
+                </th>
+                {benchmark.results.map((r) => {
+                  const v = r.values[m.key];
+                  return (
+                    <td key={r.group} className={[m.group === 'ours' ? 'r-col-model' : '', v === null ? 'r-pending' : ''].join(' ').trim() || undefined}>
+                      {m.key in r.values ? show(v, { percent, decimals }) : ''}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
   return (
     <div className="p-writings-table-scroll r-table" tabIndex={0} role="region" aria-label={`${benchmark.title}, table`}>
       {/* Wider than the column when there are many methods: the wrapper scrolls. */}

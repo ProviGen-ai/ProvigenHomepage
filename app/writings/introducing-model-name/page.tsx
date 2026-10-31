@@ -23,8 +23,8 @@ import {
   fill,
   headline,
   isDraft,
+  benchmarkTitle,
   liveUrl,
-  methodsIn,
   placeholders,
   release,
   sectionOf,
@@ -132,9 +132,8 @@ export default function ReleasePage() {
   /*
    * One result, whatever its id (a new benchmark in the data file needs no code):
    * its title (unless it repeats the section's), the question, then by shape:
-   * coverage rows (arrays) as the calibration plot and a table; rows measured
-   * against a constant reference (random = 1.0) as bars; anything else as a
-   * table. Its headline sentences (those not in the hero) and head-to-head
+   * coverage rows (arrays) as the calibration plot and a table; lower-is-better
+   * rows as bars (null values as empty slots); anything else as a table. Its headline sentences (those not in the hero) and head-to-head
    * results follow, then how it was measured, folded inline.
    */
   const inHero = [hero.id, second.id];
@@ -142,16 +141,13 @@ export default function ReleasePage() {
     const sentences = release.headline_candidates.filter((h) => h.benchmark === b.id && !inHero.includes(h.id));
     const said = sentences.map((h) => <p key={h.id}>{fill(h)}</p>);
     const coverage = b.results.some((r) => Object.values(r.values).some(Array.isArray));
-    const constantRef = methodsIn(b).some(
-      (m) => m.group === 'reference' && b.results.every((r) => typeof r.values[m.key] === 'number' && r.values[m.key] === b.results[0].values[m.key]),
-    );
     const figure = coverage ? (
       <>
         <CoveragePlot benchmark={b} />
         <ResultsTable benchmark={b} percent />
         {said}
       </>
-    ) : constantRef && /^lower\b/i.test(b.metric.direction) ? (
+    ) : /^lower\b/i.test(b.metric.direction) ? (
       <>
         <RegretBars benchmark={b} />
         {said}
@@ -164,7 +160,7 @@ export default function ReleasePage() {
     );
     return (
       <Fragment key={b.id}>
-        {b.title !== section ? <h3>{b.title}</h3> : null}
+        {benchmarkTitle(b) !== section ? <h3>{benchmarkTitle(b)}</h3> : null}
         <p className="r-question">{b.question}</p>
         {figure}
         <PairedTable benchmark={b} />
@@ -298,7 +294,7 @@ export default function ReleasePage() {
                   }
                 : undefined
             }
-            asOf={summary.as_of}
+            asOf={summary.as_of ? formatDate(summary.as_of) : null}
             fold={false}
           />
           <CampaignTrace />

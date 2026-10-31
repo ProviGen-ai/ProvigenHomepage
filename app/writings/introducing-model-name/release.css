@@ -647,3 +647,23 @@
   text-transform: uppercase;
   letter-spacing: 0.12em;
 }
+
+/* An unmeasured value: a thin dashed slot, not a bar of zero. */
+.r-bar-row--empty {
+  height: 0.55rem;
+  margin-top: 0.25rem;
+}
+.r-bar-slot {
+  display: block;
+  flex: 1;
+  height: 0;
+  border-top: 1.5px dashed var(--c-line-3);
+}
+
+/* A table turned on its side (many methods): the first column names the method. */
+.w-prose .r-table--turned table {
+  min-width: 0;
+}
+.w-prose .r-table--turned th[scope='row'].r-col-model {
+  color: var(--c-teal-ink);
+}

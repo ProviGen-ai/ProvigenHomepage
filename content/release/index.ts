@@ -44,12 +44,15 @@ export type Benchmark = {
   not_measured_yet?: boolean;
   /** Which section shows it; without it, see sectionOf(). */
   section?: 'results' | 'real_lab';
+  /** The heading as a claim, shown instead of `title` only when `title_holds` is true. */
+  claim_title?: string;
+  title_holds?: boolean | null;
 };
 
 export type Headline = {
   id: string;
   text_template: string;
-  values: Record<string, number | null>;
+  values: Record<string, number | string | null>;
   benchmark: string;
   standin: boolean;
   not_measured_yet?: string;
@@ -103,7 +106,7 @@ export type ReleaseData = {
     kicker: string;
     section_titles: Record<'why' | 'category' | 'how' | 'results' | 'real_lab' | 'enables' | 'handles' | 'faq' | 'model_card' | 'cta', string>;
     results_intro_template: string;
-    results_intro_values: Record<string, number | null>;
+    results_intro_values: Record<string, number | string | null>;
     cta_text: string;
   };
   takeaways: Templated[];
@@ -135,7 +138,7 @@ export type ReleaseData = {
    */
   self_optimization?: SelfOptimization;
   /** Shown inside the results aside only when `holds` is true; while null it does not appear at all. */
-  contamination?: { title: string; text_template: string; values: Record<string, number | null>; holds: boolean | null; anchor: string };
+  contamination?: { title: string; text_template: string; values: Record<string, number | string | null>; holds: boolean | null; anchor: string };
 };
 
 export type SelfOptimization = {
@@ -164,7 +167,7 @@ const SELF_OPTIMIZATION_DEFAULT: SelfOptimization = {
 };
 
 /** Any sentence with {placeholders} and their values. */
-export type Templated = { text_template: string; values: Record<string, number | null>; benchmark?: string };
+export type Templated = { text_template: string; values: Record<string, number | string | null>; benchmark?: string };
 
 /* JSON imports are typed by their literal shape; the file is checked against ReleaseData by hand (schema_version 1). */
 export const release = data as unknown as ReleaseData;
@@ -314,6 +317,9 @@ export const selfOptimization: SelfOptimization = (() => {
   const so = release.self_optimization ?? SELF_OPTIMIZATION_DEFAULT;
   return { ...so, intro: so.intro.replace('[MODEL NAME]', release.model.name) };
 })();
+
+/** A benchmark's heading: its claim once that holds, else its neutral title. */
+export const benchmarkTitle = (b: Benchmark) => (b.title_holds === true && b.claim_title ? b.claim_title : b.title);
 
 /* Benchmarks on real lab data before the data file carried `section`. */
 const REAL_LAB_IDS = ['cellfree_rerank', 'discovery_cellfree'];
