@@ -128,8 +128,39 @@ export type ReleaseData = {
   };
   asides: { anchor: string; title: string; text: string }[];
   faq: { q: string; a: string }[];
+  /**
+   * The model pointed at its own pipeline (founder, 31 Oct 2026): one result
+   * per target, a closing line. Shown in the draft with its slots; on the
+   * released page only when `holds` is true.
+   */
+  self_optimization?: SelfOptimization;
   /** Shown inside the results aside only when `holds` is true; while null it does not appear at all. */
   contamination?: { title: string; text_template: string; values: Record<string, number | null>; holds: boolean | null; anchor: string };
+};
+
+export type SelfOptimization = {
+  title: string;
+  intro: string;
+  results: { target: string; metric: string; value: number | string | null }[];
+  closing: string;
+  holds: boolean | null;
+};
+
+/**
+ * Until the data file carries `self_optimization`, the page uses this, in the
+ * founder's words of 31 Oct 2026, with every result a slot.
+ */
+const SELF_OPTIMIZATION_DEFAULT: SelfOptimization = {
+  title: 'Optimising its own pipeline',
+  intro:
+    'Because [MODEL NAME] treats any process with settings and a measurable outcome as a black box to optimise, we pointed it at itself: its own data processing, compute efficiency and memory footprint.',
+  results: [
+    { target: 'Data processing', metric: '[TBD: metric]', value: null },
+    { target: 'Compute efficiency', metric: '[TBD: metric]', value: null },
+    { target: 'Memory footprint', metric: '[TBD: metric]', value: null },
+  ],
+  closing: 'The results were impressive, and we already see the potential for recursive self-improvement.',
+  holds: null,
 };
 
 /** Any sentence with {placeholders} and their values. */
@@ -278,6 +309,12 @@ export const benchmark = (id: string) => {
   return found;
 };
 
+/** The self-optimisation subsection: the data file's, else the default above. */
+export const selfOptimization: SelfOptimization = (() => {
+  const so = release.self_optimization ?? SELF_OPTIMIZATION_DEFAULT;
+  return { ...so, intro: so.intro.replace('[MODEL NAME]', release.model.name) };
+})();
+
 /* Benchmarks on real lab data before the data file carried `section`. */
 const REAL_LAB_IDS = ['cellfree_rerank', 'discovery_cellfree'];
 
@@ -288,7 +325,7 @@ export const sectionOf = (b: Benchmark): 'results' | 'real_lab' => b.section ?? 
 export const isDraft = JSON.stringify(release).includes('"standin":true');
 
 /** Placeholders still in the data file, e.g. [MODEL NAME], [TBD]. */
-export const placeholders = () => [...new Set(JSON.stringify(release).match(/\[(?:[A-Z][A-Z ]*|TBD[^\]"]*)\]/g) ?? [])];
+export const placeholders = () => [...new Set(JSON.stringify([release, selfOptimization]).match(/\[(?:[A-Z][A-Z ]*|TBD[^\]"]*)\]/g) ?? [])];
 
 /** A link only for a real address; "[TBD]" stays plain text. */
 export const liveUrl = (url: string) => (/^https?:\/\//.test(url) ? url : undefined);

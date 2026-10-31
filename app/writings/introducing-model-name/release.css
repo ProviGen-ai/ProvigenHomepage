@@ -585,3 +585,50 @@
   line-height: 1.5;
   text-wrap: pretty;
 }
+
+/* Optimising its own pipeline: one tile per target, the result large. */
+.w-prose .r-self {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.75rem 0;
+  padding: 0;
+  list-style: none;
+}
+.r-self li {
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--c-ink);
+}
+.r-self-target {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-teal-ink);
+}
+.r-self-value {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.3rem);
+  line-height: 1.1;
+  color: var(--c-teal-ink);
+}
+.r-self-value.r-pending {
+  font-size: 1rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--c-faint);
+}
+.r-self-metric {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--c-muted);
+}
+@media (max-width: 600px) {
+  .w-prose .r-self {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

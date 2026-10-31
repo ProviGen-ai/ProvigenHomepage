@@ -28,6 +28,9 @@ import {
   placeholders,
   release,
   sectionOf,
+  selfOptimization,
+  show,
+  TO_BE_MEASURED,
   type Benchmark,
 } from '@/content/release';
 import '../writings.css';
@@ -47,8 +50,9 @@ import './release.css';
  * hero and takeaways; why; the category explained; how, with the landscapes it
  * is built for; results opening with the evaluation size, a summary chart, one
  * campaign's trace, then each benchmark with its method folded inline; the
- * real lab campaign; what it enables; what it handles; questions; model card;
- * call to action. Confident, no caveats, no training details (founder).
+ * real lab campaign; the model optimising its own pipeline (founder, 31 Oct
+ * 2026); what it enables; what it handles; questions; model card; call to
+ * action. Framed on biotech, biochemical and chemical applications. Confident, no caveats, no training details (founder).
  */
 
 const { model } = release;
@@ -64,12 +68,16 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+/* The self-optimisation subsection: in the draft with its slots; released only once its results hold. */
+const showSelf = isDraft || selfOptimization.holds === true;
+
 const toc = [
   { id: 'why', title: T.why },
   { id: 'category', title: T.category },
   { id: 'how', title: T.how },
   { id: 'results', title: T.results },
   { id: 'real-lab', title: T.real_lab },
+  ...(showSelf ? [{ id: 'self', title: selfOptimization.title }] : []),
   { id: 'enables', title: T.enables },
   { id: 'handles', title: T.handles },
   { id: 'faq', title: T.faq },
@@ -219,7 +227,7 @@ export default function ReleasePage() {
         <section aria-labelledby="why">
           <Heading id="why" text={T.why} />
           <p>
-            In a lab campaign every experiment costs a plate, reagents, instrument time and days of waiting. How many a
+            In biotech, biochemical and chemical development, every experiment costs a plate, reagents, instrument time and days of waiting. How many a
             campaign needs depends heavily on one recurring decision: which experiments to run next. Today that decision
             is usually a fixed screen planned up front, or judgement between rounds.
           </p>
@@ -302,6 +310,25 @@ export default function ReleasePage() {
           <Heading id="real-lab" text={T.real_lab} />
           {resultsIn('real_lab').map((b) => result(b, T.real_lab))}
         </section>
+
+        {showSelf ? (
+          <section aria-labelledby="self">
+            <Heading id="self" text={selfOptimization.title} />
+            <p>{selfOptimization.intro}</p>
+            <ul className="r-self">
+              {selfOptimization.results.map((r) => (
+                <li key={r.target}>
+                  <span className="r-self-target">{r.target}</span>
+                  <span className={r.value === null ? 'r-self-value r-pending' : 'r-self-value'}>
+                    {r.value === null ? `[${TO_BE_MEASURED}]` : show(r.value)}
+                  </span>
+                  <span className="r-self-metric">{r.metric}</span>
+                </li>
+              ))}
+            </ul>
+            <p>{selfOptimization.closing}</p>
+          </section>
+        ) : null}
 
         <section aria-labelledby="enables">
           <Heading id="enables" text={T.enables} />
