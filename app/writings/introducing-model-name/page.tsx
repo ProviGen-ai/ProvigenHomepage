@@ -221,16 +221,19 @@ export default function ReleasePage() {
         <section aria-labelledby="why">
           <Heading id="why" text={T.why} />
           <p>
-            In biotech, biochemical and chemical development, every experiment costs a plate, reagents, instrument time and days of waiting. How many a
-            campaign needs depends heavily on one recurring decision: which experiments to run next. Today that decision
-            is usually a fixed screen planned up front, or judgement between rounds.
+            Every campaign comes down to one decision, made again and again: what do you run next? In biotech,
+            biochemical and chemical development, each answer costs a plate, reagents, instrument time and days of waiting.
           </p>
           <p>
-            Methods that make that decision from data exist. Bayesian optimisation is the standard one, but it fits a
-            fresh model to every campaign from scratch, starting from assumptions chosen up front, chiefly that responses
-            change smoothly. Lab responses often do not: a formulation precipitates past a threshold, nothing grows under
-            some conditions, a readout saturates.
+            Today that decision is usually a fixed screen planned up front, or judgement between rounds. Bayesian
+            optimisation makes it from data, but it fits a fresh model to every campaign from scratch, starting from
+            assumptions chosen up front, chiefly that responses change smoothly.
           </p>
+          <p>
+            Lab responses often do not. A formulation precipitates past a threshold. Nothing grows under some conditions.
+            A readout saturates.
+          </p>
+          <p>{model.name} is built for those campaigns. There is nothing to fit. It starts from your first results.</p>
         </section>
 
         <section aria-labelledby="category">
@@ -245,16 +248,16 @@ export default function ReleasePage() {
           <Heading id="how" text={T.how} />
           <ol className="r-steps">
             <li>
-              <span className="r-step-title">Your results so far</span>
-              {release.model_card.model_details.inputs}.
+              <span className="r-step-title">Bring your results</span>
+              Give it the settings you tried and what you measured. Say where runs fail or a readout saturates.
             </li>
             <li>
-              <span className="r-step-title">One pass, nothing to fit</span>
-              {release.capabilities.find((c) => c.name === 'No per-campaign tuning')?.text}
+              <span className="r-step-title">Nothing to fit</span>
+              It reads your campaign and predicts every untested setting.
             </li>
             <li>
-              <span className="r-step-title">The next experiments</span>
-              {release.capabilities.find((c) => c.name === 'Batches')?.text}
+              <span className="r-step-title">Run the next plate</span>
+              It proposes the next experiment or a whole plate. Each result improves the next proposal.
             </li>
           </ol>
           <ResponseShapes />
