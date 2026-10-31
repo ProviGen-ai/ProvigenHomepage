@@ -24,7 +24,7 @@
     },
     "intended_use": [
       "Choosing the next experiments in biotech, biochemical and chemical campaigns where each experiment is expensive: formulation, media and buffer optimisation, assay development, reaction conditions, protocol and process parameters",
-      "Ranking a candidate list (for example a plate of untested formulations) by expected outcome and uncertainty",
+      "Ranking a candidate list (for example a plate of untested formulations) by expected outcome",
       "Campaigns that aim for a target value, stay within limits, or trade off several outcomes"
     ],
     "operating_envelope": {
@@ -229,7 +229,7 @@
       "metric": {
         "name": "Remaining gap to the best configuration after 25 and 50 experiments",
         "direction": "lower",
-        "unit": "normalised regret"
+        "unit": "remaining gap, on a 0 to 1 scale"
       },
       "results": [
         {
@@ -274,7 +274,7 @@
     },
     {
       "id": "cellfree_rerank",
-      "title": "Proven on a real lab campaign: cell-free protein expression",
+      "title": "Cell-free protein expression",
       "question": "Given a few measured formulations, which untested one should be made next?",
       "task": "From the first measured formulations of a published three-stage campaign, pick the untested formulation to make next, and compare it with the best one still untested.",
       "dataset": {
@@ -374,7 +374,7 @@
         }
       ],
       "metric": {
-        "name": "Acceleration factor: random's median experiments to the goal divided by the method's",
+        "name": "How many times faster than random screening (median experiments to the goal)",
         "direction": "higher",
         "unit": "x"
       },
@@ -433,7 +433,7 @@
     },
     {
       "name": "Failed runs and saturated readouts",
-      "text": "Declare where runs fail or a readout saturates; the model treats those outcomes as censored rather than exact."
+      "text": "Declare where runs fail or a readout saturates; the model reads those results as limits, not exact values."
     },
     {
       "name": "Limits on other outcomes",
@@ -441,7 +441,7 @@
     },
     {
       "name": "Several objectives",
-      "text": "Map the trade-off front between competing outcomes."
+      "text": "See the trade-off between competing outcomes and choose where to sit on it."
     },
     {
       "name": "Mixed parameter types",
@@ -454,8 +454,8 @@
   ],
   "enables": [
     {
-      "title": "Every plate ranked, with honest uncertainty",
-      "text": "A team screening one plate a week gets the next plate proposed and every candidate ranked by expected outcome and by how sure the model is, so reagent goes to the wells that teach the most or are most likely to win."
+      "title": "Every plate ranked",
+      "text": "A team screening one plate a week gets the next plate proposed and every candidate ranked, so reagent goes to the wells most likely to win or to teach the most."
     },
     {
       "title": "Failed runs count as information",
@@ -582,7 +582,7 @@
   ],
   "category_explainer": {
     "title": "What is a foundation model for experiment design?",
-    "text": "Classical design of experiments plans a screen up front. Bayesian optimisation fits a new statistical model to every campaign and starts from scratch each time. A foundation model for experiment design arrives ready: it already knows how lab results tend to depend on settings, from smooth trends to sharp optima, thresholds and failed runs. Given a lab's results so far, it predicts every untested setting with honest uncertainty and proposes the next experiments in seconds."
+    "text": "Classical design of experiments plans a screen up front. Bayesian optimisation fits a new statistical model to every campaign and starts from scratch each time. A foundation model for experiment design arrives ready: it already knows how lab results tend to depend on settings, from smooth trends to sharp optima, thresholds and failed runs. Given a lab's results so far, it predicts how untested settings will turn out and proposes the next experiments in seconds."
   },
   "summary_chart": {
     "benchmark": "heldout_search",
@@ -591,14 +591,14 @@
       "key": "baybe",
       "label_template": "Strongest alternative: {name}"
     },
-    "title_template": "[MODEL NAME] gets closest to the optimum of every method tested",
-    "title_holds": false,
+    "title_template": "[MODEL NAME] ends closest to the optimum on average across 11 benchmark landscapes",
+    "title_holds": true,
     "as_of": "2026-10-31",
     "standin": true
   },
   "campaign_trace": {
     "title": "One campaign, experiment by experiment",
-    "problem": "Ackley function, 4 parameters, with many local optima: a typical campaign, the median of 10.",
+    "problem": "Ackley function, 4 parameters, with many local optima: a typical campaign, the median of 10. By experiment 25 [MODEL NAME] had closed nearly half the gap, ahead of every other method, and after 50 it ended closest, while random search had barely moved.",
     "x_label": "Experiments run",
     "y_label": "Gap to the best possible result (lower is better)",
     "series": [
@@ -884,12 +884,12 @@
     {
       "anchor": "how",
       "title": "How it works",
-      "text": "Given a campaign's results so far, [MODEL NAME] predicts every untested setting in a single pass: a full distribution over the outcome and the chance the run succeeds, with no model to fit or tune. It then proposes the settings with the most to gain."
+      "text": "Given a campaign's results so far, [MODEL NAME] predicts untested settings in a single pass: a full distribution over the outcome and the chance the run succeeds, with no model to fit or tune. It then proposes the settings with the most to gain."
     },
     {
       "anchor": "results",
       "title": "How these benchmarks were run",
-      "text": "Every method started from the same initial experiments on the same seeds and ran through the same harness. Industry tools ran with their default settings. Every benchmark was held out of training."
+      "text": "Every method started from the same initial experiments on the same seeds and ran through the same test setup. Industry tools ran with their default settings. Every benchmark was held out of training."
     }
   ],
   "faq": [
@@ -903,7 +903,7 @@
     },
     {
       "q": "Can it handle failed runs and saturated readouts?",
-      "a": "Yes. Declare where runs fail or a readout saturates and the model treats those results as censored rather than exact."
+      "a": "Yes. Declare where runs fail or a readout saturates and the model reads those results as limits, not exact values."
     },
     {
       "q": "Can it aim for a value instead of the maximum?",

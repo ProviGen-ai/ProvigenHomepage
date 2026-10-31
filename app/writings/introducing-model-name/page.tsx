@@ -253,11 +253,11 @@ export default function ReleasePage() {
             </li>
             <li>
               <span className="r-step-title">Nothing to fit</span>
-              It reads your campaign and predicts every untested setting.
+              It reads your campaign and predicts how untested settings will turn out.
             </li>
             <li>
               <span className="r-step-title">Run the next plate</span>
-              It proposes the next experiment or a whole plate. Each result improves the next proposal.
+              It proposes the next experiment or a whole plate. Each new result goes into the next proposal.
             </li>
           </ol>
           <ResponseShapes />
