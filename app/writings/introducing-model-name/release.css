@@ -659,3 +659,77 @@
   font-size: 0.9em;
   color: var(--c-muted);
 }
+
+/* ---- The cube (13 Nov 2026): 54 stickers in CSS 3D, turned by CubeLive ---- */
+.r-cube {
+  margin: 0 0 3rem;
+  display: grid;
+  justify-items: center;
+}
+.r-cube-stage {
+  position: relative;
+  width: min(100%, 320px);
+  aspect-ratio: 1;
+  perspective: 900px;
+}
+.r-cube-body {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.r-cube-sticker {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46px;
+  height: 46px;
+  margin: -23px 0 0 -23px;
+  background: #151514;
+  border-radius: 3px;
+}
+.r-cube-sticker::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 4px;
+  background: var(--c, #888);
+}
+.r-cube-hud {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem 1.25rem;
+  margin-top: 0.75rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.r-cube-hud button {
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--c-line-3);
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--c-ink);
+  cursor: pointer;
+}
+.r-cube-hud button:hover {
+  border-color: var(--c-ink);
+}
+.r-cube-mock {
+  padding: 0.1em 0.5em;
+  border: 1px solid var(--c-amber-ink);
+  color: var(--c-amber-ink);
+}
+/* The high-demand notice: the server is protecting itself; the cube waits. */
+.r-cube-notice {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  border-left: 2px solid var(--c-orange);
+  background: var(--c-paper-2);
+  font-size: 0.95rem;
+}

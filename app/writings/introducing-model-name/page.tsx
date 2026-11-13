@@ -14,6 +14,7 @@ import {
   ResultsTable,
 } from '@/components/release/ReleaseParts';
 import { ArrowIcon } from '@/components/site/Header';
+import CubeLive from '@/components/release/cube/CubeLive';
 import {
   METHOD_LABEL,
   RELEASE_PATH,
@@ -24,6 +25,8 @@ import {
   headline,
   isDraft,
   benchmarkTitle,
+  cubeDemo,
+  showCube,
   liveUrl,
   placeholders,
   release,
@@ -72,6 +75,7 @@ const toc = [
   { id: 'why', title: T.why },
   { id: 'category', title: T.category },
   { id: 'how', title: T.how },
+  ...(showCube ? [{ id: 'cube', title: 'The cube at the top of this page' }] : []),
   { id: 'results', title: T.results },
   { id: 'real-lab', title: T.real_lab },
   ...(selfOptimization ? [{ id: 'self', title: selfOptimization.title }] : []),
@@ -196,6 +200,18 @@ export default function ReleasePage() {
       noteLabel="Draft"
       lead={
         <>
+          {/* The cube opens the page unexplained; the reveal section says what solves it (founder, 13 Nov 2026). */}
+          {showCube ? (
+            <CubeLive
+              label="A Rubik's cube being scrambled and solved"
+              config={{
+                scrambleDepth: cubeDemo.scramble_depth,
+                maxDepth: cubeDemo.max_depth,
+                batch: cubeDemo.batch,
+                maxCalls: cubeDemo.max_calls,
+              }}
+            />
+          ) : null}
           <section className="r-hero" aria-label="Headline result">
             <p className="r-hero-figure">
               {hero.values.wins} <span>of</span> {hero.values.runs}
@@ -269,6 +285,27 @@ export default function ReleasePage() {
             </Aside>
           ) : null}
         </section>
+
+        {showCube ? (
+          <section aria-labelledby="cube">
+            <h2 id="cube">
+              The cube at the top of this <em>page</em>
+            </h2>
+            <p>
+              Is being solved by {model.name}, right now, while you read. Not by a cube solver: {model.name} knows
+              nothing about cubes.
+            </p>
+            <p>
+              It sees the cube the way it sees a lab campaign, as a black box. Each experiment is a sequence of moves.
+              The only result that comes back is how many stickers are in place after the whole sequence, never which
+              moves helped. So it has to find, again and again, how long a sequence must be before any sequence of that
+              length makes the cube better, and then which one does.
+            </p>
+            {cubeDemo.holds === true && cubeDemo.result_template ? (
+              <p>{fill({ text_template: cubeDemo.result_template, values: cubeDemo.values ?? {} })}</p>
+            ) : null}
+          </section>
+        ) : null}
 
         <section aria-labelledby="results">
           <Heading id="results" text={T.results} />

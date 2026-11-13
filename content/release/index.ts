@@ -132,6 +132,12 @@ export type ReleaseData = {
   asides: { anchor: string; title: string; text: string }[];
   faq: { q: string; a: string }[];
   /**
+   * The cube demo (founder, 13 Nov 2026): settings, and whether the model
+   * team's test holds, so the cube and its reveal may appear on the
+   * published page. Absent, the defaults below apply and both stay hidden.
+   */
+  cube_demo?: CubeDemo;
+  /**
    * The model pointed at its own pipeline (founder, 31 Oct 2026): one result
    * per target, a closing line. Nothing appears until `holds` is true.
    */
@@ -139,6 +145,19 @@ export type ReleaseData = {
   /** Shown inside the results aside only when `holds` is true; while null it does not appear at all. */
   contamination?: { title: string; text_template: string; values: Record<string, number | string | null>; holds: boolean | null; anchor: string };
 };
+
+export type CubeDemo = {
+  holds: boolean | null;
+  scramble_depth: number;
+  max_depth: number;
+  batch: number;
+  max_calls: number;
+  /** One sentence with the test's figures, filled from values; shown under the reveal once it holds. */
+  result_template?: string;
+  values?: Record<string, number | string | null>;
+};
+
+const CUBE_DEFAULTS: CubeDemo = { holds: null, scramble_depth: 8, max_depth: 4, batch: 16, max_calls: 60 };
 
 export type SelfOptimization = {
   title: string;
@@ -295,6 +314,19 @@ export const benchmark = (id: string) => {
   if (!found) throw new Error(`release: no benchmark "${id}" in announcement.json`);
   return found;
 };
+
+/** The cube's settings: the data file's, else defaults until the model team's test sets them. */
+export const cubeDemo: CubeDemo = { ...CUBE_DEFAULTS, ...release.cube_demo };
+
+/**
+ * Whether the cube and its reveal appear. On the published page only once the
+ * test holds and the page is built against the served endpoint: the reveal
+ * says the model is solving it live, which the mock is not. In development
+ * always, on the mock or the endpoint, so they can be built and checked (the
+ * cube then says "Mock model").
+ */
+export const showCube =
+  process.env.NODE_ENV !== 'production' || (cubeDemo.holds === true && Boolean(process.env.NEXT_PUBLIC_SDM_API));
 
 /**
  * The self-optimisation section, only once the data file carries it and its
