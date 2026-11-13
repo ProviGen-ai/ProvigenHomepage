@@ -85,7 +85,7 @@ function Card({
 }) {
   const id = `r-cube-card-${n}`;
   return (
-    <section className={active ? 'r-cube-card r-cube-card--active' : 'r-cube-card'}>
+    <section className={active ? 'r-cube-card r-cube-card--active' : 'r-cube-card'} aria-current={active ? 'step' : undefined}>
       <button type="button" className="r-cube-card-head" aria-expanded={open} aria-controls={id} onClick={onToggle}>
         <span className="r-cube-card-n">Level {n}</span>
         <span className="r-cube-card-title">{title}</span>
@@ -105,7 +105,8 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
   const stickers = useRef<(HTMLSpanElement | null)[]>([]);
   const cube = useRef<Cube>(solved());
   const [level, setLevel] = useState<Level>('idle');
-  const [open, setOpen] = useState<Record<number, boolean>>({ 1: true, 2: false });
+  /* One accordion: at most one level open at a time. */
+  const [open, setOpen] = useState<1 | 2 | null>(1);
   const [found, setFound] = useState<DiscoverEvent>({ experiments: 0, best: null, blocks: [] });
   const [solving, setSolving] = useState<SolveEvent | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -177,7 +178,7 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
     try {
       /* Level 1: each new best building block is shown on the solved cube, held, then undone. */
       setLevel('discover');
-      setOpen({ 1: true, 2: false });
+      setOpen(1);
       const blocks: Block[] = await discover(
         config,
         setFound,
@@ -192,7 +193,7 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
       if (cancelled.current) return;
       /* Level 2: scramble, then solve with the blocks. */
       setLevel('scramble');
-      setOpen({ 1: false, 2: true });
+      setOpen(2);
       await playAll(scramble(config.scrambleDepth), 140);
       setLevel('solve');
       await solveWith(blocks, cube.current, config, setSolving, (moves) => playAll(moves, 260), wait, () => cancelled.current);
@@ -220,7 +221,8 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
   );
 
   const busy = level === 'discover' || level === 'scramble' || level === 'solve';
-  const toggle = (n: number) => setOpen((o) => ({ ...o, [n]: !o[n] }));
+  /* Opening one level closes the other; the open one closes on a second click. */
+  const toggle = (n: 1 | 2) => setOpen((o) => (o === n ? null : n));
 
   return (
     <figure className="r-cube" aria-label={label}>
@@ -260,7 +262,7 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
       </div>
 
       <div className="r-cube-cards">
-        <Card n={1} title="Discover building blocks" open={open[1]} active={level === 'discover'} onToggle={() => toggle(1)}>
+        <Card n={1} title="Discover building blocks" open={open === 1} active={level === 'discover'} onToggle={() => toggle(1)}>
           <p>
             On a solved cube, {modelName} looks for move sequences that disturb as few pieces as possible. All it is told
             is how many pieces each one moves.
@@ -279,9 +281,9 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
             </ol>
           ) : null}
         </Card>
-        <Card n={2} title="Solve with them" open={open[2]} active={level === 'scramble' || level === 'solve'} onToggle={() => toggle(2)}>
+        <Card n={2} title="Solve with them" open={open === 2} active={level === 'scramble' || level === 'solve'} onToggle={() => toggle(2)}>
           <p>
-            The cube is scrambled. Now each experiment is one building block from level 1, turned or mirrored in one of 48
+            Then the cube is scrambled. Now each experiment is one building block from level 1, turned or mirrored in one of 48
             ways and placed with a short setup. The results: corners and edges in place, and turned the right way.
           </p>
           <p className="r-cube-stats">

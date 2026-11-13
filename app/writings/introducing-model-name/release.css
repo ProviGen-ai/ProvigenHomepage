@@ -677,19 +677,22 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
-/* The level cards beside the cube: the running level open, the other closed. */
+/* The levels beside the cube: one box, one section per level, one open at a time. */
 .r-cube-cards {
-  display: grid;
-  gap: 0.6rem;
-  align-content: start;
-}
-.r-cube-card {
   border: 1px solid var(--c-line-2);
   background: var(--c-paper);
+  align-self: start;
+}
+.r-cube-card + .r-cube-card {
+  border-top: 1px solid var(--c-line-2);
+}
+/* The running level: a teal rule on its left. */
+.r-cube-card {
+  border-left: 2px solid transparent;
   transition: border-color 200ms ease;
 }
 .r-cube-card--active {
-  border-color: var(--c-teal-ink);
+  border-left-color: var(--c-teal-ink);
 }
 .r-cube-card-head {
   display: grid;
