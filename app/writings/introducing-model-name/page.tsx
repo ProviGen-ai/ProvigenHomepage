@@ -413,8 +413,9 @@ export default function ReleasePage() {
               Try it on a hidden <em>landscape</em>
             </h2>
             <p>
-              Pick a landscape. Ask {model.name} for the next experiment, or click the plot to run one of your own; it
-              learns from yours too. When you are done, reveal what was hidden.
+              One landscape, hidden, with regions where runs fail. Choose who picks the experiments: you, by clicking;{' '}
+              {model.name}; Bayesian optimisation; or a design of experiments planned up front. Each gets 25 tries on the
+              same landscape. Show it when you are done, and draw a new one to go again.
             </p>
             <TryPanel modelName={model.name} />
           </section>

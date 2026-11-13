@@ -82,13 +82,16 @@ export async function discover(
   for (let call = 0; call < config.discoverCalls; call++) {
     await wait();
     if (cancelled()) break;
-    const answer = await propose({
-      space: DISCOVER_SPACE,
-      history,
-      batch: config.batch,
-      goal: 'minimize',
-      objectives: [{ name: 'pieces_moved', goal: 'minimize' }],
-    });
+    const answer = await propose(
+      {
+        space: DISCOVER_SPACE,
+        history,
+        batch: config.batch,
+        goal: 'minimize',
+        objectives: [{ name: 'pieces_moved', goal: 'minimize' }],
+      },
+      'demo',
+    );
     let improved: Move[] | null = null;
     for (const { params } of answer.proposals) {
       const moves = commutator(read(params, 'a', 'a_depth', 3), read(params, 'b', 'b_depth', 2));
@@ -163,7 +166,7 @@ export async function solveWith(
         { name: 'edges_placed', goal: 'maximize' },
         { name: 'edges_oriented', goal: 'maximize' },
       ],
-    });
+    }, 'demo');
     const before = outcomes(cube);
     let best: { moves: Move[]; gain: number; last: SolveEvent['last'] } | undefined;
     for (const { params } of answer.proposals) {

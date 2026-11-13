@@ -2,10 +2,11 @@ import type { Param, ProposeRequest, ProposeResponse, Settings, Status } from '.
 
 /*
  * Stand-in for the SDM endpoint until it is served (13 Nov 2026). Same
- * contract, no model: proposals are random settings, half of them near the
- * best experiment so far, after a short delay like a network round trip. It
- * exists so the page's demos can be built and tested; it is never presented
- * as the model (the demos show a "Mock model" label while it is in use).
+ * contract, no model and no optimiser: for every method, proposals are
+ * random settings, half of them near the best experiment so far (doe-lhs: a
+ * Latin hypercube), after a short delay like a network round trip. It exists
+ * so the page's demos can be built and tested; the published page shows the
+ * demos only when built against the served endpoint.
  *
  * In development, ?sdm-mock=busy, =paused or =ratelimit on the page's URL
  * makes the mock answer as an overloaded server would, to test the notices.
@@ -45,12 +46,35 @@ export async function mockStatus(): Promise<Status> {
   return { state: 'ok' };
 }
 
+/* For doe-lhs: one point per stratum on every axis, as a Latin hypercube does (no optimisation, a stand-in). */
+function latin(request: ProposeRequest): Settings[] {
+  const n = request.batch;
+  const columns = request.space.map(() => {
+    const order = Array.from({ length: n }, (_, i) => i);
+    for (let i = n - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    return order;
+  });
+  return Array.from({ length: n }, (_, k) => {
+    const params: Settings = {};
+    request.space.forEach((p, d) => {
+      const u = (columns[d][k] + Math.random()) / n;
+      params[p.name] =
+        p.type === 'categorical' ? p.choices[Math.floor(u * p.choices.length)] : p.type === 'integer' ? Math.round(p.low + u * (p.high - p.low)) : p.low + u * (p.high - p.low);
+    });
+    return params;
+  });
+}
+
 export async function mockPropose(request: ProposeRequest): Promise<ProposeResponse | { status: number; retry_after_s: number }> {
   await delay(250 + Math.random() * 250);
   const forced = forcedState();
   if (forced === 'busy' || forced === 'paused') return { status: 503, retry_after_s: 60 };
   if (forced === 'ratelimit') return { status: 429, retry_after_s: 20 };
 
+  if (request.method === 'doe-lhs') return { proposals: latin(request).map((params) => ({ params })), model: 'mock', version: '0' };
   const scored = request.history.filter((o) => o.value !== null);
   const best = scored.length
     ? scored.reduce((a, b) => ((request.goal === 'maximize' ? (b.value as number) > (a.value as number) : (b.value as number) < (a.value as number)) ? b : a))

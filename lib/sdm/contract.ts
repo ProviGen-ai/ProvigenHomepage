@@ -45,7 +45,18 @@ export type ProposeRequest = {
   goal: 'maximize' | 'minimize';
   /** Several outcomes, each with its own goal, keyed into Observation.values. */
   objectives?: { name: string; goal: 'maximize' | 'minimize' }[];
+  /**
+   * Who proposes (default the model). The server maps these onto the
+   * BiofoundryDemo methods: sdm-1 -> gamma, bayesian-optimisation -> alpha
+   * (its Gaussian-process optimiser), doe-lhs -> the lhs baseline (a
+   * space-filling Latin hypercube; asked once with an empty history and a
+   * batch of the whole budget, as a design planned up front). The page never
+   * runs an optimiser of its own.
+   */
+  method?: Method;
 };
+
+export type Method = 'sdm-1' | 'bayesian-optimisation' | 'doe-lhs';
 
 export type ProposeResponse = {
   proposals: { params: Settings }[];
@@ -68,8 +79,12 @@ export const PUBLIC_LIMITS = {
   maxParams: 24,
   maxHistory: 200,
   maxBatch: 16,
-  /** Proposals one page view may request in all, across the page's demos. */
+  /** A design planned up front (doe-lhs) is asked for in one batch of this size at most. */
+  maxDesign: 32,
+  /** Calls one page view may make for what the visitor asks (the try-it panel). */
   callsPerPageView: 120,
+  /** Calls one page view may make for the page's own demo (the cube), which the visitor does not ask for. */
+  demoCallsPerPageView: 240,
 } as const;
 
 /** Why a call did not return proposals, in the terms the page shows. */

@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { isLive } from '@/lib/sdm/client';
 import { SdmUnavailable } from '@/lib/sdm/contract';
 import { useInViewMotion } from '@/lib/use-in-view-motion';
 import { applyMove, inverse, parseMove, scramble, solved, type Cube, type Face, type Move, type Vec } from './cube';
@@ -66,7 +65,7 @@ const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2,
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export type CubeConfig = PhaseConfig & { scrambleDepth: number };
-type Level = 'idle' | 'discover' | 'scramble' | 'solve' | 'done' | 'unavailable';
+type Level = 'idle' | 'discover' | 'scramble' | 'solve' | 'done' | 'spent' | 'unavailable';
 
 function Card({
   n,
@@ -100,6 +99,37 @@ function Card({
   );
 }
 
+function Metric({ value, label }: { value: ReactNode; label: string }) {
+  return (
+    <p className="r-cube-metric">
+      <span className="r-cube-metric-value">{value}</span>
+      <span className="r-cube-metric-label">{label}</span>
+    </p>
+  );
+}
+
+/** Best so far against experiments: a step line on a 0 to `max` scale. */
+function Curve({ points, max, label }: { points: [number, number][]; max: number; label: string }) {
+  const W = 260;
+  const H = 70;
+  const last = points.length ? points[points.length - 1][0] : 0;
+  const x = (e: number) => 2 + (last ? (e / last) * (W - 4) : 0);
+  const y = (v: number) => H - 4 - (v / max) * (H - 10);
+  let d = '';
+  points.forEach(([e, v], i) => {
+    d += i === 0 ? `M${x(0)},${y(v)} H${x(e)}` : ` V${y(v)} H${x(e)}`;
+  });
+  return (
+    <figure className="r-cube-curve">
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${label}: ${points.length ? points[points.length - 1][1] : 'none yet'}.`}>
+        <line x1={2} x2={W - 2} y1={H - 4} y2={H - 4} className="r-cube-curve-axis" />
+        {d ? <path d={d} className="r-cube-curve-line" /> : null}
+      </svg>
+      <figcaption>{label}</figcaption>
+    </figure>
+  );
+}
+
 export default function CubeLive({ config, label, modelName }: { config: CubeConfig; label: string; modelName: string }) {
   const { ref, running, allowed } = useInViewMotion<HTMLDivElement>(0.3);
   const stickers = useRef<(HTMLSpanElement | null)[]>([]);
@@ -109,6 +139,9 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
   const [open, setOpen] = useState<1 | 2 | null>(1);
   const [found, setFound] = useState<DiscoverEvent>({ experiments: 0, best: null, blocks: [] });
   const [solving, setSolving] = useState<SolveEvent | null>(null);
+  /* Best so far against experiments, one point per call: level 1 falls, level 2 climbs. */
+  const [curve1, setCurve1] = useState<[number, number][]>([]);
+  const [curve2, setCurve2] = useState<[number, number][]>([]);
   const [notice, setNotice] = useState<string | null>(null);
   const runningRef = useRef(running);
   const allowedRef = useRef(allowed);
@@ -173,6 +206,8 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
     setNotice(null);
     setFound({ experiments: 0, best: null, blocks: [] });
     setSolving(null);
+    setCurve1([]);
+    setCurve2([]);
     cube.current = solved();
     draw();
     try {
@@ -181,7 +216,10 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
       setOpen(1);
       const blocks: Block[] = await discover(
         config,
-        setFound,
+        (e) => {
+          setFound(e);
+          if (e.best !== null) setCurve1((c) => [...c, [e.experiments, e.best as number]]);
+        },
         async (moves) => {
           await playAll(moves, 110);
           if (allowed) await sleep(700);
@@ -196,9 +234,22 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
       setOpen(2);
       await playAll(scramble(config.scrambleDepth), 140);
       setLevel('solve');
-      await solveWith(blocks, cube.current, config, setSolving, (moves) => playAll(moves, 260), wait, () => cancelled.current);
+      await solveWith(
+        blocks,
+        cube.current,
+        config,
+        (e) => {
+          setSolving(e);
+          setCurve2((c) => (c.length && c[c.length - 1][0] === e.experiments ? [...c.slice(0, -1), [e.experiments, e.solvedPieces]] : [...c, [e.experiments, e.solvedPieces]]));
+        },
+        (moves) => playAll(moves, 260),
+        wait,
+        () => cancelled.current,
+      );
       setLevel('done');
     } catch (error) {
+      /* The page's own budget for the cube ran out: it simply stops, without a message and without Run again. */
+      if (error instanceof SdmUnavailable && error.kind === 'limit') return setLevel('spent');
       setLevel('unavailable');
       setNotice(error instanceof SdmUnavailable ? error.message : 'The model could not be reached.');
     }
@@ -241,8 +292,7 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
           </div>
         </div>
         <figcaption className="r-cube-hud">
-          {!isLive ? <span className="r-cube-mock">Mock model</span> : null}
-          {!busy ? (
+          {!busy && level !== 'spent' ? (
             <button
               type="button"
               onClick={() => {
@@ -263,41 +313,20 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
 
       <div className="r-cube-cards">
         <Card n={1} title="Discover building blocks" open={open === 1} active={level === 'discover'} onToggle={() => toggle(1)}>
-          <p>
-            On a solved cube, {modelName} looks for move sequences that disturb as few pieces as possible. All it is told
-            is how many pieces each one moves.
-          </p>
-          <p className="r-cube-stats">
-            <span>{found.experiments} experiments</span>
-            <span>fewest pieces moved: {found.best ?? '–'}</span>
-          </p>
-          {found.blocks.length ? (
-            <ol className="r-cube-blocks">
-              {found.blocks.map((b) => (
-                <li key={b.label}>
-                  <code>{b.label}</code> <span>moves {b.support} pieces</span>
-                </li>
-              ))}
-            </ol>
-          ) : null}
+          <p>Find move sequences that disturb as few pieces as possible. The only feedback: how many pieces moved.</p>
+          <div className="r-cube-metrics">
+            <Metric value={found.best ?? '–'} label="fewest pieces moved" />
+            <Metric value={found.experiments} label="experiments" />
+          </div>
+          <Curve points={curve1} max={20} label="Fewest pieces moved so far" />
         </Card>
         <Card n={2} title="Solve with them" open={open === 2} active={level === 'scramble' || level === 'solve'} onToggle={() => toggle(2)}>
-          <p>
-            Then the cube is scrambled. Now each experiment is one building block from level 1, turned or mirrored in one of 48
-            ways and placed with a short setup. The results: corners and edges in place, and turned the right way.
-          </p>
-          <p className="r-cube-stats">
-            <span>{solving?.experiments ?? 0} experiments</span>
-            <span>{solving ? `${solving.solvedPieces} / 20 pieces solved` : level === 'scramble' ? 'scrambling' : 'waiting for level 1'}</span>
-          </p>
-          {solving?.last ? (
-            <p className="r-cube-last">
-              Last step: {solving.last.block}, symmetry {solving.last.symmetry}
-              {solving.last.setup.length ? `, setup ${solving.last.setup.join(' ')}` : ''}
-            </p>
-          ) : null}
-          {solving?.done === 'solved' ? <p className="r-cube-last">Solved.</p> : null}
-          {solving?.done === 'budget' ? <p className="r-cube-last">Stopped: this visit has used its experiments.</p> : null}
+          <p>Scramble the cube, then solve it using those sequences as single moves.</p>
+          <div className="r-cube-metrics">
+            <Metric value={solving ? `${solving.solvedPieces}/20` : '–'} label={solving?.done === 'solved' ? 'pieces solved: done' : 'pieces solved'} />
+            <Metric value={solving?.experiments ?? 0} label="experiments" />
+          </div>
+          <Curve points={curve2} max={20} label="Pieces solved so far" />
         </Card>
       </div>
       <p className="s-sr" aria-live="polite">

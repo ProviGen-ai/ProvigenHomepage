@@ -898,14 +898,14 @@
   color: var(--c-faint);
   cursor: default;
 }
-.r-try-tabs button[aria-selected='true'] {
+.r-try-tabs button[aria-checked='true'] {
   border-color: var(--c-teal-ink);
   background: var(--c-teal-ink);
   color: var(--c-paper);
 }
 .r-try-body {
   display: grid;
-  grid-template-columns: minmax(0, calc(320px + 1.4rem)) minmax(0, 1fr);
+  grid-template-columns: minmax(0, calc(400px + 1.4rem)) minmax(0, 1fr);
   gap: 1.5rem;
   align-items: start;
 }
@@ -987,8 +987,139 @@
 .r-try-x {
   color: var(--c-amber-ink);
 }
-@media (max-width: 700px) {
+@media (max-width: 860px) {
   .r-try-body {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* Try it, second version (13 Nov 2026): who chooses, a score per method, the landscape as a toggle. */
+.r-try-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.r-try-tabs button[aria-checked='true'] .r-try-mark {
+  border-color: var(--c-paper) !important;
+}
+.r-try-mark {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid;
+}
+.r-try-mark--circle {
+  border-radius: 50%;
+}
+.r-try-mark--diamond {
+  transform: rotate(45deg) scale(0.85);
+}
+.r-try-mark--triangle {
+  border-radius: 1px 1px 0 0;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  border-width: 0;
+  background: currentColor;
+}
+.r-try-canvas--place {
+  cursor: crosshair;
+}
+.r-try-canvas {
+  cursor: default;
+}
+.w-prose .r-try-hint {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--c-muted);
+}
+.r-try-actions--row {
+  grid-template-columns: 1fr 1fr;
+}
+.w-prose .r-try-score {
+  width: 100%;
+  min-width: 0;
+  table-layout: auto;
+  border-collapse: collapse;
+  border-top: 1px solid var(--c-ink);
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+}
+.w-prose .r-try-score th,
+.w-prose .r-try-score td {
+  padding: 0.4rem 0.5rem 0.4rem 0;
+  border-bottom: 1px solid var(--c-line);
+  text-align: left;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: var(--c-ink);
+}
+.w-prose .r-try-score thead th {
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.w-prose .r-try-score td:last-child,
+.w-prose .r-try-score th:last-child {
+  text-align: right;
+  padding-right: 0;
+}
+.w-prose .r-try-score--on th,
+.w-prose .r-try-score--on td {
+  color: var(--c-teal-ink);
+  font-weight: 600;
+}
+.w-prose .r-try-score tfoot th,
+.w-prose .r-try-score tfoot td {
+  color: var(--c-muted);
+}
+
+/* The level cards, simplified (13 Nov 2026): two key figures and a best-so-far curve. */
+.r-cube-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.r-cube-metric {
+  display: grid;
+  gap: 0.15rem;
+}
+.r-cube-metric-value {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-size: 1.9rem;
+  line-height: 1;
+  color: var(--c-teal-ink);
+}
+.r-cube-metric-label {
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.r-cube-curve {
+  margin: 0;
+}
+.r-cube-curve svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.r-cube-curve-axis {
+  stroke: var(--c-line-2);
+}
+.r-cube-curve-line {
+  fill: none;
+  stroke: var(--c-teal);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.r-cube-curve figcaption {
+  margin-top: 0.2rem;
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  color: var(--c-faint);
 }
