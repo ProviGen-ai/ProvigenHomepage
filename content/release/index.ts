@@ -67,6 +67,8 @@ export type ReleaseData = {
     release_date: string | null;
     status: string;
     one_line: string;
+    /** What the name stands for (SDM: sequential decision model). */
+    full_name?: string;
     standin: boolean;
   };
   model_card: {
@@ -131,6 +133,8 @@ export type ReleaseData = {
   };
   asides: { anchor: string; title: string; text: string }[];
   faq: { q: string; a: string }[];
+  /** The benchmarks tab: a few metrics, each a small table of SDM-1 against Bayesian optimisation. */
+  benchmark_overview?: BenchmarkOverview;
   /** The highlights grid, if the data file sets it; otherwise the page builds it from the fields above. */
   highlights?: { value_template: string; values: Record<string, number | string | null>; label: string }[];
   /**
@@ -146,6 +150,21 @@ export type ReleaseData = {
   self_optimization?: SelfOptimization;
   /** Shown inside the results aside only when `holds` is true; while null it does not appear at all. */
   contamination?: { title: string; text_template: string; values: Record<string, number | string | null>; holds: boolean | null; anchor: string };
+};
+
+export type BenchmarkOverview = {
+  note?: string;
+  n_note: string;
+  benchmarks: { id: string; name: string; detail: string; citation?: string; url?: string }[];
+  metrics: {
+    id: string;
+    name: string;
+    explain: string;
+    better: 'higher' | 'lower';
+    unit: string;
+    rows: { benchmark: string; n: number; model: number; bo: number; vs_bo: string }[];
+  }[];
+  standin?: boolean;
 };
 
 export type CubeDemo = {

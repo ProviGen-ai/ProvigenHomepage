@@ -1,15 +1,16 @@
 {
   "schema_version": 1,
   "notes": [
-    "Page data for the [MODEL NAME] announcement. Values marked standin are placeholders until the release."
+    "Page data for the SDM-1 announcement. Values marked standin are placeholders until the release."
   ],
   "model": {
-    "name": "[MODEL NAME]",
+    "name": "SDM-1",
     "version": "v[VERSION]",
     "release_date": null,
     "status": "Announced. Access by request.",
     "one_line": "A foundation model for experiment design in biotech, biochemical and chemical development: it reads a campaign's results so far and proposes which experiments to run next.",
-    "standin": true
+    "standin": true,
+    "full_name": "Sequential decision model"
   },
   "model_card": {
     "model_details": {
@@ -279,8 +280,8 @@
       "task": "From the first measured formulations of a published three-stage campaign, pick the untested formulation to make next, and compare it with the best one still untested.",
       "dataset": {
         "name": "Cell-free reagent formulations (three stages, 13 / 28 / 21 reagents, 1,231 formulations)",
-        "citation": "Olsen et al. 2026 (CC BY)",
-        "url": "[TBD: paper link]"
+        "citation": "Olsen et al., Nature Communications 17:3478 (2026)",
+        "url": "https://doi.org/10.1038/s41467-026-69605-8"
       },
       "baselines": [
         {
@@ -338,8 +339,8 @@
       "task": "Search each cell-free stage for its top 5% / top 1% formulations, 200 experiments, one at a time, 10 campaigns per stage.",
       "dataset": {
         "name": "Cell-free reagent formulations",
-        "citation": "Olsen et al. 2026 (CC BY)",
-        "url": "[TBD]"
+        "citation": "Olsen et al., Nature Communications 17:3478 (2026)",
+        "url": "https://doi.org/10.1038/s41467-026-69605-8"
       },
       "baselines": [
         {
@@ -477,7 +478,7 @@
   "methods": [
     {
       "key": "model",
-      "name": "[MODEL NAME]",
+      "name": "SDM-1",
       "group": "ours"
     },
     {
@@ -537,7 +538,7 @@
     }
   ],
   "copy": {
-    "kicker": "Introducing [MODEL NAME] v[VERSION]",
+    "kicker": "Introducing SDM-1 v[VERSION]",
     "section_titles": {
       "why": "Every experiment counts",
       "category": "A foundation model for experiment design",
@@ -556,7 +557,7 @@
       "benchmarks": 2,
       "methods": 11
     },
-    "cta_text": "Access opens later. Join the list to be among the first labs to run their next campaign with [MODEL NAME], or tell us about a campaign you are planning.",
+    "cta_text": "Access opens later. Join the list to be among the first labs to run their next campaign with SDM-1, or tell us about a campaign you are planning.",
     "standin": true
   },
   "takeaways": [
@@ -591,14 +592,14 @@
       "key": "baybe",
       "label_template": "Strongest alternative: {name}"
     },
-    "title_template": "[MODEL NAME] ends closest to the optimum on average across 11 benchmark landscapes",
+    "title_template": "SDM-1 ends closest to the optimum on average across 11 benchmark landscapes",
     "title_holds": true,
     "as_of": "2026-10-31",
     "standin": true
   },
   "campaign_trace": {
     "title": "One campaign, experiment by experiment",
-    "problem": "Ackley function, 4 parameters, with many local optima: a typical campaign, the median of 10. By experiment 25 [MODEL NAME] had closed nearly half the gap, ahead of every other method, and after 50 it ended closest, while random search had barely moved.",
+    "problem": "Ackley function, 4 parameters, with many local optima: a typical campaign, the median of 10. By experiment 25 SDM-1 had closed nearly half the gap, ahead of every other method, and after 50 it ended closest, while random search had barely moved.",
     "x_label": "Experiments run",
     "y_label": "Gap to the best possible result (lower is better)",
     "series": [
@@ -884,7 +885,7 @@
     {
       "anchor": "how",
       "title": "How it works",
-      "text": "Given a campaign's results so far, [MODEL NAME] predicts untested settings in a single pass: a full distribution over the outcome and the chance the run succeeds, with no model to fit or tune. It then proposes the settings with the most to gain."
+      "text": "Given a campaign's results so far, SDM-1 predicts untested settings in a single pass: a full distribution over the outcome and the chance the run succeeds, with no model to fit or tune. It then proposes the settings with the most to gain."
     },
     {
       "anchor": "results",
@@ -958,6 +959,185 @@
       {
         "name": "From one to a hundred parameters",
         "text": "from a two-factor screen to a many-component formulation"
+      }
+    ],
+    "standin": true
+  },
+  "benchmark_overview": {
+    "note": "Figures from the founders' benchmark slide (9 Nov 2026), to be confirmed by the model team against the release model.",
+    "n_note": "n counts all experiments, including the 5 starting points.",
+    "benchmarks": [
+      {
+        "id": "functions",
+        "name": "Standard optimisation functions",
+        "detail": "11 problems"
+      },
+      {
+        "id": "hpob",
+        "name": "HPO-B",
+        "detail": "hyperparameter tuning for machine learning"
+      },
+      {
+        "id": "cellfree",
+        "name": "Cell-free protein expression",
+        "detail": "a published lab campaign",
+        "citation": "Olsen et al., Nature Communications 17:3478 (2026)",
+        "url": "https://doi.org/10.1038/s41467-026-69605-8"
+      }
+    ],
+    "metrics": [
+      {
+        "id": "score",
+        "name": "Score",
+        "explain": "0 is what random search reaches with the same number of experiments, 100 is the optimum. Higher is better.",
+        "better": "higher",
+        "unit": "",
+        "rows": [
+          {
+            "benchmark": "functions",
+            "n": 25,
+            "model": 56,
+            "bo": 48,
+            "vs_bo": "+17%"
+          },
+          {
+            "benchmark": "functions",
+            "n": 50,
+            "model": 76,
+            "bo": 68,
+            "vs_bo": "+12%"
+          },
+          {
+            "benchmark": "hpob",
+            "n": 25,
+            "model": 47,
+            "bo": 44,
+            "vs_bo": "+6%"
+          },
+          {
+            "benchmark": "hpob",
+            "n": 50,
+            "model": 57,
+            "bo": 60,
+            "vs_bo": "−6%"
+          },
+          {
+            "benchmark": "cellfree",
+            "n": 25,
+            "model": 46,
+            "bo": 40,
+            "vs_bo": "+16%"
+          },
+          {
+            "benchmark": "cellfree",
+            "n": 50,
+            "model": 57,
+            "bo": 41,
+            "vs_bo": "+40%"
+          }
+        ]
+      },
+      {
+        "id": "distance",
+        "name": "Distance from the optimum",
+        "explain": "How far the best result is from the optimum, as a share of each task's range. 0% means the optimum was found. Lower is better.",
+        "better": "lower",
+        "unit": "%",
+        "rows": [
+          {
+            "benchmark": "functions",
+            "n": 25,
+            "model": 20.6,
+            "bo": 28.2,
+            "vs_bo": "1.4x closer"
+          },
+          {
+            "benchmark": "functions",
+            "n": 50,
+            "model": 11.0,
+            "bo": 15.4,
+            "vs_bo": "1.4x closer"
+          },
+          {
+            "benchmark": "hpob",
+            "n": 25,
+            "model": 5.9,
+            "bo": 8.0,
+            "vs_bo": "1.4x closer"
+          },
+          {
+            "benchmark": "hpob",
+            "n": 50,
+            "model": 2.8,
+            "bo": 5.3,
+            "vs_bo": "1.9x closer"
+          },
+          {
+            "benchmark": "cellfree",
+            "n": 25,
+            "model": 12.0,
+            "bo": 14.0,
+            "vs_bo": "1.2x closer"
+          },
+          {
+            "benchmark": "cellfree",
+            "n": 50,
+            "model": 3.3,
+            "bo": 5.8,
+            "vs_bo": "1.8x closer"
+          }
+        ]
+      },
+      {
+        "id": "top1",
+        "name": "Top 1% reached",
+        "explain": "Share of campaigns whose best result is in the top 1% of what is possible. Higher is better.",
+        "better": "higher",
+        "unit": "%",
+        "rows": [
+          {
+            "benchmark": "functions",
+            "n": 25,
+            "model": 75,
+            "bo": 66,
+            "vs_bo": "+12%"
+          },
+          {
+            "benchmark": "functions",
+            "n": 50,
+            "model": 87,
+            "bo": 83,
+            "vs_bo": "+6%"
+          },
+          {
+            "benchmark": "hpob",
+            "n": 25,
+            "model": 71,
+            "bo": 72,
+            "vs_bo": "−1%"
+          },
+          {
+            "benchmark": "hpob",
+            "n": 50,
+            "model": 85,
+            "bo": 88,
+            "vs_bo": "−4%"
+          },
+          {
+            "benchmark": "cellfree",
+            "n": 25,
+            "model": 67,
+            "bo": 53,
+            "vs_bo": "+25%"
+          },
+          {
+            "benchmark": "cellfree",
+            "n": 50,
+            "model": 87,
+            "bo": 73,
+            "vs_bo": "+18%"
+          }
+        ]
       }
     ],
     "standin": true

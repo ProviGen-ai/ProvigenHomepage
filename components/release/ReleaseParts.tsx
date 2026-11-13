@@ -625,9 +625,8 @@ export function ModelCard() {
   ];
   return (
     <details className="r-card">
-      {/* The section's heading already says "Model card". */}
       <summary>
-        Open the card <span>{release.model.name} {release.model.version}</span>
+        Model card <span>{release.model.name} {release.model.version}</span>
       </summary>
       <dl>
         {sections.map(([k, v]) => (

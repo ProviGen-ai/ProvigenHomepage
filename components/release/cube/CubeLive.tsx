@@ -45,11 +45,11 @@ function rotation(axis: number, angle: number): Mat {
   if (axis === 1) return [c, 0, s, 0, 1, 0, -s, 0, c];
   return [c, -s, 0, s, c, 0, 0, 0, 1];
 }
-/* The view: tilted to show the up, front and right faces. */
-const VIEW = mul(rotation(0, 0.5), rotation(1, -0.62));
+/* The view: tilted to show the up face, turned about the vertical by `spin` (the cube turns slowly while in view). */
+const viewAt = (spin: number) => mul(rotation(0, 0.5), rotation(1, -0.62 + spin));
 
 /** A sticker's CSS matrix: its centre and in-plane axes, turned by `turn`, then the view; y flipped for CSS. */
-function stickerMatrix(pos: Vec, normal: Vec, turn: Mat | null) {
+function stickerMatrix(pos: Vec, normal: Vec, turn: Mat | null, VIEW: Mat) {
   const axis = normal.findIndex((c) => c !== 0);
   const u: Vec = [0, 0, 0];
   u[(axis + 1) % 3] = 1;
@@ -130,7 +130,18 @@ function Curve({ points, max, label }: { points: [number, number][]; max: number
   );
 }
 
-export default function CubeLive({ config, label, modelName }: { config: CubeConfig; label: string; modelName: string }) {
+export default function CubeLive({
+  config,
+  label,
+  modelName,
+  intro,
+}: {
+  config: CubeConfig;
+  label: string;
+  modelName: string;
+  /** What the reader learns first, beside the cube, before the level cards. */
+  intro?: ReactNode;
+}) {
   const { ref, running, allowed } = useInViewMotion<HTMLDivElement>(0.3);
   const stickers = useRef<(HTMLSpanElement | null)[]>([]);
   const cube = useRef<Cube>(solved());
@@ -151,14 +162,21 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
   runningRef.current = running;
   allowedRef.current = allowed;
 
-  /* Draw the cube as it is, optionally with one layer part-way through a turn. */
-  const draw = useCallback((turn?: { axis: number; layer: number; angle: number }) => {
-    const m = turn ? rotation(turn.axis, turn.angle) : null;
+  /* The slow spin of the whole cube, and the layer part-way through a turn, if any. */
+  const spin = useRef(0);
+  const turnNow = useRef<{ axis: number; layer: number; angle: number } | null>(null);
+
+  /* Draw the cube as it is: spun, with the turning layer part-way through its turn. */
+  const draw = useCallback((turn?: { axis: number; layer: number; angle: number } | null) => {
+    if (turn !== undefined) turnNow.current = turn;
+    const t = turnNow.current;
+    const m = t ? rotation(t.axis, t.angle) : null;
+    const view = viewAt(spin.current);
     cube.current.forEach((s, i) => {
       const el = stickers.current[i];
       if (!el) return;
-      const turning = turn && s.pos[turn.axis] === turn.layer;
-      el.style.transform = stickerMatrix(s.pos, s.normal, turning ? m : null);
+      const turning = t && s.pos[t.axis] === t.layer;
+      el.style.transform = stickerMatrix(s.pos, s.normal, turning ? m : null, view);
       el.style.setProperty('--c', COLORS[s.color]);
     });
   }, []);
@@ -169,7 +187,7 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
         const { axis, layer, turns } = parseMove(move);
         const finish = () => {
           cube.current = applyMove(cube.current, move);
-          draw();
+          draw(null);
           resolve();
         };
         if (!allowed || ms <= 0) return finish();
@@ -258,6 +276,20 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
   /* First draw, and the first run once the cube is in view and motion is allowed. */
   const started = useRef(false);
   useEffect(() => draw(), [draw]);
+  /* The spin: a slow turn of the whole cube while it is in view and motion is allowed. */
+  useEffect(() => {
+    if (!running || !allowed) return;
+    let frame = 0;
+    let last = performance.now();
+    const tick = (now: number) => {
+      spin.current += ((now - last) / 1000) * 0.35;
+      last = now;
+      draw();
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [running, allowed, draw]);
   useEffect(() => {
     if (running && !started.current) {
       started.current = true;
@@ -311,6 +343,8 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
         ) : null}
       </div>
 
+      <div className="r-cube-right">
+      {intro ? <div className="r-cube-intro">{intro}</div> : null}
       <div className="r-cube-cards">
         <Card n={1} title="Discover building blocks" open={open === 1} active={level === 'discover'} onToggle={() => toggle(1)}>
           <p>Find move sequences that disturb as few pieces as possible. The only feedback: how many pieces moved.</p>
@@ -328,6 +362,7 @@ export default function CubeLive({ config, label, modelName }: { config: CubeCon
           </div>
           <Curve points={curve2} max={20} label="Pieces solved so far" />
         </Card>
+      </div>
       </div>
       <p className="s-sr" aria-live="polite">
         {solving?.done === 'solved' ? `Solved after ${found.experiments + solving.experiments} experiments.` : ''}
