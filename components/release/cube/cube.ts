@@ -104,3 +104,100 @@ export function scramble(length: number, random = Math.random): Move[] {
 }
 
 export const invert = (move: Move): Move => (move.endsWith('2') ? move : move.endsWith("'") ? move[0] : `${move[0]}'`);
+
+/* ---- Pieces (13 Nov 2026): the four outcomes and support, for the two-phase campaign ---- */
+
+const AXIS_OF: Record<Face, 0 | 1 | 2> = { R: 0, L: 0, U: 1, D: 1, F: 2, B: 2 };
+
+/** Corners and edges, each as its stickers (centres left out). */
+function pieces(cube: Cube) {
+  const groups = new Map<string, Sticker[]>();
+  for (const s of cube) {
+    const key = s.pos.join();
+    groups.set(key, [...(groups.get(key) ?? []), s]);
+  }
+  return [...groups.values()].filter((g) => g.length >= 2);
+}
+
+/** A piece's home slot: the corner or edge between the centres of its colours. */
+const home = (g: Sticker[]): Vec => {
+  const h: Vec = [0, 0, 0];
+  for (const s of g) h[AXIS_OF[s.color]] = FACE[s.color].sign;
+  return h;
+};
+
+/*
+ * Orientation in the convention two-phase solvers use (U/D for corners, F/B
+ * for edges): a corner is oriented when its U-or-D-coloured sticker faces U
+ * or D; an edge, when its reference sticker (U/D colour if it has one, else
+ * its F/B colour) sits on the slot's reference face (U/D for edges in the top
+ * or bottom layer, F/B for edges in the middle layer). Only quarter turns of
+ * R, L, F, B twist corners; only quarter turns of F and B flip edges.
+ */
+function oriented(g: Sticker[]) {
+  if (g.length === 3) return g.some((s) => (s.color === 'U' || s.color === 'D') && s.normal[1] !== 0);
+  const ref = g.find((s) => s.color === 'U' || s.color === 'D') ?? g.find((s) => s.color === 'F' || s.color === 'B')!;
+  const middleLayer = ref.pos[1] === 0;
+  return middleLayer ? ref.normal[2] !== 0 : ref.normal[1] !== 0;
+}
+
+export type Outcomes = { cornersPlaced: number; cornersOriented: number; edgesPlaced: number; edgesOriented: number };
+
+export function outcomes(cube: Cube): Outcomes {
+  const o: Outcomes = { cornersPlaced: 0, cornersOriented: 0, edgesPlaced: 0, edgesOriented: 0 };
+  for (const g of pieces(cube)) {
+    const corner = g.length === 3;
+    const placed = home(g).every((c, i) => c === g[0].pos[i]);
+    if (placed) corner ? o.cornersPlaced++ : o.edgesPlaced++;
+    if (oriented(g)) corner ? o.cornersOriented++ : o.edgesOriented++;
+  }
+  return o;
+}
+
+/** Pieces solved (placed and turned right), 0 to 20. */
+export const piecesSolved = (cube: Cube) =>
+  pieces(cube).filter((g) => g.every((s) => s.color === faceOf(s.normal))).length;
+
+/** How many pieces a sequence moves: apply it to a solved cube and count the pieces it leaves unsolved. */
+export const support = (moves: Move[]) => 20 - piecesSolved(applyMoves(solved(), moves));
+
+export const inverse = (moves: Move[]) => moves.slice().reverse().map(invert);
+export const commutator = (a: Move[], b: Move[]) => [...a, ...b, ...inverse(a), ...inverse(b)];
+export const conjugate = (x: Move[], y: Move[]) => [...x, ...y, ...inverse(x)];
+
+/*
+ * The 48 symmetries of the cube, as signed permutation matrices (24
+ * rotations, each with or without a mirror). A symmetry acts on a move by
+ * sending the face's outward axis to its image; a mirror (determinant -1)
+ * also reverses the turn. One operator found becomes 48.
+ */
+export const SYMMETRIES: number[][] = (() => {
+  const out: number[][] = [];
+  const perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
+  for (const p of perms)
+    for (let signs = 0; signs < 8; signs++) {
+      const m = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+      p.forEach((col, row) => (m[row * 3 + col] = signs & (1 << row) ? -1 : 1));
+      out.push(m);
+    }
+  /* Identity first, so symmetry 0 leaves a sequence as it is. */
+  out.sort((a, b) => Number(b.join() === '1,0,0,0,1,0,0,0,1') - Number(a.join() === '1,0,0,0,1,0,0,0,1'));
+  return out;
+})();
+
+const det3 = (m: number[]) => m[0] * (m[4] * m[8] - m[5] * m[7]) - m[1] * (m[3] * m[8] - m[5] * m[6]) + m[2] * (m[3] * m[7] - m[4] * m[6]);
+
+export function symmetric(moves: Move[], s: number): Move[] {
+  const m = SYMMETRIES[((s % 48) + 48) % 48];
+  const mirror = det3(m) < 0;
+  return moves.map((move) => {
+    const face = move[0] as Face;
+    const n: Vec = [0, 0, 0];
+    n[AXIS_OF[face]] = FACE[face].sign;
+    const image: Vec = [m[0] * n[0] + m[1] * n[1] + m[2] * n[2], m[3] * n[0] + m[4] * n[1] + m[5] * n[2], m[6] * n[0] + m[7] * n[1] + m[8] * n[2]];
+    const target = faceOf(image);
+    const suffix = move.slice(1);
+    if (!mirror || suffix === '2') return `${target}${suffix}`;
+    return suffix === "'" ? target : `${target}'`;
+  });
+}

@@ -131,6 +131,8 @@ export type ReleaseData = {
   };
   asides: { anchor: string; title: string; text: string }[];
   faq: { q: string; a: string }[];
+  /** The highlights grid, if the data file sets it; otherwise the page builds it from the fields above. */
+  highlights?: { value_template: string; values: Record<string, number | string | null>; label: string }[];
   /**
    * The cube demo (founder, 13 Nov 2026): settings, and whether the model
    * team's test holds, so the cube and its reveal may appear on the
@@ -149,15 +151,67 @@ export type ReleaseData = {
 export type CubeDemo = {
   holds: boolean | null;
   scramble_depth: number;
-  max_depth: number;
+  /** Calls for level 1 (discover building blocks) and level 2 (solve with them). */
+  discover_calls: number;
+  solve_calls: number;
   batch: number;
-  max_calls: number;
+  /** Building blocks level 1 keeps for level 2. */
+  keep: number;
   /** One sentence with the test's figures, filled from values; shown under the reveal once it holds. */
   result_template?: string;
   values?: Record<string, number | string | null>;
 };
 
-const CUBE_DEFAULTS: CubeDemo = { holds: null, scramble_depth: 8, max_depth: 4, batch: 16, max_calls: 60 };
+const CUBE_DEFAULTS: CubeDemo = { holds: null, scramble_depth: 8, discover_calls: 20, solve_calls: 60, batch: 16, keep: 4 };
+
+/**
+ * The highlights grid (founder, 13 Nov 2026, after the big-figure grids of
+ * other launch pages): the data file's `highlights`, else four or five
+ * figures read from the fields that already carry them, each label restating
+ * the sentence its figure comes from. A figure whose field is missing or
+ * null is left out, never shown as a slot.
+ */
+export function highlights(): { value: string; label: string }[] {
+  if (release.highlights?.length)
+    return release.highlights.map((h) => ({ value: fill({ text_template: h.value_template, values: h.values }), label: h.label }));
+  const items: { value: string; label: string }[] = [];
+  const h = (id: string) => release.headline_candidates.find((x) => x.id === id);
+  const abrupt = h('abrupt_vs_bo');
+  if (abrupt && typeof abrupt.values.wins === 'number')
+    items.push({
+      value: `${abrupt.values.wins} of ${abrupt.values.runs}`,
+      label: 'benchmark campaigns with sharp optima and abrupt changes where it beat standard Bayesian optimisation',
+    });
+  const random = h('beats_random');
+  if (random && typeof random.values.pct === 'number')
+    items.push({ value: show(random.values.pct, { percent: true }), label: 'of benchmark campaigns where it beat random search' });
+  const fewer = h('fewer_experiments');
+  if (fewer && fewer.values.factor !== null && fewer.values.factor !== undefined)
+    items.push({
+      value: `${show(fewer.values.factor)}x`,
+      label: 'faster than random screening to half of the best 5% of formulations, on a published cell-free campaign',
+    });
+  /* "18 vs 147 experiments" in the discovery table becomes 147 → 18. */
+  const discovery = release.benchmarks.find((b) => b.id === 'discovery_cellfree');
+  const top1 = discovery?.results.find((r) => /top 1%/i.test(r.group));
+  const m = typeof top1?.values.model === 'string' ? top1.values.model.match(/\(([\d.]+) vs ([\d.]+) experiments\)/) : null;
+  if (m)
+    items.push({
+      value: `${m[2]} → ${m[1]}`,
+      label: `experiments to find every one of the best 1% of formulations (${top1!.group.replace(/^.*\((.*)\).*$/, '$1')}): random screening, then ${release.model.name}`,
+    });
+  const campaigns = release.copy.results_intro_values.campaigns;
+  if (typeof campaigns === 'number')
+    items.push({ value: show(campaigns), label: 'optimisation campaigns, every method from the same starting experiments' });
+  return items;
+}
+
+/**
+ * Whether the try-it panel appears: on the published page only when it is
+ * built against the served endpoint (the panel talks to the model; the mock
+ * is not the model). In development always, labelled "Mock model".
+ */
+export const showTry = process.env.NODE_ENV !== 'production' || Boolean(process.env.NEXT_PUBLIC_SDM_API);
 
 export type SelfOptimization = {
   title: string;

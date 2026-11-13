@@ -15,6 +15,7 @@ import {
 } from '@/components/release/ReleaseParts';
 import { ArrowIcon } from '@/components/site/Header';
 import CubeLive from '@/components/release/cube/CubeLive';
+import TryPanel from '@/components/release/try/TryPanel';
 import {
   METHOD_LABEL,
   RELEASE_PATH,
@@ -26,7 +27,9 @@ import {
   isDraft,
   benchmarkTitle,
   cubeDemo,
+  highlights,
   showCube,
+  showTry,
   liveUrl,
   placeholders,
   release,
@@ -81,6 +84,7 @@ const toc = [
   ...(selfOptimization ? [{ id: 'self', title: selfOptimization.title }] : []),
   { id: 'enables', title: T.enables },
   { id: 'handles', title: T.handles },
+  ...(showTry ? [{ id: 'try', title: 'Try it on a hidden landscape' }] : []),
   { id: 'faq', title: T.faq },
   { id: 'model-card', title: T.model_card },
 ];
@@ -203,12 +207,14 @@ export default function ReleasePage() {
           {/* The cube opens the page unexplained; the reveal section says what solves it (founder, 13 Nov 2026). */}
           {showCube ? (
             <CubeLive
-              label="A Rubik's cube being scrambled and solved"
+              label="A Rubik's cube being solved"
+              modelName={model.name}
               config={{
                 scrambleDepth: cubeDemo.scramble_depth,
-                maxDepth: cubeDemo.max_depth,
+                discoverCalls: cubeDemo.discover_calls,
+                solveCalls: cubeDemo.solve_calls,
                 batch: cubeDemo.batch,
-                maxCalls: cubeDemo.max_calls,
+                keep: cubeDemo.keep,
               }}
             />
           ) : null}
@@ -293,13 +299,14 @@ export default function ReleasePage() {
             </h2>
             <p>
               Is being solved by {model.name}, right now, while you read. Not by a cube solver: {model.name} knows
-              nothing about cubes.
+              nothing about cubes. It sees the cube the way it sees a lab campaign, as a black box: settings go in, a few
+              numbers come back.
             </p>
             <p>
-              It sees the cube the way it sees a lab campaign, as a black box. Each experiment is a sequence of moves.
-              The only result that comes back is how many stickers are in place after the whole sequence, never which
-              moves helped. So it has to find, again and again, how long a sequence must be before any sequence of that
-              length makes the cube better, and then which one does.
+              The same model works on it at two levels. First it optimises sequences of moves, looking for ones that
+              disturb as few pieces as possible. Then it goes one level up and optimises with what it found: each
+              experiment is now a whole building block, turned or mirrored and set in place. Nothing in the model changes
+              between the two. Only what counts as one experiment does.
             </p>
             {cubeDemo.holds === true && cubeDemo.result_template ? (
               <p>{fill({ text_template: cubeDemo.result_template, values: cubeDemo.values ?? {} })}</p>
@@ -309,6 +316,15 @@ export default function ReleasePage() {
 
         <section aria-labelledby="results">
           <Heading id="results" text={T.results} />
+          {/* The highlights: big figures, small labels, each from the data file (highlights()). */}
+          <dl className="r-highlights">
+            {highlights().map((h) => (
+              <div key={h.label}>
+                <dt>{h.value}</dt>
+                <dd>{h.label}</dd>
+              </div>
+            ))}
+          </dl>
           <p>{fill({ text_template: release.copy.results_intro_template, values: release.copy.results_intro_values })}</p>
           {resultsAside ? (
             <Aside title={resultsAside.title}>
@@ -390,6 +406,19 @@ export default function ReleasePage() {
             ))}
           </dl>
         </section>
+
+        {showTry ? (
+          <section aria-labelledby="try">
+            <h2 id="try">
+              Try it on a hidden <em>landscape</em>
+            </h2>
+            <p>
+              Pick a landscape. Ask {model.name} for the next experiment, or click the plot to run one of your own; it
+              learns from yours too. When you are done, reveal what was hidden.
+            </p>
+            <TryPanel modelName={model.name} />
+          </section>
+        ) : null}
 
         <section aria-labelledby="faq">
           <Heading id="faq" text={T.faq} />

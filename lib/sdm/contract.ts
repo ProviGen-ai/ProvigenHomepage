@@ -29,15 +29,22 @@ export type Param =
 export type ParamValue = number | string;
 export type Settings = Record<string, ParamValue>;
 
-/** One experiment run so far: its settings and what was measured (null: the run failed). */
-export type Observation = { params: Settings; value: number | null };
+/**
+ * One experiment run so far: its settings and what was measured (null: the
+ * run failed). With several objectives, `values` carries each by name and
+ * `value` their combined score for servers that read only one.
+ */
+export type Observation = { params: Settings; value: number | null; values?: Record<string, number | null> };
 
 export type ProposeRequest = {
   space: Param[];
   history: Observation[];
   /** How many proposals to return at once. */
   batch: number;
+  /** The goal for `value`. */
   goal: 'maximize' | 'minimize';
+  /** Several outcomes, each with its own goal, keyed into Observation.values. */
+  objectives?: { name: string; goal: 'maximize' | 'minimize' }[];
 };
 
 export type ProposeResponse = {
