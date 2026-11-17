@@ -712,6 +712,11 @@ a.w-tl-col:focus-visible .w-tl-label {
   margin-top: 0;
   max-width: none;
 }
+/* The line as the index's title (founder, 14 Nov 2026): smaller than a display headline, so it does not dominate. */
+.w-index-hero .w-index-title--line {
+  font-size: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+  line-height: 1.1;
+}
 .w-index-hero .w-index-dek {
   margin-top: 1.5rem;
   max-width: 36ch;
@@ -2509,5 +2514,29 @@ html[data-motion='paused'] .w-card:hover .w-plate-scan {
   }
   .w-plate-next {
     fill-opacity: 1 !important;
+  }
+}
+
+/* The release card's decision tree (17 Nov 2026): the stage holds it, as the other drawings, with room around it. */
+.w-visual--tree .w-visual-stage {
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 0.5rem + 2vw, 2.25rem);
+}
+.w-visual--tree .r-tree {
+  transform: none;
+  max-height: 100%;
+}
+
+/* The release card's dek (the user, 17 Nov 2026): its first sentence stands on one line, the second below it. The
+   sentence is 52 characters, so the line is given the room for it and, from the tablet width up, a slightly smaller
+   size, so it fits; on a phone it wraps as any other text rather than running off the card. No nowrap, which would
+   have carried the line out of a narrow card. */
+.w-card--introducing-sdm-1 .w-card-dek {
+  max-width: 58ch;
+}
+@media (min-width: 46rem) {
+  .w-card--introducing-sdm-1 .w-card-dek {
+    font-size: clamp(1.0625rem, 0.98rem + 0.28vw, 1.25rem);
   }
 }

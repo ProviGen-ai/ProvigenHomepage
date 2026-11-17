@@ -1,0 +1,103 @@
+/* The activation page (the user, 17 Nov 2026): barebones. One card in the middle of the page, in the site's tokens
+   (app/site.css). The classes the token itself uses are the Get access form's, repeated here because this page does
+   not load the release page's stylesheet; keep the two in step if that one changes. */
+.r-act-page {
+  display: grid;
+  place-items: center;
+  min-height: 70svh;
+  padding-block: clamp(3rem, 2rem + 6vw, 7rem);
+}
+.r-act-wrap {
+  max-width: 34rem;
+}
+.r-act-kicker {
+  margin: 0 0 0.75rem;
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.r-act {
+  display: grid;
+  gap: 0.9rem;
+  justify-items: start;
+  padding: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+  border: 1px solid rgb(120 92 52 / 18%);
+  background: color-mix(in oklab, var(--c-paper), #fffdf8 50%);
+}
+.r-act-lead {
+  margin: 0;
+  font-family: var(--f-serif);
+  font-size: 1.125rem;
+  line-height: 1.5;
+  color: var(--c-ink);
+}
+.r-act .r-access-label {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+}
+.r-act .r-access-token {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid color-mix(in oklab, var(--c-ink) 25%, transparent);
+  background: var(--c-paper);
+}
+.r-act .r-access-token code {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--f-mono);
+  font-size: 0.85rem;
+}
+.r-act .r-access-copy {
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid color-mix(in oklab, var(--c-ink) 25%, transparent);
+  background: transparent;
+  color: var(--c-ink);
+  cursor: pointer;
+}
+.r-act .r-access-note {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--c-muted);
+}
+.r-act .r-access-error {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #a23b2a;
+}
+.r-act .r-launch-cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+  padding: 0.8rem 1.2rem;
+  border: 0;
+  background: var(--c-ink);
+  color: var(--c-paper);
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+.r-act .r-launch-cta-link:hover {
+  background: var(--c-teal-ink);
+}
+.r-act .r-launch-cta-link:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

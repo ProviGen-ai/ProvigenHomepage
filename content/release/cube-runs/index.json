@@ -1,0 +1,37 @@
+[
+  {
+    "seed": 1,
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-13",
+    "solved": false
+  },
+  {
+    "seed": 2,
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-13",
+    "solved": false
+  },
+  {
+    "seed": 3,
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-13",
+    "solved": false
+  },
+  {
+    "seed": 4,
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-13",
+    "solved": false
+  },
+  {
+    "seed": 5,
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-13",
+    "solved": false
+  }
+]

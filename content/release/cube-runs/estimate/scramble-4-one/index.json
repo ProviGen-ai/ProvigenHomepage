@@ -1,0 +1,512 @@
+[
+  {
+    "seed": 1,
+    "scramble": 1,
+    "rank": 1,
+    "method": "sdm-1",
+    "run": 1,
+    "model": "sdm-1",
+    "version": "decision_meta_search@4955ab5e+model=gamma_s1-003-037-feashead-s1:model.pt:2c5516977c84+warp=20261108-s1-004-071-r1:8d268be8d694",
+    "recorded": "2026-11-15",
+    "solved": true,
+    "stats": {
+      "runs": 10,
+      "solved": 6,
+      "medianExperiments": 752,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 2,
+    "scramble": 1,
+    "rank": 2,
+    "method": "sdm-1",
+    "run": 9,
+    "model": "sdm-1",
+    "version": "decision_meta_search@4955ab5e+model=gamma_s1-003-037-feashead-s1:model.pt:2c5516977c84+warp=20261108-s1-004-071-r1:8d268be8d694",
+    "recorded": "2026-11-15",
+    "solved": true,
+    "stats": {
+      "runs": 10,
+      "solved": 6,
+      "medianExperiments": 752,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 3,
+    "scramble": 1,
+    "rank": 3,
+    "method": "sdm-1",
+    "run": 10,
+    "model": "sdm-1",
+    "version": "decision_meta_search@4955ab5e+model=gamma_s1-003-037-feashead-s1:model.pt:2c5516977c84+warp=20261108-s1-004-071-r1:8d268be8d694",
+    "recorded": "2026-11-15",
+    "solved": true,
+    "stats": {
+      "runs": 10,
+      "solved": 6,
+      "medianExperiments": 752,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 4,
+    "scramble": 1,
+    "rank": 4,
+    "method": "sdm-1",
+    "run": 7,
+    "model": "sdm-1",
+    "version": "decision_meta_search@4955ab5e+model=gamma_s1-003-037-feashead-s1:model.pt:2c5516977c84+warp=20261108-s1-004-071-r1:8d268be8d694",
+    "recorded": "2026-11-15",
+    "solved": true,
+    "stats": {
+      "runs": 10,
+      "solved": 6,
+      "medianExperiments": 752,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 5,
+    "scramble": 1,
+    "rank": 5,
+    "method": "sdm-1",
+    "run": 8,
+    "model": "sdm-1",
+    "version": "decision_meta_search@4955ab5e+model=gamma_s1-003-037-feashead-s1:model.pt:2c5516977c84+warp=20261108-s1-004-071-r1:8d268be8d694",
+    "recorded": "2026-11-15",
+    "solved": true,
+    "stats": {
+      "runs": 10,
+      "solved": 6,
+      "medianExperiments": 752,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 6,
+    "scramble": 1,
+    "rank": 6,
+    "method": "sdm-1",
+    "run": 5,
+    "model": "sdm-1",
+    "version": "decision_meta_search@4955ab5e+model=gamma_s1-003-037-feashead-s1:model.pt:2c5516977c84+warp=20261108-s1-004-071-r1:8d268be8d694",
+    "recorded": "2026-11-15",
+    "solved": true,
+    "stats": {
+      "runs": 10,
+      "solved": 6,
+      "medianExperiments": 752,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 7,
+    "scramble": 1,
+    "rank": 7,
+    "method": "sdm-1",
+    "run": 3,
+    "model": "sdm-1",
+    "version": "decision_meta_search@4955ab5e+model=gamma_s1-003-037-feashead-s1:model.pt:2c5516977c84+warp=20261108-s1-004-071-r1:8d268be8d694",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 6,
+      "medianExperiments": 752,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 8,
+    "scramble": 1,
+    "rank": 8,
+    "method": "sdm-1",
+    "run": 4,
+    "model": "sdm-1",
+    "version": "decision_meta_search@4955ab5e+model=gamma_s1-003-037-feashead-s1:model.pt:2c5516977c84+warp=20261108-s1-004-071-r1:8d268be8d694",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 6,
+      "medianExperiments": 752,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 9,
+    "scramble": 1,
+    "rank": 9,
+    "method": "sdm-1",
+    "run": 6,
+    "model": "sdm-1",
+    "version": "decision_meta_search@4955ab5e+model=gamma_s1-003-037-feashead-s1:model.pt:2c5516977c84+warp=20261108-s1-004-071-r1:8d268be8d694",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 6,
+      "medianExperiments": 752,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 10,
+    "scramble": 1,
+    "rank": 10,
+    "method": "sdm-1",
+    "run": 2,
+    "model": "sdm-1",
+    "version": "decision_meta_search@4955ab5e+model=gamma_s1-003-037-feashead-s1:model.pt:2c5516977c84+warp=20261108-s1-004-071-r1:8d268be8d694",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 6,
+      "medianExperiments": 752,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 1,
+    "scramble": 1,
+    "rank": 1,
+    "method": "bayesian-optimisation",
+    "run": 9,
+    "model": "bayesian-optimisation",
+    "version": "decision_bo@4955ab5e",
+    "recorded": "2026-11-15",
+    "solved": true,
+    "stats": {
+      "runs": 10,
+      "solved": 3,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 2,
+    "scramble": 1,
+    "rank": 2,
+    "method": "bayesian-optimisation",
+    "run": 10,
+    "model": "bayesian-optimisation",
+    "version": "decision_bo@4955ab5e",
+    "recorded": "2026-11-15",
+    "solved": true,
+    "stats": {
+      "runs": 10,
+      "solved": 3,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 3,
+    "scramble": 1,
+    "rank": 3,
+    "method": "bayesian-optimisation",
+    "run": 8,
+    "model": "bayesian-optimisation",
+    "version": "decision_bo@4955ab5e",
+    "recorded": "2026-11-15",
+    "solved": true,
+    "stats": {
+      "runs": 10,
+      "solved": 3,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 4,
+    "scramble": 1,
+    "rank": 4,
+    "method": "bayesian-optimisation",
+    "run": 1,
+    "model": "bayesian-optimisation",
+    "version": "decision_bo@4955ab5e",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 3,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 5,
+    "scramble": 1,
+    "rank": 5,
+    "method": "bayesian-optimisation",
+    "run": 3,
+    "model": "bayesian-optimisation",
+    "version": "decision_bo@4955ab5e",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 3,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 6,
+    "scramble": 1,
+    "rank": 6,
+    "method": "bayesian-optimisation",
+    "run": 4,
+    "model": "bayesian-optimisation",
+    "version": "decision_bo@4955ab5e",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 3,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 7,
+    "scramble": 1,
+    "rank": 7,
+    "method": "bayesian-optimisation",
+    "run": 5,
+    "model": "bayesian-optimisation",
+    "version": "decision_bo@4955ab5e",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 3,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 8,
+    "scramble": 1,
+    "rank": 8,
+    "method": "bayesian-optimisation",
+    "run": 6,
+    "model": "bayesian-optimisation",
+    "version": "decision_bo@4955ab5e",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 3,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 9,
+    "scramble": 1,
+    "rank": 9,
+    "method": "bayesian-optimisation",
+    "run": 7,
+    "model": "bayesian-optimisation",
+    "version": "decision_bo@4955ab5e",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 3,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 10,
+    "scramble": 1,
+    "rank": 10,
+    "method": "bayesian-optimisation",
+    "run": 2,
+    "model": "bayesian-optimisation",
+    "version": "decision_bo@4955ab5e",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 3,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 1,
+    "scramble": 1,
+    "rank": 1,
+    "method": "doe-lhs",
+    "run": 3,
+    "model": "doe-lhs",
+    "version": "lhs:scipy-1.17.1",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 0,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 2,
+    "scramble": 1,
+    "rank": 2,
+    "method": "doe-lhs",
+    "run": 10,
+    "model": "doe-lhs",
+    "version": "lhs:scipy-1.17.1",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 0,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 3,
+    "scramble": 1,
+    "rank": 3,
+    "method": "doe-lhs",
+    "run": 1,
+    "model": "doe-lhs",
+    "version": "lhs:scipy-1.17.1",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 0,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 4,
+    "scramble": 1,
+    "rank": 4,
+    "method": "doe-lhs",
+    "run": 2,
+    "model": "doe-lhs",
+    "version": "lhs:scipy-1.17.1",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 0,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 5,
+    "scramble": 1,
+    "rank": 5,
+    "method": "doe-lhs",
+    "run": 4,
+    "model": "doe-lhs",
+    "version": "lhs:scipy-1.17.1",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 0,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 6,
+    "scramble": 1,
+    "rank": 6,
+    "method": "doe-lhs",
+    "run": 5,
+    "model": "doe-lhs",
+    "version": "lhs:scipy-1.17.1",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 0,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 7,
+    "scramble": 1,
+    "rank": 7,
+    "method": "doe-lhs",
+    "run": 6,
+    "model": "doe-lhs",
+    "version": "lhs:scipy-1.17.1",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 0,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 8,
+    "scramble": 1,
+    "rank": 8,
+    "method": "doe-lhs",
+    "run": 7,
+    "model": "doe-lhs",
+    "version": "lhs:scipy-1.17.1",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 0,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 9,
+    "scramble": 1,
+    "rank": 9,
+    "method": "doe-lhs",
+    "run": 8,
+    "model": "doe-lhs",
+    "version": "lhs:scipy-1.17.1",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 0,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  },
+  {
+    "seed": 10,
+    "scramble": 1,
+    "rank": 10,
+    "method": "doe-lhs",
+    "run": 9,
+    "model": "doe-lhs",
+    "version": "lhs:scipy-1.17.1",
+    "recorded": "2026-11-15",
+    "solved": false,
+    "stats": {
+      "runs": 10,
+      "solved": 0,
+      "medianExperiments": null,
+      "budget": 1000
+    }
+  }
+]

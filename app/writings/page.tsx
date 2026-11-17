@@ -10,8 +10,8 @@ import { orderedWritings, type WritingCard } from '@/content/writings';
 import './writings.css';
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Writings',
-  description: 'Field notes on building the AI that steers biology.',
+  title: 'Blog',
+  description: 'Field notes on steering biology.',
   path: '/writings',
 });
 
@@ -33,15 +33,16 @@ export default function WritingsIndex() {
         </div>
         <div className="w-index-wash" aria-hidden="true" />
         <div className="s-wrap w-index-hero-inner">
-          <h1 className="s-display w-index-title">
+          {/* Founder, 14 Nov 2026: no "Blog" heading on the page; the line itself is the title, set small. */}
+          <h1 className="s-display w-index-title w-index-title--line">
             <span className="s-line">
-              <span>Writings</span>
+              <span>{'Field notes on steering\u00a0biology.'}</span>
             </span>
           </h1>
+          {/* The dek, now the title above.
           <p className="s-lede w-index-dek">
-            {/* No-break spaces keep the category phrase on one line. */}
-            {'Field notes on building the\u00a0AI\u00a0that\u00a0steers\u00a0biology.'}
-          </p>
+            {'Field notes on steering\u00a0biology.'}
+          </p> */}
         </div>
       </header>
 
@@ -90,7 +91,9 @@ export default function WritingsIndex() {
 function FeaturedCard({ card, index }: { card: WritingCard; index: number }) {
   return (
     <article
-      className="w-card w-card--featured s-rise"
+      /* A class of the card's own (17 Nov 2026), so one card can be set apart: the release's dek holds its first
+         sentence on one line. */
+      className={`w-card w-card--featured w-card--${card.slug} s-rise`}
       style={i(index)}
       aria-labelledby={`w-card-${card.slug}`}
     >
@@ -107,7 +110,11 @@ function FeaturedCard({ card, index }: { card: WritingCard; index: number }) {
             <Html as="span" html={card.title} />
           </a>
         </h3>
-        <p className="w-card-dek">{card.dek}</p>
+        {/* The dek carries markup now (the user, 17 Nov 2026: the manifesto's "Lab-in-the-loop" sentence on its own
+            line), as the title already does. */}
+        <p className="w-card-dek">
+          <Html as="span" html={card.dek} />
+        </p>
         <p className="w-card-foot">
           {/* Provenance line hidden (founder, 15 Oct 2026). */}
           {/* <span className="w-card-source">{card.provenance}</span> */}

@@ -5,6 +5,7 @@ import { forecasts } from '@/content/writings/cheap-thought-costly-evidence';
 import ForecastTimeline from './ForecastTimeline';
 import PlateMotif from './PlateMotif';
 import CycleMotif from './CycleMotif';
+import DecisionTree from '@/components/release/DecisionTree';
 import EpisodeCover from './EpisodeCover';
 
 /*
@@ -17,6 +18,8 @@ const FRAME: Record<WritingCard['visual'], { label?: string; index?: string }> =
   plate: { label: '384-well plate', index: 'Illustrative' },
   cycle: { label: 'Lab in the loop', index: 'Illustrative' },
   membrane: { label: 'Living material', index: 'Artwork' },
+  /* The release's own drawing (17 Nov 2026): the tree of paths through a campaign. */
+  tree: { label: 'Sequential decisions', index: 'Illustrative' },
   /* No frame words on the episode thumbnail (the founder, 4 Oct 2026). */
   episode: {},
 };
@@ -41,6 +44,7 @@ export default function WritingVisual({
         )}
         {card.visual === 'plate' && <PlateMotif />}
         {card.visual === 'cycle' && <CycleMotif />}
+        {card.visual === 'tree' && <DecisionTree />}
         {card.visual === 'membrane' && (
           <Image
             unoptimized

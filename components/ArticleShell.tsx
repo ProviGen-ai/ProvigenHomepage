@@ -51,6 +51,8 @@ type Props = {
   /** May contain one <em>. */
   title: string;
   dek: string;
+  /** Keep the dek for search and link previews but leave it off the page (the use cases, 13 Nov 2026). */
+  hideDek?: boolean;
   /** Status chip under the dek (e.g. an ambition label). */
   banner?: string;
   meta: ArticleMeta;
@@ -76,6 +78,7 @@ export default function ArticleShell({
   eyebrow,
   title,
   dek,
+  hideDek = false,
   banner,
   meta,
   toc,
@@ -122,7 +125,7 @@ export default function ArticleShell({
           <h1 id="w-title" className="w-hero-title">
             <Html as="span" html={title} />
           </h1>
-          <p className="w-hero-dek">{dek}</p>
+          {hideDek ? null : <p className="w-hero-dek">{dek}</p>}
           {banner && (
             <p className="s-status s-status--ambition w-hero-banner">
               {banner}

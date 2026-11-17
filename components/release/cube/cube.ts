@@ -201,3 +201,22 @@ export function symmetric(moves: Move[], s: number): Move[] {
     return suffix === "'" ? target : `${target}'`;
   });
 }
+
+/* ---- Pieces one by one (14 Nov 2026), for the one-level campaign (solve.ts, solveDirect) ---- */
+
+export type PieceState = { id: string; solved: boolean; placed: boolean; oriented: boolean };
+
+/** Every corner and edge, named by its home slot: solved, in its slot, turned right. */
+export const pieceStates = (cube: Cube): PieceState[] =>
+  pieces(cube).map((g) => {
+    const h = home(g);
+    return {
+      id: h.join(),
+      solved: g.every((s) => s.color === faceOf(s.normal)),
+      placed: h.every((c, i) => c === g[0].pos[i]),
+      oriented: oriented(g),
+    };
+  });
+
+/** How right a piece is: solved 3, in its slot but turned wrong 2, turned right in another slot 1, else 0. */
+export const pieceScore = (p: PieceState) => (p.solved ? 3 : (p.placed ? 2 : 0) + (p.oriented ? 1 : 0));

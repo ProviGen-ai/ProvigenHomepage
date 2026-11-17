@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import Reveal from '@/components/Reveal';
-import { ArrowIcon } from '@/components/site/Header';
+/* import { ArrowIcon } from '@/components/site/Header'; (the doors' arrows went with their links, 17 Nov 2026) */
 import { audiences } from '@/content/home/audiences';
 import './Audiences.css';
 
@@ -23,7 +23,10 @@ export default function Audiences() {
         <ul className="a-doors">
           {audiences.doors.map((door, index) => (
             <li key={door.id} className="a-door s-rise" style={{ '--i': index + 1 } as CSSProperties}>
-              <a className="a-door-link" href={door.href}>
+              {/* The doors no longer lead anywhere (the user, 17 Nov 2026: the "For your lab" and "For AI labs" links
+                  out of the first version): the same card, without the link and its line. Was
+                  <a className="a-door-link" href={door.href}> ... </a> with the a-door-cta line at its foot. */}
+              <div className="a-door-link a-door-link--static">
                 <span className="a-door-title">{door.title}</span>
                 <span className={'examples' in door ? 'a-door-line a-door-line--split' : 'a-door-line a-door-line--wide'}>
                   <span className="a-door-text">{door.line}</span>
@@ -40,11 +43,7 @@ export default function Audiences() {
                     </span>
                   ) : null}
                 </span>
-                <span className="a-door-cta" aria-hidden="true">
-                  {door.cta}
-                  <ArrowIcon />
-                </span>
-              </a>
+              </div>
             </li>
           ))}
         </ul>

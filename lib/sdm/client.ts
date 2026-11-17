@@ -8,8 +8,10 @@ import {
 import { mockPropose, mockStatus } from './mock';
 
 /*
- * The page's one way to the model (13 Nov 2026): the live endpoint when
- * NEXT_PUBLIC_SDM_API is set at build time, the mock otherwise. Every demo on
+ * The page's one way to the model (13 Nov 2026): the site's own route
+ * (/api/sdm1, lib/sdm/proxy.ts, which alone calls AWS) when
+ * NEXT_PUBLIC_SDM_LIVE=1 at build time, the mock otherwise. The flag is not a
+ * secret: it only says the route is configured on this deploy. Every demo on
  * the page goes through here, so the page-wide limits hold in one place: one
  * request in flight at a time, separate per-page-view budgets for what the
  * visitor asks (`visitor`) and for the page's own demo (`demo`, the cube),
@@ -19,12 +21,15 @@ import { mockPropose, mockStatus } from './mock';
  * for it.
  */
 
-const BASE = (process.env.NEXT_PUBLIC_SDM_API ?? '').replace(/\/$/, '');
+const BASE = '/api/sdm1';
 
 /** True when the page talks to the served model, false while it uses the mock. */
-export const isLive = BASE !== '';
+export const isLive = process.env.NEXT_PUBLIC_SDM_LIVE === '1';
 
-const TIMEOUT_MS = 20000;
+/* Above the route's own budget (AWS answers within 54 s, the route gives up at 57 s, maxDuration 60 s; 16 Nov 2026,
+   was 25 s / 26 s / 40 s and 45 s here). */
+// const TIMEOUT_MS = 45000;
+const TIMEOUT_MS = 65000;
 
 const calls = { visitor: 0, demo: 0 };
 let blockedUntil = 0;

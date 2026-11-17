@@ -1,0 +1,122 @@
+[
+  {
+    "seed": 1,
+    "method": "sdm-1",
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 1,
+    "method": "bayesian-optimisation",
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 1,
+    "method": "doe-lhs",
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 2,
+    "method": "sdm-1",
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 2,
+    "method": "bayesian-optimisation",
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 2,
+    "method": "doe-lhs",
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 3,
+    "method": "sdm-1",
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 3,
+    "method": "bayesian-optimisation",
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 3,
+    "method": "doe-lhs",
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 4,
+    "method": "sdm-1",
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 4,
+    "method": "bayesian-optimisation",
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 4,
+    "method": "doe-lhs",
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 5,
+    "method": "sdm-1",
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 5,
+    "method": "bayesian-optimisation",
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 5,
+    "method": "doe-lhs",
+    "model": "mock",
+    "version": "0",
+    "recorded": "2026-11-14",
+    "solved": false
+  }
+]

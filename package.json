@@ -13,6 +13,11 @@
     "lint": "oxlint",
     "format": "oxfmt",
     "check:claims": "node scripts/check-claims.mjs",
+    "record:cube": "node scripts/record-cube.mjs",
+    "check:cube": "node scripts/record-cube.mjs --check && node scripts/record-cube.mjs --check --direct && node scripts/record-cube.mjs --check --estimate",
+    "record:cube-estimate": "node --max-old-space-size=3000 scripts/record-cube.mjs --estimate",
+    "record:cube-direct": "node scripts/record-cube.mjs --direct",
+    "check:sdm": "node scripts/check-sdm-proxy.mjs",
     "deploy:preview": "node --experimental-strip-types --no-warnings scripts/prepare-vercel.mjs --target=preview",
     "deploy:production": "node --experimental-strip-types --no-warnings scripts/prepare-vercel.mjs --target=production"
   },

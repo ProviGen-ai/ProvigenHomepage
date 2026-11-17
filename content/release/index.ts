@@ -11,6 +11,10 @@
  * [TBD]) are listed by placeholders() so none survives a release unnoticed.
  */
 import data from './announcement.json';
+import cubeRunIndex from './cube-runs/index.json';
+// import raceRunIndex from './cube-runs/direct/index.json';
+/* The race by estimated moves remaining (15 Nov 2026). */
+import raceRunIndex from './cube-runs/estimate/index.json';
 
 /** A method's key in the result rows ("model", "bo_gp", "tabpfn_v2_5", ...). */
 export type MethodKey = string;
@@ -133,8 +137,44 @@ export type ReleaseData = {
   };
   asides: { anchor: string; title: string; text: string }[];
   faq: { q: string; a: string }[];
-  /** The benchmarks tab: a few metrics, each a small table of SDM-1 against Bayesian optimisation. */
+  /** The benchmarks tab: a few metrics, each a small table of SDM-1 against Bayesian optimization. */
   benchmark_overview?: BenchmarkOverview;
+  /** Rows added after the first table (the model team, 15 Nov 2026: chemistry and materials), kept apart so the backup
+      page's table stays as it was; the comparison page merges them in. Per metric id, the new rows. */
+  /** The model card section's text on the comparison page (16 Nov 2026), over model.one_line and model_card's. */
+  /** The comparison page's copy over `copy` (16 Nov 2026). */
+  copy_added?: { note?: string; cta_text?: string };
+  model_card_text?: {
+    note?: string;
+    one_line?: string;
+    intended_use?: string[];
+    evaluation_summary?: string;
+    operating_envelope?: Record<string, string>;
+    inputs?: string;
+    outputs?: string[];
+    access?: string;
+  };
+  benchmark_overview_added?: {
+    note?: string;
+    n_note?: string;
+    /** A rough overview of the Bayesian optimization compared against (founder, 16 Nov 2026), under the table. */
+    bo_note?: string;
+    /** The table's order of benchmarks by id (founder, 16 Nov 2026: lab benchmarks right after the standard functions); ids not listed go last. */
+    order?: string[];
+    /** Benchmarks kept in the data but not shown (founder, 16 Nov 2026: EDBO and Liang shown as one pooled row). */
+    hidden?: string[];
+    /** Per metric id, the vs-BO text of an original row changed on the comparison page (founder, 16 Nov 2026: HPO-B 71% vs 72% reads as equal). */
+    row_vs?: Record<string, { benchmark: string; n: number; vs_bo: string }[]>;
+    /** Per benchmark id, its table text changed on the comparison page; citation null drops the footnote (and its
+        link, which the benchmark's card carries instead; founder, 16 Nov 2026). */
+    benchmark_text?: Record<string, { name?: string; detail?: string; citation?: null }>;
+    batch_note?: string;
+    /** `before`: placed just before that benchmark instead of at the end (founder, 16 Nov 2026: Bayesmark before HPO-B). */
+    benchmarks: (BenchmarkOverview['benchmarks'][number] & { before?: string })[];
+    rows: Record<string, BenchmarkOverview['metrics'][number]['rows']>;
+    /** A metric's wording, corrected for the merged table (the model team, 15 Nov 2026: top 1% of the candidates). */
+    metric_text?: Record<string, { name?: string; explain?: string; explain_brief?: string }>;
+  };
   /** The highlights grid, if the data file sets it; otherwise the page builds it from the fields above. */
   highlights?: { value_template: string; values: Record<string, number | string | null>; label: string }[];
   /**
@@ -155,11 +195,15 @@ export type ReleaseData = {
 export type BenchmarkOverview = {
   note?: string;
   n_note: string;
+  /** The batch size each benchmark ran at (founder, 14 Nov 2026), shown after n_note on the comparison page's grid. */
+  batch_note?: string;
   benchmarks: { id: string; name: string; detail: string; citation?: string; url?: string }[];
   metrics: {
     id: string;
     name: string;
     explain: string;
+    /** One short sentence, shown bold on the comparison page (founder, 15 Nov 2026). */
+    explain_brief?: string;
     better: 'higher' | 'lower';
     unit: string;
     rows: { benchmark: string; n: number; model: number; bo: number; vs_bo: string }[];
@@ -181,7 +225,7 @@ export type CubeDemo = {
   values?: Record<string, number | string | null>;
 };
 
-const CUBE_DEFAULTS: CubeDemo = { holds: null, scramble_depth: 8, discover_calls: 20, solve_calls: 60, batch: 16, keep: 4 };
+const CUBE_DEFAULTS: CubeDemo = { holds: null, scramble_depth: 8, discover_calls: 20, solve_calls: 60, batch: 8, keep: 4 };
 
 /**
  * The highlights grid (founder, 13 Nov 2026, after the big-figure grids of
@@ -199,7 +243,7 @@ export function highlights(): { value: string; label: string }[] {
   if (abrupt && typeof abrupt.values.wins === 'number')
     items.push({
       value: `${abrupt.values.wins} of ${abrupt.values.runs}`,
-      label: 'benchmark campaigns with sharp optima and abrupt changes where it beat standard Bayesian optimisation',
+      label: 'benchmark campaigns with sharp optima and abrupt changes where it beat standard Bayesian optimization',
     });
   const random = h('beats_random');
   if (random && typeof random.values.pct === 'number')
@@ -221,16 +265,20 @@ export function highlights(): { value: string; label: string }[] {
     });
   const campaigns = release.copy.results_intro_values.campaigns;
   if (typeof campaigns === 'number')
-    items.push({ value: show(campaigns), label: 'optimisation campaigns, every method from the same starting experiments' });
+    items.push({ value: show(campaigns), label: 'optimization campaigns, every method from the same starting experiments' });
   return items;
 }
 
 /**
- * Whether the try-it panel appears: on the published page only when it is
- * built against the served endpoint (the panel talks to the model; the mock
- * is not the model). In development always, labelled "Mock model".
+ * Whether the try-it panel appears: always (the user, 17 Nov 2026). It plays the recorded runs
+ * (content/release/try-runs/ridged.json) and asks the model for nothing, so nothing about it depends on an endpoint.
+ *
+ * Was `process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_SDM_LIVE === '1'`, from when the panel called
+ * the model live: on a published page it hid the panel, and with it the landscape sticker in Application Areas, unless
+ * that flag was set, while the flag's name said "live" and by then meant "show recordings". NEXT_PUBLIC_SDM_LIVE still
+ * decides whether lib/sdm/client.ts calls the API at all, which the panel no longer does while a recording is passed.
  */
-export const showTry = process.env.NODE_ENV !== 'production' || Boolean(process.env.NEXT_PUBLIC_SDM_API);
+export const showTry = true;
 
 export type SelfOptimization = {
   title: string;
@@ -249,13 +297,19 @@ export const release = data as unknown as ReleaseData;
 /** The page's address. Proposed, not yet chosen (the model's name is a placeholder). */
 export const RELEASE_PATH = '/writings/introducing-model-name';
 export const RELEASE_SLUG = 'introducing-model-name';
+/** The address the page will have once merged and public (founder, 17 Nov 2026): on main, Writings became Blog, and
+    the slug is the model's name. The route here stays at RELEASE_PATH until the merge, which moves the page folder to
+    app/blog/introducing-sdm-1 and points main's /writings/introducing-model-name redirect there. */
+export const RELEASE_PUBLIC_PATH = '/blog/introducing-sdm-1';
+/** The day the release page carries, shared by the page and the landing page's banner (17 Nov 2026). */
+export const RELEASE_DATE = '2026-11-17';
 
 /* A data file without `methods` (schema of 30 Oct 2026, morning) names its
    methods by these keys. */
 const LEGACY_METHODS: Method[] = [
   { key: 'model', name: release.model.name, group: 'ours' },
   { key: 'tabpfn', name: 'TabPFN v2.5', group: 'tabpfn' },
-  { key: 'bo_gp', name: 'Bayesian optimisation (GP)', group: 'bo' },
+  { key: 'bo_gp', name: 'Bayesian optimization (GP)', group: 'bo' },
   { key: 'bo_gp_published', name: 'GP, HPO-B published', group: 'bo' },
   { key: 'fsbo_published', name: 'FSBO, published', group: 'other' },
   { key: 'random', name: 'Random search', group: 'reference' },
@@ -392,17 +446,25 @@ export const benchmark = (id: string) => {
 export const cubeDemo: CubeDemo = { ...CUBE_DEFAULTS, ...release.cube_demo };
 
 /**
- * Whether the cube and its reveal appear. On the published page only once the
- * test holds and the page is built against the served endpoint: the reveal
- * says the model is solving it live, which the mock is not. In development
- * always, on the mock or the endpoint, so they can be built and checked (the
- * cube then says "Mock model").
+ * Whether the cube and its reveal appear. The cube replays recorded runs of
+ * the model (components/release/cube/recording.ts, 13 Nov 2026), so it needs
+ * no endpoint. On the published page only once the test holds and every
+ * stored run comes from the model, not the mock: the reveal says the model
+ * solved it. In development always (a mock run then says "Mock model").
  */
-export const showCube =
-  process.env.NODE_ENV !== 'production' || (cubeDemo.holds === true && Boolean(process.env.NEXT_PUBLIC_SDM_API));
+const cubeRunsFromModel = cubeRunIndex.length > 0 && cubeRunIndex.every((r) => r.model !== 'mock');
+export const showCube = process.env.NODE_ENV !== 'production' || (cubeDemo.holds === true && cubeRunsFromModel);
 
 /**
- * The self-optimisation section, only once the data file carries it and its
+ * The same gate for the cube race (comparison page, 14 Nov 2026): on a production build only when every race run
+ * (cube-runs/estimate/ since 15 Nov 2026, was cube-runs/direct/; all three methods) was recorded against the model (the
+ * served endpoint, or the same model run locally). A mock recording never ships.
+ */
+const raceRunsFromModel = raceRunIndex.length > 0 && raceRunIndex.every((r) => r.model !== 'mock');
+export const showRace = process.env.NODE_ENV !== 'production' || (cubeDemo.holds === true && raceRunsFromModel);
+
+/**
+ * The self-optimization section, only once the data file carries it and its
  * results hold. No wording lives in this repo until then: it would claim an
  * experiment that has not finished, and the repo is public.
  */

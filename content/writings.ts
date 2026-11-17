@@ -4,13 +4,13 @@
    the manifesto joined the forecast and the field note on 4 Oct 2026, on the
    founder's call); the rest form the compact "More writing" list. Every entry keeps a provenance line for its visual. */
 
-export type WritingCategory = 'Perspective' | 'Field note' | 'Conversation' | 'Use case';
+export type WritingCategory = 'Perspective' | 'Field note' | 'Conversation' | 'Use case' | 'Release';
 
 /**
  * Which visual a card carries (components/writings/WritingVisual). 'episode'
  * is a recorded conversation's own thumbnail, from `poster`.
  */
-export type WritingVisual = 'forecast' | 'plate' | 'cycle' | 'membrane' | 'episode';
+export type WritingVisual = 'forecast' | 'plate' | 'cycle' | 'membrane' | 'episode' | 'tree';
 
 export type WritingCard = {
   slug: string;
@@ -35,11 +35,36 @@ export type WritingCard = {
    * last paragraph already invites a conversation.
    */
   cta?: { text: string; label: string; href: string };
+  /**
+   * Reachable by direct link only (founder, 13 Nov 2026): left out of
+   * /writings, the feed, the sitemap and the "Next" cards, while the page
+   * itself still finds its card here.
+   */
+  unlisted?: boolean;
 };
 
 /* Dates are first publication (14 Oct 2026): the use cases and the manifesto
    as the old site published them, the episode as it aired. */
 export const writings: WritingCard[] = [
+  {
+    /* The SDM-1 release (the user, 17 Nov 2026): the article lives at /blog/introducing-sdm-1, the address it keeps
+       after the merge, and leads the gallery as the newest piece. */
+    slug: 'introducing-sdm-1',
+    href: '/blog/introducing-sdm-1',
+    title: 'Introducing <em>SDM-1</em>.',
+    /* Was "...decision making: it reads a campaign\u2019s results so far and proposes which experiments to run next."
+       (the user, 17 Nov 2026: change what follows the colon), then "... decision making. It proposes the next experiments
+       to run, from the results so far." The second half now comes from the page itself, the Partner with us section:
+       "finds better results with the same number of experiments". */
+    dek: 'A foundation model for experimental decision making.<br />Better results with the same number of experiments.',
+    date: '2026-11-17',
+    dateLabel: '17 November 2026',
+    category: 'Release',
+    tag: 'Release \u00b7 Sequential Decision Model \u00b7 November 2026',
+    featured: true,
+    visual: 'tree',
+    provenance: 'The decision tree of the release page',
+  },
   {
     /* Lucas Mair on the Frameshifts podcast, read for the company (4 Oct
        2026): the episode embedded behind one click, quotes with their times. */
@@ -67,7 +92,7 @@ export const writings: WritingCard[] = [
     slug: 'manifesto',
     href: '/writings/manifesto',
     title: 'The <em>Manifesto</em>.',
-    dek: 'Biotech is entering a new era. Lab-in-the-loop is becoming the new operating model for biotechnology.',
+    dek: 'Biotech is entering a new era.<br />Lab-in-the-loop is becoming the new operating model for biotechnology.',
     date: '2026-09-25',
     dateLabel: '25 September 2026',
     category: 'Perspective',
@@ -87,6 +112,7 @@ export const writings: WritingCard[] = [
   {
     slug: 'deciding-what-to-assemble-next',
     href: '/writings/deciding-what-to-assemble-next',
+    unlisted: true,
     title: 'Deciding what to <em>assemble</em> next.',
     dek: 'Much of plasmid construction can run on automation. The decisions between the stages (ratios, cycles, which colonies to carry forward) are still made by hand, and that is where a decision loop earns its place.',
     date: '2026-06-08',
@@ -100,6 +126,7 @@ export const writings: WritingCard[] = [
   {
     slug: 'antibody-discovery',
     href: '/writings/antibody-discovery',
+    unlisted: true,
     title: 'Which antibody to test <em>next</em>.',
     dek: 'An antibody program narrows a large pool gate by gate, under several properties at once. A note on how a decision loop chooses the next batch, and what a published lab-in-the-loop campaign by others actually shows.',
     date: '2026-06-08',
@@ -110,19 +137,22 @@ export const writings: WritingCard[] = [
     visual: 'plate',
     provenance: 'Illustrative plate, not data',
   },
-  {
-    slug: 'cheap-thought-costly-evidence',
-    href: '/writings/cheap-thought-costly-evidence',
-    title: 'Cheap thought, costly <em>evidence</em>.',
-    dek: 'Six dated forecasts for AI in experimental biology, each with a probability and the observation that would prove us wrong.',
-    date: '2026-10-01',
-    dateLabel: 'October 2026',
-    category: 'Perspective',
-    tag: 'Perspective · Forecast · October 2026',
-    featured: true,
-    visual: 'forecast',
-    provenance: 'Provisional forecasts, not a completed expert study',
-  },
+  /* Cheap thought, costly evidence: not to be published (founder, 13 Nov 2026);
+     the page sits in a private folder (app/writings/_cheap-thought-costly-evidence).
+    {
+      slug: 'cheap-thought-costly-evidence',
+      href: '/writings/cheap-thought-costly-evidence',
+      title: 'Cheap thought, costly <em>evidence</em>.',
+      dek: 'Six dated forecasts for AI in experimental biology, each with a probability and the observation that would prove us wrong.',
+      date: '2026-10-01',
+      dateLabel: 'October 2026',
+      category: 'Perspective',
+      tag: 'Perspective · Forecast · October 2026',
+      featured: true,
+      visual: 'forecast',
+      provenance: 'Provisional forecasts, not a completed expert study',
+    },
+  */
   /* The old site's use-case pages, back at their own URLs with their own text
      (founder, 27 Oct 2026; content/use-cases.ts). */
   {
@@ -167,7 +197,8 @@ export const writings: WritingCard[] = [
 ];
 
 /** Newest first, whatever order the list above is written in. */
-export const orderedWritings = [...writings].sort((a, b) =>
+/** The listed pieces, newest first: what /writings, the feed, the sitemap and "Next" walk. */
+export const orderedWritings = writings.filter((w) => !w.unlisted).sort((a, b) =>
   b.date.localeCompare(a.date),
 );
 

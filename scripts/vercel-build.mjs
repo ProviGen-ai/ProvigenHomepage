@@ -13,6 +13,7 @@ import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { retired } from '../next.config.ts';
+import { writeSdmBuildOutput } from './sdm-function.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const production = process.env.VERCEL_ENV === 'production';
@@ -71,6 +72,9 @@ export default function contact(request) {
 `,
 );
 writeFileSync(join(fn, '.vc-config.json'), `${JSON.stringify({ runtime: 'edge', entrypoint: 'index.js' }, null, 2)}\n`);
+
+// The SDM-1 route (lib/sdm/proxy.ts) as Node Functions at /api/sdm1/*: see scripts/sdm-function.mjs.
+writeSdmBuildOutput(join(out, 'functions'));
 
 const security = {
   'X-Content-Type-Options': 'nosniff',

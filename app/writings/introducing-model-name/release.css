@@ -1168,23 +1168,32 @@
   color: var(--c-teal-ink);
 }
 .r-launch-name {
-  margin-top: 1.25rem;
+  margin-top: clamp(1.75rem, 1.4rem + 1vw, 2.5rem);
   font-family: var(--f-display);
   font-size: clamp(1.3rem, 1.1rem + 0.8vw, 1.8rem);
   line-height: 1.3;
   color: var(--c-muted);
+}
+/* The model sentence runs the full width of the page, wrapping only at its edge (founder, 13 Nov 2026). */
+.r-launch-hero > .r-launch-name {
+  max-width: none;
+  text-wrap: wrap;
 }
 .r-launch-name strong {
   font-weight: 400;
   color: var(--c-ink);
 }
 .r-launch-lede {
-  margin-top: 2rem;
-  max-width: 40rem;
+  margin-top: clamp(2.5rem, 1.75rem + 2.5vw, 4rem);
+  max-width: 52rem;
   font-family: var(--f-serif);
   font-size: clamp(1.15rem, 1.05rem + 0.4vw, 1.35rem);
   line-height: 1.55;
   text-wrap: pretty;
+}
+/* The lede's second paragraph follows almost as a new line, not at the gap under the title. */
+.r-launch-lede + .r-launch-lede {
+  margin-top: 0.4em;
 }
 .r-launch-h2 {
   margin-bottom: 1.5rem;
@@ -1251,16 +1260,17 @@
 }
 .r-show-tabs {
   display: flex;
-  flex-wrap: wrap;
   gap: 0;
   border-bottom: 1px solid var(--c-ink);
 }
 .r-show-tabs button {
+  flex: 1 1 0;
+  min-width: 0;
   display: inline-flex;
   align-items: baseline;
+  justify-content: center;
   gap: 0.6rem;
-  padding: 0.85rem 1.4rem 0.75rem 0;
-  margin-right: 1.4rem;
+  padding: 0.85rem 0.5rem 0.75rem;
   border: 0;
   border-bottom: 3px solid transparent;
   margin-bottom: -2px;
@@ -1481,4 +1491,4016 @@
 }
 .r-launch-more .r-card {
   margin: 0;
+}
+
+/* ---- The cell-free value section (comparison page, 13 Nov 2026): components/release/CfeValue.tsx ---- */
+/* Two columns on wide screens: the statement, figures and sources on the left, the plot on the right. */
+.r-cfe {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.55fr);
+  grid-template-areas:
+    'claim plot'
+    'figures plot'
+    'foot plot';
+  grid-template-rows: auto auto 1fr;
+  column-gap: clamp(2.5rem, 1rem + 4vw, 5rem);
+  align-items: start;
+}
+.r-cfe > .r-show-claim {
+  grid-area: claim;
+  /* A step below the other showcases' claims, so it sits in two lines and its answer in a third (founder, 14 Nov 2026). */
+  font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2.1rem);
+}
+.r-cfe-plot {
+  grid-area: plot;
+  margin: 0;
+}
+.r-cfe-figures {
+  grid-area: figures;
+}
+.r-cfe-foot {
+  grid-area: foot;
+}
+@media (max-width: 900px) {
+  .r-cfe {
+    grid-template-columns: 1fr;
+    grid-template-areas: 'claim' 'plot' 'figures' 'foot';
+    grid-template-rows: auto;
+  }
+  .r-cfe-plot {
+    margin-top: 1.75rem;
+  }
+}
+/* The headline's answer on a line of its own, never split. */
+.r-cfe-punch {
+  display: block;
+  margin-top: 0.15em;
+  white-space: nowrap;
+  color: var(--c-teal-ink);
+}
+.r-cfe-stage {
+  fill: var(--c-ink);
+  opacity: 0.035;
+}
+.r-cfe-dot-start {
+  fill: var(--c-paper);
+  stroke: var(--c-ink);
+  stroke-width: 1.25;
+}
+.r-cfe-dot {
+  fill: var(--c-ink);
+  opacity: 0.16;
+}
+.r-cfe-dot--sdm {
+  fill: var(--c-teal-ink);
+  opacity: 0.35;
+}
+.r-cfe-plot svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.r-cfe-grid {
+  stroke: var(--c-line);
+  stroke-width: 1;
+}
+.r-cfe-tick,
+.r-cfe-axis,
+.r-cfe-note {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  fill: var(--c-muted);
+}
+.r-cfe-axis {
+  font-size: 11.5px;
+}
+.r-cfe-top {
+  fill: var(--c-teal);
+  opacity: 0.08;
+}
+.r-cfe-band {
+  fill: var(--c-teal);
+  opacity: 0.14;
+}
+.r-cfe-lab,
+.r-cfe-sdm,
+.r-cfe-bo {
+  fill: none;
+  stroke-linejoin: round;
+}
+.r-cfe-lab {
+  stroke: var(--c-ink);
+  stroke-width: 1.75;
+}
+.r-cfe-sdm {
+  stroke: var(--c-teal-ink);
+  stroke-width: 2.5;
+}
+.r-cfe-bo {
+  stroke: var(--c-faint);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+.r-cfe-dot-lab {
+  fill: var(--c-ink);
+}
+.r-cfe-dot-sdm {
+  fill: var(--c-teal-ink);
+}
+.r-cfe-label {
+  font-family: var(--f-serif);
+  font-size: 14px;
+  fill: var(--c-ink);
+}
+.r-cfe-label--sdm {
+  fill: var(--c-teal-ink);
+}
+.r-cfe-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.5rem;
+  margin-top: 0.75rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--c-muted);
+}
+.r-cfe-key::before {
+  content: '';
+  display: inline-block;
+  width: 1.4em;
+  margin-right: 0.5em;
+  vertical-align: middle;
+  border-top: 2px solid var(--c-ink);
+}
+.r-cfe-key--sdm::before {
+  border-top: 2.5px solid var(--c-teal-ink);
+}
+.r-cfe-key--bo::before {
+  border-top: 1.5px dashed var(--c-faint);
+}
+.r-cfe-figures {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, max-content));
+  gap: 1.5rem 2.5rem;
+  margin-top: 2rem;
+}
+.r-cfe-figures dt {
+  white-space: nowrap;
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2.1rem);
+  line-height: 1;
+  color: var(--c-ink);
+}
+.r-cfe-figures dd {
+  margin: 0.4rem 0 0;
+  white-space: nowrap;
+  font-family: var(--f-serif);
+  font-size: 1rem;
+  color: var(--c-muted);
+}
+.r-cfe-foot {
+  margin-top: 1.75rem;
+  max-width: 38rem;
+  font-family: var(--f-serif);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--c-muted);
+}
+@media (max-width: 600px) {
+  .r-cfe-figures {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* ---- "Where it applies", airier (comparison page, 13 Nov 2026): more room, one short line each ---- */
+/* A screen of its own, content centred, no rule above the fields (founder, 14 Nov 2026). */
+.r-launch-fields--airy {
+  /* With the gap under the introduction above it, exactly one window: the fields centred in it, the same gap
+     below. The header hides on scroll. */
+  --r-screen-gap: max(4rem, calc((100svh - var(--s-header, 76px) - 28rem) / 2));
+  box-sizing: border-box;
+  min-height: calc(100svh - var(--r-screen-gap));
+  padding-block: 0 var(--r-screen-gap);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.r-launch-fields--airy > ul {
+  border-top: 0;
+}
+.r-fields-title {
+  margin: 0 auto;
+  max-width: 40rem;
+  text-align: center;
+  text-wrap: balance;
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-size: clamp(2rem, 1.4rem + 2.2vw, 3.4rem);
+  line-height: 1.1;
+  letter-spacing: var(--d-track-l);
+  color: var(--c-ink);
+}
+.r-launch-fields--airy ul {
+  /* Three a row, each with room; the last row centred (founder, 14 Nov 2026: 3 + 2). */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3rem 3.5rem;
+  padding-top: 0;
+}
+.r-launch-fields--airy .r-field {
+  flex: 0 1 calc((100% - 2 * 3.5rem) / 3);
+  text-align: center;
+  justify-items: center;
+}
+@media (max-width: 760px) {
+  .r-launch-fields--airy .r-field {
+    flex-basis: 100%;
+  }
+}
+.r-launch-fields--airy .r-field {
+  gap: 0.6rem;
+  padding: 0;
+  border-bottom: 0;
+}
+.r-launch-fields--airy .r-field-example {
+  text-wrap: balance;
+  font-family: var(--f-display);
+  font-size: clamp(1.1rem, 1rem + 0.35vw, 1.3rem);
+  line-height: 1.3;
+  color: var(--c-ink);
+}
+
+/* ---- Benchmarks as a section of their own (comparison page, 13 Nov 2026) ---- */
+.r-launch-bench {
+  padding-block: 2rem 5rem;
+}
+.r-launch-bench .r-show-claim {
+  margin-top: 2rem;
+}
+
+/* ---- The hero's decision tree and subtitle (comparison page, 14 Nov 2026): components/release/DecisionTree.tsx ---- */
+/* Two columns: the text, and beside it the tree with the model sentence under it, as tall as the text. */
+.r-launch-hero--tree {
+  /* The first view is the introduction alone, centred in the window below the site header; "Where it applies"
+     starts below the fold (founder, 14 Nov 2026). Exactly one window, padding included. */
+  box-sizing: border-box;
+  min-height: 100svh;
+  /* One shared gap between the introduction and the fields (founder, 14 Nov 2026: not two margins added up):
+     the introduction sits at the bottom of its screen with --r-screen-gap under it, sized so the first view still
+     reads as centred (the introduction is about 28rem tall); that gap is also the top of the fields' screen. */
+  --r-screen-gap: max(4rem, calc((100svh - var(--s-header, 76px) - 28rem) / 2));
+  padding-block: calc(var(--s-header, 76px) + 1rem) var(--r-screen-gap);
+  align-content: end;
+  display: grid;
+  /* The side column starts after the one-line title (about 54rem at the title's largest), never under it. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, min(38rem, calc(100% - 54rem)));
+  column-gap: clamp(2rem, 1rem + 3vw, 4rem);
+  align-items: stretch;
+}
+.r-launch-hero--tree > * {
+  max-width: none;
+}
+.r-hero-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 0;
+}
+.r-hero-side {
+  container-type: inline-size;
+}
+/* One line under the tree (founder, 14 Nov 2026), its type scaled to the column. The block keeps the height of
+   the two lines it used to take, so the tree above keeps its size. */
+.r-hero-side .r-launch-name {
+  display: flex;
+  /* Centred in the open space under the tree, on the tree's own axis (founder, 14 Nov 2026): a line wider than the
+     column overflows it equally on both sides, into the gap on the left and the page margin on the right. */
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.25rem;
+  min-height: calc(2.6 * clamp(1.3rem, 1.1rem + 0.8vw, 1.8rem));
+}
+.r-hero-side .r-launch-name strong {
+  white-space: nowrap;
+  font-size: min(2.6rem, 6cqi);
+}
+/* The title keeps its one line and runs into the tree's empty top-left corner. */
+.r-hero-text .r-launch-title {
+  white-space: nowrap;
+}
+/* Narrower paragraphs beside the tree, which takes the room (founder, 14 Nov 2026). */
+.r-launch-hero--tree .r-launch-lede {
+  max-width: 44rem;
+}
+/* A clearer gap between the two paragraphs, now that the first has a line break of its own (founder, 14 Nov 2026). */
+.r-launch-hero--tree .r-launch-lede + .r-launch-lede {
+  margin-top: 0.9em;
+}
+.r-launch-subtitle {
+  margin-top: 0.9rem;
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-size: clamp(1.4rem, 1.1rem + 1.2vw, 2.2rem);
+  line-height: 1.2;
+  color: var(--c-teal-ink);
+}
+/* Too narrow for the text and the tree side by side: one column, the tree steps out, the sentence follows the text. */
+@media (max-width: 1240px) {
+  .r-launch-hero--tree {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .r-tree {
+    display: none;
+  }
+}
+
+/* The model sentence in bold (comparison page, founder 14 Nov 2026): the display face has no bold, so the
+   serif's bold, the same face as "black-box optimization" in the lede, at the sentence's size. */
+.r-launch-hero--tree .r-launch-name strong {
+  font-family: var(--f-serif);
+  font-weight: 600;
+}
+
+/* The field names larger (founder, 14 Nov 2026). */
+.r-launch-fields--airy .r-field-name {
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+}
+/* Each field's examples as a list with square bullets (comparison page, 14 Nov 2026). */
+.r-launch-fields--airy .r-field-items {
+  display: grid;
+  grid-template-columns: auto;
+  gap: 0.3rem;
+  border-top: 0;
+  justify-self: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+  font-family: var(--f-display);
+  font-size: clamp(1.1rem, 1rem + 0.35vw, 1.3rem);
+  line-height: 1.3;
+  color: var(--c-ink);
+}
+.r-launch-fields--airy .r-field-items li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+}
+.r-launch-fields--airy .r-field-items li::before {
+  content: '';
+  flex: none;
+  width: 0.38em;
+  height: 0.38em;
+  box-sizing: border-box;
+  border: 1.5px solid var(--c-teal-ink);
+  background: none;
+  transform: translateY(-0.12em);
+}
+
+/* ---- Byline and the orange horizon (comparison page, founder 14 Nov 2026) ---- */
+.r-launch-byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6em;
+  margin-top: 1.25rem;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.r-launch-byline span:first-child {
+  color: var(--c-ink);
+}
+/* The homepage's dawn, continuous through the whole post (founder, 14 Nov 2026: a gradient only if it runs through
+   the post): plain paper at the top, warming slowly to a light orange at the end, where the footer's own dawn
+   (site.css) starts from that same colour, so no edge shows anywhere. */
+.r-launch--v2 {
+  --r-dawn-end: color-mix(in oklab, var(--c-paper), #e9a54a 16%);
+  background: linear-gradient(
+    180deg in oklab,
+    var(--c-paper) 0%,
+    var(--c-paper) 6%,
+    color-mix(in oklab, var(--c-paper), #e9a54a 4%) 35%,
+    color-mix(in oklab, var(--c-paper), #e9a54a 9%) 70%,
+    var(--r-dawn-end) 100%
+  );
+}
+body:has(.r-launch--v2) .s-footer {
+  --dawn-ground: color-mix(in oklab, var(--c-paper), #e9a54a 16%);
+}
+/* The bullets take the orange's ink. */
+.r-launch-fields--airy .r-field-items li::before {
+  border-color: var(--c-amber-ink);
+}
+/* The ask sits on the page's gradient instead of a band of its own, so the dawn runs on unbroken. */
+.r-launch--v2 .r-launch-cta {
+  background: none;
+}
+
+/* ---- Paper-cut accent bands (comparison page, 14 Nov 2026): components/release/PaperBand.tsx ---- */
+.r-paper-band {
+  position: relative;
+  width: 100%;
+  height: clamp(14rem, 9rem + 14vw, 24rem);
+  overflow: hidden;
+  pointer-events: none;
+  /* The foot fades into the page, so the band has no hard lower edge. */
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 62%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 62%, transparent 100%);
+}
+.r-paper-band svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.r-paper-mark {
+  fill: var(--c-paper);
+  stroke: var(--c-amber-ink);
+  stroke-width: 2;
+}
+.r-paper-mark--top {
+  fill: var(--c-orange);
+  stroke: var(--c-amber-ink);
+}
+
+/* ---- Paper pieces down the page (comparison page, 14 Nov 2026): components/release/PaperPiece.tsx ---- */
+.r-launch--v2 :is(.r-launch-fields--airy, .r-launch-bench, .r-launch-cta, .r-launch-more) {
+  position: relative;
+  isolation: isolate;
+}
+.r-piece {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+.r-piece svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+/* Placed in the empty margins of each section, some running off the page's edge. */
+.r-piece--fields-right {
+  top: 6%;
+  right: 1.5rem;
+  width: 11rem;
+  transform: rotate(8deg);
+}
+.r-piece--fields-left {
+  bottom: 9%;
+  left: 1rem;
+  width: 10.5rem;
+  transform: rotate(-7deg);
+}
+.r-piece--bench {
+  top: -4rem;
+  right: 0;
+  width: 9.5rem;
+  transform: rotate(-6deg);
+}
+.r-piece--cta {
+  top: 50%;
+  right: 10%;
+  width: 13rem;
+  transform: translateY(-50%) rotate(4deg);
+}
+.r-piece--more {
+  /* The section is the narrow reading column, so this reaches back out into the page's left margin. */
+  top: 2rem;
+  left: -13rem;
+  width: 9rem;
+  transform: rotate(-4deg);
+}
+/* Too narrow for margins: the pieces step out rather than sit behind the words. */
+@media (max-width: 1100px) {
+  .r-piece {
+    display: none;
+  }
+}
+
+/* The fields' paper tiles: small, in flow, above each field's name (founder, 14 Nov 2026). */
+.r-launch-fields--airy .r-field .r-piece.r-field-tile {
+  position: static;
+  z-index: auto;
+  display: block;
+  width: 5.5rem;
+  margin: 0 auto 0.4rem;
+}
+/* The easter egg: the mark stamped in ink on a small piece of paper, at the end of the page. */
+.r-mark {
+  position: relative;
+  display: block;
+  width: 4.5rem;
+  margin: 3.5rem auto 0;
+  transform: rotate(-4deg);
+}
+.r-mark .r-piece.r-mark-paper {
+  position: static;
+  z-index: auto;
+  display: block;
+  width: 100%;
+}
+.r-mark-ink {
+  position: absolute;
+  inset: 22% 24% 24% 24%;
+  background: var(--c-teal-ink);
+  opacity: 0.82;
+  mix-blend-mode: multiply;
+  -webkit-mask: url('/assets/provigen/mark.svg') center / contain no-repeat;
+  mask: url('/assets/provigen/mark.svg') center / contain no-repeat;
+}
+@media (max-width: 1100px) {
+  .r-mark .r-piece.r-mark-paper {
+    display: block;
+  }
+}
+/* Graph paper behind the plot (founder, 14 Nov 2026, after pi05): grid lines only, in the ink at low opacity, so the
+   page's own colour shows through; the grid fades out at its edges and so melts into the page. */
+.r-launch--v2 .r-cfe-plot {
+  position: relative;
+  isolation: isolate;
+}
+.r-launch--v2 .r-cfe-plot::before {
+  content: '';
+  position: absolute;
+  /* Far beyond the plot, with a fade that reaches nothing exactly at its own edges: the grid seems to run on forever
+     and dissolve, with no side ending in a line. */
+  inset: -7rem -6rem;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(19 19 18 / 7%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(19 19 18 / 7%) 1px, transparent 1px),
+    linear-gradient(rgb(19 19 18 / 3.5%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(19 19 18 / 3.5%) 1px, transparent 1px);
+  background-size: 40px 40px, 40px 40px, 8px 8px, 8px 8px;
+  -webkit-mask-image: radial-gradient(closest-side ellipse at 50% 50%, #000 35%, rgb(0 0 0 / 55%) 62%, rgb(0 0 0 / 18%) 82%, transparent 100%);
+  mask-image: radial-gradient(closest-side ellipse at 50% 50%, #000 35%, rgb(0 0 0 / 55%) 62%, rgb(0 0 0 / 18%) 82%, transparent 100%);
+}
+@media (max-width: 1100px) {
+  .r-launch-fields--airy .r-field .r-piece.r-field-tile {
+    display: block;
+  }
+}
+
+/* The industry silhouettes framing the fields (founder, 14 Nov 2026): each beside its own field, loosely, at its own
+   corner and angle, behind the text. */
+.r-launch-fields--airy .r-field {
+  position: relative;
+}
+.r-launch-fields--airy .r-field .r-piece.r-field-shape {
+  z-index: -1;
+  width: 6.5rem;
+}
+.r-field-shape--1 {
+  top: -3.5rem;
+  left: -1rem;
+  transform: rotate(-12deg);
+}
+.r-field-shape--2 {
+  top: -4.25rem;
+  right: -0.5rem;
+  transform: rotate(9deg);
+  width: 6rem !important;
+}
+.r-field-shape--3 {
+  bottom: -2.25rem;
+  right: -3.75rem;
+  transform: rotate(14deg);
+}
+.r-field-shape--4 {
+  top: 0.5rem;
+  left: -4.5rem;
+  transform: rotate(-7deg);
+  width: 7rem !important;
+}
+.r-field-shape--5 {
+  bottom: -1.5rem;
+  right: -4rem;
+  transform: rotate(6deg);
+  width: 6rem !important;
+}
+
+/* Full-height numerals where "SDM-1" stands in serif text (founder, 14 Nov 2026: the old-style 1 read smaller than
+   the capitals): the plot's labels, its section's footnote, the sentence under the tree. */
+.r-launch--v2 :is(.r-cfe-label, .r-cfe-foot, .r-launch-name) {
+  font-variant-numeric: lining-nums;
+}
+
+/* ---- The cube in paper (comparison page, founder 14 Nov 2026): each face its own textured paper, as the field
+   icons are: white cells, green leaf, blue strata, red weave, orange marble, yellow sand with charcoal. Softer
+   colours than plastic stickers; fine grain over all; edges a little darker, as a cut card's are. ---- */
+.r-launch--next .r-cube-sticker::after {
+  background-size: 80px 80px, 120px 120px;
+  background-blend-mode: multiply, normal;
+  box-shadow: inset 0 0 5px rgb(19 19 18 / 28%);
+}
+.r-launch--next .r-cube-sticker[data-face='U']::after {
+  background-color: #dfe9df;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.08  0 0 0 0 0.07  0 0 0 0 0.06  0 0 0 0.28 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.07' numOctaves='2' seed='5'/%3E%3CfeColorMatrix values='0 0 0 0 0.2  0 0 0 0 0.44  0 0 0 0 0.45  -8 0 0 0 1.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker[data-face='F']::after {
+  background-color: #9db48a;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.08  0 0 0 0 0.07  0 0 0 0 0.06  0 0 0 0.28 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035 0.05' numOctaves='3' seed='7'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='table' tableValues='0 0 0 0 1 0 0 0 1 0 0 0 0'/%3E%3C/feComponentTransfer%3E%3CfeColorMatrix values='0 0 0 0 0.93  0 0 0 0 0.94  0 0 0 0 0.72  0.85 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker[data-face='B']::after {
+  background-color: #4f9094;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.08  0 0 0 0 0.07  0 0 0 0 0.06  0 0 0 0.28 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.008 0.16' numOctaves='3' seed='9'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='discrete' tableValues='0 0.33 0.66 1 0.5'/%3E%3C/feComponentTransfer%3E%3CfeColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.32  0 0 0 0 0.34  0.75 0 0 0 -0.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker[data-face='R']::after {
+  background-color: #c97650;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.08  0 0 0 0 0.07  0 0 0 0 0.06  0 0 0 0.28 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.9 0.08' numOctaves='1' seed='11' result='a'/%3E%3CfeTurbulence type='turbulence' baseFrequency='0.08 0.9' numOctaves='1' seed='12' result='b'/%3E%3CfeBlend in='a' in2='b' mode='multiply'/%3E%3CfeColorMatrix values='0 0 0 0 0.38  0 0 0 0 0.17  0 0 0 0 0.1  -1.1 0 0 0 0.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker[data-face='L']::after {
+  background-color: #e2a14a;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.08  0 0 0 0 0.07  0 0 0 0 0.06  0 0 0 0.28 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.03' numOctaves='3' seed='13'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='table' tableValues='0 0 1 0 0 0 1 0 0 0 1 0 0'/%3E%3C/feComponentTransfer%3E%3CfeColorMatrix values='0 0 0 0 0.45  0 0 0 0 0.22  0 0 0 0 0.08  0.8 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker[data-face='D']::after {
+  background-color: #e2d4b2;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.08  0 0 0 0 0.07  0 0 0 0 0.06  0 0 0 0.28 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.06 0.18' numOctaves='3' seed='15'/%3E%3CfeColorMatrix values='0 0 0 0 0.1  0 0 0 0 0.1  0 0 0 0 0.09  7 0 0 0 -4.3'/%3E%3CfeGaussianBlur stdDeviation='0.6'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E");
+}
+/* The single headline's answer, in SDM-1's colour (comparison page, 14 Nov 2026). */
+.r-cfe-answer {
+  color: var(--c-teal-ink);
+}
+
+/* The two-line headline across the full width, figures and footnote below it on the left, the plot on the right
+   (comparison page, founder 14 Nov 2026). */
+.r-cfe--wide {
+  grid-template-areas:
+    'claim claim'
+    'figures plot'
+    'foot plot';
+  grid-template-rows: auto auto 1fr;
+}
+.r-cfe--wide > .r-show-claim {
+  margin-bottom: 1.5rem;
+}
+.r-cfe--wide .r-cfe-line {
+  display: block;
+}
+.r-cfe-line {
+  display: block;
+}
+@media (max-width: 900px) {
+  .r-cfe--wide {
+    grid-template-areas: 'claim' 'plot' 'figures' 'foot';
+  }
+}
+
+/* "Get access" beside the date (comparison page, founder 14 Nov 2026): outlined, in the byline's small caps, as the
+   header's Contact us. */
+.r-launch-hero--tree .r-launch-byline {
+  align-items: center;
+  gap: 2.25rem;
+}
+.r-launch-access {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.6em 0.95em;
+  border: 1px solid var(--c-ink);
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+.r-launch-access svg {
+  width: 0.75em;
+  height: 0.75em;
+}
+.r-launch-access:hover,
+.r-launch-access:focus-visible {
+  background: var(--c-ink);
+  color: var(--c-paper);
+}
+/* The sentence and "Try SDM-1" under the tree, both on its axis (comparison page, founder 14 Nov 2026). */
+.r-hero-foot {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+.r-hero-foot .r-launch-name {
+  margin-top: 0;
+  min-height: 0;
+}
+/* "Try SDM-1" under the second paragraph (comparison page, founder 14 Nov 2026), hung below the text column rather
+   than in its flow, so the columns, the tree and the sentence under it keep exactly the heights they had. */
+.r-hero-text {
+  position: relative;
+}
+.r-launch-access--lede {
+  position: absolute;
+  top: calc(100% + 1.75rem);
+  left: 0;
+}
+
+/* ---- The cube in yarn (comparison page, founder 14 Nov 2026, after a needlepoint cube: "more like cloth or paper",
+   replacing the stone-like papers above). Every sticker is rows of slanted tent stitches over the cube's dark canvas:
+   the classic six colours, a little softened; a light ridge and a shaded flank on each stitch; fine fibre noise. ---- */
+.r-launch--next .r-cube-sticker::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6 1.4' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.22 -0.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect width='12' height='12' fill='rgba%2819%2C19%2C18%2C0.22%29'/%3E%3Cpath d='M1.5 10.5 L10.5 1.5' stroke='rgba%28255%2C255%2C255%2C0.0%29' stroke-width='6.4' stroke-linecap='round'/%3E%3Cpath d='M1.8 10.2 L10.2 1.8' stroke='rgba%2819%2C19%2C18%2C0.10%29' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M2 9.4 L9.4 2' stroke='rgba%28255%2C255%2C255%2C0.38%29' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M3.2 10.4 L10.4 3.2' stroke='rgba%2819%2C19%2C18%2C0.16%29' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-size: 120px 120px, 6px 6px;
+  background-blend-mode: soft-light, normal;
+  box-shadow: inset 0 0 3px rgb(19 19 18 / 35%);
+}
+.r-launch--next .r-cube-sticker[data-face='U']::after {
+  background-color: #efeae0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6 1.4' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.22 -0.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect width='12' height='12' fill='rgba%2819%2C19%2C18%2C0.22%29'/%3E%3Cpath d='M1.5 10.5 L10.5 1.5' stroke='rgba%28255%2C255%2C255%2C0.0%29' stroke-width='6.4' stroke-linecap='round'/%3E%3Cpath d='M1.8 10.2 L10.2 1.8' stroke='rgba%2819%2C19%2C18%2C0.10%29' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M2 9.4 L9.4 2' stroke='rgba%28255%2C255%2C255%2C0.38%29' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M3.2 10.4 L10.4 3.2' stroke='rgba%2819%2C19%2C18%2C0.16%29' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker[data-face='D']::after {
+  background-color: #e8c64a;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6 1.4' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.22 -0.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect width='12' height='12' fill='rgba%2819%2C19%2C18%2C0.22%29'/%3E%3Cpath d='M1.5 10.5 L10.5 1.5' stroke='rgba%28255%2C255%2C255%2C0.0%29' stroke-width='6.4' stroke-linecap='round'/%3E%3Cpath d='M1.8 10.2 L10.2 1.8' stroke='rgba%2819%2C19%2C18%2C0.10%29' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M2 9.4 L9.4 2' stroke='rgba%28255%2C255%2C255%2C0.38%29' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M3.2 10.4 L10.4 3.2' stroke='rgba%2819%2C19%2C18%2C0.16%29' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker[data-face='F']::after {
+  background-color: #3f8a52;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6 1.4' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.22 -0.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect width='12' height='12' fill='rgba%2819%2C19%2C18%2C0.22%29'/%3E%3Cpath d='M1.5 10.5 L10.5 1.5' stroke='rgba%28255%2C255%2C255%2C0.0%29' stroke-width='6.4' stroke-linecap='round'/%3E%3Cpath d='M1.8 10.2 L10.2 1.8' stroke='rgba%2819%2C19%2C18%2C0.10%29' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M2 9.4 L9.4 2' stroke='rgba%28255%2C255%2C255%2C0.38%29' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M3.2 10.4 L10.4 3.2' stroke='rgba%2819%2C19%2C18%2C0.16%29' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker[data-face='B']::after {
+  background-color: #3466a6;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6 1.4' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.22 -0.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect width='12' height='12' fill='rgba%2819%2C19%2C18%2C0.22%29'/%3E%3Cpath d='M1.5 10.5 L10.5 1.5' stroke='rgba%28255%2C255%2C255%2C0.0%29' stroke-width='6.4' stroke-linecap='round'/%3E%3Cpath d='M1.8 10.2 L10.2 1.8' stroke='rgba%2819%2C19%2C18%2C0.10%29' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M2 9.4 L9.4 2' stroke='rgba%28255%2C255%2C255%2C0.38%29' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M3.2 10.4 L10.4 3.2' stroke='rgba%2819%2C19%2C18%2C0.16%29' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker[data-face='R']::after {
+  background-color: #c4412f;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6 1.4' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.22 -0.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect width='12' height='12' fill='rgba%2819%2C19%2C18%2C0.22%29'/%3E%3Cpath d='M1.5 10.5 L10.5 1.5' stroke='rgba%28255%2C255%2C255%2C0.0%29' stroke-width='6.4' stroke-linecap='round'/%3E%3Cpath d='M1.8 10.2 L10.2 1.8' stroke='rgba%2819%2C19%2C18%2C0.10%29' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M2 9.4 L9.4 2' stroke='rgba%28255%2C255%2C255%2C0.38%29' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M3.2 10.4 L10.4 3.2' stroke='rgba%2819%2C19%2C18%2C0.16%29' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker[data-face='L']::after {
+  background-color: #de7a2e;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6 1.4' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.22 -0.04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect width='12' height='12' fill='rgba%2819%2C19%2C18%2C0.22%29'/%3E%3Cpath d='M1.5 10.5 L10.5 1.5' stroke='rgba%28255%2C255%2C255%2C0.0%29' stroke-width='6.4' stroke-linecap='round'/%3E%3Cpath d='M1.8 10.2 L10.2 1.8' stroke='rgba%2819%2C19%2C18%2C0.10%29' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M2 9.4 L9.4 2' stroke='rgba%28255%2C255%2C255%2C0.38%29' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M3.2 10.4 L10.4 3.2' stroke='rgba%2819%2C19%2C18%2C0.16%29' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* ---- The cube in paper, take two (comparison page, founder 14 Nov 2026: the yarn's small tile read as pixelated).
+   Light fibre clouds at about 40% of the first strength (founder: full strength left whitish spots, dark clouds looked
+   dirty, none looked too uniform). Dark grain and relief at half strength: they read as dirt.
+   One large sheet of paper texture, far bigger than a sticker so nothing repeats: uneven fibre clouds, a fine tooth,
+   a soft relief. Each sticker shows a different part of the sheet. Classic colours as soft construction paper. ---- */
+.r-launch--next .r-cube-sticker::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='4' seed='8' result='cloud'/%3E%3CfeColorMatrix in='cloud' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.36 0 0 0 -0.14' result='light'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' result='tooth'/%3E%3CfeColorMatrix in='tooth' values='0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 0 0.08  -0.4 0 0 0 0.21' result='grain'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.07' numOctaves='3' seed='10' result='bump'/%3E%3CfeDiffuseLighting in='bump' surfaceScale='1.6' lightingColor='%23ffffff' result='lit'%3E%3CfeDistantLight azimuth='225' elevation='58'/%3E%3C/feDiffuseLighting%3E%3CfeColorMatrix in='lit' values='0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 0 0.08  -0.28 0 0 0 0.23' result='shade'/%3E%3CfeMerge%3E%3CfeMergeNode in='light'/%3E%3CfeMergeNode in='shade'/%3E%3CfeMergeNode in='grain'/%3E%3C/feMerge%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23p%29'/%3E%3C/svg%3E");
+  background-size: 360px 360px;
+  background-blend-mode: normal;
+  box-shadow: inset 0 0 4px rgb(19 19 18 / 12%);
+}
+.r-launch--next .r-cube-sticker[data-face='U']::after {
+  background-color: #ece6d8;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='4' seed='8' result='cloud'/%3E%3CfeColorMatrix in='cloud' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.36 0 0 0 -0.14' result='light'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' result='tooth'/%3E%3CfeColorMatrix in='tooth' values='0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 0 0.08  -0.4 0 0 0 0.21' result='grain'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.07' numOctaves='3' seed='10' result='bump'/%3E%3CfeDiffuseLighting in='bump' surfaceScale='1.6' lightingColor='%23ffffff' result='lit'%3E%3CfeDistantLight azimuth='225' elevation='58'/%3E%3C/feDiffuseLighting%3E%3CfeColorMatrix in='lit' values='0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 0 0.08  -0.28 0 0 0 0.23' result='shade'/%3E%3CfeMerge%3E%3CfeMergeNode in='light'/%3E%3CfeMergeNode in='shade'/%3E%3CfeMergeNode in='grain'/%3E%3C/feMerge%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23p%29'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker[data-face='D']::after {
+  background-color: #e3c45c;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='4' seed='8' result='cloud'/%3E%3CfeColorMatrix in='cloud' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.36 0 0 0 -0.14' result='light'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' result='tooth'/%3E%3CfeColorMatrix in='tooth' values='0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 0 0.08  -0.4 0 0 0 0.21' result='grain'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.07' numOctaves='3' seed='10' result='bump'/%3E%3CfeDiffuseLighting in='bump' surfaceScale='1.6' lightingColor='%23ffffff' result='lit'%3E%3CfeDistantLight azimuth='225' elevation='58'/%3E%3C/feDiffuseLighting%3E%3CfeColorMatrix in='lit' values='0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 0 0.08  -0.28 0 0 0 0.23' result='shade'/%3E%3CfeMerge%3E%3CfeMergeNode in='light'/%3E%3CfeMergeNode in='shade'/%3E%3CfeMergeNode in='grain'/%3E%3C/feMerge%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23p%29'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker[data-face='F']::after {
+  background-color: #4f8f5c;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='4' seed='8' result='cloud'/%3E%3CfeColorMatrix in='cloud' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.36 0 0 0 -0.14' result='light'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' result='tooth'/%3E%3CfeColorMatrix in='tooth' values='0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 0 0.08  -0.4 0 0 0 0.21' result='grain'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.07' numOctaves='3' seed='10' result='bump'/%3E%3CfeDiffuseLighting in='bump' surfaceScale='1.6' lightingColor='%23ffffff' result='lit'%3E%3CfeDistantLight azimuth='225' elevation='58'/%3E%3C/feDiffuseLighting%3E%3CfeColorMatrix in='lit' values='0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 0 0.08  -0.28 0 0 0 0.23' result='shade'/%3E%3CfeMerge%3E%3CfeMergeNode in='light'/%3E%3CfeMergeNode in='shade'/%3E%3CfeMergeNode in='grain'/%3E%3C/feMerge%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23p%29'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker[data-face='B']::after {
+  background-color: #4069a3;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='4' seed='8' result='cloud'/%3E%3CfeColorMatrix in='cloud' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.36 0 0 0 -0.14' result='light'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' result='tooth'/%3E%3CfeColorMatrix in='tooth' values='0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 0 0.08  -0.4 0 0 0 0.21' result='grain'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.07' numOctaves='3' seed='10' result='bump'/%3E%3CfeDiffuseLighting in='bump' surfaceScale='1.6' lightingColor='%23ffffff' result='lit'%3E%3CfeDistantLight azimuth='225' elevation='58'/%3E%3C/feDiffuseLighting%3E%3CfeColorMatrix in='lit' values='0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 0 0.08  -0.28 0 0 0 0.23' result='shade'/%3E%3CfeMerge%3E%3CfeMergeNode in='light'/%3E%3CfeMergeNode in='shade'/%3E%3CfeMergeNode in='grain'/%3E%3C/feMerge%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23p%29'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker[data-face='R']::after {
+  background-color: #c24c3c;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='4' seed='8' result='cloud'/%3E%3CfeColorMatrix in='cloud' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.36 0 0 0 -0.14' result='light'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' result='tooth'/%3E%3CfeColorMatrix in='tooth' values='0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 0 0.08  -0.4 0 0 0 0.21' result='grain'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.07' numOctaves='3' seed='10' result='bump'/%3E%3CfeDiffuseLighting in='bump' surfaceScale='1.6' lightingColor='%23ffffff' result='lit'%3E%3CfeDistantLight azimuth='225' elevation='58'/%3E%3C/feDiffuseLighting%3E%3CfeColorMatrix in='lit' values='0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 0 0.08  -0.28 0 0 0 0.23' result='shade'/%3E%3CfeMerge%3E%3CfeMergeNode in='light'/%3E%3CfeMergeNode in='shade'/%3E%3CfeMergeNode in='grain'/%3E%3C/feMerge%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23p%29'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker[data-face='L']::after {
+  background-color: #dc8445;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.035' numOctaves='4' seed='8' result='cloud'/%3E%3CfeColorMatrix in='cloud' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.36 0 0 0 -0.14' result='light'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='9' result='tooth'/%3E%3CfeColorMatrix in='tooth' values='0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 0 0.08  -0.4 0 0 0 0.21' result='grain'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.07' numOctaves='3' seed='10' result='bump'/%3E%3CfeDiffuseLighting in='bump' surfaceScale='1.6' lightingColor='%23ffffff' result='lit'%3E%3CfeDistantLight azimuth='225' elevation='58'/%3E%3C/feDiffuseLighting%3E%3CfeColorMatrix in='lit' values='0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 0 0.08  -0.28 0 0 0 0.23' result='shade'/%3E%3CfeMerge%3E%3CfeMergeNode in='light'/%3E%3CfeMergeNode in='shade'/%3E%3CfeMergeNode in='grain'/%3E%3C/feMerge%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23p%29'/%3E%3C/svg%3E");
+}
+.r-launch--next .r-cube-sticker:nth-child(1)::after { background-position: -137px -89px; }
+.r-launch--next .r-cube-sticker:nth-child(2)::after { background-position: -274px -178px; }
+.r-launch--next .r-cube-sticker:nth-child(3)::after { background-position: -91px -267px; }
+.r-launch--next .r-cube-sticker:nth-child(4)::after { background-position: -228px -36px; }
+.r-launch--next .r-cube-sticker:nth-child(5)::after { background-position: -45px -125px; }
+.r-launch--next .r-cube-sticker:nth-child(6)::after { background-position: -182px -214px; }
+.r-launch--next .r-cube-sticker:nth-child(7)::after { background-position: -319px -303px; }
+.r-launch--next .r-cube-sticker:nth-child(8)::after { background-position: -136px -72px; }
+.r-launch--next .r-cube-sticker:nth-child(9)::after { background-position: -273px -161px; }
+.r-launch--next .r-cube-sticker:nth-child(10)::after { background-position: -90px -250px; }
+.r-launch--next .r-cube-sticker:nth-child(11)::after { background-position: -227px -19px; }
+.r-launch--next .r-cube-sticker:nth-child(12)::after { background-position: -44px -108px; }
+.r-launch--next .r-cube-sticker:nth-child(13)::after { background-position: -181px -197px; }
+.r-launch--next .r-cube-sticker:nth-child(14)::after { background-position: -318px -286px; }
+.r-launch--next .r-cube-sticker:nth-child(15)::after { background-position: -135px -55px; }
+.r-launch--next .r-cube-sticker:nth-child(16)::after { background-position: -272px -144px; }
+.r-launch--next .r-cube-sticker:nth-child(17)::after { background-position: -89px -233px; }
+.r-launch--next .r-cube-sticker:nth-child(18)::after { background-position: -226px -2px; }
+.r-launch--next .r-cube-sticker:nth-child(19)::after { background-position: -43px -91px; }
+.r-launch--next .r-cube-sticker:nth-child(20)::after { background-position: -180px -180px; }
+.r-launch--next .r-cube-sticker:nth-child(21)::after { background-position: -317px -269px; }
+.r-launch--next .r-cube-sticker:nth-child(22)::after { background-position: -134px -38px; }
+.r-launch--next .r-cube-sticker:nth-child(23)::after { background-position: -271px -127px; }
+.r-launch--next .r-cube-sticker:nth-child(24)::after { background-position: -88px -216px; }
+.r-launch--next .r-cube-sticker:nth-child(25)::after { background-position: -225px -305px; }
+.r-launch--next .r-cube-sticker:nth-child(26)::after { background-position: -42px -74px; }
+.r-launch--next .r-cube-sticker:nth-child(27)::after { background-position: -179px -163px; }
+.r-launch--next .r-cube-sticker:nth-child(28)::after { background-position: -316px -252px; }
+.r-launch--next .r-cube-sticker:nth-child(29)::after { background-position: -133px -21px; }
+.r-launch--next .r-cube-sticker:nth-child(30)::after { background-position: -270px -110px; }
+.r-launch--next .r-cube-sticker:nth-child(31)::after { background-position: -87px -199px; }
+.r-launch--next .r-cube-sticker:nth-child(32)::after { background-position: -224px -288px; }
+.r-launch--next .r-cube-sticker:nth-child(33)::after { background-position: -41px -57px; }
+.r-launch--next .r-cube-sticker:nth-child(34)::after { background-position: -178px -146px; }
+.r-launch--next .r-cube-sticker:nth-child(35)::after { background-position: -315px -235px; }
+.r-launch--next .r-cube-sticker:nth-child(36)::after { background-position: -132px -4px; }
+.r-launch--next .r-cube-sticker:nth-child(37)::after { background-position: -269px -93px; }
+.r-launch--next .r-cube-sticker:nth-child(38)::after { background-position: -86px -182px; }
+.r-launch--next .r-cube-sticker:nth-child(39)::after { background-position: -223px -271px; }
+.r-launch--next .r-cube-sticker:nth-child(40)::after { background-position: -40px -40px; }
+.r-launch--next .r-cube-sticker:nth-child(41)::after { background-position: -177px -129px; }
+.r-launch--next .r-cube-sticker:nth-child(42)::after { background-position: -314px -218px; }
+.r-launch--next .r-cube-sticker:nth-child(43)::after { background-position: -131px -307px; }
+.r-launch--next .r-cube-sticker:nth-child(44)::after { background-position: -268px -76px; }
+.r-launch--next .r-cube-sticker:nth-child(45)::after { background-position: -85px -165px; }
+.r-launch--next .r-cube-sticker:nth-child(46)::after { background-position: -222px -254px; }
+.r-launch--next .r-cube-sticker:nth-child(47)::after { background-position: -39px -23px; }
+.r-launch--next .r-cube-sticker:nth-child(48)::after { background-position: -176px -112px; }
+.r-launch--next .r-cube-sticker:nth-child(49)::after { background-position: -313px -201px; }
+.r-launch--next .r-cube-sticker:nth-child(50)::after { background-position: -130px -290px; }
+.r-launch--next .r-cube-sticker:nth-child(51)::after { background-position: -267px -59px; }
+.r-launch--next .r-cube-sticker:nth-child(52)::after { background-position: -84px -148px; }
+.r-launch--next .r-cube-sticker:nth-child(53)::after { background-position: -221px -237px; }
+.r-launch--next .r-cube-sticker:nth-child(54)::after { background-position: -38px -6px; }
+
+/* ---- The cube, laid out like the protein expression showcase (comparison page, founder 14 Nov 2026: the cards took
+   too much height). Words, steps and figures on the left; the cube on fading graph paper on the right. ---- */
+.r-cube--flat {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.55fr);
+  column-gap: clamp(2.5rem, 1rem + 4vw, 5rem);
+  align-items: center;
+}
+.r-cube--flat .r-cube-intro .r-show-claim {
+  font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2.1rem);
+}
+.r-cube--flat .r-show-sub {
+  font-size: 1rem;
+}
+.r-cube-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.75rem;
+  margin: 1.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--f-serif);
+  font-size: 1rem;
+  color: var(--c-faint);
+}
+.r-cube-steps li {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  transition: color 200ms ease;
+}
+/* The square outline bullet of the fields, filled in teal for the step under way. */
+.r-cube-steps li::before {
+  content: '';
+  width: 0.55em;
+  height: 0.55em;
+  border: 1.5px solid currentColor;
+}
+.r-cube-steps .r-cube-step--on {
+  color: var(--c-ink);
+}
+.r-cube-steps .r-cube-step--on::before {
+  border-color: var(--c-teal-ink);
+  background: var(--c-teal-ink);
+}
+.r-cube-figures {
+  margin-top: 1.5rem;
+}
+.r-cube-figures dt {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.r-cube--flat .r-cube-hud {
+  justify-content: flex-start;
+  margin-top: 1.5rem;
+}
+.r-cube-paper {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  justify-items: center;
+}
+.r-cube-paper::before {
+  content: '';
+  position: absolute;
+  inset: -4rem -3rem;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(19 19 18 / 7%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(19 19 18 / 7%) 1px, transparent 1px),
+    linear-gradient(rgb(19 19 18 / 3.5%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(19 19 18 / 3.5%) 1px, transparent 1px);
+  background-size: 40px 40px, 40px 40px, 8px 8px, 8px 8px;
+  -webkit-mask-image: radial-gradient(closest-side ellipse at 50% 50%, #000 35%, rgb(0 0 0 / 55%) 62%, rgb(0 0 0 / 18%) 82%, transparent 100%);
+  mask-image: radial-gradient(closest-side ellipse at 50% 50%, #000 35%, rgb(0 0 0 / 55%) 62%, rgb(0 0 0 / 18%) 82%, transparent 100%);
+}
+@media (max-width: 900px) {
+  .r-cube--flat {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .r-cube--flat .r-cube-paper {
+    order: -1;
+    margin-top: 1rem;
+  }
+}
+
+/* ---- Try it, simpler (comparison page, founder 14 Nov 2026): checkboxes with a real check mark. ---- */
+.r-try-checks {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+.r-try-check {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--c-ink);
+  cursor: pointer;
+}
+.r-try-check input {
+  appearance: none;
+  -webkit-appearance: none;
+  display: grid;
+  place-content: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin: 0;
+  border: 1px solid var(--c-line-3);
+  background: var(--c-paper);
+  cursor: pointer;
+}
+.r-try-check input:hover {
+  border-color: var(--c-ink);
+}
+.r-try-check input:checked {
+  border-color: var(--c-teal-ink);
+  background: var(--c-teal-ink);
+}
+.r-try-check input:checked::after {
+  content: '';
+  width: 0.32rem;
+  height: 0.6rem;
+  margin-top: -0.12rem;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.r-try-check input:focus-visible {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 2px;
+}
+
+/* "Olsen et al. needed 1,179 experiments." on one line at every two-column width (founder, 14 Nov 2026): the claim's
+   size follows the showcase's width, so the line always fits its column, and it never breaks. */
+.r-cfe {
+  container-type: inline-size;
+}
+@media (min-width: 901px) {
+  .r-launch--next .r-cfe > .r-show-claim {
+    font-size: min(2.1rem, 2.4cqi);
+  }
+  .r-launch--next .r-cfe-line {
+    white-space: nowrap;
+  }
+}
+
+/* The words, figures and sources as one block, centred on the plot's height (founder, 14 Nov 2026), not stuck to its top. */
+@media (min-width: 901px) {
+  .r-launch--next .r-cfe {
+    grid-template-areas:
+      '. plot'
+      'claim plot'
+      'figures plot'
+      'foot plot'
+      '. plot';
+    grid-template-rows: 1fr auto auto auto 1fr;
+  }
+}
+
+/* Try it's toggles as whole-width buttons again (founder, 14 Nov 2026), the check box on the right purely as a sign
+   of on or off, in the button's own colours. */
+.r-try .r-try-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.r-try-tick {
+  display: grid;
+  place-content: center;
+  flex: none;
+  width: 0.95rem;
+  height: 0.95rem;
+  border: 1px solid currentColor;
+}
+.r-try-toggle[aria-checked='true'] .r-try-tick::after {
+  content: '';
+  width: 0.28rem;
+  height: 0.55rem;
+  margin-top: -0.12rem;
+  border: solid currentColor;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+
+/* ---- The cube race (comparison page, founder 14 Nov 2026): three cubes side by side, each on fading graph paper,
+   its method's name, a bar of how close it is, and two figures. ---- */
+.r-race {
+  margin: 1.75rem 0 0;
+}
+.r-race-lanes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 0.5rem + 2vw, 2.5rem);
+}
+.r-race-lane {
+  display: grid;
+  align-content: start;
+}
+.r-race-stage {
+  width: min(100%, 250px);
+}
+.r-race-stage .r-cube-body {
+  transform: scale(0.74);
+}
+.r-race-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+  margin: 0.5rem 0 0;
+  font-family: var(--f-serif);
+  font-size: 1.05rem;
+  color: var(--c-ink);
+}
+.r-race-flag {
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lane);
+}
+.r-race-bar {
+  height: 4px;
+  margin-top: 0.6rem;
+  background: rgb(19 19 18 / 8%);
+}
+.r-race-bar span {
+  display: block;
+  height: 100%;
+  background: var(--lane);
+  transition: width 300ms ease;
+}
+.r-race-figures {
+  display: flex;
+  gap: 2rem;
+  margin: 0.9rem 0 0;
+}
+.r-race-figures dt {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-size: clamp(1.4rem, 1.1rem + 0.8vw, 1.8rem);
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--c-ink);
+}
+.r-race-lane--won .r-race-figures dt:first-child {
+  color: var(--lane);
+}
+.r-race-figures dd {
+  margin: 0.35rem 0 0;
+  font-family: var(--f-serif);
+  font-size: 0.95rem;
+  color: var(--c-muted);
+}
+.r-race-hud {
+  justify-content: flex-start;
+  margin-top: 1.5rem;
+}
+@media (max-width: 760px) {
+  .r-race-lanes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The race, laid out like the protein expression showcase (founder, 14 Nov 2026): the words on the left, the live
+   convergence plot on the right, the three cubes in a row below. */
+.r-race {
+  margin: 0;
+}
+.r-race-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.55fr);
+  column-gap: clamp(2.5rem, 1rem + 4vw, 5rem);
+  align-items: center;
+}
+.r-race-text .r-show-claim {
+  font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2.1rem);
+}
+.r-race-hud {
+  margin-top: 1.25rem;
+}
+.r-race-plot {
+  /* Not the protein plot's named area: this grid has none, and a missing area adds implicit columns. */
+  grid-area: auto;
+  margin: 0;
+}
+.r-race-dots {
+  opacity: 0.32;
+}
+.r-race-line {
+  fill: none;
+  stroke-width: 1.75;
+  stroke-linejoin: round;
+}
+.r-race-line--sdm {
+  stroke-width: 2.5;
+}
+.r-race-key::before {
+  border-top: 2px solid var(--key);
+}
+.r-race-lanes {
+  margin-top: 1.5rem;
+}
+.r-race-lane {
+  justify-items: center;
+  text-align: center;
+}
+.r-race-stage {
+  width: min(100%, 210px);
+}
+.r-race-stage .r-cube-body {
+  transform: scale(0.62);
+}
+.r-race-name {
+  justify-content: center;
+  margin-top: 0.25rem;
+}
+.r-race-count {
+  margin: 0.2rem 0 0;
+  font-family: var(--f-serif);
+  font-size: 0.95rem;
+  color: var(--c-muted);
+}
+.r-race-count strong {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-size: 1.35rem;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--c-ink);
+}
+.r-race-lane--won .r-race-count strong {
+  color: var(--lane);
+}
+@media (max-width: 900px) {
+  .r-race-top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .r-race-plot {
+    margin-top: 1.5rem;
+  }
+}
+@media (max-width: 760px) {
+  .r-race-lanes {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .r-race-stage .r-cube-body {
+    transform: scale(0.36);
+  }
+}
+/* The prose wrapper's figure margins stay off the race and its plot (they doubled the space around the plot). */
+.r-show-panel figure.r-race,
+.r-show-panel figure.r-race-plot {
+  margin: 0;
+}
+/* The cubes under the words, beside the plot (founder, 14 Nov 2026): three small cubes in the text column. */
+.r-race-text .r-race-lanes {
+  margin-top: 1.25rem;
+  gap: 0.5rem;
+}
+.r-race-text .r-race-stage {
+  width: min(100%, 170px);
+}
+.r-race-text .r-race-stage .r-cube-body {
+  transform: scale(0.5);
+}
+.r-race-text .r-race-name {
+  font-size: 0.95rem;
+}
+/* The same distance below the tab titles as the protein expression showcase, whose plot keeps the prose figure
+   margin (founder, 14 Nov 2026). */
+.r-show-panel .r-race-top {
+  padding-top: 2.75rem;
+  align-items: start;
+}
+
+/* Try it: the two toggles and New landscape in one row of three (founder, 14 Nov 2026). */
+.r-try-actions--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 600px) {
+  .r-try-actions--three {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---- What SDM-1 can do (comparison page, founder 14 Nov 2026): between the introduction and the fields, a short
+   list, a bold lead and one sentence each, the fields' square outline bullet. ---- */
+.r-launch-can {
+  padding-bottom: max(4rem, calc((100svh - var(--s-header, 76px) - 28rem) / 2));
+}
+.r-launch-can .r-launch-h2 {
+  margin-bottom: 1.75rem;
+}
+.r-can-list {
+  display: grid;
+  gap: 1.1rem;
+  max-width: 44rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--f-serif);
+  font-size: clamp(1.1rem, 1rem + 0.4vw, 1.3rem);
+  line-height: 1.5;
+  color: var(--c-muted);
+}
+.r-can-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 0.85rem;
+}
+.r-can-list li::before {
+  content: '';
+  width: 0.42em;
+  height: 0.42em;
+  margin-top: 0.62em;
+  border: 1.5px solid var(--c-amber-ink);
+}
+.r-can-list strong {
+  font-weight: 600;
+  color: var(--c-ink);
+}
+
+/* ---- Benchmarks as a ruled grid (comparison page, founder 14 Nov 2026, after a comparable release's table): every
+   cell ruled, the model's column filled and outlined in the page's warm accent, the better value in bold, the other
+   method's cell shaded grey where it is the better one. ---- */
+.r-launch--next .r-bench-grid table {
+  min-width: 520px;
+  border: 1px solid var(--c-line-3);
+  border-collapse: collapse;
+  font-family: var(--f-serif);
+  font-size: 1rem;
+}
+.r-launch--next .r-bench-grid th,
+.r-launch--next .r-bench-grid td {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--c-line-3);
+  vertical-align: top;
+}
+.r-launch--next .r-bench-grid thead th {
+  font-family: var(--f-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--c-ink);
+}
+.r-launch--next .r-bench-grid thead td {
+  border-top-color: transparent;
+  border-left-color: transparent;
+}
+.r-launch--next .r-bench-grid tbody th {
+  width: 38%;
+}
+.r-launch--next .r-bench-grid .r-bench-name {
+  font-family: var(--f-serif);
+  font-size: 1rem;
+  font-weight: 600;
+}
+.r-launch--next .r-bench-grid .r-bench-detail {
+  font-family: var(--f-serif);
+  font-size: 0.95rem;
+  color: var(--c-muted);
+}
+.r-launch--next .r-bench-grid td {
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--c-ink);
+}
+/* The model's column: outlined top to bottom; warm fill only where it wins,
+   the rest stays white, as on the Opus 5.5 table (founder, 14 Nov 2026). */
+.r-launch--next .r-bench-grid .r-bench-model {
+  /* background: rgb(226 159 55 / 22%); */
+  background: transparent;
+  border-left: 2px solid #c9771c;
+  border-right: 2px solid #c9771c;
+  color: var(--c-ink);
+}
+.r-launch--next .r-bench-grid thead .r-bench-model {
+  border-top: 2px solid #c9771c;
+}
+.r-launch--next .r-bench-grid tbody tr:last-child .r-bench-model {
+  border-bottom: 2px solid #c9771c;
+}
+.r-launch--next .r-bench-grid td.r-bench-win {
+  font-weight: 700;
+}
+.r-launch--next .r-bench-grid td.r-bench-model.r-bench-win {
+  background: rgb(226 159 55 / 22%);
+}
+.r-launch--next .r-bench-grid td.r-bench-other-win {
+  background: rgb(19 19 18 / 9%);
+}
+.r-launch--next .r-bench-grid .r-bench-delta {
+  color: var(--c-muted);
+}
+
+/* Try it: Show previous points under the methods, as wide as its words (founder, 14 Nov 2026). */
+.r-try .r-try-toggle--others {
+  width: max-content;
+  margin: -0.4rem 0 1rem;
+}
+/* The convergence plot in place of the table. */
+.r-show-panel figure.r-try-plot-curve {
+  grid-area: auto;
+  margin: 0.9rem 0 0.4rem;
+}
+/* The list's bullet placed beside the text, so the bold lead and its sentence stay one flowing line. */
+.r-can-list li {
+  display: block;
+  position: relative;
+  padding-left: 1.3em;
+}
+.r-can-list li::before {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+/* The grid's row labels in the page's serif, not the older table's capitals. */
+.r-launch--next .r-bench-grid tbody th,
+.r-launch--next .r-bench-grid .r-bench-name,
+.r-launch--next .r-bench-grid .r-bench-detail {
+  text-transform: none;
+  letter-spacing: 0;
+}
+.r-launch--next .r-bench-grid tbody th {
+  width: 34%;
+}
+.r-launch--next .r-bench-grid .r-bench-after {
+  width: 1%;
+  white-space: nowrap;
+  color: var(--c-muted);
+  font-weight: 400;
+}
+/* The prose tables' fixed layout would squeeze the After column under the model's; this grid sizes by content. */
+.r-launch--next .r-bench-grid table {
+  table-layout: auto;
+}
+/* The three value columns equally wide, as in the reference grid. */
+.r-launch--next .r-bench-grid thead th:not(.r-bench-after) {
+  width: 17%;
+}
+
+/* Try it: Show previous points, Show the landscape and New landscape in one row under the Setting A / Setting B plot
+   (founder, 14 Nov 2026), lined up with the canvas, not its axis gutter. */
+.r-try-left {
+  min-width: 0;
+}
+.r-try .r-try-actions--under {
+  /* grid-template-columns: repeat(3, minmax(0, 1fr)); */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: calc(400px + 1.4rem);
+  margin-top: 0.5rem;
+  padding-left: 1.4rem;
+}
+.r-try .r-try-actions--under .r-try-new {
+  grid-column: 1 / -1;
+}
+/* Keep both toggles on one line at the plot's width. */
+.r-try .r-try-actions--under .r-try-toggle {
+  gap: 0.5rem;
+  padding-inline: 0.75rem;
+  white-space: nowrap;
+}
+
+/* Try it: Run experiments as a small button over the plot of points (founder, 14 Nov 2026), centred on the canvas
+   (the plot's padding holds the axis labels). */
+.r-try-run {
+  position: absolute;
+  inset: 0 0 1.4rem 1.4rem;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.r-try .r-try-run button {
+  pointer-events: auto;
+  border-color: var(--c-teal-ink);
+  background: var(--c-teal-ink);
+  color: var(--c-paper);
+  box-shadow: 0 1px 6px rgb(19 19 18 / 14%);
+}
+.r-try .r-try-run button:hover:not(:disabled) {
+  border-color: var(--c-ink);
+  background: var(--c-ink);
+}
+/* The notice floating over the landscape like Run experiments (comparison page, founder 15 Nov 2026: `floatNotice`). */
+.r-try-run .r-try-float-notice {
+  pointer-events: auto;
+  max-width: min(22rem, 85%);
+  margin: 0;
+  border: 1px solid var(--c-line-3);
+  border-left: 2px solid var(--c-orange);
+  background: var(--c-paper);
+  box-shadow: 0 1px 6px rgb(19 19 18 / 14%);
+  text-align: center;
+}
+
+/* What SDM-1 can do: the sentence after the bold lead on its own line (founder, 14 Nov 2026). */
+.r-can-list li > strong {
+  display: block;
+}
+
+/* Try it: the methods above the convergence plot (founder, 14 Nov 2026); the selected method's line, points and key
+   stand out, the others step back. */
+.r-try-side > .r-try-tabs {
+  margin: 0;
+}
+.r-try-plot-curve .r-race-line.r-try-on {
+  stroke-width: 3;
+}
+.r-try-plot-curve .r-race-line.r-try-off {
+  stroke-width: 1.5;
+  opacity: 0.4;
+}
+.r-try-plot-curve .r-race-dots.r-try-on {
+  opacity: 0.6;
+}
+.r-try-plot-curve .r-race-dots.r-try-off {
+  opacity: 0.18;
+}
+.r-try-plot-curve .r-race-key.r-try-on {
+  color: var(--c-ink);
+  font-weight: 600;
+}
+.r-try-plot-curve .r-race-key.r-try-on::before {
+  border-top-width: 3px;
+}
+.r-try-plot-curve .r-race-key.r-try-off {
+  opacity: 0.6;
+}
+
+/* Try it's convergence plot draws its own graph paper, on the ticks (founder, 14 Nov 2026), so no CSS paper here. */
+.r-launch--v2 .r-try-plot-curve::before {
+  content: none;
+}
+.r-try-paper line {
+  stroke: rgb(19 19 18 / 3.5%);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.r-try-paper line.r-try-paper-major {
+  stroke: rgb(19 19 18 / 8%);
+}
+
+/* Protein expression: a ring where each stage's top 1% was reached (founder, 14 Nov 2026). */
+.r-cfe-hit {
+  fill: none;
+  stroke: var(--c-muted);
+  stroke-width: 1.25;
+}
+.r-cfe-hit--sdm {
+  stroke: var(--c-teal-ink);
+  stroke-width: 1.5;
+}
+
+/* The paper's link in the protein expression footnote (founder, 14 Nov 2026): the note's own colour, underlined. */
+.r-cfe-foot a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+.r-cfe-foot a:hover {
+  color: var(--c-ink);
+}
+
+/* Full-height numerals in the race and Try it too (founder, 14 Nov 2026: the 1 of "SDM-1" again read too small). */
+.r-launch--v2 :is(.r-race, .r-try-hint, .r-show-claim) {
+  font-variant-numeric: lining-nums;
+}
+
+/* Who leads the race, shown the same way for every method (founder, 14 Nov 2026): its own line below the method's
+   name, one color, and the leader's count no longer takes its lane color. */
+p.r-race-flag {
+  margin: 0.2rem 0 0;
+  min-height: 1.2em;
+  line-height: 1.2;
+  color: var(--c-ink);
+}
+.r-race-lane--won .r-race-count strong {
+  color: var(--c-ink);
+}
+
+/* The race's figure with its label underneath, not beside it (founder, 15 Nov 2026). */
+.r-race-count--stack {
+  display: grid;
+  justify-items: center;
+  gap: 0.1rem;
+}
+.r-race-count--stack strong {
+  line-height: 1;
+}
+/* What the methods are told, under the race. */
+.r-race-foot {
+  margin: 1.25rem 0 0;
+  max-width: 62ch;
+}
+
+/* Benchmarks (founder, 15 Nov 2026, comparison page): "After n experiments" bold like the other heads, and each
+   measure explained in one bold sentence. */
+.r-launch--next .r-bench-grid thead th.r-bench-after--head {
+  font-weight: 600;
+  color: var(--c-ink);
+}
+.r-bench-explain--brief {
+  font-weight: 600;
+  color: var(--c-ink);
+  font-variant-numeric: lining-nums;
+}
+
+/* Each cube's statistics over its method's repeated runs (founder, 15 Nov 2026). */
+.r-race-stats {
+  margin: 0.35rem 0 0;
+  font-family: var(--f-serif);
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: var(--c-muted);
+  font-variant-numeric: lining-nums;
+}
+
+/* The cube plot draws its own graph paper on its ticks (founder, 15 Nov 2026): the CSS paper behind it is off. */
+.r-launch--v2 .r-race-plot::before {
+  content: none;
+}
+
+/* "Solved first / second / third" under the 0, in the same capitals as Ahead and Tie (founder, 15 Nov 2026). */
+.r-race-count .r-race-place {
+  margin-top: 0.2rem;
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+}
+
+/* The tree's reduced-motion rules moved to components/release/DecisionTree.css (17 Nov 2026). */
+
+/* What SDM-1 can do, centred (v2, founder 15 Nov 2026): the title over the middle of the page, the list as one block
+   under it (its lines still start at the bullets). */
+.r-launch-can--center .r-launch-h2 {
+  text-align: center;
+}
+.r-launch-can--center .r-can-list {
+  margin-inline: auto;
+  width: fit-content;
+}
+
+/* Benchmarks: each name shows what the benchmark is about on hover, focus or tap (comparison page, founder
+   15 Nov 2026: `explain`, BenchmarkInfo.tsx), a small picture with a description next to it. */
+.r-bench-info {
+  cursor: help;
+  text-decoration: underline dotted;
+  text-decoration-color: var(--c-line-3);
+  text-underline-offset: 0.2em;
+}
+.r-bench-info:hover,
+.r-bench-info:focus-visible {
+  text-decoration-color: var(--c-teal-ink);
+  outline: none;
+}
+.r-bench-card {
+  position: fixed;
+  z-index: 40;
+  display: grid;
+  /* grid-template-columns: 5.75rem 1fr; */
+  grid-template-columns: 8.5rem 1fr;
+  gap: 1rem;
+  align-items: start;
+  /* width: min(26rem, calc(100vw - 2rem)); */
+  width: min(33rem, calc(100vw - 2rem));
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--c-line-3);
+  background: var(--c-paper);
+  box-shadow: 0 2px 12px rgb(19 19 18 / 14%);
+  font-family: var(--f-serif);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--c-ink);
+  text-decoration: none;
+  white-space: normal;
+  cursor: default;
+  pointer-events: none;
+}
+.r-bench-card-text {
+  display: grid;
+  gap: 0.35rem;
+}
+.r-bench-card-lead {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-weight: 600;
+}
+/* Labelled facts: the label small and muted in a column of its own. */
+.r-bench-card-fact {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.6rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--c-line);
+}
+.r-bench-card-label {
+  padding-top: 0.15em;
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+/* On a phone the picture goes above the text. */
+@media (max-width: 30rem) {
+  .r-bench-card {
+    grid-template-columns: 1fr;
+  }
+  .r-bench-card .r-bench-pic {
+    width: 7rem;
+  }
+}
+.r-bench-pic {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.r-bench-pic-cells rect {
+  fill: var(--c-teal-ink);
+}
+.r-bench-pic-frame {
+  fill: none;
+  stroke: var(--c-line-3);
+  stroke-width: 1;
+}
+.r-bench-pic-ring {
+  fill: none;
+  stroke: var(--c-orange);
+  stroke-width: 1.5;
+}
+.r-bench-pic-track {
+  stroke: var(--c-line-3);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.r-bench-pic-knob {
+  fill: var(--c-paper);
+  stroke: var(--c-teal-ink);
+  stroke-width: 1.5;
+}
+.r-bench-pic-arrow {
+  fill: none;
+  stroke: var(--c-muted);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.r-bench-pic-fill {
+  fill: var(--c-teal-ink);
+  opacity: 0.75;
+}
+.r-bench-pic-well {
+  fill: var(--c-teal-ink);
+  stroke: var(--c-line-3);
+  stroke-width: 0.75;
+}
+.r-bench-pic-well--best {
+  fill-opacity: 1;
+  stroke: var(--c-orange);
+  stroke-width: 1.75;
+}
+
+/* A benchmark card clicked open (founder, 16 Nov 2026): it stays until a click outside it, and its links work. */
+.r-bench-card.r-bench-card--pinned {
+  pointer-events: auto;
+}
+.r-bench-card a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--c-line-3);
+  text-underline-offset: 0.15em;
+}
+.r-bench-card a:hover {
+  text-decoration-color: currentColor;
+}
+
+/* An equal row (founder, 16 Nov 2026): the comparison column marked as the winner, in the neutral shade, not SDM-1's. */
+.r-bench td.r-bench-delta.r-bench-tie {
+  color: var(--c-ink);
+}
+.r-launch--next .r-bench-grid td.r-bench-delta.r-bench-tie {
+  background: rgb(19 19 18 / 9%);
+  color: var(--c-ink);
+}
+
+/* Two pictures in one card (chemistry and materials, founder 16 Nov 2026): stacked in the picture column, side by side
+   on a phone. */
+.r-bench-pics {
+  display: grid;
+  gap: 0.6rem;
+}
+@media (max-width: 30rem) {
+  .r-bench-pics {
+    grid-auto-flow: column;
+    justify-content: start;
+  }
+}
+
+/* The cube race with `runs` (founder, 16 Nov 2026): the runs' statistics and the note under the plot, in its column. */
+.r-race-side {
+  min-width: 0;
+}
+.r-race-side .r-race-foot {
+  margin-top: 1rem;
+  max-width: none;
+}
+
+/* Was (16 Nov 2026), a rounded tinted box in the plot's column:
+/* The race's info box (founder, 16 Nov 2026): under the plot, the runs solved per method side by side, two short lines. *\/
+.r-race-info {
+  margin-top: 1.25rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgb(19 19 18 / 12%);
+  border-radius: 6px;
+  background: rgb(19 19 18 / 3%);
+}
+.r-race-info-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+}
+.r-race-info-stats dt {
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.r-race-info-stats dd {
+  margin: 0.2rem 0 0;
+  font-family: var(--f-serif);
+  font-size: 0.95rem;
+  color: var(--c-muted);
+  font-variant-numeric: lining-nums;
+}
+.r-race-info-stats strong {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-size: 1.5rem;
+  color: var(--c-ink);
+}
+.r-race-info-stats .r-race-info-median {
+  margin-top: 0;
+  font-size: 0.85rem;
+}
+.r-race-info-note {
+  margin: 0.9rem 0 0;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgb(19 19 18 / 10%);
+  font-family: var(--f-serif);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--c-muted);
+}
+@media (max-width: 600px) {
+  .r-race-info-stats {
+    gap: 0.6rem;
+  }
+}
+*/
+
+/* The race's info box (founder, 16 Nov 2026): below the cubes and the plot, the race's full width, in the benchmark
+   hover cards' style (paper, hairline border, light shadow, mono labels). One row: the three methods, then the note. */
+.r-race-info {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.9fr);
+  margin-top: 1.75rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--c-line-3);
+  background: var(--c-paper);
+  box-shadow: 0 2px 12px rgb(19 19 18 / 8%);
+  font-family: var(--f-serif);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--c-ink);
+}
+.r-race-info-stats {
+  display: contents;
+}
+.r-race-info-stats > div {
+  padding-right: 1rem;
+}
+.r-race-info-stats dt {
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.r-race-info-stats dd {
+  margin: 0.25rem 0 0;
+  color: var(--c-muted);
+  font-variant-numeric: lining-nums;
+}
+.r-race-info-stats strong {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-size: 1.35rem;
+  line-height: 1;
+  color: var(--c-ink);
+}
+.r-race-info-stats .r-race-info-median {
+  margin-top: 0.1rem;
+  font-size: 0.8125rem;
+}
+.r-race-info-note {
+  margin: 0;
+  padding-left: 1rem;
+  border-left: 1px solid var(--c-line);
+  align-self: center;
+  color: var(--c-muted);
+}
+/* Narrower: the three methods in a row, the note under them. */
+@media (max-width: 900px) {
+  .r-race-info {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .r-race-info-note {
+    grid-column: 1 / -1;
+    margin-top: 0.75rem;
+    padding: 0.6rem 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--c-line);
+  }
+}
+
+/* The info box restructured (founder, 16 Nov 2026): one heading over the three methods, each a label and its count. */
+.r-race-info-stats {
+  display: block;
+  padding-right: 1rem;
+}
+.r-race-info-stats > div {
+  padding-right: 0;
+}
+.r-race-info-head {
+  margin: 0 0 0.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--c-line);
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+}
+.r-race-info-stats dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+}
+.r-race-info-stats dd span {
+  font-size: 0.875rem;
+  color: var(--c-muted);
+}
+.r-race-info {
+  grid-template-columns: minmax(0, 3fr) minmax(0, 1.9fr);
+}
+@media (max-width: 900px) {
+  .r-race-info {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .r-race-info-stats {
+    padding-right: 0;
+  }
+}
+/* More room between each method's name and its count (founder, 16 Nov 2026). */
+.r-race-info-stats dl dd {
+  margin-top: 0.6rem;
+}
+/* The run on show, at the info box's very left (founder, 16 Nov 2026). */
+.r-race-info {
+  grid-template-columns: auto minmax(0, 3fr) minmax(0, 1.9fr);
+}
+.r-race-info-run {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 0.6rem;
+  min-width: 3.25rem;
+  margin-right: 1rem;
+  padding-right: 1rem;
+  border-right: 1px solid var(--c-line);
+}
+.r-race-info-run span {
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+}
+.r-race-info-run strong {
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-size: 2.1rem;
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--c-ink);
+}
+@media (max-width: 900px) {
+  .r-race-info {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+}
+/* The counts centred in their cells, the most solved bold and highlighted as in the benchmark table (founder, 16 Nov 2026). */
+.r-race-info-stats dl {
+  gap: 0.4rem;
+}
+.r-race-info-stats dl > div {
+  padding: 0.45rem 0.4rem 0.5rem;
+  text-align: center;
+}
+/* .r-race-info-head { text-align: center; } (founder, 16 Nov 2026: the heading left-aligned, the counts centred) */
+.r-race-info-stats dl > .r-race-info-win {
+  background: rgb(19 19 18 / 9%);
+}
+/* .r-race-info-stats dl > .r-race-info-win--model { background: rgb(226 159 55 / 22%); }
+   (founder, 16 Nov 2026: no tint on SDM-1, only the orange border) */
+.r-race-info-stats dl > .r-race-info-win--model {
+  background: transparent;
+}
+.r-race-info-win strong {
+  font-weight: 700;
+}
+/* As the benchmark table (founder, 16 Nov 2026: its orange looks much better): SDM-1's cell outlined in its column's
+   orange, the fill only where it wins, the counts in the table's serif, the most solved bold. */
+.r-race-info-stats dl > .r-race-info-model {
+  border: 2px solid #c9771c;
+}
+.r-race-info-stats dl strong {
+  font-family: var(--f-serif);
+  font-weight: 400;
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+.r-race-info-stats dl > .r-race-info-win strong {
+  font-weight: 700;
+}
+/* The run column's divider also between the methods (founder, 16 Nov 2026): a hairline in the middle of each gap. */
+.r-race-info-stats dl {
+  column-gap: 0.8rem;
+}
+.r-race-info-stats dl > div + div {
+  position: relative;
+}
+.r-race-info-stats dl > div + div::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -0.4rem;
+  border-left: 1px solid var(--c-line);
+}
+/* SDM-1's orange box hugging its name and count (founder, 16 Nov 2026: smaller), centred in its column. */
+.r-race-info-stats dl > .r-race-info-model {
+  justify-self: center;
+  align-self: center;
+  padding: 0.3rem 0.9rem 0.35rem;
+}
+/* No orange box on SDM-1 (founder, 16 Nov 2026): an orange underline a little below its count instead. The box rules
+   above stay for reference; these undo them. */
+.r-race-info-stats dl > .r-race-info-model {
+  border: 0;
+  justify-self: stretch;
+  align-self: stretch;
+  padding: 0.45rem 0.4rem 0.5rem;
+}
+.r-race-info-stats dl > .r-race-info-model strong {
+  display: inline-block;
+  padding-bottom: 0.2rem;
+  border-bottom: 2px solid #c9771c;
+}
+/* The underline wider and bolder (founder, 16 Nov 2026). */
+.r-race-info-stats dl > .r-race-info-model strong {
+  padding: 0 0.7rem 0.2rem;
+  border-bottom-width: 3px;
+}
+/* A small paragraph gap in the race's note, after what one experiment is (founder, 16 Nov 2026). */
+.r-race-info-gap {
+  display: block;
+  height: 0.55rem;
+}
+
+/* The n and Difference heads set apart from the methods' heads (founder, 16 Nov 2026: those columns looked like
+   alternative methods): no box above or beside them, small muted capitals, sitting on the line under the heads. */
+.r-launch--next .r-bench-grid--quiet thead th.r-bench-after,
+.r-launch--next .r-bench-grid--quiet thead th.r-bench-delta-head {
+  border-top-color: transparent;
+  vertical-align: bottom;
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.r-launch--next .r-bench-grid--quiet thead th.r-bench-after {
+  border-left-color: transparent;
+}
+.r-launch--next .r-bench-grid--quiet thead th.r-bench-delta-head {
+  border-right-color: transparent;
+}
+/* The empty corner cell's right edge is the same line as the n head's left (collapsed borders: the corner's won). */
+.r-launch--next .r-bench-grid--quiet thead td {
+  border-right-color: transparent;
+}
+/* Try it: the results over every landscape, a small hover under the plot (founder, 16 Nov 2026). */
+.r-try-results {
+  margin: 0.5rem 0 0;
+  font-family: var(--f-serif);
+  font-size: 0.875rem;
+  color: var(--c-muted);
+}
+
+/* ---- The model card, its own section (comparison page, founder 16 Nov 2026): components/release/ModelCardSheet.tsx.
+   A sheet in the benchmark cards' manner: paper, hairline border, mono labels. Header (name, type, status), the summary,
+   the specifications as a row of key facts, then labelled rows. ---- */
+.r-launch-card {
+  padding-block: 1rem 5rem;
+}
+.r-mc {
+  max-width: 60rem;
+  margin-inline: auto;
+  border: 1px solid var(--c-line-3);
+  background: var(--c-paper);
+  box-shadow: 0 2px 12px rgb(19 19 18 / 6%);
+  font-family: var(--f-serif);
+  color: var(--c-ink);
+}
+.r-mc-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  padding: 1.75rem 2rem 0;
+}
+.r-mc-kicker,
+.r-mc-specs dt,
+.r-mc-rows dt,
+.r-mc-status {
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.r-mc-kicker {
+  margin: 0 0 0.6rem;
+  color: var(--c-muted);
+}
+.r-mc-name {
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: clamp(2.2rem, 1.6rem + 2vw, 3.2rem);
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: var(--d-track-l);
+}
+.r-mc-type {
+  margin: 0.6rem 0 0;
+  font-size: 1rem;
+  color: var(--c-muted);
+}
+.r-mc-status {
+  margin: 0;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid #c9771c;
+  color: var(--c-ink);
+  white-space: nowrap;
+}
+.r-mc-lead {
+  max-width: 44rem;
+  margin: 1.25rem 0 0;
+  padding: 0 2rem 1.75rem;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  border-bottom: 1px solid var(--c-line-3);
+}
+.r-mc-specs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  border-bottom: 1px solid var(--c-line-3);
+}
+.r-mc-specs > div {
+  padding: 1rem 1.25rem 1.1rem;
+}
+.r-mc-specs > div:first-child {
+  padding-left: 2rem;
+}
+.r-mc-specs > div + div {
+  border-left: 1px solid var(--c-line);
+}
+.r-mc-specs dt,
+.r-mc-rows dt {
+  color: var(--c-muted);
+}
+.r-mc-specs dd {
+  margin: 0.45rem 0 0;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+.r-mc-rows {
+  margin: 0;
+  padding: 0.5rem 2rem 1.5rem;
+}
+.r-mc-rows > div {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
+  gap: 1rem;
+  padding: 0.9rem 0;
+}
+.r-mc-rows > div + div {
+  border-top: 1px solid var(--c-line);
+}
+.r-mc-rows dt {
+  padding-top: 0.3em;
+}
+.r-mc-rows dd {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.r-mc-rows ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+.r-mc-rows li + li {
+  margin-top: 0.3rem;
+}
+.r-mc-rows a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--c-line-3);
+  text-underline-offset: 0.15em;
+}
+.r-mc-rows a:hover {
+  text-decoration-color: var(--c-teal-ink);
+}
+@media (max-width: 760px) {
+  .r-mc-head,
+  .r-mc-lead,
+  .r-mc-rows {
+    padding-inline: 1.1rem;
+  }
+  .r-mc-specs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .r-mc-specs > div,
+  .r-mc-specs > div:first-child {
+    padding-left: 1.1rem;
+  }
+  .r-mc-specs > div:nth-child(odd) {
+    border-left: 0;
+  }
+  .r-mc-specs > div:nth-child(n + 3) {
+    border-top: 1px solid var(--c-line);
+  }
+  .r-mc-rows > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
+  }
+}
+
+/* The model card as parchment (founder, 16 Nov 2026), in the register of a reference page's paper only: a warm sheet,
+   soft mottling, fine grain, fibres (ModelCardSheet.tsx) and darker edges. Same technique as the cube's papers: SVG
+   noise as data URIs. */
+.r-mc {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: rgb(120 92 52 / 28%);
+  background-color: #f3ead2;
+  background-image:
+    /* fine grain */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 0.24  0 0 0 0 0.19  0 0 0 0 0.11  0 0 0 0.32 -0.06'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"),
+    /* mottling */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006' numOctaves='4' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0.55  0 0 0 0 0.42  0 0 0 0 0.24  0.55 0 0 0 -0.22'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"),
+    /* a lighter middle */
+    radial-gradient(ellipse at 50% 45%, rgb(255 251 240 / 55%), rgb(255 251 240 / 0%) 70%);
+  background-size: 220px 220px, 900px 900px, 100% 100%;
+  box-shadow:
+    inset 0 0 70px rgb(128 96 52 / 16%),
+    inset 0 0 14px rgb(128 96 52 / 10%),
+    0 1px 2px rgb(29 30 26 / 18%),
+    0 8px 22px rgb(29 30 26 / 10%);
+}
+.r-mc > :not(.r-mc-fibres) {
+  position: relative;
+}
+.r-mc-fibres {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+/* Rules and dividers in the sheet's ink. */
+.r-mc-lead,
+.r-mc-specs {
+  border-color: rgb(120 92 52 / 22%);
+}
+.r-mc-specs > div + div,
+.r-mc-rows > div + div {
+  border-color: rgb(120 92 52 / 16%);
+}
+/* Parchment toned down (founder, 16 Nov 2026: too strong, closer to the inspiration): its pale warm paper (#f6f0e1), a
+   fine grain both lighter and darker than the sheet, mottling barely there, a soft edge shading. */
+.r-mc {
+  border-color: rgb(120 92 52 / 18%);
+  background-color: #f6f0e1;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.13  0 0 0 0 0.08  0 0 0 0.2 -0.05'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='23'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 0.99  0 0 0 0 0.94  0 0 0 0.24 -0.06'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006' numOctaves='4' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0.55  0 0 0 0 0.42  0 0 0 0 0.24  0.22 0 0 0 -0.09'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E");
+  background-size: 220px 220px, 220px 220px, 900px 900px;
+  box-shadow:
+    inset 0 0 60px rgb(128 96 52 / 7%),
+    0 1px 2px rgb(29 30 26 / 16%),
+    0 7px 16px rgb(29 30 26 / 8%);
+}
+.r-mc-lead,
+.r-mc-specs {
+  border-color: rgb(120 92 52 / 16%);
+}
+.r-mc-specs > div + div,
+.r-mc-rows > div + div {
+  border-color: rgb(120 92 52 / 12%);
+}
+/* Parchment after the founder's sample (16 Nov 2026): measured from it, a greyish cream (mean rgb 230 224 208), an even
+   fine grain (pixel spread about 6 levels, darker specks twice as common as lighter ones), no mottling, no edge shading,
+   no visible fibres. */
+.r-mc {
+  background-color: #e6e0d0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 0.42  0 0 0 0 0.37  0 0 0 0 0.27  0 0 0 0.55 -0.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6 0.95' numOctaves='2' seed='23'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 0.99  0 0 0 0 0.95  0 0 0 0.45 -0.22'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E");
+  background-size: 200px 200px, 200px 200px;
+  box-shadow:
+    0 1px 2px rgb(29 30 26 / 14%),
+    0 6px 16px rgb(29 30 26 / 7%);
+}
+/* No fibres: the sample shows none at this scale (the strokes stay in ModelCardSheet.tsx, hidden). */
+.r-mc-fibres {
+  display: none;
+}
+/* Brighter and in the page's tone (founder, 16 Nov 2026): the sheet takes the post's warm paper (the dawn gradient's
+   colour, a little lighter than where the card sits), the grain a touch softer. Was #e6e0d0, from the sample. */
+.r-mc {
+  background-color: color-mix(in oklab, var(--c-paper), #e9a54a 7%);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.4  0 0 0 0 0.26  0 0 0 0.45 -0.17'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6 0.95' numOctaves='2' seed='23'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 0.99  0 0 0 0 0.95  0 0 0 0.5 -0.22'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23f%29'/%3E%3C/svg%3E");
+}
+/* Between the two (founder, 16 Nov 2026: the page's tone was too close to the background): the sample's grey cream
+   lightened 40% toward the page's paper, cooler than the warm page around it, so the sheet still stands apart. */
+.r-mc {
+  background-color: color-mix(in oklab, #e6e0d0 60%, var(--c-paper));
+}
+/* A bit brighter (founder, 16 Nov 2026): the sample's cream at 40% instead of 60%. */
+.r-mc {
+  background-color: color-mix(in oklab, #e6e0d0 40%, var(--c-paper));
+}
+/* Brighter still (founder, 16 Nov 2026): the page's paper lifted toward white, a trace of the sample's cream. */
+.r-mc {
+  background-color: color-mix(in oklab, color-mix(in oklab, #e6e0d0 20%, var(--c-paper)), #fffdf8 35%);
+}
+/* The citation as BibTeX (founder, 16 Nov 2026): a quiet code block on the sheet. */
+.r-mc-bib {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  border: 1px solid rgb(120 92 52 / 14%);
+  background: rgb(255 253 248 / 55%);
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: var(--c-ink);
+}
+
+/* The call to action with a small partner section (comparison page, founder 16 Nov 2026): the list on the left, the
+   partner offer on the right as a sheet in the model card's manner. */
+.r-cta-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: clamp(2rem, 1rem + 4vw, 5rem);
+  align-items: start;
+}
+.r-cta-partner {
+  padding: 1.5rem 1.6rem 1.4rem;
+  border: 1px solid rgb(120 92 52 / 18%);
+  background: color-mix(in oklab, var(--c-paper), #fffdf8 50%);
+  box-shadow: 0 1px 2px rgb(29 30 26 / 10%), 0 6px 16px rgb(29 30 26 / 6%);
+}
+.r-cta-partner h3 {
+  margin: 0 0 0.9rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid rgb(120 92 52 / 16%);
+  font-family: var(--f-display);
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: var(--d-track-l);
+  color: var(--c-ink);
+}
+.r-launch-cta .r-cta-partner p {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+.r-launch-cta .r-cta-partner .r-cta-partner-lead {
+  font-weight: 600;
+  color: var(--c-ink);
+}
+.r-cta-partner-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  background: #c9771c;
+  color: #fffdf8;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.r-cta-partner-link:hover {
+  background: color-mix(in oklab, #c9771c, #131312 18%);
+}
+.r-cta-partner-link svg {
+  width: 14px;
+  height: 14px;
+}
+.r-launch-cta .r-cta-partner .r-cta-partner-mail {
+  margin: 0.9rem 0 0;
+  font-size: 0.9rem;
+}
+.r-cta-partner-mail a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgb(201 119 28 / 60%);
+  text-underline-offset: 0.18em;
+}
+@media (max-width: 900px) {
+  .r-cta-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* The citation's widest line (93 characters) inside the card on desktop without scrolling (founder, 16 Nov 2026). */
+.r-mc-bib {
+  font-size: 0.7rem;
+}
+/* Bigger again (founder, 16 Nov 2026), and still without scrolling: the citation's row puts its label above the block,
+   so the block takes the card's full width. */
+.r-mc-bib {
+  font-size: 0.8125rem;
+}
+/* .r-mc-rows > div:has(.r-mc-bib) { grid-template-columns: minmax(0, 1fr); gap: 0.6rem; }
+   (founder, 16 Nov 2026: back to the label column, as at first) */
+/* The original size (founder, 16 Nov 2026: "I meant the original"). */
+.r-mc-bib {
+  font-size: 0.75rem;
+}
+/* No sideways scrolling (founder, 16 Nov 2026): 0.74rem, and where a line still does not fit it wraps instead (the copied
+   text keeps its own line breaks). */
+.r-mc-bib {
+  overflow-x: visible;
+  font-size: 0.74rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+/* The card's lists with the fields' square outline bullet (founder, 16 Nov 2026). */
+.r-mc-rows ul {
+  padding-left: 0;
+  list-style: none;
+}
+.r-mc-rows li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6em;
+}
+.r-mc-rows li::before {
+  content: '';
+  flex: none;
+  width: 0.42em;
+  height: 0.42em;
+  box-sizing: border-box;
+  border: 1.5px solid var(--c-teal-ink);
+  transform: translateY(-0.12em);
+}
+
+/* The application areas' title (founder, 16 Nov 2026): as "SDM-1 can" above, centred over the five fields. */
+.r-launch-fields--airy .r-fields-h2 {
+  /* margin: 0 0 3rem; (the small head) */
+  /* margin: 0 auto 5.5rem; (founder, 16 Nov 2026: a bit higher still) */
+  margin: 0 auto 7.5rem;
+  text-align: center;
+}
+
+/* "Get access" (16 Nov 2026): the token form in the call to action's left column, and the token once issued. */
+.r-access {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.25rem;
+  max-width: 34rem;
+}
+.r-access-email {
+  display: grid;
+  gap: 0.35rem;
+}
+.r-access-email span,
+.r-access-label {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+}
+.r-access-email input {
+  font: inherit;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid color-mix(in oklab, var(--c-ink) 25%, transparent);
+  background: var(--c-paper);
+  color: var(--c-ink);
+}
+.r-access-email input:focus-visible {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 1px;
+}
+.r-access-box {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.6rem;
+  align-items: start;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+.r-access-box input {
+  margin-top: 0.25rem;
+  accent-color: var(--c-teal-ink);
+}
+.r-access .r-launch-cta-link {
+  justify-self: start;
+  margin-top: 0.25rem;
+  border: 0;
+  cursor: pointer;
+}
+.r-access .r-launch-cta-link:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.r-access-error {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #a23b2a;
+}
+.r-access-token {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid color-mix(in oklab, var(--c-ink) 25%, transparent);
+  background: color-mix(in oklab, var(--c-paper), #fffdf8 50%);
+}
+.r-access-token code {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--f-mono);
+  font-size: 0.85rem;
+}
+.r-access-note {
+  margin: 0;
+  font-size: 0.88rem;
+}
+.r-access-copy,
+.r-access-tabs button {
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid color-mix(in oklab, var(--c-ink) 25%, transparent);
+  background: transparent;
+  color: var(--c-ink);
+  cursor: pointer;
+}
+.r-access-tabs {
+  display: flex;
+  gap: 0.4rem;
+}
+.r-access-tabs [aria-selected="true"] {
+  background: var(--c-ink);
+  color: var(--c-paper);
+}
+.r-access-tabs .r-access-copy {
+  margin-left: auto;
+}
+.r-access-snippet pre {
+  margin: 0.5rem 0 0;
+  padding: 0.8rem;
+  overflow-x: auto;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  background: color-mix(in oklab, var(--c-ink) 5%, var(--c-paper));
+}
+
+/* The data protection information, folded under the boxes (16 Nov 2026). */
+.r-access-info {
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+.r-access-info summary {
+  cursor: pointer;
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.r-access-info dl {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.7rem 0 0;
+  padding: 0.8rem 0.9rem;
+  border-left: 2px solid color-mix(in oklab, var(--c-ink) 18%, transparent);
+}
+.r-access-info dt {
+  font-weight: 600;
+}
+.r-access-info dd {
+  margin: 0;
+}
+
+/* The Get access card (founder, 16 Nov 2026): "Try SDM-1" opens the form over the page. */
+button.r-launch-access,
+button.r-launch-cta-link {
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+}
+button.r-launch-cta-link {
+  border: 0;
+  background: var(--c-ink);
+}
+.r-access-card {
+  /* Centred on the screen (founder, 16 Nov 2026): the site's reset takes away the dialog's own auto margins. */
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  height: fit-content;
+  width: min(36rem, calc(100vw - 2rem));
+  max-height: calc(100svh - 2rem);
+  overflow-y: auto;
+  padding: 1.6rem 1.7rem 1.5rem;
+  border: 1px solid rgb(120 92 52 / 18%);
+  background: color-mix(in oklab, var(--c-paper), #fffdf8 50%);
+  color: var(--c-ink);
+  box-shadow: 0 1px 2px rgb(29 30 26 / 10%), 0 18px 48px rgb(29 30 26 / 18%);
+}
+.r-access-card::backdrop {
+  background: rgb(29 30 26 / 35%);
+}
+.r-access-card[open] {
+  animation: r-access-open 0.18s ease-out;
+}
+@keyframes r-access-open {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .r-access-card[open] {
+    animation: none;
+  }
+}
+.r-access-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid rgb(120 92 52 / 18%);
+}
+.r-access-card-head h2 {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.r-access-card-close {
+  border: 0;
+  background: transparent;
+  color: var(--c-ink);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.r-access-card-lead {
+  margin: 0.9rem 0 0;
+}
+.r-access-card .r-access {
+  margin-top: 1rem;
+  max-width: none;
+}
+/* The protein picture's helix (founder, 16 Nov 2026: a protein structure). */
+.r-bench-pic-helix {
+  fill: none;
+  stroke: var(--c-teal-ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* The protein expression result under the title as a card (founder, 16 Nov 2026): the Get access card's light paper,
+   border and shadow, so it stands off the page. */
+.r-launch-cfe .r-show-panel {
+  padding: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+  border: 1px solid rgb(120 92 52 / 18%);
+  background: color-mix(in oklab, var(--c-paper), #fffdf8 50%);
+  box-shadow:
+    0 1px 2px rgb(29 30 26 / 10%),
+    0 10px 28px rgb(29 30 26 / 8%);
+}
+/* The card's title (founder, 16 Nov 2026), in the Get access card's head style. */
+.r-cfe-card-title {
+  margin: 0 0 1.25rem;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+/* The arrow down from the title screen (founder, 16 Nov 2026): thin, in the page's green, centred in the gap under the
+   introduction; a click scrolls to the next section. */
+.r-launch-hero--tree {
+  position: relative;
+}
+.r-launch-down {
+  position: absolute;
+  left: 50%;
+  bottom: max(1rem, calc(var(--r-screen-gap) / 2 - 1.25rem));
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.5rem;
+  color: var(--c-teal);
+  opacity: 0.75;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.r-launch-down svg {
+  width: 1.75rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.r-launch-down:hover,
+.r-launch-down:focus-visible {
+  opacity: 1;
+  transform: translate(-50%, 0.2rem);
+}
+.r-launch-down:focus-visible {
+  outline: 1px solid var(--c-teal);
+  outline-offset: 2px;
+}
+#cell-free-section {
+  scroll-margin-top: calc(var(--s-header, 76px) + 1rem);
+}
+@media (prefers-reduced-motion: no-preference) {
+  html:has(.r-launch-down) {
+    scroll-behavior: smooth;
+  }
+}
+/* The card's title, corrected (founder, 16 Nov 2026): without the prose headings' number and rule (.w-prose h2 in
+   writings.css), centred, and set in the card's top padding so the card is no taller than before. */
+.r-launch-cfe .r-show-panel {
+  --r-cfe-pad: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+  position: relative;
+  padding: var(--r-cfe-pad);
+}
+.r-launch-cfe .r-cfe-card-title {
+  position: absolute;
+  top: calc(var(--r-cfe-pad) / 2);
+  left: var(--r-cfe-pad);
+  right: var(--r-cfe-pad);
+  transform: translateY(-50%);
+  margin: 0;
+  counter-increment: none;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.r-launch-cfe .r-cfe-card-title::before {
+  content: none;
+}
+.r-launch-cfe .r-cfe-card-title + * {
+  margin-top: 0;
+}
+/* The arrow's target (founder, 16 Nov 2026): a point at the arrow's bottom edge, brought to just under the site
+   header (the root's scroll padding is the header plus 16px; the negative margin takes the 16px back), so the arrow
+   scrolls out of view. */
+.r-launch-down-target {
+  position: absolute;
+  left: 0;
+  bottom: max(1rem, calc(var(--r-screen-gap) / 2 - 1.25rem));
+  width: 1px;
+  height: 0;
+  scroll-margin-top: -16px;
+}
+/* The card's title in the page's title style (founder, 16 Nov 2026: as "Application Areas", .r-fields-title), back in
+   the flow above the card's content (it no longer fits the top padding). */
+.r-launch-cfe .r-cfe-card-title {
+  position: static;
+  transform: none;
+  margin: 0 auto clamp(1.75rem, 1.25rem + 1.5vw, 2.75rem);
+  max-width: 40rem;
+  text-align: center;
+  text-wrap: balance;
+  text-transform: none;
+  font-family: var(--f-display);
+  font-weight: 200;
+  font-size: clamp(2rem, 1.4rem + 2.2vw, 3.4rem);
+  line-height: 1.1;
+  letter-spacing: var(--d-track-l);
+  color: var(--c-ink);
+}
+/* On one line (founder, 16 Nov 2026): the reading width and balance removed; smaller on narrow screens so it fits. */
+.r-launch-cfe .r-cfe-card-title {
+  max-width: none;
+  white-space: nowrap;
+  text-wrap: nowrap;
+  font-size: clamp(1.3rem, 0.6rem + 3.2vw, 3.4rem);
+}
+/* Sized by the card's width (container units), so the one line fits on any screen: about 13.5em of text. */
+.r-launch-cfe .r-show-panel {
+  container-type: inline-size;
+}
+.r-launch-cfe .r-cfe-card-title {
+  font-size: min(3.4rem, 6.6cqi);
+}
+/* Corrected (founder, 16 Nov 2026: the arrow still showed): the site header hides on scrolling down and is
+   translucent, so the arrow's bottom edge goes to the very top of the window, the root's whole scroll padding
+   (the header plus 16px) taken back. */
+.r-launch-down-target {
+  scroll-margin-top: calc(-1 * (var(--s-header, 76px) + 16px));
+}
+/* "Use case" over the card's title (founder, 16 Nov 2026), centred like it. */
+.r-launch-cfe .r-cfe-card-kicker {
+  margin: 0 0 0.75rem;
+  text-align: center;
+}
+.r-launch-cfe .r-cfe-card-kicker + .r-cfe-card-title {
+  margin-top: 0;
+}
+/* A bit bigger (founder, 16 Nov 2026): was the kicker's 0.75rem. */
+.r-launch-cfe .r-cfe-card-kicker {
+  font-size: 0.9375rem;
+}
+/* "SDM-1 can" lower, in the middle between the use-case card above and the fields' title below (founder, 16 Nov
+   2026). Below it: its own padding (the screen gap) plus the room the fields section leaves over its centred content
+   (about 27rem tall on wide screens); above it: the card section's 4rem. The top padding makes up the difference.
+   On phones the fields stack taller than the window, so both gaps are already the screen gap. */
+/* Only after the card (the original page has no card above it). */
+@media (min-width: 761px) {
+  .r-launch-cfe + .r-launch-can {
+    --r-can-gap: max(4rem, calc((100svh - var(--s-header, 76px) - 28rem) / 2));
+    padding-top: max(
+      0rem,
+      calc(var(--r-can-gap) + max(0rem, (100svh - var(--r-can-gap) - 27rem) / 2) - 4rem)
+    );
+  }
+}
+/* Less (founder, 16 Nov 2026: the top margin was too much): the gap above now equals the section's own bottom
+   padding, the screen gap, without the fields' extra room. */
+@media (min-width: 761px) {
+  .r-launch-cfe + .r-launch-can {
+    padding-top: max(0rem, calc(var(--r-can-gap) - 4rem));
+  }
+}
+
+/* Application Areas as a card, reverted (founder, 17 Nov 2026): the styles, kept out of use.
+( Application Areas as a card (founder, 17 Nov 2026: "a card style as well"): the cell-free card's paper, border and
+   shadow around the title and the five fields. The card isolates, so the silhouettes behind each field paint on its
+   paper; where they reach past its edge they lie on the page. Only on the comparison page (v2) for now. )
+.r-fields-card {
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 64rem;
+  margin-inline: auto;
+  padding: clamp(1.75rem, 1rem + 3vw, 3.5rem) clamp(1.25rem, 0.5rem + 3vw, 3.5rem);
+  border: 1px solid rgb(120 92 52 / 18%);
+  background: color-mix(in oklab, var(--c-paper), #fffdf8 50%);
+  box-shadow:
+    0 1px 2px rgb(29 30 26 / 10%),
+    0 10px 28px rgb(29 30 26 / 8%);
+}
+( Inside the card the title sits closer to the fields (was 7.5rem below it on the open page). )
+.r-launch-fields--airy .r-fields-card .r-fields-h2 {
+  margin: 0 auto clamp(3rem, 2rem + 3vw, 5rem);
+}
+( The fields' list is no longer the section's direct child, so ".r-launch-fields--airy > ul" no longer lifts the old
+   ink rule above it. )
+.r-launch-fields--airy .r-fields-card > ul {
+  border-top: 0;
+}
+( As wide as the cell-free card (founder, 17 Nov 2026: "much smaller than the use case"): the full content width and
+   that card's padding. Was max-width: 64rem. )
+.r-fields-card {
+  max-width: none;
+  padding: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+}
+*/
+
+/* Was, the pictures in place of the bullets (founder, 17 Nov 2026: reverted, the bullets back beside them):
+( "SDM-1 can" with a small picture beside each item (founder, 17 Nov 2026), in the benchmark cards' style
+   (components/release/CanPictures.tsx), in place of the square bullet. Only where the list has --pics (v2). )
+.r-can-list.r-can-list--pics {
+  gap: 2rem;
+}
+.r-can-list--pics li {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 28rem);
+  column-gap: 1.5rem;
+  align-items: center;
+  padding-left: 0;
+}
+.r-can-list--pics li::before {
+  content: none;
+}
+.r-can-list--pics strong {
+  display: block;
+}
+.r-can-pic-box {
+  stroke: var(--c-ink);
+  stroke-width: 1.5;
+}
+@media (max-width: 30rem) {
+  .r-can-list--pics li {
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    column-gap: 1rem;
+  }
+}
+*/
+
+/* "SDM-1 can" with a small picture beside each item (founder, 17 Nov 2026: the list's own style, bullets kept): the
+   picture to the left, then the item as before, its square bullet and the bold lead on its own line. Only where the
+   list has --pics (v2). */
+.r-can-list--pics li {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  column-gap: 1.25rem;
+  align-items: center;
+  padding-left: 0;
+}
+.r-can-list--pics li::before {
+  content: none;
+}
+.r-can-list--pics li > div {
+  position: relative;
+  padding-left: 1.3em;
+}
+.r-can-list--pics li > div::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0.42em;
+  height: 0.42em;
+  margin-top: 0.62em;
+  border: 1.5px solid var(--c-amber-ink);
+}
+.r-can-list--pics li > div > strong {
+  display: block;
+}
+.r-can-pic-box {
+  stroke: var(--c-ink);
+  stroke-width: 1.5;
+}
+@media (max-width: 30rem) {
+  .r-can-list--pics li {
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    column-gap: 0.85rem;
+  }
+}
+/* The empty search space in the "start without prior knowledge" picture: its edge dashed, its corners (the bounds)
+   drawn firm. */
+.r-can-pic-open {
+  stroke-dasharray: 3 3;
+}
+.r-can-pic-corner {
+  stroke: var(--c-teal-ink);
+}
+
+/* ---- The benchmarks as a radar (comparison page, founder 17 Nov 2026): components/release/BenchmarkRadar.tsx ----
+   SDM-1 in the teal ink, solid, round marks; Bayesian optimization in a mid grey, dashed, square marks (checked with
+   the palette validator on paper: colour-blind and normal-vision separation pass; the grey is the baseline on
+   purpose). Grid and labels recessive. */
+.r-radar {
+  margin: clamp(3rem, 2rem + 3vw, 5rem) auto 0;
+  max-width: 52rem;
+}
+.r-radar-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.5rem;
+}
+.r-radar-controls .r-bench-chips {
+  margin: 0;
+}
+.r-radar-plot {
+  position: relative;
+  margin-top: 1rem;
+}
+.r-radar-plot svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.r-radar-ring {
+  fill: none;
+  stroke: rgb(19 19 18 / 10%);
+  stroke-width: 1;
+}
+.r-radar-spoke {
+  stroke: rgb(19 19 18 / 10%);
+  stroke-width: 1;
+}
+.r-radar-spoke.is-active {
+  stroke: rgb(19 19 18 / 35%);
+}
+.r-radar-tick {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  fill: var(--c-muted);
+}
+.r-radar-area {
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.r-radar-area--model {
+  fill: rgb(42 102 105 / 12%);
+  stroke: #2a6669;
+}
+.r-radar-area--bo {
+  fill: rgb(138 133 128 / 10%);
+  stroke: #8a8580;
+  stroke-dasharray: 5 4;
+}
+.r-radar-dot {
+  stroke: var(--c-paper);
+  stroke-width: 2;
+  pointer-events: none;
+}
+.r-radar-dot--model {
+  fill: #2a6669;
+}
+.r-radar-dot--bo {
+  fill: #8a8580;
+}
+.r-radar-label {
+  font-family: var(--f-serif);
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--c-ink);
+}
+.r-radar-label .r-radar-detail {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-weight: 400;
+  fill: var(--c-muted);
+}
+.r-radar-label.is-active {
+  fill: #2a6669;
+}
+.r-radar-hit {
+  fill: transparent;
+  cursor: help;
+  outline: none;
+}
+.r-radar-hit:focus-visible {
+  fill: rgb(42 102 105 / 6%);
+}
+.r-radar-tip {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 13rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgb(120 92 52 / 18%);
+  background: color-mix(in oklab, var(--c-paper), #fffdf8 50%);
+  box-shadow: 0 6px 18px rgb(29 30 26 / 10%);
+  font-family: var(--f-serif);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--c-ink);
+  pointer-events: none;
+}
+.r-radar-tip p {
+  margin: 0;
+}
+.r-radar-tip-name {
+  margin-bottom: 0.35rem !important;
+  font-weight: 600;
+}
+.r-radar-tip-vs {
+  margin-top: 0.35rem !important;
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--c-muted);
+}
+.r-radar-key {
+  display: inline-block;
+  width: 1.4rem;
+  height: 0;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  border-top: 2px solid #2a6669;
+}
+.r-radar-key--bo {
+  border-top: 2px dashed #8a8580;
+}
+.r-radar-caption {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  text-align: center;
+  font-family: var(--f-serif);
+  font-size: 0.95rem;
+  color: var(--c-muted);
+}
+.r-radar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.5rem;
+  color: var(--c-ink);
+}
+@media (max-width: 640px) {
+  .r-radar-label {
+    font-size: 19px;
+  }
+  .r-radar-label .r-radar-detail {
+    display: none;
+  }
+  .r-radar-tip {
+    position: static;
+    margin-top: 0.75rem;
+  }
+}
+/* The text as wide as without the pictures (founder, 17 Nov 2026: the lines got narrower): the list wider by the
+   picture's column and its gap, so the text column keeps the list's 44rem. */
+.r-can-list.r-can-list--pics {
+  max-width: calc(44rem + 4.5rem + 1.25rem);
+}
+@media (max-width: 30rem) {
+  .r-can-list.r-can-list--pics {
+    max-width: calc(44rem + 3.5rem + 0.85rem);
+  }
+}
+
+/* "SDM-1 can" on the left, the benchmark radar on the right (founder, 17 Nov 2026). The list as before, without the
+   pictures: the same 44rem measure and type. One column on narrower screens, the radar under the list. */
+.r-can-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: clamp(2rem, 1rem + 4vw, 5rem);
+  align-items: center;
+}
+.r-can-split .r-radar {
+  margin: 0;
+  max-width: none;
+}
+@media (max-width: 960px) {
+  .r-can-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .r-can-split .r-radar {
+    margin-top: 1rem;
+  }
+}
+
+/* ---- The use case cards (founder, 17 Nov 2026): components/release/UseCaseCards.tsx ----
+   The card as before in the middle, a thin chevron on each side in the page's green, like the arrow under the title.
+   All cards in one grid cell, each stretched to the tallest, so blank cards are the same size. */
+.r-uc {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: clamp(0.5rem, 0.25rem + 1.5vw, 1.75rem);
+}
+.r-uc-track {
+  display: grid;
+  min-width: 0;
+}
+.r-uc-slide {
+  grid-area: 1 / 1;
+  display: grid;
+  min-width: 0;
+  visibility: hidden;
+}
+.r-uc-slide.is-active {
+  visibility: visible;
+}
+.r-uc-slide > .r-show-panel {
+  box-sizing: border-box;
+  width: 100%;
+}
+.r-uc-arrow {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 3.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--c-teal);
+  opacity: 0.75;
+  cursor: pointer;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+.r-uc-arrow svg {
+  width: 1rem;
+  height: 1.75rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.r-uc-arrow:hover,
+.r-uc-arrow:focus-visible {
+  opacity: 1;
+}
+.r-uc-arrow--prev:hover {
+  transform: translateX(-0.2rem);
+}
+.r-uc-arrow--next:hover {
+  transform: translateX(0.2rem);
+}
+.r-uc-arrow:focus-visible {
+  outline: 1.5px solid var(--c-teal);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .r-uc-arrow {
+    transition: none;
+  }
+  .r-uc-arrow:hover {
+    transform: none;
+  }
+}
+/* On a phone the arrows sit under the card, side by side. */
+@media (max-width: 640px) {
+  .r-uc {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 0.5rem;
+  }
+  .r-uc-track {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+  .r-uc-arrow--prev {
+    grid-row: 2;
+    justify-self: end;
+  }
+  .r-uc-arrow--next {
+    grid-row: 2;
+    justify-self: start;
+  }
+}
+/* The arrows in the page's side margin, so the card keeps its width (17 Nov 2026): the arrow and its gap take 4rem,
+   the margin's full width on wide screens; on narrower ones the card gives up only the difference. */
+@media (min-width: 641px) {
+  /* Only where the arrows are (the user, 17 Nov 2026: one card needs no room for them). */
+  .r-uc:has(.r-uc-arrow) {
+    column-gap: 1.25rem;
+    margin-inline: calc(-1 * var(--s-gutter));
+  }
+}
+
+/* Get access, Partner with us and the questions as three columns, below Application Areas (founder, 17 Nov 2026).
+   Two columns on mid-size screens, the questions then across both; one on phones. */
+.r-cta-split.r-cta-split--three {
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: clamp(2rem, 1rem + 3vw, 4rem);
+}
+.r-cta-faq .r-faq {
+  margin-top: 0.25rem;
+}
+.r-launch-cta .r-cta-faq .r-faq details p {
+  max-width: none;
+  font-size: 1rem;
+}
+@media (max-width: 1100px) {
+  .r-cta-split.r-cta-split--three {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .r-cta-split--three .r-cta-faq {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 700px) {
+  .r-cta-split.r-cta-split--three {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* A very small bit brighter (founder, 17 Nov 2026): white at 45% instead of 35%. */
+.r-mc {
+  background-color: color-mix(in oklab, color-mix(in oklab, #e6e0d0 20%, var(--c-paper)), #fffdf8 45%);
+}
+/* More (founder, 17 Nov 2026: white at 60%), changed back to 45%:
+.r-mc {
+  background-color: color-mix(in oklab, color-mix(in oklab, #e6e0d0 20%, var(--c-paper)), #fffdf8 60%);
+} */
+/* The share of white tunable by the dev-only slider (TuneModelCard.tsx, 17 Nov 2026); 45% unless it is moved. */
+.r-mc {
+  background-color: color-mix(in oklab, color-mix(in oklab, #e6e0d0 20%, var(--c-paper)), #fffdf8 var(--r-mc-white, 45%));
+}
+.r-tune {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 50;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--c-line-3);
+  background: var(--c-paper);
+  box-shadow: 0 6px 18px rgb(29 30 26 / 14%);
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  color: var(--c-ink);
+}
+.r-tune label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.r-tune input {
+  width: 10rem;
+  accent-color: var(--c-teal-ink);
+}
+.r-tune output {
+  min-width: 2.5rem;
+  text-align: right;
+}
+/* Chosen with the slider (founder, 17 Nov 2026): white at 85%. The slider is removed from the page; .r-tune unused. */
+.r-mc {
+  background-color: color-mix(in oklab, color-mix(in oklab, #e6e0d0 20%, var(--c-paper)), #fffdf8 85%);
+}
+/* "Sequential Decision Model" under the name easier to read (founder, 17 Nov 2026): the ink instead of the muted grey,
+   a little heavier. */
+/* Changed back (founder, 17 Nov 2026: before was better):
+.r-mc-type {
+  color: var(--c-ink);
+  font-weight: 500;
+} */
+/* "Sequential Decision Model" a bit bigger instead (founder, 17 Nov 2026); was 1rem, the muted grey kept. */
+.r-mc-type {
+  /* font-size: 1.2rem; (founder, 17 Nov 2026: less) */
+  font-size: 1.1rem;
+}
+
+/* The model card on the comparison page (founder, 17 Nov 2026): more room above the summary (was 1.25rem), and the
+   Access row's Get access button, smaller than the call to action's, beside "Via API.". */
+.r-mc--next .r-mc-lead {
+  margin-top: 2.25rem;
+}
+.r-mc-access {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+}
+.r-mc-access .r-launch-cta-link.r-mc-access-link {
+  margin-top: 0;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.6875rem;
+}
+/* The Access row's button as "Try SDM-1" at the top (founder, 17 Nov 2026): the outlined button, in the row's flow. */
+.r-mc-access .r-launch-access.r-mc-access-link {
+  margin: 0;
+  padding: 0.6em 0.95em;
+  font-size: 0.75rem;
+}
+/* "Questions" without the prose's section number and its rule (founder, 17 Nov 2026), level with "Get access". */
+.r-cta-faq.w-prose h2::before {
+  content: none;
+}
+.r-cta-faq.w-prose h2 {
+  counter-increment: none;
+  margin-top: 0;
+}
+
+/* Two columns again (founder, 17 Nov 2026): Partner with us on the left; the FAQ on the right, Get access under it. */
+.r-cta-split.r-cta-split--two {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: clamp(2rem, 1rem + 3vw, 4rem);
+}
+.r-cta-faq-access {
+  margin-top: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+}
+.r-cta-faq.w-prose .r-cta-faq-access h2 {
+  margin-top: 0;
+}
+@media (max-width: 900px) {
+  .r-cta-split.r-cta-split--two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* The pointer to the privacy policy under the data protection information (17 Nov 2026). */
+.r-access-info-more {
+  margin: 0.6rem 0 0;
+  padding-left: 0.9rem;
+}
+.r-access-info-more a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+/* More room above "Data protection information" (founder, 17 Nov 2026: cramped under the optional box); the grid's
+   0.9rem gap plus this. */
+.r-access .r-access-info {
+  margin-top: 0.6rem;
+}
+/* Sides flipped (founder, 17 Nov 2026): the FAQ and Get access on the left, Partner with us on the right; the wider
+   column stays with the FAQ. */
+.r-cta-split.r-cta-split--two.r-cta-split--faq-first {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+}
+@media (max-width: 900px) {
+  .r-cta-split.r-cta-split--two.r-cta-split--faq-first {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Less room under the model card before the footer (founder, 17 Nov 2026: too big). The section after it is empty
+   since the FAQ moved up, so it goes; the card's own bottom padding drops from 5rem where nothing follows it. With the
+   page's 4rem, about 5.5rem in all (was about 9rem). */
+.r-launch-more:empty {
+  display: none;
+}
+.r-launch-card:has(+ .r-launch-more:empty) {
+  padding-bottom: 1.5rem;
+}
+/* The media formulation picture a bit smaller (founder, 17 Nov 2026), centred in its place. */
+.r-bench-pic.r-bench-pic--media {
+  width: 90%;
+  margin-inline: auto;
+}
+/* The T flask's cap in the page's orange (17 Nov 2026). */
+.r-bench-pic-cap {
+  fill: var(--c-orange);
+  stroke: var(--c-amber-ink);
+  stroke-width: 1;
+}
+/* The T flask slightly 3D (17 Nov 2026): its right side a faint tint with the frame's line; the cap's top lighter and
+   its side darker. */
+.r-bench-pic-side {
+  fill: color-mix(in oklab, var(--c-teal-ink) 7%, transparent);
+  stroke: var(--c-line-3);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+.r-bench-pic-cap--top {
+  fill: color-mix(in oklab, var(--c-orange), #fff 30%);
+}
+.r-bench-pic-cap--side {
+  fill: color-mix(in oklab, var(--c-orange), #000 18%);
+}
+/* The T flask's neck front (17 Nov 2026), drawn over the trapezoid's top face. */
+.r-bench-pic-neck {
+  fill: var(--c-paper);
+  stroke: var(--c-line-3);
+  stroke-width: 1;
+}
+/* The cap's faces meet in sharp corners, a box (17 Nov 2026). */
+.r-bench-pic-cap {
+  stroke-linejoin: miter;
+}
+/* The round cap (17 Nov 2026): smooth joins again. */
+.r-bench-pic-cap {
+  stroke-linejoin: round;
+}
+/* The flask's flat top, a shade lighter than its side (17 Nov 2026). */
+.r-bench-pic-side--top {
+  fill: color-mix(in oklab, var(--c-teal-ink) 4%, transparent);
+}
+/* The lid's side half as dark (17 Nov 2026), reverted: the founder meant half as wide.
+.r-bench-pic-cap--side {
+  fill: color-mix(in oklab, var(--c-orange), #000 9%);
+} */
+/* Half as wide and half as dark together (founder, 17 Nov 2026): 9% toward black. */
+.r-bench-pic-cap--side {
+  fill: color-mix(in oklab, var(--c-orange), #000 9%);
+}
+/* The lid's side band without a line of its own (founder, 17 Nov 2026: its left edge showed darker); the lid's outline
+   is drawn again over it. */
+.r-bench-pic-cap.r-bench-pic-cap--side {
+  stroke: none;
+}
+.r-bench-pic-cap-line {
+  fill: none;
+  stroke: var(--c-amber-ink);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+/* ---- The paper Rubik's cube in Application Areas (founder, 17 Nov 2026): components/release/CubeDoor.tsx ----
+   Small, at the section's lower left, cut from the same paper as the field pieces. Clickable at a glance: the pointer,
+   and on hover or focus it lifts, tilts a little, its shadow deepens and a short label appears beside it. A click
+   opens the cube race as a card (the Get access card's dialog, wider). */
+.r-cube-door {
+  position: absolute;
+  left: clamp(1rem, 5vw, 6rem);
+  bottom: calc(var(--r-screen-gap, 4rem) * 0.3);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem;
+  border: 0;
+  background: none;
+  color: var(--c-ink);
+  cursor: pointer;
+}
+.r-cube-door .r-piece {
+  position: static;
+  z-index: auto;
+  display: block;
+  width: 5.25rem;
+  pointer-events: none;
+  transform: rotate(-4deg);
+  transition:
+    transform 0.22s ease,
+    filter 0.22s ease;
+}
+.r-cube-door-label {
+  font-family: var(--f-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-teal-ink);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-0.4rem);
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+}
+.r-cube-door-label::after {
+  content: " \2192";
+}
+.r-cube-door:hover .r-piece,
+.r-cube-door:focus-visible .r-piece {
+  transform: translateY(-5px) rotate(-10deg) scale(1.08);
+  filter: drop-shadow(0 8px 10px rgb(19 19 18 / 22%));
+}
+.r-cube-door:hover .r-cube-door-label,
+.r-cube-door:focus-visible .r-cube-door-label {
+  opacity: 1;
+  transform: none;
+}
+.r-cube-door:focus-visible {
+  outline: 1.5px solid var(--c-teal);
+  outline-offset: 4px;
+}
+/* Touch screens have no hover: the label always shows there. */
+@media (hover: none) {
+  .r-cube-door-label {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .r-cube-door .r-piece,
+  .r-cube-door-label {
+    transition: none;
+  }
+  .r-cube-door:hover .r-piece,
+  .r-cube-door:focus-visible .r-piece {
+    transform: rotate(-4deg);
+  }
+}
+/* On narrow screens, where the field pieces are hidden, the cube stays: in the flow under the fields, centred. */
+@media (max-width: 1100px) {
+  .r-cube-door {
+    position: static;
+    margin: 2.5rem auto 0;
+  }
+  .r-cube-door .r-piece {
+    display: block;
+  }
+}
+.r-access-card.r-cube-card {
+  width: min(64rem, calc(100vw - 2rem));
+}
+.r-cube-card-body {
+  margin-top: 1rem;
+}
+/* The cube coloured as the animated one (founder, 17 Nov 2026), a bit bigger (5.25rem to 6.25rem) and further left
+   (from the section's edge). Its own svg in place of the paper piece; the hover lift and tilt carry over. */
+.r-cube-door {
+  left: clamp(0rem, 1vw, 1rem);
+}
+.r-cube-paper {
+  display: block;
+  width: 6.25rem;
+  height: auto;
+  transform: rotate(-4deg);
+  transition:
+    transform 0.22s ease,
+    filter 0.22s ease;
+}
+.r-cube-door:hover .r-cube-paper,
+.r-cube-door:focus-visible .r-cube-paper {
+  transform: translateY(-5px) rotate(-10deg) scale(1.08);
+  filter: drop-shadow(0 8px 10px rgb(19 19 18 / 22%));
+}
+@media (prefers-reduced-motion: reduce) {
+  .r-cube-paper {
+    transition: none;
+  }
+  .r-cube-door:hover .r-cube-paper,
+  .r-cube-door:focus-visible .r-cube-paper {
+    transform: rotate(-4deg);
+  }
+}
+/* The cube card as wide as the cube race in the showcases (founder, 17 Nov 2026): its content gets the page's content
+   width (as .s-wrap gives the showcase), the card's own side padding added on top; within the screen. Was 64rem. */
+.r-access-card.r-cube-card {
+  width: min(calc(var(--s-max) - 2 * var(--s-gutter) + 3.4rem), calc(100vw - 2rem));
+}
+/* The landscape game's sticker (founder, 17 Nov 2026): the cube's companion at the section's lower right, its label on
+   its left. */
+.r-cube-door.r-cube-door--land {
+  left: auto;
+  right: clamp(0rem, 1vw, 1rem);
+  flex-direction: row-reverse;
+}
+.r-cube-door--land .r-cube-door-label {
+  transform: translateX(0.4rem);
+}
+.r-cube-door--land:hover .r-cube-door-label,
+.r-cube-door--land:focus-visible .r-cube-door-label {
+  transform: none;
+}
+.r-cube-door--land:hover .r-cube-paper,
+.r-cube-door--land:focus-visible .r-cube-paper {
+  transform: translateY(-5px) rotate(6deg) scale(1.08);
+}
+/* Narrow screens: both stickers in the flow under the fields, side by side. */
+@media (max-width: 1100px) {
+  .r-cube-door.r-cube-door--land {
+    position: static;
+    margin: 1rem auto 0;
+  }
+}
+/* In the card the panel's own top padding (2rem) gives the room under the card's head. */
+.r-cube-card .r-cube-card-body.r-show-panel {
+  margin-top: 0;
+}
+
+/* Try it's "click" hint (founder, 17 Nov 2026): over the plot's upper right, the arrow pointing into its middle, as in
+   the founder's sketch; it lets clicks through to the plot and bobs gently. */
+.r-try-hint-click {
+  position: absolute;
+  left: 55%;
+  top: 24%;
+  width: clamp(5.5rem, 22%, 8rem);
+  height: auto;
+  pointer-events: none;
+  animation: r-try-hint-bob 2.4s ease-in-out infinite;
+}
+@keyframes r-try-hint-bob {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-4px, 4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .r-try-hint-click {
+    animation: none;
+  }
+}
+/* The "click" hint in a comic style (founder, 17 Nov 2026): Comic Sans, standing still. */
+.r-try-hint-click {
+  animation: none;
+  width: clamp(6rem, 24%, 8.5rem);
+}
+.r-try-hint-word {
+  font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Comic Neue', cursive;
+  font-size: 21px;
+  font-weight: 700;
+}
+/* "click" bigger (founder, 17 Nov 2026): 28px in the hint's box (was 21), the box a little wider. */
+.r-try-hint-click {
+  width: clamp(7rem, 27%, 10rem);
+}
+.r-try-hint-word {
+  font-size: 28px;
+}
+
+/* A full-width line between sections (founder, 17 Nov 2026: above Benchmarks, as the FAQ section's own lines). */
+.r-launch-rule {
+  border-top: 1px solid var(--c-line-2);
+}
+/* Benchmarks right before the FAQ section: their bottom padding and its top margin together were a wide gap. */
+.r-launch-rule + .r-launch-bench {
+  padding-top: clamp(2.5rem, 2rem + 3vw, 4rem);
+}
+.r-launch-bench + .r-launch-cta {
+  margin-top: 0;
+}
+/* Less room between the model card and the footer's moving line (founder, 17 Nov 2026: still a bit much), on this page
+   only: the page's bottom padding 1rem (was 4rem) where the card ends it, and the footer's dawn a little shorter
+   (rises 7 to 11rem, was 9 to 14rem), its gradient otherwise the same. */
+.r-launch--v2:has(.r-launch-more:empty) {
+  padding-bottom: 1rem;
+}
+body:has(.r-launch--v2 .r-launch-more:empty) .s-footer {
+  --foot-rise: clamp(7rem, 3.5rem + 7vw, 11rem);
+}
+
+/* Use Case #2 (17 Nov 2026): the generation in which Kim and Audet first reached the top 1%, a faint band. */
+.r-media-gen {
+  fill: rgb(138 85 9 / 7%);
+}
+/* The synthesis picture (17 Nov 2026): the made molecule's bonds in its fill colour; a failed attempt's cross in orange. */
+.r-bench-pic-bond {
+  stroke: var(--c-teal-ink);
+  stroke-opacity: 0.75;
+  stroke-width: 2.4;
+}
+.r-bench-pic-fail {
+  fill: none;
+  stroke: var(--c-orange);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+/* RECOB's response surface (17 Nov 2026): the wireframe in the teal ink, light. */
+.r-bench-pic-mesh {
+  fill: none;
+  stroke: var(--c-teal-ink);
+  stroke-opacity: 0.55;
+  stroke-width: 0.9;
+  stroke-linejoin: round;
+}
+/* The kinase synthesis in skeletal formulas (17 Nov 2026): bonds and atoms in the teal ink; each atom label on a patch of
+   the hover card's paper, so the bonds stop short of it. */
+.r-bench-pic-bondline {
+  stroke: var(--c-teal-ink);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+.r-bench-pic-atom {
+  font-family: var(--f-sans, system-ui, sans-serif);
+  font-size: 5.6px;
+  font-weight: 600;
+  fill: var(--c-teal-ink);
+  text-anchor: middle;
+}
+.r-bench-pic-atom-bg {
+  fill: var(--c-paper);
+}
+/* Atoms as dots (founder, 17 Nov 2026: no letters): nitrogen filled in the teal ink, chlorine an open ring in amber. */
+.r-bench-pic-atom-dot {
+  fill: var(--c-teal-ink);
+}
+.r-bench-pic-atom-ring {
+  fill: var(--c-paper);
+  stroke: var(--c-amber-ink);
+  stroke-width: 1.4;
+}
+/* Atoms as dots (founder, 17 Nov 2026: no letters): nitrogen filled in the teal ink, chlorine an open ring in amber. */
+.r-bench-pic-atom-dot {
+  fill: var(--c-teal-ink);
+}
+.r-bench-pic-atom-ring {
+  fill: var(--c-paper);
+  stroke: var(--c-amber-ink);
+  stroke-width: 1.4;
+}
+/* The candidate molecules (17 Nov 2026): bold skeletal lines in the teal ink, the chosen one in the page's orange. */
+.r-bench-pic-molecule {
+  fill: none;
+  stroke: var(--c-teal-ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.r-bench-pic-molecule--chosen {
+  stroke: var(--c-orange);
+  stroke-width: 2.2;
+}
+/* The perovskite cell (17 Nov 2026): back edges dashed; the octahedron's edges in the teal ink; the A-site cations in
+   orange with an amber edge. */
+.r-bench-pic-frame--back {
+  stroke-dasharray: 2 2;
+}
+.r-bench-pic-oct {
+  fill: none;
+  stroke: var(--c-teal-ink);
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+}
+.r-bench-pic-oct--back {
+  stroke-opacity: 0.45;
+  stroke-width: 1;
+  stroke-dasharray: 1.6 1.6;
+}
+.r-bench-pic-cation {
+  fill: var(--c-orange);
+  stroke: var(--c-amber-ink);
+  stroke-width: 0.8;
+}
+/* The perovskite's B atom at the cell's centre, seen through the octahedron (17 Nov 2026). */
+.r-bench-pic-b {
+  fill: var(--c-muted);
+}
+/* The materials picture a bit smaller (founder, 17 Nov 2026), centred in its place, as the media picture. */
+.r-bench-pic.r-bench-pic--materials {
+  width: 85%;
+  margin-inline: auto;
+}
+/* Life science: more room between the protein and the molecules below it (founder, 17 Nov 2026). */
+.r-bench-pics > .r-bench-pic--molecules {
+  margin-top: 0.75rem;
+}
+/* Life science: more room above the protein, between it and the media picture (founder, 17 Nov 2026); a first try
+   pulled it up (margin-top: -0.5rem), the wrong way. */
+.r-bench-pics > .r-bench-pic--protein {
+  margin-top: 0.75rem;
+}
+/* The plate picture a bit smaller (founder, 17 Nov 2026), centred, as the materials and media pictures. */
+.r-bench-pic.r-bench-pic--plate {
+  width: 85%;
+  margin-inline: auto;
+}
+
+/* Use Case #2 (founder, 17 Nov 2026: cleaner): its first headline line may wrap, being longer than Use Case #1's. */
+@media (min-width: 901px) {
+  .r-launch--next .r-cfe--media .r-cfe-line {
+    white-space: normal;
+  }
+}
+/* Machine-learning tuning's pictures (17 Nov 2026): learning curves (grey runs, the best in teal, a failed one dashed) and
+   a score gauge after the tree. */
+.r-bench-pic-run {
+  fill: none;
+  stroke: var(--c-line-3);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.r-bench-pic-run--failed {
+  stroke-dasharray: 2 2;
+}
+.r-bench-pic-run--best {
+  stroke: var(--c-teal-ink);
+  stroke-width: 2;
+}
+.r-bench-pic-gauge {
+  fill: none;
+  stroke: rgb(19 19 18 / 15%);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+.r-bench-pic-gauge--fill {
+  stroke: var(--c-teal-ink);
+}
+/* The tree's partition (17 Nov 2026): regions tinted by the class they predict, the splits in teal, the points in the
+   two classes' colours. */
+.r-bench-pic-region--a {
+  fill: rgb(42 102 105 / 10%);
+}
+.r-bench-pic-region--b {
+  fill: rgb(226 159 55 / 14%);
+}
+.r-bench-pic-split {
+  fill: none;
+  stroke: var(--c-teal-ink);
+  stroke-width: 1.3;
+}
+.r-bench-pic-point--a {
+  fill: var(--c-teal-ink);
+}
+.r-bench-pic-point--b {
+  fill: var(--c-orange);
+}
+
+/* Parametric CAD as an engineering drawing (founder, 17 Nov 2026): the part, its bolt holes with centre marks, the
+   hidden target behind it dashed, and dimension lines, the searched one in orange. */
+.r-bench-pic-part {
+  fill: color-mix(in oklab, var(--c-teal-ink) 12%, transparent);
+  stroke: var(--c-teal-ink);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+.r-bench-pic-ghost {
+  fill: none;
+  stroke: var(--c-line-3);
+  stroke-width: 1.2;
+  stroke-dasharray: 3 2.5;
+  stroke-linejoin: round;
+}
+.r-bench-pic-hole {
+  fill: var(--c-paper);
+  stroke: var(--c-teal-ink);
+  stroke-width: 1.3;
+}
+.r-bench-pic-centre {
+  fill: none;
+  stroke: var(--c-teal-ink);
+  stroke-opacity: 0.5;
+  stroke-width: 0.7;
+}
+.r-bench-pic-ext {
+  fill: none;
+  stroke: rgb(19 19 18 / 30%);
+  stroke-width: 0.7;
+}
+.r-bench-pic-dim {
+  fill: none;
+  stroke: var(--c-muted);
+  stroke-width: 1;
+}
+.r-bench-pic-dim--tip {
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.r-bench-pic-dim--driving {
+  stroke: var(--c-orange);
+  stroke-width: 1.4;
+}
+.r-bench-pic-dim--driving.r-bench-pic-dim--tip {
+  stroke-width: 1.6;
+}
+/* The score's hover card (17 Nov 2026): a scale from random search to the optimum. */
+.r-bench-pic-fill-line {
+  stroke: var(--c-teal-ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.r-bench-pic-scale {
+  font-family: var(--f-mono);
+  font-size: 8px;
+  fill: var(--c-muted);
+}
+
+/* The field a use case belongs to (founder, 17 Nov 2026): at the card's top left, in the page's mono capitals, while
+   "Use Case #n" stays centred above the title. */
+.r-launch-cfe .r-uc-domain {
+  position: absolute;
+  top: var(--r-cfe-pad);
+  left: var(--r-cfe-pad);
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--c-muted);
+}
+/* Too narrow for both: the field goes above the kicker, centred. */
+@media (max-width: 640px) {
+  .r-launch-cfe .r-uc-domain {
+    position: static;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+}
+
+/* Use Case #2 (17 Nov 2026): the other replays' best-so-far behind the highlighted one, and the whole screen's yields
+   as a histogram against the plot's right edge. */
+.r-cfe-run {
+  fill: none;
+  stroke: var(--c-teal-ink);
+  stroke-opacity: 0.18;
+  stroke-width: 1;
+}
+.r-suzuki-hist {
+  fill: var(--c-muted);
+  opacity: 0.35;
+}
+.r-cfe-key--runs::before {
+  background: color-mix(in oklab, var(--c-teal-ink) 30%, transparent);
+}
+/* The replays as one soft band (the user, 17 Nov 2026), in place of 29 faint lines. */
+.r-cfe-band {
+  fill: color-mix(in oklab, var(--c-teal-ink) 14%, transparent);
+  stroke: none;
+}
+/* The second line of the plot's SDM-1 label (17 Nov 2026): where the line reaches the top 1%. Bold and in the model's
+   own colour (the user, 17 Nov 2026: more visible); was 400 at 10px in the muted grey. */
+.r-cfe-label-sub {
+  font-weight: 700;
+  font-size: 10.5px;
+  /* The page's ink, not the model's green (the user, 17 Nov 2026). */
+  fill: var(--c-ink);
+}
+/* The top-1% field on Use Case #2 (the user, 17 Nov 2026: big enough to recognise): stronger than the 8% band, with its
+   lower edge drawn so the threshold is clear. */
+.r-cfe-top.r-cfe-top--strong {
+  opacity: 0.22;
+}
+.r-cfe-top-edge {
+  stroke: var(--c-teal-ink);
+  stroke-opacity: 0.45;
+  stroke-width: 1;
+  stroke-dasharray: 3 2.5;
+}
+/* Every condition the robot measured, as faint dots behind the run (the user, 17 Nov 2026): one path of zero-length
+   segments with round caps, so 3,696 dots cost one element. */
+.r-suzuki-cloud {
+  fill: none;
+  stroke: var(--c-muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.16;
+}
+/* SDM-1's own experiments on Use Case #2: larger than the other plots' dots and ringed in the paper colour, so they
+   read against the screen's grey ones, but back to their old intensity (the user, 17 Nov 2026: less intense again;
+   was opacity 1). */
+.r-cfe-dot.r-suzuki-pick {
+  opacity: 0.35;
+  stroke: var(--c-paper);
+  stroke-width: 1;
+}
+/* Use Case #2's figures (the user's screenshot, 17 Nov 2026: the three labels ran into each other): equal columns and
+   labels that wrap, since they are longer than Use Case #1's "fewer experiments". */
+.r-cfe--suzuki .r-cfe-figures {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem 1.5rem;
+}
+.r-cfe--suzuki .r-cfe-figures dd {
+  white-space: normal;
+  text-wrap: balance;
+}
+/* With one card there are no arrows, so the card keeps the page's own width (the user, 17 Nov 2026). */
+.r-uc.r-uc--single {
+  display: block;
+  margin-inline: 0;
 }

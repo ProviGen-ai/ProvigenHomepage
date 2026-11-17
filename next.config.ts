@@ -39,8 +39,11 @@ export const retired: [source: string, destination: string][] = [
   /* Taken off the site on 8 Oct 2026 (founder); archived in ../output/provigen-website-removed-2026-10-08/. */
   ['/writings/three-papers-lab-in-the-loop', '/writings'],
   ['/writings/as-fast-as-its-experiments', '/writings'],
-  ['/blog/:slug', '/writings'],
-  ['/blog', '/writings'],
+  /* This branch still carries the old catch-alls, from when /blog was the former site's path; on main they are gone and
+     /blog is the index. The release lives at /blog/introducing-sdm-1 (17 Nov 2026), so the catch-all is off here, or it
+     would swallow the article. The single old post above keeps its own rule. */
+  // ['/blog/:slug', '/writings'],
+  // ['/blog', '/writings'],
   ['/demo', '/writings/closed-loop-optimization#simulation'],
   /* The Start-here doors (founder, 7 Oct 2026): the Investors door was removed,
      and the Frontier labs door became AI Labs. */

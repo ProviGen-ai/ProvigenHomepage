@@ -18,6 +18,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { retired } from '../next.config.ts';
+import { SDM_FUNCTIONS, writeSdmApiDir } from './sdm-function.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const flag = (name) => process.argv.find((a) => a === `--${name}` || a.startsWith(`--${name}=`));
@@ -90,6 +91,8 @@ export function GET() {
 }
 `,
   );
+  // The SDM-1 route (lib/sdm/proxy.ts) at /api/sdm1/*: see scripts/sdm-function.mjs.
+  writeSdmApiDir(api);
   // ES modules for the Function files; no dependencies, nothing to install.
   writeFileSync(join(t.out, 'package.json'), `${JSON.stringify({ private: true, type: 'module' }, null, 2)}\n`);
 } else {
@@ -108,6 +111,7 @@ const vercel = {
   buildCommand: '',
   outputDirectory: 'public',
   cleanUrls: true,
+  functions: SDM_FUNCTIONS,
   redirects: retired.map(([source, destination]) => ({ source, destination, permanent: true })),
   headers: [
     {

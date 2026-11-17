@@ -1,0 +1,122 @@
+[
+  {
+    "seed": 1,
+    "method": "sdm-1",
+    "model": "sdm-1",
+    "version": "decision_meta_search@700751a+model=gamma_s1-003-037-feashead-s1:model.pt:2c5516977c84+warp=20261108-s1-004-071-r1:8d268be8d694",
+    "recorded": "2026-11-14",
+    "solved": true
+  },
+  {
+    "seed": 1,
+    "method": "bayesian-optimisation",
+    "model": "bayesian-optimisation",
+    "version": "decision_bo@700751a",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 1,
+    "method": "doe-lhs",
+    "model": "doe-lhs",
+    "version": "lhs:scipy-1.17.1",
+    "recorded": "2026-11-14",
+    "solved": true
+  },
+  {
+    "seed": 2,
+    "method": "sdm-1",
+    "model": "sdm-1",
+    "version": "decision_meta_search@700751a+model=gamma_s1-003-037-feashead-s1:model.pt:2c5516977c84+warp=20261108-s1-004-071-r1:8d268be8d694",
+    "recorded": "2026-11-14",
+    "solved": true
+  },
+  {
+    "seed": 2,
+    "method": "bayesian-optimisation",
+    "model": "bayesian-optimisation",
+    "version": "decision_bo@700751a",
+    "recorded": "2026-11-14",
+    "solved": true
+  },
+  {
+    "seed": 2,
+    "method": "doe-lhs",
+    "model": "doe-lhs",
+    "version": "lhs:scipy-1.17.1",
+    "recorded": "2026-11-14",
+    "solved": true
+  },
+  {
+    "seed": 3,
+    "method": "sdm-1",
+    "model": "sdm-1",
+    "version": "decision_meta_search@700751a+model=gamma_s1-003-037-feashead-s1:model.pt:2c5516977c84+warp=20261108-s1-004-071-r1:8d268be8d694",
+    "recorded": "2026-11-14",
+    "solved": true
+  },
+  {
+    "seed": 3,
+    "method": "bayesian-optimisation",
+    "model": "bayesian-optimisation",
+    "version": "decision_bo@700751a",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 3,
+    "method": "doe-lhs",
+    "model": "doe-lhs",
+    "version": "lhs:scipy-1.17.1",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 4,
+    "method": "sdm-1",
+    "model": "sdm-1",
+    "version": "decision_meta_search@700751a+model=gamma_s1-003-037-feashead-s1:model.pt:2c5516977c84+warp=20261108-s1-004-071-r1:8d268be8d694",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 4,
+    "method": "bayesian-optimisation",
+    "model": "bayesian-optimisation",
+    "version": "decision_bo@700751a",
+    "recorded": "2026-11-14",
+    "solved": true
+  },
+  {
+    "seed": 4,
+    "method": "doe-lhs",
+    "model": "doe-lhs",
+    "version": "lhs:scipy-1.17.1",
+    "recorded": "2026-11-14",
+    "solved": true
+  },
+  {
+    "seed": 5,
+    "method": "sdm-1",
+    "model": "sdm-1",
+    "version": "decision_meta_search@700751a+model=gamma_s1-003-037-feashead-s1:model.pt:2c5516977c84+warp=20261108-s1-004-071-r1:8d268be8d694",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 5,
+    "method": "bayesian-optimisation",
+    "model": "bayesian-optimisation",
+    "version": "decision_bo@700751a",
+    "recorded": "2026-11-14",
+    "solved": false
+  },
+  {
+    "seed": 5,
+    "method": "doe-lhs",
+    "model": "doe-lhs",
+    "version": "lhs:scipy-1.17.1",
+    "recorded": "2026-11-14",
+    "solved": false
+  }
+]

@@ -137,3 +137,162 @@
   }
 }
 
+
+/* The release banner under the call to action (the user, 17 Nov 2026): a card with the decision tree of the article's
+   opening on the left, the title and the model's line on the right. Was a small strip over the title. */
+.h-hero-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: min(32rem, 100%);
+  margin-top: 1.75rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid rgb(120 92 52 / 22%);
+  background: color-mix(in oklab, var(--c-paper), #fffdf8 60%);
+  color: var(--c-ink);
+  text-decoration: none;
+  transition: border-color 0.2s, background-color 0.2s, transform 0.2s;
+}
+/* The article's first screen in miniature: its title block, the tree beside it, on the article's own paper. */
+.h-hero-banner-art {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: none;
+  width: 11.5rem;
+  height: 5rem;
+  padding: 0.45rem 0.5rem;
+  overflow: hidden;
+  border: 1px solid rgb(120 92 52 / 16%);
+  background: var(--c-paper);
+}
+.h-hero-banner-slide {
+  display: grid;
+  gap: 0.18rem;
+  min-width: 0;
+}
+.h-hero-banner-slide-kicker {
+  font-family: var(--f-mono);
+  font-size: 0.3125rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-teal-ink);
+}
+.h-hero-banner-slide-title {
+  font-family: var(--f-display);
+  font-size: 0.95rem;
+  font-weight: 300;
+  line-height: 1.05;
+  color: var(--c-ink);
+}
+.h-hero-banner-slide-title em {
+  font-style: normal;
+  color: var(--c-teal-ink);
+}
+.h-hero-banner-slide-sub {
+  font-family: var(--f-serif);
+  font-size: 0.5rem;
+  line-height: 1.2;
+  color: var(--c-teal-ink);
+}
+.h-hero-banner-slide-date {
+  font-family: var(--f-mono);
+  font-size: 0.3125rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+/* .h-hero-banner-tree: the tree in the preview, dropped 17 Nov 2026 (the title block alone). */
+.h-hero-banner-words {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+.h-hero-banner-tag {
+  justify-self: start;
+  padding: 0.1rem 0.4rem;
+  background: var(--c-teal-ink);
+  color: var(--c-paper);
+  font-family: var(--f-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.h-hero-banner-text {
+  font-family: var(--f-display);
+  font-size: 1.25rem;
+  font-weight: 300;
+  line-height: 1.15;
+}
+/* One short line now (the user, 17 Nov 2026), so no clamping. */
+.h-hero-banner-sub {
+  font-family: var(--f-serif);
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--c-muted);
+}
+.h-hero-banner svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+.h-hero-banner:hover,
+.h-hero-banner:focus-visible {
+  border-color: var(--c-teal-ink);
+  background: var(--c-paper);
+  transform: translateY(-2px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .h-hero-banner:hover,
+  .h-hero-banner:focus-visible {
+    transform: none;
+  }
+}
+@media (max-width: 640px) {
+  .h-hero-banner {
+    gap: 0.75rem;
+    padding: 0.7rem 0.85rem;
+  }
+  .h-hero-banner-art {
+    width: 9.5rem;
+    height: 4.5rem;
+  }
+  .h-hero-banner-text {
+    font-size: 1.05rem;
+  }
+}
+
+/* The hero centres its contents (.h-hero-inner), which the banner inherited: its preview, its words and the lede all
+   came out centred (the user's screenshot, 17 Nov 2026). The card itself stays centred on the page; everything in it
+   reads from the left, as the article's own title block does. */
+.h-hero-banner,
+.h-hero-banner-slide,
+.h-hero-banner-words {
+  text-align: left;
+}
+.h-hero-banner-slide,
+.h-hero-banner-words {
+  justify-items: start;
+}
+.h-hero-banner-art {
+  align-items: flex-start;
+}
+.h-hero-banner-slide {
+  align-content: center;
+  height: 100%;
+}
+/* The lede on two lines, reading from the left. */
+.h-hero-banner-sub {
+  max-width: 24rem;
+}
+
+/* The "New" tag at the card's top left corner, over its edge (the user, 17 Nov 2026); it used to sit above the
+   headline inside the words. */
+.h-hero-banner {
+  position: relative;
+}
+.h-hero-banner-tag {
+  position: absolute;
+  top: -0.6rem;
+  left: -0.5rem;
+}

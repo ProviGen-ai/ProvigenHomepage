@@ -213,13 +213,6 @@ export default function LongformReleasePage() {
             <CubeLive
               label="A Rubik's cube being solved"
               modelName={model.name}
-              config={{
-                scrambleDepth: cubeDemo.scramble_depth,
-                discoverCalls: cubeDemo.discover_calls,
-                solveCalls: cubeDemo.solve_calls,
-                batch: cubeDemo.batch,
-                keep: cubeDemo.keep,
-              }}
             />
           ) : null}
           <section className="r-hero" aria-label="Headline result">

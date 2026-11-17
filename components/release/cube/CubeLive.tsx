@@ -1,18 +1,21 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { SdmUnavailable } from '@/lib/sdm/contract';
 import { useInViewMotion } from '@/lib/use-in-view-motion';
-import { applyMove, inverse, parseMove, scramble, solved, type Cube, type Face, type Move, type Vec } from './cube';
-import { discover, solveWith, type Block, type DiscoverEvent, type PhaseConfig, type SolveEvent } from './solve';
+import { applyMove, inverse, parseMove, solved, type Cube, type Face, type Move, type Vec } from './cube';
+import { replayer, type CubeRun } from './recording';
+import { cubeRuns, loadRun } from './runs';
+import { discover, solveWith, type Block, type DiscoverEvent, type SolveEvent } from './solve';
 
 /*
  * The release page's cube (13 Nov 2026): one model at two levels of
  * abstraction (solve.ts). Level 1 finds building blocks on a solved cube;
- * level 2 scrambles the cube and solves it with them. Every proposal comes
- * through the page's one client (lib/sdm), live when the endpoint is served,
- * on the mock until then (labelled). Beside the cube, a card per level opens
- * while its level runs; the reader can open or close either.
+ * level 2 scrambles the cube and solves it with them. The proposals are the
+ * model's, from one of five recorded runs (recording.ts, runs.ts), replayed
+ * through the same solver: the page makes no model calls for the cube. The
+ * first run is picked at random, "Run again" plays the next one. Beside the
+ * cube, a card per level opens while its level runs; the reader can open or
+ * close either.
  *
  * Drawn as 54 stickers in CSS 3D; each turn is animated frame by frame by
  * rotating the turning layer's stickers (no library). The run starts in view
@@ -20,8 +23,8 @@ import { discover, solveWith, type Block, type DiscoverEvent, type PhaseConfig, 
  * waits for the reader's Start, and turns without animation.
  */
 
-const S = 46; // sticker pitch in px
-const COLORS: Record<Face, string> = {
+export const S = 46; // sticker pitch in px
+export const COLORS: Record<Face, string> = {
   U: '#f3f0e8',
   D: '#f0c22e',
   F: '#2e9a69',
@@ -38,7 +41,7 @@ const apply = (m: Mat, v: Vec): Vec => [
   m[3] * v[0] + m[4] * v[1] + m[5] * v[2],
   m[6] * v[0] + m[7] * v[1] + m[8] * v[2],
 ];
-function rotation(axis: number, angle: number): Mat {
+export function rotation(axis: number, angle: number): Mat {
   const c = Math.cos(angle);
   const s = Math.sin(angle);
   if (axis === 0) return [1, 0, 0, 0, c, -s, 0, s, c];
@@ -46,10 +49,10 @@ function rotation(axis: number, angle: number): Mat {
   return [c, -s, 0, s, c, 0, 0, 0, 1];
 }
 /* The view: tilted to show the up face, turned about the vertical by `spin` (the cube turns slowly while in view). */
-const viewAt = (spin: number) => mul(rotation(0, 0.5), rotation(1, -0.62 + spin));
+export const viewAt = (spin: number) => mul(rotation(0, 0.5), rotation(1, -0.62 + spin));
 
 /** A sticker's CSS matrix: its centre and in-plane axes, turned by `turn`, then the view; y flipped for CSS. */
-function stickerMatrix(pos: Vec, normal: Vec, turn: Mat | null, VIEW: Mat) {
+export function stickerMatrix(pos: Vec, normal: Vec, turn: Mat | null, VIEW: Mat) {
   const axis = normal.findIndex((c) => c !== 0);
   const u: Vec = [0, 0, 0];
   u[(axis + 1) % 3] = 1;
@@ -61,11 +64,10 @@ function stickerMatrix(pos: Vec, normal: Vec, turn: Mat | null, VIEW: Mat) {
   return `matrix3d(${[...css(U), 0, ...css(V), 0, ...css(N), 0, ...css(C), 1].map((n) => +n.toFixed(4)).join(',')})`;
 }
 
-const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+export const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export type CubeConfig = PhaseConfig & { scrambleDepth: number };
-type Level = 'idle' | 'discover' | 'scramble' | 'solve' | 'done' | 'spent' | 'unavailable';
+type Level = 'idle' | 'discover' | 'scramble' | 'solve' | 'done' | 'unavailable';
 
 function Card({
   n,
@@ -73,10 +75,12 @@ function Card({
   open,
   active,
   onToggle,
+  plain,
   children,
 }: {
   n: number;
   title: string;
+  plain?: boolean;
   open: boolean;
   active: boolean;
   onToggle: () => void;
@@ -86,7 +90,7 @@ function Card({
   return (
     <section className={active ? 'r-cube-card r-cube-card--active' : 'r-cube-card'} aria-current={active ? 'step' : undefined}>
       <button type="button" className="r-cube-card-head" aria-expanded={open} aria-controls={id} onClick={onToggle}>
-        <span className="r-cube-card-n">Level {n}</span>
+        {plain ? null : <span className="r-cube-card-n">Level {n}</span>}
         <span className="r-cube-card-title">{title}</span>
         <span className="r-cube-card-sign" aria-hidden="true">
           {open ? '−' : '+'}
@@ -131,16 +135,27 @@ function Curve({ points, max, label }: { points: [number, number][]; max: number
 }
 
 export default function CubeLive({
-  config,
   label,
   modelName,
   intro,
+  plain = false,
+  flat = false,
 }: {
-  config: CubeConfig;
   label: string;
   modelName: string;
   /** What the reader learns first, beside the cube, before the level cards. */
   intro?: ReactNode;
+  /**
+   * Fewer words (founder, 13 Nov 2026, comparison page): no "Level n", no sentence in the cards, no
+   * "Recorded run" line. The cards keep their figures and curves; a mock run still says so.
+   */
+  plain?: boolean;
+  /**
+   * Laid out like the protein expression showcase (founder, 14 Nov 2026, comparison page: the cards took too much
+   * height): the words, the two steps and three figures on the left, the cube on graph paper on the right; no cards,
+   * no curves.
+   */
+  flat?: boolean;
 }) {
   const { ref, running, allowed } = useInViewMotion<HTMLDivElement>(0.3);
   const stickers = useRef<(HTMLSpanElement | null)[]>([]);
@@ -154,6 +169,9 @@ export default function CubeLive({
   const [curve1, setCurve1] = useState<[number, number][]>([]);
   const [curve2, setCurve2] = useState<[number, number][]>([]);
   const [notice, setNotice] = useState<string | null>(null);
+  /* The recorded run on show, and which of them plays next (the first one at random). */
+  const [shown, setShown] = useState<CubeRun | null>(null);
+  const nextRun = useRef<number | null>(null);
   const runningRef = useRef(running);
   const allowedRef = useRef(allowed);
   /* Started by the reader's button: under reduced motion the run goes on without animation. */
@@ -178,6 +196,8 @@ export default function CubeLive({
       const turning = t && s.pos[t.axis] === t.layer;
       el.style.transform = stickerMatrix(s.pos, s.normal, turning ? m : null, view);
       el.style.setProperty('--c', COLORS[s.color]);
+      /* The face the sticker belongs to, so a page can give each face its own paper (comparison page, 14 Nov 2026). */
+      el.dataset.face = s.color;
     });
   }, []);
 
@@ -221,6 +241,9 @@ export default function CubeLive({
 
   const run = useCallback(async () => {
     cancelled.current = false;
+    if (nextRun.current === null) nextRun.current = Math.floor(Math.random() * cubeRuns.length);
+    const pick = cubeRuns[nextRun.current % cubeRuns.length];
+    nextRun.current += 1;
     setNotice(null);
     setFound({ experiments: 0, best: null, blocks: [] });
     setSolving(null);
@@ -229,11 +252,16 @@ export default function CubeLive({
     cube.current = solved();
     draw();
     try {
+      const recorded = await loadRun(pick.seed);
+      const { config } = recorded;
+      const ask = replayer(recorded);
+      setShown(recorded);
       /* Level 1: each new best building block is shown on the solved cube, held, then undone. */
       setLevel('discover');
       setOpen(1);
       const blocks: Block[] = await discover(
         config,
+        ask,
         (e) => {
           setFound(e);
           if (e.best !== null) setCurve1((c) => [...c, [e.experiments, e.best as number]]);
@@ -250,12 +278,13 @@ export default function CubeLive({
       /* Level 2: scramble, then solve with the blocks. */
       setLevel('scramble');
       setOpen(2);
-      await playAll(scramble(config.scrambleDepth), 140);
+      await playAll(recorded.scramble, 140);
       setLevel('solve');
       await solveWith(
         blocks,
         cube.current,
         config,
+        ask,
         (e) => {
           setSolving(e);
           setCurve2((c) => (c.length && c[c.length - 1][0] === e.experiments ? [...c.slice(0, -1), [e.experiments, e.solvedPieces]] : [...c, [e.experiments, e.solvedPieces]]));
@@ -265,13 +294,11 @@ export default function CubeLive({
         () => cancelled.current,
       );
       setLevel('done');
-    } catch (error) {
-      /* The page's own budget for the cube ran out: it simply stops, without a message and without Run again. */
-      if (error instanceof SdmUnavailable && error.kind === 'limit') return setLevel('spent');
+    } catch {
       setLevel('unavailable');
-      setNotice(error instanceof SdmUnavailable ? error.message : 'The model could not be reached.');
+      setNotice('This run could not be loaded.');
     }
-  }, [allowed, config, draw, playAll, wait]);
+  }, [allowed, draw, playAll, wait]);
 
   /* First draw, and the first run once the cube is in view and motion is allowed. */
   const started = useRef(false);
@@ -307,6 +334,79 @@ export default function CubeLive({
   /* Opening one level closes the other; the open one closes on a second click. */
   const toggle = (n: 1 | 2) => setOpen((o) => (o === n ? null : n));
 
+  const stage = (
+    <div ref={ref} className="r-cube-stage" role="img" aria-label={label}>
+      <div className="r-cube-body">
+        {cube.current.map((_, i) => (
+          <span
+            key={i}
+            className="r-cube-sticker"
+            ref={(el) => {
+              stickers.current[i] = el;
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+  const restart = !busy ? (
+    <button
+      type="button"
+      onClick={() => {
+        manual.current = true;
+        void run();
+      }}
+    >
+      {level === 'idle' ? 'Start' : 'Run again'}
+    </button>
+  ) : null;
+  const solvedNote = (
+    <p className="s-sr" aria-live="polite">
+      {solving?.done === 'solved' ? `Solved after ${found.experiments + solving.experiments} experiments.` : ''}
+    </p>
+  );
+
+  if (flat) {
+    const step = level === 'scramble' || level === 'solve' || level === 'done' ? 2 : 1;
+    return (
+      <figure className="r-cube r-cube--flat" aria-label={label}>
+        <div className="r-cube-text">
+          {intro ? <div className="r-cube-intro">{intro}</div> : null}
+          <ol className="r-cube-steps">
+            <li aria-current={step === 1 && busy ? 'step' : undefined} className={step === 1 ? 'r-cube-step--on' : undefined}>
+              Discover building blocks
+            </li>
+            <li aria-current={step === 2 && busy ? 'step' : undefined} className={step === 2 ? 'r-cube-step--on' : undefined}>
+              Solve with them
+            </li>
+          </ol>
+          <dl className="r-cfe-figures r-cube-figures">
+            <div>
+              <dt>{found.best ?? '–'}</dt>
+              <dd>fewest pieces moved</dd>
+            </div>
+            <div>
+              <dt>{solving ? `${solving.solvedPieces}/20` : '–'}</dt>
+              <dd>pieces solved</dd>
+            </div>
+            <div>
+              <dt>{found.experiments + (solving?.experiments ?? 0)}</dt>
+              <dd>experiments</dd>
+            </div>
+          </dl>
+          <div className="r-cube-hud">{restart}</div>
+          {notice ? (
+            <p className="r-cube-notice" role="status">
+              {notice}
+            </p>
+          ) : null}
+        </div>
+        <div className="r-cube-paper">{stage}</div>
+        {solvedNote}
+      </figure>
+    );
+  }
+
   return (
     <figure className="r-cube" aria-label={label}>
       <div className="r-cube-left">
@@ -324,7 +424,13 @@ export default function CubeLive({
           </div>
         </div>
         <figcaption className="r-cube-hud">
-          {!busy && level !== 'spent' ? (
+          {shown && !plain ? (
+            <span>
+              Recorded run {shown.seed} of {cubeRuns.length}
+              {shown.model === 'mock' ? <span className="r-cube-mock">Mock model</span> : null}
+            </span>
+          ) : null}
+          {!busy ? (
             <button
               type="button"
               onClick={() => {
@@ -346,16 +452,16 @@ export default function CubeLive({
       <div className="r-cube-right">
       {intro ? <div className="r-cube-intro">{intro}</div> : null}
       <div className="r-cube-cards">
-        <Card n={1} title="Discover building blocks" open={open === 1} active={level === 'discover'} onToggle={() => toggle(1)}>
-          <p>Find move sequences that disturb as few pieces as possible. The only feedback: how many pieces moved.</p>
+        <Card n={1} title="Discover building blocks" plain={plain} open={open === 1} active={level === 'discover'} onToggle={() => toggle(1)}>
+          {plain ? null : <p>Find move sequences that disturb as few pieces as possible. The only feedback: how many pieces moved.</p>}
           <div className="r-cube-metrics">
             <Metric value={found.best ?? '–'} label="fewest pieces moved" />
             <Metric value={found.experiments} label="experiments" />
           </div>
           <Curve points={curve1} max={20} label="Fewest pieces moved so far" />
         </Card>
-        <Card n={2} title="Solve with them" open={open === 2} active={level === 'scramble' || level === 'solve'} onToggle={() => toggle(2)}>
-          <p>Scramble the cube, then solve it using those sequences as single moves.</p>
+        <Card n={2} title="Solve with them" plain={plain} open={open === 2} active={level === 'scramble' || level === 'solve'} onToggle={() => toggle(2)}>
+          {plain ? null : <p>Scramble the cube, then solve it using those sequences as single moves.</p>}
           <div className="r-cube-metrics">
             <Metric value={solving ? `${solving.solvedPieces}/20` : '–'} label={solving?.done === 'solved' ? 'pieces solved: done' : 'pieces solved'} />
             <Metric value={solving?.experiments ?? 0} label="experiments" />

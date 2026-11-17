@@ -12,7 +12,8 @@ import { useState, type ReactNode } from 'react';
 
 export type Showcase = { id: string; label: string; content: ReactNode };
 
-export default function Showcases({ items }: { items: Showcase[] }) {
+/** `numbered` (default true) shows 01, 02, … before each tab; the comparison page turns it off. */
+export default function Showcases({ items, numbered = true }: { items: Showcase[]; numbered?: boolean }) {
   const [active, setActive] = useState(items[0]?.id);
   return (
     <div className="r-show">
@@ -34,7 +35,7 @@ export default function Showcases({ items }: { items: Showcase[] }) {
               document.getElementById(`r-show-tab-${next.id}`)?.focus();
             }}
           >
-            <span className="r-show-n">{String(i + 1).padStart(2, '0')}</span>
+            {numbered ? <span className="r-show-n">{String(i + 1).padStart(2, '0')}</span> : null}
             {item.label}
           </button>
         ))}

@@ -1,0 +1,167 @@
+/* The decision tree's own styles (17 Nov 2026): moved out of app/writings/introducing-model-name/release.css, so
+   any page that renders the component carries them, the landing page's release banner among them. */
+.r-tree {
+  display: block;
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* A little lower than the column's top (founder, 14 Nov 2026), without changing its size. */
+  transform: translateY(1.25rem);
+}
+.r-tree-edge {
+  fill: none;
+  stroke: var(--c-ink);
+  stroke-opacity: 0.24;
+  stroke-width: 1.35;
+}
+.r-tree-edge--bold {
+  stroke: var(--c-teal-ink);
+  stroke-opacity: 0.9;
+  stroke-width: 3;
+}
+.r-tree-node {
+  fill: var(--c-paper);
+  stroke: var(--c-ink);
+  stroke-opacity: 0.34;
+  stroke-width: 1.35;
+}
+.r-tree-node--bold {
+  fill: var(--c-teal-ink);
+  stroke: var(--c-teal-ink);
+  stroke-opacity: 1;
+}
+/* The decision tree traced (founder, 15 Nov 2026): a hollow, brighter node runs down the chosen path; a bright stroke
+   draws right behind it and the dark one follows further back; each node fills in dark once the runner has left it.
+   Timing per element in --start / --dur (DecisionTree.tsx). */
+.r-tree {
+  --tree-lead: #5fa3a3;
+}
+.r-tree-lead {
+  stroke: var(--tree-lead);
+  stroke-opacity: 1;
+  stroke-width: 3;
+}
+.r-tree-edge.r-tree-trace {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: r-tree-draw var(--dur) linear var(--start) forwards;
+}
+.r-tree-node--bold.r-tree-trace {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: r-tree-fill 0.3s ease-out var(--start) forwards;
+}
+.r-tree-head {
+  fill: var(--c-paper);
+  stroke: var(--tree-lead);
+  /* Lighter than the first draft (founder, 15 Nov 2026). */
+  stroke-width: 1.5;
+  opacity: 0;
+  offset-rotate: 0deg;
+  offset-distance: 0%;
+  animation:
+    r-tree-move var(--travel) linear var(--start) both,
+    r-tree-show 0.2s ease-out var(--start) forwards,
+    r-tree-hide 0.4s ease-in var(--end) forwards;
+}
+/* The gradient (founder, 15 Nov 2026): each piece of the path appears bright and turns dark over 0.9 s (AGE in
+   DecisionTree.tsx); the bright stroke under it goes once its branch is dark. */
+.r-tree-lead.r-tree-trace {
+  animation:
+    r-tree-draw var(--dur) linear var(--start) forwards,
+    r-tree-gone 0.01s linear var(--gone) forwards;
+}
+.r-tree-age {
+  stroke: var(--tree-lead);
+  stroke-opacity: 1;
+  opacity: 0;
+  animation:
+    r-tree-show 0.01s linear var(--start) forwards,
+    r-tree-age 0.9s linear var(--start) forwards;
+}
+@keyframes r-tree-age {
+  from {
+    stroke: var(--tree-lead);
+  }
+  to {
+    stroke: var(--c-teal-ink);
+  }
+}
+/* The root: fades in dark at the start of every round, before the moving node sets off (founder, 15 Nov 2026). */
+.r-tree-node--bold.r-tree-trace.r-tree-node--set {
+  animation: r-tree-show 0.5s ease-out 0s forwards;
+}
+/* The faint tree's root is filled, not hollow (founder, 15 Nov 2026): the faint ink, solid. */
+.r-tree-node--root {
+  /* Fill and edge in one solid colour, so it reads as a filled dot, not a ring (founder, 15 Nov 2026). */
+  fill: color-mix(in srgb, var(--c-ink) 34%, var(--c-paper));
+  stroke: color-mix(in srgb, var(--c-ink) 34%, var(--c-paper));
+  stroke-opacity: 1;
+}
+/* One round of the trace (founder, 15 Nov 2026): after the leaf it holds, then fades slowly; DecisionTree.tsx starts
+   the next round, a new random path, when this fade ends. */
+.r-tree-round {
+  animation: r-tree-fade var(--fade) ease-in-out var(--fade-at) forwards;
+}
+@keyframes r-tree-fade {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes r-tree-gone {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes r-tree-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes r-tree-fill {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes r-tree-show {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes r-tree-hide {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+/* Moved here with the rest (17 Nov 2026), so every page that shows the tree honours it. */
+@media (prefers-reduced-motion: reduce) {
+  .r-tree-trace {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  .r-tree-head {
+    display: none;
+  }
+  .r-tree-node--bold.r-tree-trace.r-tree-node--set {
+    animation: none;
+    opacity: 1;
+  }
+  .r-tree-round,
+  .r-tree-age {
+    animation: none;
+    opacity: 1;
+    stroke: var(--c-teal-ink);
+  }
+}

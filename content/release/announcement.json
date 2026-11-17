@@ -5,7 +5,7 @@
   ],
   "model": {
     "name": "SDM-1",
-    "version": "v[VERSION]",
+    "version": "",
     "release_date": null,
     "status": "Announced. Access by request.",
     "one_line": "A foundation model for experiment design in biotech, biochemical and chemical development: it reads a campaign's results so far and proposes which experiments to run next.",
@@ -24,14 +24,14 @@
       "standin": true
     },
     "intended_use": [
-      "Choosing the next experiments in biotech, biochemical and chemical campaigns where each experiment is expensive: formulation, media and buffer optimisation, assay development, reaction conditions, protocol and process parameters",
+      "Choosing the next experiments in biotech, biochemical and chemical campaigns where each experiment is expensive: formulation, media and buffer optimization, assay development, reaction conditions, protocol and process parameters",
       "Ranking a candidate list (for example a plate of untested formulations) by expected outcome",
       "Campaigns that aim for a target value, stay within limits, or trade off several outcomes"
     ],
     "operating_envelope": {
       "parameters": "up to 100 per campaign",
-      "parameter_types": "continuous, integer, log-scale, categorical, mixtures",
-      "batch_proposals": "one experiment to a full plate per round",
+      "parameter_types": "continuous, integer, log-scale, categorical",
+      "batch_proposals": "1 to [MAX BATCH] experiments per round",
       "time_per_proposal": "seconds",
       "standin": true
     },
@@ -42,7 +42,7 @@
   "headline_candidates": [
     {
       "id": "abrupt_vs_bo",
-      "text_template": "On benchmark landscapes with sharp optima and abrupt changes, it beats standard Bayesian optimisation in {wins} of {runs} campaigns.",
+      "text_template": "On benchmark landscapes with sharp optima and abrupt changes, it beats standard Bayesian optimization in {wins} of {runs} campaigns.",
       "values": {
         "wins": 30,
         "runs": 40
@@ -75,9 +75,9 @@
       "id": "heldout_search",
       "title": "Better results in fewer experiments",
       "question": "How close does each method get to the best possible result within 50 experiments?",
-      "task": "Optimise benchmark landscapes the model never saw in training, 50 experiments in batches of 5.",
+      "task": "Optimize benchmark landscapes the model never saw in training, 50 experiments in batches of 5.",
       "dataset": {
-        "name": "Standard optimisation test functions (Branin, Hartmann 3 and 6, Ackley, Holder table, Michalewicz, Shekel, Voronoi)",
+        "name": "Standard optimization test functions (Branin, Hartmann 3 and 6, Ackley, Holder table, Michalewicz, Shekel, Voronoi)",
         "citation": "Surjanovic and Bingham, Virtual Library of Simulation Experiments",
         "url": "https://www.sfu.ca/~ssurjano/optimization.html"
       },
@@ -98,7 +98,7 @@
           "name": "TabPFN v3.5"
         },
         {
-          "name": "Bayesian optimisation"
+          "name": "Bayesian optimization"
         },
         {
           "name": "BayBE (Merck KGaA)"
@@ -159,7 +159,7 @@
       ],
       "paired": [
         {
-          "comparison": "vs standard Bayesian optimisation, sharp optima and abrupt changes",
+          "comparison": "vs standard Bayesian optimization, sharp optima and abrupt changes",
           "result": "30 of 40 campaigns better"
         },
         {
@@ -167,7 +167,7 @@
           "result": "30 of 40 campaigns better"
         },
         {
-          "comparison": "vs standard Bayesian optimisation, Ackley",
+          "comparison": "vs standard Bayesian optimization, Ackley",
           "result": "10 of 10 campaigns better"
         },
         {
@@ -186,7 +186,7 @@
       "id": "hpo_search",
       "title": "On a public benchmark it never saw",
       "question": "How fast does each method find good configurations on a public benchmark it never saw?",
-      "task": "Search real hyperparameter-optimisation spaces of up to 6 parameters, one experiment at a time.",
+      "task": "Search real hyperparameter-optimization spaces of up to 6 parameters, one experiment at a time.",
       "dataset": {
         "name": "HPO-B v3 test split",
         "citation": "Pineda Arango et al., NeurIPS Datasets and Benchmarks 2021",
@@ -209,7 +209,7 @@
           "name": "TabPFN v3.5"
         },
         {
-          "name": "Bayesian optimisation"
+          "name": "Bayesian optimization"
         },
         {
           "name": "BayBE (Merck KGaA)"
@@ -285,7 +285,7 @@
       },
       "baselines": [
         {
-          "name": "Bayesian optimisation (GP)"
+          "name": "Bayesian optimization (GP)"
         },
         {
           "name": "TabPFN v2.5"
@@ -325,7 +325,7 @@
           "result": "better next pick in 22 of 29 head-to-head decisions"
         },
         {
-          "comparison": "vs Bayesian optimisation, after 10 measured formulations",
+          "comparison": "vs Bayesian optimization, after 10 measured formulations",
           "result": "better next pick in 13 of 22 head-to-head decisions"
         }
       ],
@@ -359,7 +359,7 @@
           "name": "TabPFN v3.5"
         },
         {
-          "name": "Bayesian optimisation"
+          "name": "Bayesian optimization"
         },
         {
           "name": "BayBE (Merck KGaA)"
@@ -418,7 +418,7 @@
       "paired": [
         {
           "comparison": "experiments to half of the top 5%, vs the fastest alternative on each stage",
-          "result": "stage 1: 18.5 vs 22.5 (DoE: space-filling); stage 2: 45 vs 55 (TabPFN v2.5); stage 3: 37 vs 41 (TabPFN v3, TabPFN v3.5, Bayesian optimisation)"
+          "result": "stage 1: 18.5 vs 22.5 (DoE: space-filling); stage 2: 45 vs 55 (TabPFN v2.5); stage 3: 37 vs 41 (TabPFN v3, TabPFN v3.5, Bayesian optimization)"
         }
       ]
     }
@@ -426,7 +426,7 @@
   "capabilities": [
     {
       "name": "Batches",
-      "text": "Proposes a whole batch at once, from a single experiment to a full plate."
+      "text": "Proposes a whole batch at once, from 1 to [MAX BATCH] experiments."
     },
     {
       "name": "Targets, not just maxima",
@@ -438,7 +438,7 @@
     },
     {
       "name": "Limits on other outcomes",
-      "text": "Keep cost, purity or other measured outcomes within limits while optimising one."
+      "text": "Keep cost, purity or other measured outcomes within limits while optimizing one."
     },
     {
       "name": "Several objectives",
@@ -446,7 +446,7 @@
     },
     {
       "name": "Mixed parameter types",
-      "text": "Continuous, integer, log-scale, categorical parameters and mixtures that must sum to a total."
+      "text": "Continuous, integer, log-scale and categorical parameters."
     },
     {
       "name": "No per-campaign tuning",
@@ -467,12 +467,12 @@
       "text": "Hitting 50% yield within a tolerance, or a viscosity window, is a goal in its own right, with the probability of landing in range for every proposal."
     },
     {
-      "title": "No modelling expertise per campaign",
+      "title": "No modeling expertise per campaign",
       "text": "There is no model to fit, kernel to choose or setting to tune: the lab supplies its results so far and gets the next experiments."
     },
     {
       "title": "From a few parameters to many",
-      "text": "The same model serves a two-factor optimisation and a formulation with dozens of components, mixing continuous, categorical and mixture parameters."
+      "text": "The same model serves a two-factor optimization and a formulation with dozens of components, mixing continuous and categorical parameters."
     }
   ],
   "methods": [
@@ -508,7 +508,7 @@
     },
     {
       "key": "bo_gp",
-      "name": "Bayesian optimisation",
+      "name": "Bayesian optimization",
       "group": "bo"
     },
     {
@@ -538,7 +538,7 @@
     }
   ],
   "copy": {
-    "kicker": "Introducing SDM-1 v[VERSION]",
+    "kicker": "Introducing SDM-1",
     "section_titles": {
       "why": "Every experiment counts",
       "category": "A foundation model for experiment design",
@@ -551,7 +551,7 @@
       "model_card": "Model card",
       "cta": "Be among the first labs to use it"
     },
-    "results_intro_template": "We ran {campaigns} optimisation campaigns on {benchmarks} benchmarks, every method on the same starting experiments, against {methods} methods: five versions of TabPFN, Bayesian optimisation, the industry tools BayBE and BoFire, two classical designs of experiments, and random search.",
+    "results_intro_template": "We ran {campaigns} optimization campaigns on {benchmarks} benchmarks, every method on the same starting experiments, against {methods} methods: five versions of TabPFN, Bayesian optimization, the industry tools BayBE and BoFire, two classical designs of experiments, and random search.",
     "results_intro_values": {
       "campaigns": 1650,
       "benchmarks": 2,
@@ -566,7 +566,7 @@
       "values": {}
     },
     {
-      "text_template": "Beats standard Bayesian optimisation in {wins} of {runs} benchmark campaigns with sharp optima and abrupt changes.",
+      "text_template": "Beats standard Bayesian optimization in {wins} of {runs} benchmark campaigns with sharp optima and abrupt changes.",
       "values": {
         "wins": 30,
         "runs": 40
@@ -583,7 +583,7 @@
   ],
   "category_explainer": {
     "title": "What is a foundation model for experiment design?",
-    "text": "Classical design of experiments plans a screen up front. Bayesian optimisation fits a new statistical model to every campaign and starts from scratch each time. A foundation model for experiment design arrives ready: it already knows how lab results tend to depend on settings, from smooth trends to sharp optima, thresholds and failed runs. Given a lab's results so far, it predicts how untested settings will turn out and proposes the next experiments in seconds."
+    "text": "Classical design of experiments plans a screen up front. Bayesian optimization fits a new statistical model to every campaign and starts from scratch each time. A foundation model for experiment design arrives ready: it already knows how lab results tend to depend on settings, from smooth trends to sharp optima, thresholds and failed runs. Given a lab's results so far, it predicts how untested settings will turn out and proposes the next experiments in seconds."
   },
   "summary_chart": {
     "benchmark": "heldout_search",
@@ -900,27 +900,17 @@
     },
     {
       "q": "How many parameters can a campaign have?",
-      "a": "Up to 100 per campaign: continuous, integer, log-scale and categorical parameters, and mixtures that must add up to a total."
+      "a": "Up to 100 per campaign: continuous, integer, log-scale and categorical parameters."
     },
     {
-      "q": "Can it handle failed runs and saturated readouts?",
-      "a": "Yes. Declare where runs fail or a readout saturates and the model reads those results as limits, not exact values."
-    },
-    {
-      "q": "Can it aim for a value instead of the maximum?",
-      "a": "Yes. Set a target with a tolerance and it proposes the settings most likely to land in range, with that probability for each."
-    },
-    {
-      "q": "How does it compare with design of experiments?",
-      "a": "We benchmarked it against both a space-filling screen and a classical response-surface design; the results are above."
-    },
-    {
-      "q": "How fast is it?",
-      "a": "Seconds per proposal on a standard computer, no GPU needed."
+      "q": "Can it aim for a specific range of values instead of a maximum or minimum?",
+      "a": "Yes. Set a target with a tolerance and it proposes the settings most likely to land in range.",
+      "was": "Yes. Set a target with a tolerance and it proposes the settings most likely to land in range, with that probability for each. (until 17 Nov 2026: without \", with that probability for each\")"
     },
     {
       "q": "How do I get access?",
-      "a": "Access opens later. Join the list and we will contact you."
+      "a": "Click “Try SDM-1” or “Get access” on this page and enter your email. You receive a personal API token at once: 50 calls a day, 500 in total.",
+      "was": "Access opens later. Join the list and we will contact you. (until 17 Nov 2026: the Get access form issues a token at once)"
     }
   ],
   "contamination": {
@@ -965,11 +955,12 @@
   },
   "benchmark_overview": {
     "note": "Figures from the founders' benchmark slide (9 Nov 2026), to be confirmed by the model team against the release model.",
-    "n_note": "n counts all experiments, including the 5 starting points.",
+    "n_note": "Identical 5 starting points for each method.",
+    "batch_note": "Batch size: 5 experiments per round for the standard optimization functions, 1 per round for HPO-B and cell-free protein expression.",
     "benchmarks": [
       {
         "id": "functions",
-        "name": "Standard optimisation functions",
+        "name": "Standard optimization functions",
         "detail": "11 problems"
       },
       {
@@ -990,6 +981,7 @@
         "id": "score",
         "name": "Score",
         "explain": "0 is what random search reaches with the same number of experiments, 100 is the optimum. Higher is better.",
+        "explain_brief": "0 is random search, 100 is perfect search: higher is better.",
         "better": "higher",
         "unit": "",
         "rows": [
@@ -1041,6 +1033,7 @@
         "id": "distance",
         "name": "Distance from the optimum",
         "explain": "How far the best result is from the optimum, as a share of each task's range. 0% means the optimum was found. Lower is better.",
+        "explain_brief": "How far the best result is from the optimum, 0% when found: lower is better.",
         "better": "lower",
         "unit": "%",
         "rows": [
@@ -1092,6 +1085,7 @@
         "id": "top1",
         "name": "Top 1% reached",
         "explain": "Share of campaigns whose best result is in the top 1% of what is possible. Higher is better.",
+        "explain_brief": "Share of campaigns that reach the top 1% of results: higher is better.",
         "better": "higher",
         "unit": "%",
         "rows": [
@@ -1141,5 +1135,827 @@
       }
     ],
     "standin": true
+  },
+  "benchmark_overview_added": {
+    "note": "Chemistry and materials rows from the model team (agent-005, S1-004-016, 15 Nov 2026): the same release model (H1) and the same scoring as the other rows; GP BO = gp-ts on the same seeds. EDBO 7 reactions x 30 seeds (batch 5), Liang 5 datasets x 50 seeds (batch 1). Caveats: EDBO: the model sees one-hot conditions, as the paper's DoE baselines did (EDBO's own GP used DFT descriptors); never compare with the paper's loss table. Liang: four of five datasets are small, most methods near the optimum at 50; say 'ahead of GP BO', never 'x times better'. Page shows H1, not the served path (which ties it). Distance: as 'x closer' like the other rows (founder, 15 Nov 2026; vs_bo_points keeps the difference), though (the ratio grows as both near the optimum; the model team, 15 Nov 2026). Top 1%: of the task's candidates (recorded conditions or points; 100,000 uniform points for the functions), not of the range; Liang at 50 (+3%) is level, not a win. Self-assembly, truss and Bayesmark rows from agent-003 (15 Nov 2026, docs/external_benchmarks.md agent/003 7dc1817): self-assembly 80 problems x 5 seeds, truss 40 x 5, Bayesmark 36 x 10, batch 1; truss at 25 and Bayesmark distance are level, shown as level; Bayesmark is level-or-better, not a lead. Parametric CAD from agent-003 (15 Nov 2026, master 98768c8): 29 problems of the CAD suite (13-parameter two-body parts, the subset PFNs4BO could run; chosen by size, not results), 5 random initial designs, batch 1; behind GP BO at 50 on score and distance, shown as behind; top 1% at 50 level. BO note confirmed by agent-003 (16 Nov 2026): gp-ts on every row incl. the 9 Nov three, BoTorch 0.16.1 / GPyTorch 1.15.1 everywhere. Earlier draft: Bayesian optimization: BoTorch's standard Gaussian-process model, refitted after every round, choosing experiments by Thompson sampling from 1,024 candidates, half spread over the space and half around the best result so far; on benchmarks with a fixed set of recorded experiments, it chooses among those. BO note before the founder's shortening (16 Nov 2026): Bayesian optimization: BoTorch's standard Gaussian-process model (BoTorch 0.16.1, RBF kernel, standardized outcomes), refitted after every round, choosing experiments by Thompson sampling from 1,024 candidates, half spread over the space and half around the best result so far; on benchmarks with a fixed set of recorded experiments, it chooses among those. The same settings on every benchmark. Chemistry and materials merged into one row (founder, 16 Nov 2026): EDBO (7 tasks) and Liang (5) pooled by task count, (7 x EDBO + 5 x Liang) / 12, from the suite means the model team sent; the separate rows stay in the data, hidden. Repeats (agent-003, 16 Nov 2026): functions 10 seeds, HPO-B 5, cell-free 10 per stage, EDBO 30, Liang 50, Bayesmark 10, self-assembly 5, truss 5, CAD 5; same seeds (so the same initial experiments) for every method, paired by problem and seed. n_note before: Each method starts from the same initial experiments: 5 on most benchmarks, 2 on the materials datasets, one per setting (2 to 9) on Bayesmark. n_note before the founder's rewording (16 Nov 2026): Results are averaged over 5 to 50 runs per problem (5 or 10 on most benchmarks). In each run, every method starts from the same initial experiments: 5 on most benchmarks, 2 on the materials datasets, one per setting (2 to 9) on Bayesmark. / batch_note before: Batch size: 5 experiments per round for the standard optimization functions and the chemical reactions, 1 per round for the materials datasets and the others. Initial designs (agent-003, 16 Nov 2026): HPO-B its published 5 (bo-initializations file); Liang 2 (the paper's protocol, per agent-005); Bayesmark d Sobol points per the PFNs4BO paper (Mueller et al., ICML 2023, sec. 7.2), not Bayesmark's own; 5 elsewhere is our choice. Wording before: In each run, every method starts from the same initial experiments: 5 on most benchmarks, 2 on the materials datasets, one per setting (2 to 9) on Bayesmark. Machine-learning tuning (16 Nov 2026, founder: combine HPO-B and Bayesmark into one row): unweighted mean over 69 tasks, 33 HPO-B test tasks (search spaces with up to 6 settings, the tasks behind the separate HPO-B row, which this reproduces exactly) plus 36 Bayesmark tasks; AWS results/experiments/s1-003-056-pfns4bo, pool_ml_tuning.py -> pool_ml_tuning.json. Score at 50: 48.5 vs 46 (+5% on unrounded values); score leaves out tasks random search already solves (64 tasks at 25, 62 at 50); distance and top 1% use all 69. Top 1% at 25 is 70 vs 68 (+2%), shown as equal. Per task (mean regret, within 1% of range = level): 25: 19 better / 38 level / 12 worse; 50: 14 / 47 / 8. Caveat: shown separately, HPO-B's score at 50 is behind (57 vs 60); pooled it is ahead because of Bayesmark, and the pooled distance lead at 50 comes almost all from HPO-B. Range and top 1% are defined per suite (HPO-B: its recorded configurations; Bayesmark: best and worst reached, top 1% of random search). Cell-culture media and protein engineering rows (biofoundrydemo-ai-09, 16 Nov 2026, on the founder's request): provenance and caveats in each benchmark's entry; protein hidden until its numbers arrive. n_note before them: Results are averaged over 5 to 50 runs per benchmark, typically 10. In each run, every method starts from the same initial experiments: 5 on most benchmarks, and on HPO-B, the materials datasets and Bayesmark the number their published protocols use. Protein engineering rows (biofoundrydemo-ai-09, 16 Nov 2026, final): index encoding, shown with the one-hot caveat in its table line and card; detail before: \"2 measured fitness landscapes\"; n_note before: \"...10 on cell-culture media, and on HPO-B...\". Protein significance (biofoundrydemo-ai-09, 16 Nov 2026): score and distance at 50 shown as \"within noise\" (were \"+42%\" and \"1.2x closer\", 8.3 points); only top 1% at 50 is significant. Reverted by the founder (16 Nov 2026): protein score and distance at 50 back to \"+42%\" and \"1.2x closer\" (8.3 points); the significance read stays in the entry's caveats. Protein detail line (founder, 16 Nov 2026: no results in benchmark descriptions; the caveat line removed): was \"2 measured fitness landscapes, each site as one setting. With one-hot encoding, Bayesian optimization leads.\". RECOB row (biofoundrydemo-ai-b9, 16 Nov 2026, in the table format on the founder's request): a separate row after Chemistry and materials. n_note before: \"Results are averaged over 5 to 50 runs per benchmark, typically 10. In each run, every method starts from the same initial experiments: 5 on most benchmarks, 10 on cell-culture media and protein engineering, and on HPO-B, the materials datasets and Bayesmark the number their published protocols use.\". RECOB hidden (founder, 17 Nov 2026): to be added only as a complete set with the pending results; its rows, card and text stay in the data. n_note was \"...10 on cell-culture media, protein engineering and RECOB, ...\". Protein rows replaced (biofoundrydemo-ai-09, 17 Nov 2026): GP BO baseline kernel corrected (one-hot, S1-003-060), 20 seeds; was score 20/20 and 40/28, distance 63.7/64.4 and 44.0/52.3, top 1% 60/60 and 100/75. Life science merged into one row (founder, 17 Nov 2026): cell-free (3 datasets), media (2) and protein (2) pooled by dataset count, (3 x cell-free + 2 x media + 2 x protein) / 7; the separate rows stay in the data, hidden. RECOB shown again and Anubis (BCR-Abl kinase inhibitors) added as rows (founder, 17 Nov 2026: both now, the set complete); RECOB rows updated to the final numbers (top 1% shown as point estimates, was \"equal\" at 25 and 50). n_note was \"Results are averaged over 5 to 50 runs per benchmark, typically 10. In each run, every method starts from the same initial experiments: 5 on most benchmarks, 10 on cell-culture media and protein engineering, and on HPO-B, the materials datasets and Bayesmark the number their published protocols use.\". RECOB merged into Chemistry and materials and Anubis into Life science (founder, 17 Nov 2026), pooled by task and dataset count; their own rows stay in the data, hidden. Perovskites (Anubis HOIP) added as their own row (founder, 17 Nov 2026), after Chemistry and materials; score shown as a difference in points. Perovskites (HOIP) merged into Chemistry and materials as one task of 27 (founder, 17 Nov 2026); their own row stays in the data, hidden.",
+    "batch_note": "Batch size: 5 experiments per round for the standard optimization functions and the chemical reactions, 1 per round for others.",
+    "benchmarks": [
+      {
+        "id": "edbo",
+        "name": "Chemical reactions",
+        "detail": "7 published reaction-yield datasets"
+      },
+      {
+        "id": "liang",
+        "name": "Materials",
+        "detail": "5 published materials datasets"
+      },
+      {
+        "id": "selfassembly",
+        "name": "Emergent patterns",
+        "detail": "80 problems",
+        "name_before": "Self-assembly and pattern formation / Lenia and self-organization"
+      },
+      {
+        "id": "truss",
+        "name": "Truss design",
+        "detail": "40 problems"
+      },
+      {
+        "id": "bayesmark",
+        "name": "Bayesmark",
+        "detail": "36 machine-learning tuning problems",
+        "before": "hpob"
+      },
+      {
+        "id": "cad",
+        "name": "Parametric CAD",
+        "detail": "29 problems"
+      },
+      {
+        "id": "chemmat",
+        "name": "Chemistry and materials",
+        "detail": "27 tasks",
+        "detail_was": "12 published datasets",
+        "provenance": "Pooled by task count (founder, 17 Nov 2026: the perovskites merged in as a single task): (7 x EDBO + 5 x Liang + 14 x RECOB + 1 x HOIP) / 27. EDBO and Liang from the values shown (rounded); RECOB and HOIP exact. Exact pooled, SDM-1 / GP BO: {\"score@25\": [51.711, 41.841], \"score@50\": [78.796, 69.819], \"distance@25\": [10.935, 13.339], \"distance@50\": [5.38, 6.936], \"top1@25\": [70.281, 63.198], \"top1@50\": [93.183, 90.657]}. Before (without HOIP, / 26): Pooled by task count (founder, 17 Nov 2026: merge RECOB into the chemistry row): (7 x EDBO + 5 x Liang + 14 x RECOB) / 26. EDBO and Liang from the values shown (rounded; the suite means behind them are not in the data file), RECOB exact (its provenance). Exact pooled, SDM-1 / GP BO: {\"score@25\": [52.331, 43.292], \"score@50\": [79.615, 71.585], \"distance@25\": [9.69, 11.375], \"distance@50\": [4.664, 5.552], \"top1@25\": [72.6, 65.5], \"top1@50\": [96.254, 93.631]}. Before (EDBO and Liang only, (7 x EDBO + 5 x Liang) / 12): {\"score\": [{\"benchmark\": \"chemmat\", \"n\": 25, \"model\": 45, \"bo\": 35, \"vs_bo\": \"+30%\"}, {\"benchmark\": \"chemmat\", \"n\": 50, \"model\": 88, \"bo\": 75, \"vs_bo\": \"+18%\"}], \"distance\": [{\"benchmark\": \"chemmat\", \"n\": 25, \"model\": 5.3, \"bo\": 6.1, \"vs_bo\": \"1.2x closer\"}, {\"benchmark\": \"chemmat\", \"n\": 50, \"model\": 1.0, \"bo\": 1.9, \"vs_bo\": \"2.0x closer\"}], \"top1\": [{\"benchmark\": \"chemmat\", \"n\": 25, \"model\": 63, \"bo\": 52, \"vs_bo\": \"+23%\"}, {\"benchmark\": \"chemmat\", \"n\": 50, \"model\": 97, \"bo\": 90, \"vs_bo\": \"+8%\"}]}",
+        "caveats": [
+          "Top 1% mixes two definitions: of the recorded candidates for EDBO and Liang, of the search space for RECOB.",
+          "RECOB on its own: ahead at 25, level at 50 (2 SE); EDBO and Liang: ahead.",
+          "HOIP on its own: score 35.6 / 4.1 at 25 and 57.5 / 23.9 at 50, distance ahead at both (2 SE); top 1% within noise."
+        ]
+      },
+      {
+        "id": "mltuning",
+        "name": "Machine-learning tuning",
+        "detail": "69 problems"
+      },
+      {
+        "id": "media",
+        "name": "Cell-culture media",
+        "detail": "2 published datasets",
+        "source": "Parsaee et al., Bioinformatics 2026, doi 10.5281/zenodo.21501659 (code CC BY 4.0); data Kim and Audet, Commun Biol 2, 48 (2019), under its own open-access article. Attribution required.",
+        "provenance": "biofoundrydemo-ai-09, 16 Nov 2026: H1 (gamma_s1-003-037-feashead-s1, harness model-ei-body) vs GP BO (gp-ts), random as the score's reference; study 20261116-s1-003-057-media-aws, commit 41e564f. T cell (535 formulations, 14 components) and TF-1 (1562, 15); 10 seeds, 10 random initial formulations, budget 50, batch 1. Score 26.9 vs 11.9 at 25, 56.8 vs 34.5 at 50 (shown rounded; vs_bo from the unrounded). Exact (biofoundrydemo-ai-09, 16 Nov 2026): score 26.9370 vs 11.9313 at 25, 56.8136 vs 34.4840 at 50; distance 5.4563 vs 6.7388 at 25 (1.2351), 1.9947 vs 3.1332 at 50 (1.5707); top 1% 40.0 vs 40.0, 90.0 vs 85.0. Held out: H1 trained on synthetic families and own simulators only, weights 2026-11-05, these data converted 2026-11-16.",
+        "caveats": [
+          "Six datasets in the paper, two shown. Inclusion rule fixed before any score: the budget covers at most 10% of the pool (T cell 9%, TF-1 3%; the other four 15% to 27%). On the other four no method beats random, GP BO included (26 to 29 components, budget a quarter of the smallest pools, best-vs-second gap below the repeat spread): a property of the benchmarks.",
+          "The score is a ratio against random, which does badly on these two pools, so it amplifies: in absolute terms the regret gap is about 1.2 points of the range at 25 and 1.1 at 50.",
+          "Per task: one better by 1 to 2%, one level, none better by more than 2%. Seed by seed, TF-1 at 50 is a tie (better on 3 of 10, worse on 3); T cell leans ahead (better on 5, worse on 2).",
+          "No TabPFN comparison yet (rerunning). 10 seeds accepted by the user after caveats 2 and 3.",
+          "Both datasets from one study by one group: not two independent pieces of evidence.",
+          "Mammalian cell-culture media optimization: never call it a biofoundry or protein-expression result.",
+          "Public academic benchmark on recorded measurements, not ProviGen lab data; the claim is sample efficiency against GP BO on the same data and seeds."
+        ]
+      },
+      {
+        "id": "protein",
+        "name": "Protein engineering",
+        "detail": "2 measured fitness landscapes",
+        "source": "ALDE (Yang et al., Nat Commun 16, 2025), doi 10.5281/zenodo.12196802, CC BY 4.0; landscapes from Wu et al., eLife 5:e16965 (2016) (GB1) and Johnston et al. (2024) (TrpB). Evaluation only, never training data. Attribution required.",
+        "provenance": "biofoundrydemo-ai-09, 17 Nov 2026 (supersedes 16 Nov): study 20261117-s1-003-060-protein-onehot (AWS array 6691), commit 0ac2936, botorch 0.16.1; H1 gamma_s1-003-037-feashead-s1 (harness model-ei-body) vs GP BO with the corrected kernel (S1-003-060: the sites declared categorical and expanded to one-hot, 80 lengthscales; before, one coordinate per site held the residue's alphabetical rank under an RBF). GB1 (149,361 measured variants) and TrpB (159,129), 4 sites x 20 amino acids, searched as pools; 20 seeds per task, 40 campaigns, 10 initial variants, n counts evaluations including them; index encoding; metrics as page_metrics.py. Exact, SDM-1 / GP BO: score 19.9 / 16.1 at 25, 37.2 / 34.5 at 50; distance 60.6 / 63.7, 43.9 / 45.9; top 1% 62.5 / 60.0, 92.5 / 85.0 (random 35 at 25, 45 at 50). Shown rounded half up; vs_bo from the unrounded (distance at 50 ratio 1.05, shown as equal). Per task at 50, normalised regret: GB1 0.445 vs GP 0.487 vs random 0.747; TrpB 0.433 vs 0.431 vs random 0.655. Tasks SDM-1 vs GP: at 25 one better >2%, one worse >2%; at 50 one better >2%, one level. TabPFN not rerun (timed out at 3 h); no TabPFN in this row. Checked against BiofoundryDemo_AI docs/external_benchmarks.md at 94191f0e, \"RESULT OF THE PRE-REGISTERED TEST\". Raw per seed: AWS /shared/orthodim/results/experiments/meta-search-benchmark/20261117-s1-003-060-protein-onehot; metrics page_metrics-20261117-s1-003-060-protein-onehot.json. Before (16 Nov, superseded, against the broken baseline): biofoundrydemo-ai-09, 16 Nov 2026 (final): study 20261116-s1-003-057-protein-aws (AWS array 6398), commit bfc4b9c; H1 gamma_s1-003-037-feashead-s1 (harness model-ei-body, the served default) vs GP BO; GB1 (149,361 measured variants) and TrpB (159,129), 4 sites x 20 amino acids, searched as pools; 10 seeds per task, 10 initial variants, n counts evaluations including them. Index encoding (4 dimensions, one coordinate per site, what the system natively receives), the row shown. Exact, SDM-1 / GP BO / TabPFN: score 20.2 / 19.5 / 14.8 at 25, 40.2 / 28.4 / 25.1 at 50; distance 63.7 / 64.4 / 68.2, 44.0 / 52.3 / 55.2; top 1% 60 / 60 / 45, 100 / 75 / 75. Shown rounded, vs_bo from the unrounded (score at 25 +4% unrounded, shown as equal: one task better, one worse; distance at 25 ratio 1.01, equal). Per task at 50 (normalised regret): GB1 0.428 vs GP 0.467, TrpB 0.452 vs 0.578, both better by more than 2%. Both landscapes searchable: value percentile of picks after the initial design 0.54 to 0.58 for SDM-1 and GP BO, 0.50 to 0.51 for random. Raw per seed: AWS /shared/orthodim/results/experiments/s1-003-057-bio/protein_encoding_read.txt. Before the numbers: \"NUMBERS PENDING: hidden until the final table arrives (then add its rows and take it out of `hidden`).\"",
+        "caveats": [
+          "SIGNIFICANCE (biofoundrydemo-ai-09, 17 Nov 2026, 20 seeds, 40 paired campaigns): nothing clears 2 se against GP BO at any budget or encoding. Index at 50 is -0.021 at 0.5 se; top 1% at 50 is 37/40 vs 34/40, 7 discordant (5/2), exact p 0.227. Against random it is emphatic: 4.2 se at 25, 8.5 se at 50; top 1% 37/40 vs 18/40, 20 of 21 discordant ours.",
+          "The claim these numbers support: level with Bayesian optimization, far ahead of random (top 1% reached 92.5 against 45 at n=50). On the means SDM-1 is equal or better than GP BO on all three metrics at both budgets (the founder's criterion for the row, 16 Nov); on the paired test those margins are not demonstrated. If the row is shown on the means, this significance caveat has to be visible with it (the founder's call).",
+          "ENCODING: at 20 seeds with the corrected baseline the encoding no longer reverses the verdict: level under all three (one-hot SDM-1 minus GP +0.027, se 0.052, at 50 over the 30 campaigns that finished; index level too). The old framing \"better than GP BO on the representation the system is actually given\" is withdrawn.",
+          "Public academic benchmark on recorded measurements, not ProviGen lab data; the claim is sample efficiency against GP BO on the same data and seeds.",
+          "Superseded 16 Nov caveats (do not publish), kept for the record: SIGNIFICANCE (biofoundrydemo-ai-09, 16 Nov 2026, docs/external_benchmarks.md 5356d19, encoding_spread.py): paired by seed, 20 pairs. Only index top 1% at 50 clears 2 se in our favour (20/20 vs 15/20, all 5 discordant seeds ours, exact one-sided p = 0.031). Score at 25 is 0.1 se; distance at 50 is -0.083 at 1.5 se (12 of 20 seeds, TrpB alone); Georgiev lead at 25 is 0.5 se; one-hot at 25 on distance is against us at 2.1 se. Beats random at every encoding and budget by 2.6 to 7.7 se. Never publish \"+42% score\"; distance level; the separation is in top 1%. || MANDATORY, visible wherever the row is shown (not a footnote): three encodings of the same amino acids over identical pool rows and initial designs. Index encoding (the row shown): SDM-1 ahead. One-hot (80 sparse binary dimensions): a plain GP overtakes SDM-1 at both budgets (score 32.4 vs 44.7 at 50). Georgiev physicochemical factors (76 dimensions): SDM-1 ahead at 25, behind at 50. The claim is \"better than GP BO on the representation the system is actually given\", never \"better than GP BO on protein landscapes\". || Lead with n=50 (both tasks better); n=25 shown beside it (one task better, one worse). || Earlier: The amino-acid encoding changes the result (GP BO on GB1 at 50, regret: one-hot 0.392, Georgiev 0.421, naive index 0.467); three encodings in flight on identical variants, values and starting points. Do not show partial (naive-index-only) numbers. || Public academic benchmark on recorded measurements, not ProviGen lab data; the claim is sample efficiency against GP BO on the same data and seeds."
+        ]
+      },
+      {
+        "id": "recob",
+        "name": "Chemistry and materials (RECOB)",
+        "detail": "14 tasks",
+        "source": "Xie et al., \"RECOB: Reliable Benchmarking of Experimental Optimization in Chemistry and Materials Science\", arXiv 2609.20891 (2026). Paper only: never publish or link RECOB's data or models.",
+        "provenance": "biofoundrydemo-ai-b9, 17 Nov 2026 (final; the user approved RECOB and Anubis as rows): H1 (gamma_s1-003-037-feashead-s1, model-ei-body) vs GP BO (gp-ts), 14 tasks x 20 trials = 280 campaigns per method, RECOB's protocol (10 fixed starting points). Exact, H1 / GP BO: score 58.9 / 50.9 at 25, 72.5 / 68.8 at 50; distance 13.41 / 15.86, 7.84 / 8.69; top 1% 80.4 / 77.5, 95.4 / 96.1. 2 SE: nothing passes at suite level (at 25 score 1.96 SE, distance 1.87 SE, at the edge); words: ahead at 25, level at 50. Top 1% here is the 99th percentile of each task's oracle over 200,000 uniform points (top 1% of the search space). RECOB re-asks repeated conditions for free and we cannot (about a fifth of our budget), which works against us. Internal: docs/external_benchmarks.md master ef8e61e, study 20261115-s1-004-016-recob-aws (code 05a8eaa, arrays 5780/6369). Before: biofoundrydemo-ai-b9, 16 Nov 2026: H1 (gamma_s1-003-037-feashead-s1, model-ei-body) vs the page's GP BO (gp-ts), 14 tasks, 20 seeds (RECOB's frozen trials), the same 10 frozen starts, batch 1; n counts the starts. Study 20261115-s1-004-016-recob-aws (code 05a8eaa, arrays 5780 + 6369), readout recob_page.py with recob_landscape.json, docs/external_benchmarks.md RECOB 'Page-table reading' (3e9c5a0 on agent/005). Exact, SDM-1 / GP BO: n=25 score 58.88 / 50.85, distance 13.411 / 15.864, top 1% 80.36 / 77.50; n=50 score 72.50 / 68.84, distance 7.841 / 8.689, top 1% 95.36 / 96.07. Paired, SDM-1 minus GP BO [SE over 14 tasks]: n=25 score +8.03 [4.10], distance -2.45 [1.31], top 1% +2.86 [4.12]; n=50 score +3.66 [3.67], distance -0.85 [1.09], top 1% -0.71 [1.27]. Distance per task (>2% / 1-2% / <1% of range): n=25 better 6 (4 resolved) + 1, level 6, worse 1 (p3ht_cnt_conductivity); n=50 better 5 (3), level 8, worse 1 (resolved, p3ht_cnt_conductivity). Shown with the page's conventions: top 1% at 25 (+3.7%, 0.7 SE) and at 50 (-0.7%) as equal, like protein's score at 25.",
+        "caveats": [
+          "Adapted definitions (a learned oracle, no candidate set, no known optimum): optimum = best value known (max over 200,000 uniform latent-cube rows decoded by RECOB's mapping, all 2,800 published runs and ours); bottom = landscape minimum; distance = (optimum - best so far) / range; score = 100(1 - min(1, distance / random's distance)) per task, then mean; top 1% = the oracle's 99th percentile over the uniform sample (by volume). Random reaches it in 18.9% / 37.1% at 25 / 50.",
+          "Under a 2 SE rule nothing resolves at suite level: n=25 score and distance at 1.96 and 1.87 SE (borderline), n=50 level on all three. Weaker than EDBO and Liang; a separate row, never pooled into Chemistry and materials (different definitions).",
+          "Never quote or compare with the paper's Table 4 (the repository snapshot does not reproduce it). Earlier anytime-score claim (78.0 vs HEBO 70.2, LogEI 71.1, random 30.8; 10 of 14 vs HEBO) not used on the page: the founder asked for the table's format (16 Nov 2026). No final-score claim against HEBO.",
+          "Learned oracles trained on measured lab data, not ProviGen lab data."
+        ]
+      },
+      {
+        "id": "lifesci",
+        "name": "Life science",
+        "detail": "8 published datasets",
+        "provenance": "Pooled by dataset count (founder, 17 Nov 2026: merge Anubis into life science): (3 x cell-free + 2 x media + 2 x protein + 1 x kinase inhibitors) / 8. Cell-free from the values shown (rounded); media, protein and Anubis exact. Exact pooled, SDM-1 / GP BO: {\"score@25\": [35.384, 25.408], \"score@50\": [55.403, 42.946], \"distance@25\": [22.322, 24.818], \"distance@50\": [13.05, 14.806], \"top1@25\": [59.087, 51.962], \"top1@50\": [90.75, 81.963]}. Before (without Anubis, / 7): Pooled (founder, 17 Nov 2026: combine cell-free protein expression, cell-culture media and protein engineering into one row) by dataset count, as Chemistry and materials: (3 x cell-free + 2 x media + 2 x protein) / 7, from the suite means. Media and protein exact (their provenance); cell-free from the values shown (rounded), the data file has no more exact ones. Exact pooled, SDM-1 / GP BO: {\"score@25\": [33.096, 25.152], \"score@50\": [51.29, 37.281], \"distance@25\": [24.016, 26.125], \"distance@50\": [14.527, 16.495], \"top1@25\": [58.0, 51.286], \"top1@50\": [89.429, 79.857]}",
+        "caveats": [
+          "Pooling hides protein's own result: level with GP BO on the paired test (nothing clears 2 se at 20 seeds, 40 campaigns); the pooled lead comes mostly from cell-free and media.",
+          "Distance pools three scales: protein's distances (44 to 64) outweigh cell-free's and media's (2 to 14), so the pooled distance follows protein.",
+          "The kinase-inhibitor task on its own: ahead early, level by 50 (2 SE)."
+        ],
+        "detail_was": "7 published datasets"
+      },
+      {
+        "id": "anubis",
+        "name": "Kinase inhibitors with failed syntheses",
+        "detail": "270 molecules, 57 fail",
+        "source": "Hickman et al., Digital Discovery 2025, doi 10.1039/D5DD00018A. Cite the paper only: no data or model links.",
+        "provenance": "biofoundrydemo-ai-b9, 17 Nov 2026 (the user approved Anubis as a row; lifts the 16 Nov hold): Anubis BCR-Abl, H1 vs GP BO (gp-ts), 30 seeds, 12 initial points, 270 molecules of which 57 fail to synthesise, one optimum; top 1% = the 3 best of 270. Exact, H1 / GP BO: score 51.4 / 27.2 at 25, 84.2 / 82.6 at 50; distance 10.46 / 15.67, 2.71 / 2.98; top 1% 66.7 / 56.7, 100 / 96.7. 2 SE: only distance at 25 passes (-5.21 [2.49]); words: ahead early, level by 50; never 'x times better' (the 1.89 score ratio is one task early on). Served path (oracle-gamma) ties H1; page numbers stay H1. Internal: study 20261115-s1-004-016-anubis-aws (arrays 5790/6652, code 382ffaf/eaf6d38).",
+        "caveats": [
+          "One task: read as ahead early, level by 50.",
+          "HOIP perovskites (not a row; experiments to the first good material): ours found one in all 30 runs, median 39; GP BO in 73% within 250, median 80.5; random 80%, median 136.5."
+        ]
+      },
+      {
+        "id": "hoip",
+        "name": "Perovskites with failed syntheses",
+        "detail": "1,276 compositions, 1,165 fail",
+        "source": "Hickman et al., Digital Discovery 2025, doi 10.1039/D5DD00018A. Cite the paper only: no data or model links.",
+        "provenance": "biofoundrydemo-ai-b9, 17 Nov 2026 (the user asked for a row; its own row, the user's choice in this session): Anubis HOIP, H1 (model-ei-body) vs GP BO (gp-ts), 30 seeds, 5 initial points counted in n. Exact, H1 / GP BO: score 35.6 / 4.1 at 25, 57.5 / 23.9 at 50; distance 43.3 / 64.4 (-21.1 points), 24.0 / 42.9 (-19.0), both pass 2 SE (SE 7.1 and 5.8); top 1% 10.0 / 3.3, 13.3 / 13.3, equal within noise (the 2 best of the 111 compositions that form, near its floor for every method). Score shown as a difference in points at both n: at 25 GP BO is barely above random, so a ratio (8.7x) divides by almost nothing; at 50 'ahead', never '2.4x'. Score: the paper's Chimera ranking (tolerance tiers), so distance is in ranking units, not eV. Internal: docs/external_benchmarks.md master a23510c, 'HOIP page-table reading' (definitions committed 4b9b79e before the numbers); hoip_page.txt in study 20261115-s1-004-016-anubis-aws. Served path ties (27.1 / 59.5); page stays H1.",
+        "caveats": [
+          "The paper's own target, experiments to the first composition meeting both targets: ours median 39, all 30 runs within 200; GP BO median 80.5, 73% of runs within 250. Failed experiments in the first 200: ours 76%, GP BO 92%.",
+          "Shown by the table's rule as every other row (founder, 17 Nov 2026: no special rule): relative differences from the unrounded values, so score +768% at 25 (GP BO barely above random) and top 1% +200% at 25 (3 of 30 runs against 1 of 30). Was score as points (+32, +34) and top 1% as equal."
+        ]
+      }
+    ],
+    "rows": {
+      "score": [
+        {
+          "benchmark": "edbo",
+          "n": 25,
+          "model": 48,
+          "bo": 34,
+          "vs_bo": "+41%"
+        },
+        {
+          "benchmark": "edbo",
+          "n": 50,
+          "model": 85,
+          "bo": 69,
+          "vs_bo": "+24%"
+        },
+        {
+          "benchmark": "liang",
+          "n": 25,
+          "model": 40,
+          "bo": 35,
+          "vs_bo": "+14%"
+        },
+        {
+          "benchmark": "liang",
+          "n": 50,
+          "model": 92,
+          "bo": 83,
+          "vs_bo": "+11%"
+        },
+        {
+          "benchmark": "selfassembly",
+          "n": 25,
+          "model": 67,
+          "bo": 53,
+          "vs_bo": "+26%"
+        },
+        {
+          "benchmark": "selfassembly",
+          "n": 50,
+          "model": 74,
+          "bo": 59,
+          "vs_bo": "+25%"
+        },
+        {
+          "benchmark": "truss",
+          "n": 25,
+          "model": 9,
+          "bo": 9,
+          "vs_bo": "equal"
+        },
+        {
+          "benchmark": "truss",
+          "n": 50,
+          "model": 32,
+          "bo": 20,
+          "vs_bo": "+62%"
+        },
+        {
+          "benchmark": "bayesmark",
+          "n": 25,
+          "model": 36,
+          "bo": 29,
+          "vs_bo": "+26%"
+        },
+        {
+          "benchmark": "bayesmark",
+          "n": 50,
+          "model": 42,
+          "bo": 35,
+          "vs_bo": "+20%"
+        },
+        {
+          "benchmark": "cad",
+          "n": 25,
+          "model": 39,
+          "bo": 27,
+          "vs_bo": "+47%"
+        },
+        {
+          "benchmark": "cad",
+          "n": 50,
+          "model": 70,
+          "bo": 80,
+          "vs_bo": "−13%"
+        },
+        {
+          "benchmark": "mltuning",
+          "n": 25,
+          "model": 41,
+          "bo": 36,
+          "vs_bo": "+15%"
+        },
+        {
+          "benchmark": "mltuning",
+          "n": 50,
+          "model": 49,
+          "bo": 46,
+          "vs_bo": "+5%"
+        },
+        {
+          "benchmark": "media",
+          "n": 25,
+          "model": 27,
+          "bo": 12,
+          "vs_bo": "+126%"
+        },
+        {
+          "benchmark": "media",
+          "n": 50,
+          "model": 57,
+          "bo": 35,
+          "vs_bo": "+65%"
+        },
+        {
+          "benchmark": "protein",
+          "n": 25,
+          "model": 20,
+          "bo": 16,
+          "vs_bo": "+24%"
+        },
+        {
+          "benchmark": "protein",
+          "n": 50,
+          "model": 37,
+          "bo": 35,
+          "vs_bo": "+8%"
+        },
+        {
+          "benchmark": "recob",
+          "n": 25,
+          "model": 59,
+          "bo": 51,
+          "vs_bo": "+16%"
+        },
+        {
+          "benchmark": "recob",
+          "n": 50,
+          "model": 73,
+          "bo": 69,
+          "vs_bo": "+5%"
+        },
+        {
+          "benchmark": "anubis",
+          "n": 25,
+          "model": 51,
+          "bo": 27,
+          "vs_bo": "+89%"
+        },
+        {
+          "benchmark": "anubis",
+          "n": 50,
+          "model": 84,
+          "bo": 83,
+          "vs_bo": "+2%"
+        },
+        {
+          "benchmark": "lifesci",
+          "n": 25,
+          "model": 35,
+          "bo": 25,
+          "vs_bo": "+39%"
+        },
+        {
+          "benchmark": "lifesci",
+          "n": 50,
+          "model": 55,
+          "bo": 43,
+          "vs_bo": "+29%"
+        },
+        {
+          "benchmark": "hoip",
+          "n": 25,
+          "model": 36,
+          "bo": 4,
+          "vs_bo": "+768%"
+        },
+        {
+          "benchmark": "hoip",
+          "n": 50,
+          "model": 58,
+          "bo": 24,
+          "vs_bo": "+141%"
+        },
+        {
+          "benchmark": "chemmat",
+          "n": 25,
+          "model": 52,
+          "bo": 42,
+          "vs_bo": "+24%"
+        },
+        {
+          "benchmark": "chemmat",
+          "n": 50,
+          "model": 79,
+          "bo": 70,
+          "vs_bo": "+13%"
+        }
+      ],
+      "distance": [
+        {
+          "benchmark": "edbo",
+          "n": 25,
+          "model": 5.6,
+          "bo": 6.6,
+          "vs_bo": "1.2x closer",
+          "vs_bo_points": "1.0 points closer"
+        },
+        {
+          "benchmark": "edbo",
+          "n": 50,
+          "model": 1.0,
+          "bo": 2.1,
+          "vs_bo": "2.0x closer",
+          "vs_bo_points": "1.1 points closer"
+        },
+        {
+          "benchmark": "liang",
+          "n": 25,
+          "model": 5.0,
+          "bo": 5.5,
+          "vs_bo": "1.1x closer",
+          "vs_bo_points": "0.5 points closer"
+        },
+        {
+          "benchmark": "liang",
+          "n": 50,
+          "model": 0.9,
+          "bo": 1.6,
+          "vs_bo": "1.8x closer",
+          "vs_bo_points": "0.7 points closer"
+        },
+        {
+          "benchmark": "selfassembly",
+          "n": 25,
+          "model": 17.2,
+          "bo": 20.4,
+          "vs_bo": "1.2x closer"
+        },
+        {
+          "benchmark": "selfassembly",
+          "n": 50,
+          "model": 14.6,
+          "bo": 16.5,
+          "vs_bo": "1.1x closer"
+        },
+        {
+          "benchmark": "truss",
+          "n": 25,
+          "model": 21.0,
+          "bo": 20.9,
+          "vs_bo": "equal"
+        },
+        {
+          "benchmark": "truss",
+          "n": 50,
+          "model": 9.5,
+          "bo": 11.8,
+          "vs_bo": "1.2x closer"
+        },
+        {
+          "benchmark": "bayesmark",
+          "n": 25,
+          "model": 7.4,
+          "bo": 7.3,
+          "vs_bo": "equal"
+        },
+        {
+          "benchmark": "bayesmark",
+          "n": 50,
+          "model": 4.4,
+          "bo": 4.6,
+          "vs_bo": "equal"
+        },
+        {
+          "benchmark": "cad",
+          "n": 25,
+          "model": 12.7,
+          "bo": 15.5,
+          "vs_bo": "1.2x closer"
+        },
+        {
+          "benchmark": "cad",
+          "n": 50,
+          "model": 5.9,
+          "bo": 4.1,
+          "vs_bo": "1.4x worse"
+        },
+        {
+          "benchmark": "mltuning",
+          "n": 25,
+          "model": 6.6,
+          "bo": 7.6,
+          "vs_bo": "1.1x closer"
+        },
+        {
+          "benchmark": "mltuning",
+          "n": 50,
+          "model": 3.6,
+          "bo": 4.9,
+          "vs_bo": "1.4x closer"
+        },
+        {
+          "benchmark": "media",
+          "n": 25,
+          "model": 5.5,
+          "bo": 6.7,
+          "vs_bo": "1.2x closer",
+          "vs_bo_points": "1.2 points closer"
+        },
+        {
+          "benchmark": "media",
+          "n": 50,
+          "model": 2.0,
+          "bo": 3.1,
+          "vs_bo": "1.6x closer",
+          "vs_bo_points": "1.1 points closer"
+        },
+        {
+          "benchmark": "protein",
+          "n": 25,
+          "model": 60.6,
+          "bo": 63.7,
+          "vs_bo": "1.1x closer",
+          "vs_bo_points": "3.1 points closer"
+        },
+        {
+          "benchmark": "protein",
+          "n": 50,
+          "model": 43.9,
+          "bo": 45.9,
+          "vs_bo": "equal",
+          "vs_bo_points": "2.0 points closer"
+        },
+        {
+          "benchmark": "recob",
+          "n": 25,
+          "model": 13.4,
+          "bo": 15.9,
+          "vs_bo": "1.2x closer",
+          "vs_bo_points": "2.5 points closer"
+        },
+        {
+          "benchmark": "recob",
+          "n": 50,
+          "model": 7.8,
+          "bo": 8.7,
+          "vs_bo": "1.1x closer",
+          "vs_bo_points": "0.9 points closer"
+        },
+        {
+          "benchmark": "anubis",
+          "n": 25,
+          "model": 10.5,
+          "bo": 15.7,
+          "vs_bo": "1.5x closer",
+          "vs_bo_points": "5.2 points closer"
+        },
+        {
+          "benchmark": "anubis",
+          "n": 50,
+          "model": 2.7,
+          "bo": 3.0,
+          "vs_bo": "1.1x closer",
+          "vs_bo_points": "0.3 points closer"
+        },
+        {
+          "benchmark": "lifesci",
+          "n": 25,
+          "model": 22.3,
+          "bo": 24.8,
+          "vs_bo": "1.1x closer",
+          "vs_bo_points": "2.5 points closer"
+        },
+        {
+          "benchmark": "lifesci",
+          "n": 50,
+          "model": 13.0,
+          "bo": 14.8,
+          "vs_bo": "1.1x closer",
+          "vs_bo_points": "1.8 points closer"
+        },
+        {
+          "benchmark": "hoip",
+          "n": 25,
+          "model": 43.3,
+          "bo": 64.4,
+          "vs_bo": "1.5x closer",
+          "vs_bo_points": "21.1 points closer"
+        },
+        {
+          "benchmark": "hoip",
+          "n": 50,
+          "model": 24.0,
+          "bo": 42.9,
+          "vs_bo": "1.8x closer",
+          "vs_bo_points": "19.0 points closer"
+        },
+        {
+          "benchmark": "chemmat",
+          "n": 25,
+          "model": 10.9,
+          "bo": 13.3,
+          "vs_bo": "1.2x closer",
+          "vs_bo_points": "2.4 points closer"
+        },
+        {
+          "benchmark": "chemmat",
+          "n": 50,
+          "model": 5.4,
+          "bo": 6.9,
+          "vs_bo": "1.3x closer",
+          "vs_bo_points": "1.6 points closer"
+        }
+      ],
+      "top1": [
+        {
+          "benchmark": "edbo",
+          "n": 25,
+          "model": 56,
+          "bo": 44,
+          "vs_bo": "+27%"
+        },
+        {
+          "benchmark": "edbo",
+          "n": 50,
+          "model": 96,
+          "bo": 87,
+          "vs_bo": "+11%"
+        },
+        {
+          "benchmark": "liang",
+          "n": 25,
+          "model": 74,
+          "bo": 62,
+          "vs_bo": "+19%"
+        },
+        {
+          "benchmark": "liang",
+          "n": 50,
+          "model": 99,
+          "bo": 96,
+          "vs_bo": "+3%"
+        },
+        {
+          "benchmark": "selfassembly",
+          "n": 25,
+          "model": 68,
+          "bo": 60,
+          "vs_bo": "+14%"
+        },
+        {
+          "benchmark": "selfassembly",
+          "n": 50,
+          "model": 81,
+          "bo": 70,
+          "vs_bo": "+15%"
+        },
+        {
+          "benchmark": "truss",
+          "n": 25,
+          "model": 17,
+          "bo": 16,
+          "vs_bo": "equal"
+        },
+        {
+          "benchmark": "truss",
+          "n": 50,
+          "model": 49,
+          "bo": 41,
+          "vs_bo": "+21%"
+        },
+        {
+          "benchmark": "bayesmark",
+          "n": 25,
+          "model": 69,
+          "bo": 66,
+          "vs_bo": "+5%"
+        },
+        {
+          "benchmark": "bayesmark",
+          "n": 50,
+          "model": 88,
+          "bo": 85,
+          "vs_bo": "+3%"
+        },
+        {
+          "benchmark": "cad",
+          "n": 25,
+          "model": 66,
+          "bo": 53,
+          "vs_bo": "+25%"
+        },
+        {
+          "benchmark": "cad",
+          "n": 50,
+          "model": 92,
+          "bo": 90,
+          "vs_bo": "equal"
+        },
+        {
+          "benchmark": "mltuning",
+          "n": 25,
+          "model": 70,
+          "bo": 68,
+          "vs_bo": "equal"
+        },
+        {
+          "benchmark": "mltuning",
+          "n": 50,
+          "model": 86,
+          "bo": 86,
+          "vs_bo": "equal"
+        },
+        {
+          "benchmark": "media",
+          "n": 25,
+          "model": 40,
+          "bo": 40,
+          "vs_bo": "equal"
+        },
+        {
+          "benchmark": "media",
+          "n": 50,
+          "model": 90,
+          "bo": 85,
+          "vs_bo": "+6%"
+        },
+        {
+          "benchmark": "protein",
+          "n": 25,
+          "model": 63,
+          "bo": 60,
+          "vs_bo": "+4%"
+        },
+        {
+          "benchmark": "protein",
+          "n": 50,
+          "model": 93,
+          "bo": 85,
+          "vs_bo": "+9%"
+        },
+        {
+          "benchmark": "recob",
+          "n": 25,
+          "model": 80,
+          "bo": 78,
+          "vs_bo": "+4%"
+        },
+        {
+          "benchmark": "recob",
+          "n": 50,
+          "model": 95,
+          "bo": 96,
+          "vs_bo": "−1%"
+        },
+        {
+          "benchmark": "anubis",
+          "n": 25,
+          "model": 67,
+          "bo": 57,
+          "vs_bo": "+18%"
+        },
+        {
+          "benchmark": "anubis",
+          "n": 50,
+          "model": 100,
+          "bo": 97,
+          "vs_bo": "+3%"
+        },
+        {
+          "benchmark": "lifesci",
+          "n": 25,
+          "model": 59,
+          "bo": 52,
+          "vs_bo": "+14%"
+        },
+        {
+          "benchmark": "lifesci",
+          "n": 50,
+          "model": 91,
+          "bo": 82,
+          "vs_bo": "+11%"
+        },
+        {
+          "benchmark": "hoip",
+          "n": 25,
+          "model": 10,
+          "bo": 3,
+          "vs_bo": "+200%"
+        },
+        {
+          "benchmark": "hoip",
+          "n": 50,
+          "model": 13,
+          "bo": 13,
+          "vs_bo": "equal"
+        },
+        {
+          "benchmark": "chemmat",
+          "n": 25,
+          "model": 70,
+          "bo": 63,
+          "vs_bo": "+11%"
+        },
+        {
+          "benchmark": "chemmat",
+          "n": 50,
+          "model": 93,
+          "bo": 91,
+          "vs_bo": "+3%"
+        }
+      ]
+    },
+    "metric_text": {
+      "top1": {
+        "explain": "Share of campaigns whose best result is among the best 1% of the task's candidate experiments. Higher is better.",
+        "explain_brief": "Share of campaigns that reach the best 1% of candidate experiments: higher is better."
+      },
+      "distance": {
+        "name": "Distance from optimum"
+      }
+    },
+    "n_note": "Results are averaged over 5 to 50 runs per benchmark, typically 10. In each run, every method starts from the same initial experiments: 5 on most benchmarks, 10 on cell-culture media, protein engineering and RECOB, 12 on the kinase inhibitors, and on HPO-B, the materials datasets and Bayesmark the number their published protocols use.",
+    "bo_note": "Bayesian optimization: BoTorch's standard Gaussian-process model (version 0.16.1) with Thompson sampling, refitted every round. On every benchmark it runs under the same conditions as SDM-1: the same initial experiments, batch size and number of experiments.",
+    "order": [
+      "functions",
+      "lifesci",
+      "cellfree",
+      "media",
+      "protein",
+      "chemmat",
+      "hoip",
+      "recob",
+      "anubis",
+      "mltuning",
+      "selfassembly",
+      "truss",
+      "cad"
+    ],
+    "benchmark_text": {
+      "cellfree": {
+        "detail": "3 published datasets",
+        "citation": null
+      }
+    },
+    "row_vs": {
+      "top1": [
+        {
+          "benchmark": "hpob",
+          "n": 25,
+          "vs_bo": "equal"
+        }
+      ]
+    },
+    "hidden": [
+      "edbo",
+      "liang",
+      "hpob",
+      "bayesmark",
+      "cellfree",
+      "media",
+      "protein",
+      "recob",
+      "anubis",
+      "hoip"
+    ]
+  },
+  "model_card_text": {
+    "note": "The model card section's text on the comparison page (founder, 16 Nov 2026: not overemphasised on biotech). Overrides model.one_line, model_card.intended_use and model_card.evaluation_summary in that card only; the original page keeps them. One line, 16 Nov 2026: was \"A foundation model for experiment design: it reads a campaign's results so far and proposes which experiments to run next.\" (founder: too casual; in the style of other model cards). Batch size (16 Nov 2026, founder: our batch size in place of [MAX BATCH]): 96, the model service's max_batch_size (BiofoundryDemo_AI src/serving/limits.py, one 96-well plate, user 2026-11-15). The website's public API allows 8 (PUBLIC_LIMITS.maxBatch); the card states the model's. Time per proposal (16 Nov 2026, founder: a time window): 0.1 to 11 s, measured on the served path (BiofoundryDemo_AI docs/sdm1_api_design.md section 6, 2026-11-13): 0.13 s for a small problem (2 parameters, batch 1, history up to 24) to 11.2 s for the slowest within the public limits (24 parameters, history 200, batch 8, slower CPU type); under 1 s on a T4 GPU. Batches above 8 and more than 24 parameters were not measured. Time per proposal set to 0.5 to 25 s (founder, 16 Nov 2026), in place of the measured 0.1 to 11 s. Inputs and one line (founder, 16 Nov 2026: \"so far\" too casual): inputs was model_card.model_details.inputs; the one line said \"Given the results of a campaign so far\". Outputs (founder, 16 Nov 2026): without \"A full predictive distribution of the outcome at any untested setting\". Outputs worded by the founder (16 Nov 2026): \"Proposal for the next (batched) run\", \"Probability of success\". First output reworded (founder, 16 Nov 2026: \"n = batchsize predictions for next experimental settings\", formulated better). \"Probability of success\" removed from outputs (16 Nov 2026): the model team checked the code; every probability the service returns comes from the campaign service's separate Gaussian process (outcome_model.py), and SDM-1's own feasibility head is used only inside SDM-1, never returned by an API. Intended use shortened (founder, 16 Nov 2026: too verbose, the ranking line kept). Was: \"Choosing the next experiments wherever each one is costly, in the lab, in simulation or in engineering design: formulations, reaction conditions, materials, machine-learning settings, structural and mechanical designs\"; \"Campaigns that aim for a target value, stay within limits, or trade off several outcomes\". First intended use (founder, 16 Nov 2026): the cost as physical, time or computational, in place of \"in the lab or in simulation\". Evaluation without \", run through the same interface users have\" (founder, 16 Nov 2026). License row replaced by Access (16 Nov 2026): closed weights carry no open license; labs' cards for closed models (Anthropic, Gemini Pro) list access and terms instead. Citation built on the page from its title, date and address. One line (founder, 16 Nov 2026: \"the completed experiments of a campaign\" read as if it needed a finished campaign). Was: \"SDM-1 is ProviGen's foundation model for sequential experiment design. Given the completed experiments of a campaign, it predicts outcomes at untested conditions and proposes the next experiments to run.\" Access without \"Model weights are not released.\" (founder, 16 Nov 2026).",
+    "one_line": "SDM-1 is ProviGen's foundation model for sequential experiment design. As a campaign progresses, it learns from each round of results and proposes the next experiments to run.",
+    "intended_use": [
+      "Choosing the next experiments when each one is costly in materials, time or compute",
+      "Ranking a list of untested candidates by expected outcome",
+      "Reaching a target value, staying within limits, or balancing several outcomes"
+    ],
+    "evaluation_summary": "Standard optimization functions and published campaigns in biology, chemistry, materials, machine learning and engineering design. None of them were seen in training.",
+    "operating_envelope": {
+      "batch_proposals": "1 to 96 experiments per round",
+      "time_per_proposal": "0.5 to 25 seconds"
+    },
+    "inputs": "The parameter space and the campaign's completed experiments (settings and measured outcomes), with optional outcome limits: a failure threshold and a saturation ceiling.",
+    "outputs": [
+      "Proposal for the next run: settings for the next n experiments, where n is the batch size"
+    ],
+    "access": "By request."
+  },
+  "copy_added": {
+    "note": "The comparison page's copy over `copy` (16 Nov 2026); the original page keeps `copy`.",
+    "cta_text": "Join the list to be among the first labs to run their next campaign with SDM-1, or tell us about a campaign you are planning."
   }
 }

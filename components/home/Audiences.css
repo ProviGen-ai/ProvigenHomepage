@@ -245,3 +245,13 @@
     transition: none;
   }
 }
+
+/* The doors without their links (the user, 17 Nov 2026): the card keeps its shape, but nothing about it invites a
+   click: no pointer, no hover lift, no underline. */
+.a-door-link--static {
+  cursor: default;
+}
+.a-door-link--static:hover,
+.a-door-link--static:focus-visible {
+  transform: none;
+}

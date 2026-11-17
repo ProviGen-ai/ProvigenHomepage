@@ -613,7 +613,7 @@ export function ModelCard() {
       .map(([k, v]) => [human(k), String(v)] as const);
   /* No training rows (founder, 30 Oct 2026: no training details on the page). */
   const sections: [string, ReactNode][] = [
-    ['Model', <>{release.model.name} {release.model.version}. {release.model.status}</>],
+    ['Model', <>{[release.model.name, release.model.version].filter(Boolean).join(' ')}. {release.model.status}</>],
     ['Type', d.type],
     ['Inputs', d.inputs],
     ['Outputs', <List key="o" items={d.outputs} />],
@@ -626,7 +626,7 @@ export function ModelCard() {
   return (
     <details className="r-card">
       <summary>
-        Model card <span>{release.model.name} {release.model.version}</span>
+        Model card <span>{[release.model.name, release.model.version].filter(Boolean).join(' ')}</span>
       </summary>
       <dl>
         {sections.map(([k, v]) => (

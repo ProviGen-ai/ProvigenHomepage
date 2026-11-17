@@ -44,7 +44,7 @@ export default function ProseDoc({ eyebrow, doc }: { eyebrow: string; doc: Legal
       <div className="s-wrap pd-layout">
         <article className="pd-col" aria-labelledby="pd-title">
           {doc.sections.map((section) => (
-            <section key={section.title} className="pd-section">
+            <section key={section.title} id={section.id} className="pd-section">
               <h2 className="s-label pd-h2">{section.title}</h2>
               <div className="pd-text">
                 {section.paragraphs.map((paragraph) =>
