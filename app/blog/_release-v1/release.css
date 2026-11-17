@@ -5561,3 +5561,31 @@ body:has(.r-launch--v2 .r-launch-more:empty) .s-footer {
   font-size: 0.86em;
   overflow-wrap: anywhere;
 }
+
+/* The copy buttons as the usual symbol (the user, 17 Nov 2026, after the activation page): a square the size of the
+   tab beside it, two sheets in it, a tick once copied. They used to read "Copy" and "Copy example". */
+.r-access-copy {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+}
+.r-access-copy svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.r-access-copy:hover {
+  border-color: var(--c-teal-ink);
+  color: var(--c-teal-ink);
+}
+/* The token's own line: the symbol sits at its end, the token taking the rest. */
+.r-access-token {
+  align-items: center;
+}

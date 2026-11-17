@@ -68,12 +68,16 @@ answer = requests.post(
 )
 print(answer.json()["proposals"])`;
 
+/* The usual copy symbol (the user, 17 Nov 2026, after the activation page): two sheets, and a tick once the text is
+   on the clipboard. `label` stays as what a screen reader hears; it was the word on the button. */
 function Copy({ text, label }: { text: string; label: string }) {
   const [done, setDone] = useState(false);
   return (
     <button
       type="button"
       className="r-access-copy"
+      aria-label={done ? "Copied" : label}
+      title={done ? "Copied" : label}
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(text);
@@ -84,7 +88,16 @@ function Copy({ text, label }: { text: string; label: string }) {
         }
       }}
     >
-      {done ? "Copied" : label}
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        {done ? (
+          <path d="M5 12.5 L10 17.5 L19 7" />
+        ) : (
+          <>
+            <rect x="9" y="9" width="11" height="11" rx="1.5" />
+            <path d="M15 5.5 A1.5 1.5 0 0 0 13.5 4 H5.5 A1.5 1.5 0 0 0 4 5.5 V13.5 A1.5 1.5 0 0 0 5.5 15" />
+          </>
+        )}
+      </svg>
     </button>
   );
 }
@@ -143,7 +156,7 @@ export default function GetAccess({ modelName }: { modelName: string }) {
         <p className="r-access-label">Your token</p>
         <div className="r-access-token">
           <code>{issued.token}</code>
-          <Copy text={issued.token} label="Copy" />
+          <Copy text={issued.token} label="Copy the token" />
         </div>
         {/* Was "Shown only once: copy it now and keep it private. 50 calls a day (the count resets at 00:00 UTC), 500
             in total." (the user, 17 Nov 2026: a trial token first, the full one from the emailed link). */}
@@ -176,7 +189,7 @@ export default function GetAccess({ modelName }: { modelName: string }) {
                 {l === "python" ? "Python" : "curl"}
               </button>
             ))}
-            <Copy text={snippet} label="Copy example" />
+            <Copy text={snippet} label="Copy the example" />
           </div>
           <pre>
             <code>{snippet}</code>
