@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react';
 import type { Institution } from '@/content/home/team';
 
 /**
- * One institution logo at its optical height. The files are single-colour ink
+ * One institution logo at its optical height. The files are single-color ink
  * derivatives of the official artwork (public/assets/institutions/mono/), so
  * no filter runs at render time. `--tm-logo` on the parent sets the base height.
  */

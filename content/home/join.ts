@@ -16,14 +16,14 @@ export const join = {
    */
   line: 'The hardware is already there. We make it adaptive.',
   /* "The long game" was archived on 4 Oct 2026 (founder); the button now opens the manifesto. */
-  link: { href: '/writings/manifesto', label: 'The Manifesto' },
+  link: { href: '/blog/manifesto', label: 'The Manifesto' },
   /**
    * The founder's lab clip of 8 Oct 2026 (~/Desktop/1004(1).mp4: a gripper
    * carries a 96-well plate onto its holder, then a pipette head over a
    * plate), as a blurred backdrop only, treated like the earlier join-lab
-   * film: grey and blurred at encode time so no detail or mark reads. The
+   * film: gray and blurred at encode time so no detail or mark reads. The
    * 1 s blue-lit shot is left out, the cuts and the loop seam are dissolves,
-   * and every frame is levelled to join-lab's brightness and contrast, so the
+   * and every frame is leveled to join-lab's brightness and contrast, so the
    * dawn under it does not pulse (19.5 s loop; IMAGE_PROVENANCE.md). The
    * encodes are smaller than their names say (960 × 540 and 640 × 360).
    * join-lab, the 4 Oct film, now plays behind the opening (content/home/hero.ts).

@@ -27,7 +27,7 @@
 /** In-text citation, linked to the numbered reference list. */
 const c = (n: number) => `<a class="w-cite" href="#ref-${n}">[${n}]</a>`;
 
-/* The bracketed evidence labels after citations, e.g. "(modelled scenario,
+/* The bracketed evidence labels after citations, e.g. "(modeled scenario,
    not a measurement)", and the grades key that explained them were cut on
    8 Oct 2026 (founder); the reference list keeps each source's own note. */
 
@@ -89,11 +89,11 @@ export const forecasts: Forecast[] = [
     deadline: '2029-12-31',
     deadlineLabel: '31 December 2029',
     body: [
-      `So far, they do not do so consistently. Five foundation models and two other deep-learning models were tested on predicting how the transcriptome changes after one or two genes are perturbed. None did better than deliberately simple baselines&nbsp;${c(3)}. In the Virtual Cell Challenge 2025, more than 1,200 teams submitted results, and its organisers reported that models were not yet consistently beating naive baselines across all metrics&nbsp;${c(15)}.`,
+      `So far, they do not do so consistently. Five foundation models and two other deep-learning models were tested on predicting how the transcriptome changes after one or two genes are perturbed. None did better than deliberately simple baselines&nbsp;${c(3)}. In the Virtual Cell Challenge 2025, more than 1,200 teams submitted results, and its organizers reported that models were not yet consistently beating naive baselines across all metrics&nbsp;${c(15)}.`,
     ],
     rule: {
       label: 'Resolves yes if',
-      text: `a model, frozen before testing, beats additive, linear, nearest-neighbour, mean and expert-chosen baselines on every primary metric, by a margin fixed in advance, on new data from at least three independent laboratories. That data has to cover at least five human-relevant cell systems, at least five donors or genotypes, and both genetic and chemical perturbations&nbsp;${c(18)}.`,
+      text: `a model, frozen before testing, beats additive, linear, nearest-neighbor, mean and expert-chosen baselines on every primary metric, by a margin fixed in advance, on new data from at least three independent laboratories. That data has to cover at least five human-relevant cell systems, at least five donors or genotypes, and both genetic and chemical perturbations&nbsp;${c(18)}.`,
     },
     wrong:
       'by the end of 2028, such a benchmark has run, and more training data keeps improving scores on familiar data while new donors and combinations stay at baseline. That would mean the shortage is causal, interventional data rather than model scale, and 55% is too high.',
@@ -115,7 +115,7 @@ export const forecasts: Forecast[] = [
     ],
     rule: {
       label: 'Resolves yes if',
-      text: `one fixed system, tested by three independent teams on unseen multi-week biological programmes in three domains, completes at least three of five programmes at two or more of the teams: from hypothesis through remote lab execution and error recovery to an externally replicated result. It must do at least as well as a top-decile human team with the same information and resources, using no more than 20 hours of human scientific intervention per programme on average. Every discarded idea, failed run and human rescue counts against it&nbsp;${c(18)}.`,
+      text: `one fixed system, tested by three independent teams on unseen multi-week biological programs in three domains, completes at least three of five programs at two or more of the teams: from hypothesis through remote lab execution and error recovery to an externally replicated result. It must do at least as well as a top-decile human team with the same information and resources, using no more than 20 hours of human scientific intervention per program on average. Every discarded idea, failed run and human rescue counts against it&nbsp;${c(18)}.`,
     },
     wrong:
       'before 2029, a system recovers from its own failed runs and has its results replicated externally in three biological domains, with little human help. The laboratory would then be a smaller bottleneck than we think, and 30% too low.',
@@ -132,11 +132,11 @@ export const forecasts: Forecast[] = [
     deadline: '2030-12-31',
     deadlineLabel: '31 December 2030',
     body: [
-      `Closed loops already run in single laboratories. They have improved enzyme thermostability&nbsp;${c(5)} and evolved an enzyme in an automated biofoundry&nbsp;${c(6)}. A GPT-5-driven system optimised cell-free protein synthesis and cut its cost per gram of protein by 40% against the previous state of the art. Human work was largely limited to preparing reagents and consumables and loading and unloading them&nbsp;${c(13)}. We know of no case yet in which an independent laboratory has reproduced one of these loops end to end.`,
+      `Closed loops already run in single laboratories. They have improved enzyme thermostability&nbsp;${c(5)} and evolved an enzyme in an automated biofoundry&nbsp;${c(6)}. A GPT-5-driven system optimized cell-free protein synthesis and cut its cost per gram of protein by 40% against the previous state of the art. Human work was largely limited to preparing reagents and consumables and loading and unloading them&nbsp;${c(13)}. We know of no case yet in which an independent laboratory has reproduced one of these loops end to end.`,
     ],
     rule: {
       label: 'Resolves yes if',
-      text: `three independent organisations, in three domains, run preregistered head-to-head studies against human experts using classical experimental design, with the same starting information. Each time, the autonomous system must reach the baseline’s externally replicated target with at most a fifth of the fully loaded cost and wall-clock time. Failed runs, retries and human time count, at least 90% of runs must pass quality control first time, and the system must recover on its own from common failures&nbsp;${c(18)}.`,
+      text: `three independent organizations, in three domains, run preregistered head-to-head studies against human experts using classical experimental design, with the same starting information. Each time, the autonomous system must reach the baseline’s externally replicated target with at most a fifth of the fully loaded cost and wall-clock time. Failed runs, retries and human time count, at least 90% of runs must pass quality control first time, and the system must recover on its own from common failures&nbsp;${c(18)}.`,
     },
     wrong:
       'by the end of 2028, the published gains still appear only when failed runs and human rescue are left out of the accounting, or protocols stop working when moved to another site. Either would make 45% too generous.',
@@ -153,11 +153,11 @@ export const forecasts: Forecast[] = [
     deadline: '2030-12-31',
     deadlineLabel: '31 December 2030',
     body: [
-      `A review published in June 2026 found that no drug both discovered and designed entirely by AI had yet received marketing approval, though several are in clinical trials&nbsp;${c(9)}. In an early analysis of pipelines at AI-native biotech companies, AI-discovered molecules succeeded in 80–90% of Phase I trials and about 40% of Phase II trials, the latter in line with historical industry averages. The sample was small and not randomised&nbsp;${c(10)}. In a randomised Phase IIa trial of a drug whose target and molecule were both found with generative AI, the share of patients with adverse events, the primary endpoint, was similar to placebo. Its lung-function signal was a secondary endpoint, in 71 patients over 12 weeks, and larger, longer trials are needed&nbsp;${c(11)}.`,
+      `A review published in June 2026 found that no drug both discovered and designed entirely by AI had yet received marketing approval, though several are in clinical trials&nbsp;${c(9)}. In an early analysis of pipelines at AI-native biotech companies, AI-discovered molecules succeeded in 80–90% of Phase I trials and about 40% of Phase II trials, the latter in line with historical industry averages. The sample was small and not randomized&nbsp;${c(10)}. In a randomized Phase IIa trial of a drug whose target and molecule were both found with generative AI, the share of patients with adverse events, the primary endpoint, was similar to placebo. Its lung-function signal was a secondary endpoint, in 71 patients over 12 weeks, and larger, longer trials are needed&nbsp;${c(11)}.`,
     ],
     rule: {
       label: 'Resolves yes if',
-      text: `the FDA or EMA authorises a novel therapy whose dated, contemporaneous records show that an AI system generated the selected target or design before the candidate was nominated, and a blinded panel agrees. Repurposed drugs and AI credit claimed after the fact do not count&nbsp;${c(18)}.`,
+      text: `the FDA or EMA authorizes a novel therapy whose dated, contemporaneous records show that an AI system generated the selected target or design before the candidate was nominated, and a blinded panel agrees. Repurposed drugs and AI credit claimed after the fact do not count&nbsp;${c(18)}.`,
     },
     wrong:
       'no qualifying candidate has entered a pivotal trial by the end of 2028. A yes would show that AI can originate a medicine, not that it improves the odds of success; that needs far larger cohorts.',
@@ -178,7 +178,7 @@ export const forecasts: Forecast[] = [
     ],
     rule: {
       label: 'Resolves yes if',
-      text: `at least three independent organisations, working in one predefined biological domain, match a strong baseline of expert design plus active learning on the number, quality and external replication rate of validated hits. They must use no more than a tenth of the baseline’s physical experiments and not lose on total cost or time&nbsp;${c(18)}.`,
+      text: `at least three independent organizations, working in one predefined biological domain, match a strong baseline of expert design plus active learning on the number, quality and external replication rate of validated hits. They must use no more than a tenth of the baseline’s physical experiments and not lose on total cost or time&nbsp;${c(18)}.`,
     },
     wrong:
       'by the end of 2030, model guidance produces more promising candidates, but no more of them replicate elsewhere. A model that only lengthens the queue for confirmation has not reduced the work, and 40% would be too high.',
@@ -199,13 +199,13 @@ export const forecasts: Forecast[] = [
     ],
     rule: {
       label: 'Our strict version',
-      text: `at least 95% of a disease list to be frozen in 2026 has a safe, durable, regulator-authorised cure or primary prevention. That intervention must cover at least 80% of cases of each disease and be in routine use in countries holding at least 80% of affected people in every World Bank income group&nbsp;${c(18)}.`,
+      text: `at least 95% of a disease list to be frozen in 2026 has a safe, durable, regulator-authorized cure or primary prevention. That intervention must cover at least 80% of cases of each disease and be in routine use in countries holding at least 80% of affected people in every World Bank income group&nbsp;${c(18)}.`,
       more: [
         'Discovery can speed up. Trials that wait for a disease to progress, manufacturing and access cannot be compressed in the same way. The item can be scored only once the disease list is frozen and published; if it never is, the item is void.',
       ],
     },
     wrong:
-      'before 2031, a regulator-qualified human-relevant model replaces at least a quarter of a defined animal-testing package, Phase II success rates for AI-originated candidates rise clearly above historical averages in large matched cohorts, and an organisation halves its time from target to first patient with no loss of safety. Any one would move this number; all three would move it a great deal.',
+      'before 2031, a regulator-qualified human-relevant model replaces at least a quarter of a defined animal-testing package, Phase II success rates for AI-originated candidates rise clearly above historical averages in large matched cohorts, and an organization halves its time from target to first patient with no loss of safety. Any one would move this number; all three would move it a great deal.',
   },
 ];
 
@@ -253,7 +253,7 @@ export const cheapThought = {
       blocks: [
         {
           kind: 'p',
-          html: `Each forecast is an entry in an internal registry&nbsp;${c(18)}: a question, a deadline, a resolution rule written before the evidence arrives, a probability and a range. The probabilities are provisional priors, our judgement of the published evidence rather than the output of a fitted model or an expert panel. The ranges show how far a probability moves under other defensible assumptions; they are not confidence intervals. Original forecasts are never overwritten, and resolved items will be scored with the Brier score.`,
+          html: `Each forecast is an entry in an internal registry&nbsp;${c(18)}: a question, a deadline, a resolution rule written before the evidence arrives, a probability and a range. The probabilities are provisional priors, our judgment of the published evidence rather than the output of a fitted model or an expert panel. The ranges show how far a probability moves under other defensible assumptions; they are not confidence intervals. Original forecasts are never overwritten, and resolved items will be scored with the Brier score.`,
         },
         {
           kind: 'p',
@@ -316,7 +316,7 @@ export const cheapThought = {
         },
         {
           kind: 'p',
-          html: 'Programmable means specifying a behaviour and showing that it can be produced reliably. That is the discipline of getting a process from A to B, applied to a cell inside a person. A system that learns to move a culture reliably from where it is to where it needs to be is, we believe, the kind of system that could, one bounded function at a time, learn to direct cells toward repair.',
+          html: 'Programmable means specifying a behavior and showing that it can be produced reliably. That is the discipline of getting a process from A to B, applied to a cell inside a person. A system that learns to move a culture reliably from where it is to where it needs to be is, we believe, the kind of system that could, one bounded function at a time, learn to direct cells toward repair.',
         },
       ],
     },
@@ -347,7 +347,7 @@ export const cheapThought = {
       citation:
         'Hebenstreit K, Convalexius C, Reichl S, Huber S, Bock C, Samwald M. What are the limits to biomedical research acceleration through general-purpose AI? <em>Scientific Reports</em> 16, 1304 (2026).',
       href: 'https://www.nature.com/articles/s41598-025-32583-w',
-      note: 'Team-authored. Modelled scenarios plus an expert elicitation (n = 8), not ProviGen results. The 36-month to 3.6-month example and the 83% share are from the paper’s worked example (Table 1: 24 months cognitive work accelerated 100×, 12 months physical work of which 3 months are non-compressible, accelerated 25×).',
+      note: 'Team-authored. Modeled scenarios plus an expert elicitation (n = 8), not ProviGen results. The 36-month to 3.6-month example and the 83% share are from the paper’s worked example (Table 1: 24 months cognitive work accelerated 100×, 12 months physical work of which 3 months are non-compressible, accelerated 25×).',
     },
     {
       n: 2,
@@ -419,7 +419,7 @@ export const cheapThought = {
       citation:
         'Jayatunga MKP, Ayers M, Bruens L, Jayanth D, Meier C. How successful are AI-discovered drugs in clinical trials? A first analysis and emerging lessons. <em>Drug Discovery Today</em> 29, 104009 (2024).',
       href: 'https://doi.org/10.1016/j.drudis.2024.104009',
-      note: 'Observational, small sample, not randomised. The authors describe the ~40% Phase II rate as comparable to historical industry averages.',
+      note: 'Observational, small sample, not randomized. The authors describe the ~40% Phase II rate as comparable to historical industry averages.',
     },
     {
       n: 11,
@@ -459,7 +459,7 @@ export const cheapThought = {
       citation:
         'Arc Institute. Virtual Cell Challenge 2025 wrap-up: winners and reflections (6 December 2025).',
       href: 'https://arcinstitute.org/news/virtual-cell-challenge-2025-wrap-up',
-      note: 'Organiser report. “Over 1,200 teams submitted results”; over 300 made final submissions.',
+      note: 'Organizer report. “Over 1,200 teams submitted results”; over 300 made final submissions.',
     },
     {
       n: 16,

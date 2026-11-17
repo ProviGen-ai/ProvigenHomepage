@@ -2,7 +2,7 @@ import { Fragment, type ReactNode } from 'react';
 
 /**
  * Display headings are set in PP Supply Mono Ultralight (founder, 3 Oct 2026).
- * A monospace face centres a full stop or an apostrophe in its own cell, so
+ * A monospace face centers a full stop or an apostrophe in its own cell, so
  * "experiment." reads "experiment ." and "Biology’s" reads "Biology ’s". This
  * wraps each full stop that follows a letter in .s-stop and each apostrophe in
  * .s-apos (site.css), which pull the mark back to the letter spacing. The text

@@ -117,7 +117,7 @@ export const manifesto = {
       n: 3,
       label: 'Frey et al. · Lab-in-the-loop therapeutic antibody design with deep learning · bioRxiv · 2025',
       href: 'https://doi.org/10.1101/2025.02.19.639050',
-      note: 'Preprint (v3, November 2025), Genentech and Roche. Semi-autonomous antibody optimisation over four rounds, more than 1,800 variants made and measured; wet-lab, one organisation.',
+      note: 'Preprint (v3, November 2025), Genentech and Roche. Semi-autonomous antibody optimization over four rounds, more than 1,800 variants made and measured; wet-lab, one organization.',
     },
     {
       n: 4,
@@ -153,7 +153,7 @@ export const manifesto = {
       n: 9,
       label: 'Anthropic · Claude discovers a novel enzyme system · Announcement and preprint · 23 September 2026',
       href: 'https://www.anthropic.com/news/claude-discovers-novel-enzyme-system',
-      note: 'Company announcement with a preprint: a computational search over about 200,000 reverse-transcriptase clusters, followed by early characterisation in Anthropic’s own lab.',
+      note: 'Company announcement with a preprint: a computational search over about 200,000 reverse-transcriptase clusters, followed by early characterization in Anthropic’s own lab.',
     },
     /* References 10 and 11 went with Why now, the only section that cited them. */
   ] satisfies ManifestoReference[],

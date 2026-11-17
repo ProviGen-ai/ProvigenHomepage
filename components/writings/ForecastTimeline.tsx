@@ -10,7 +10,7 @@ import type { Forecast } from '@/content/writings/cheap-thought-costly-evidence'
  * phone. All deadlines fall on 31 December, so year ticks sit at year ends and
  * carry that year's number: a stem on "2029" reads "by the end of 2029".
  *
- * `figure`: labelled, each stem links to its forecast block.
+ * `figure`: labeled, each stem links to its forecast block.
  * `card`: the index and "next" card motif; decorative, tiny labels only.
  * Motion: stems rise once the surrounding Reveal adds .is-in; motion off and
  * reduced motion show the final state (writings.css).
@@ -60,7 +60,7 @@ export default function ForecastTimeline({
     const fan = k - (total - 1) / 2;
     const dx = fan * CLUSTER[variant];
     /* In a cluster the first label reads to the left of its stem and the
-       others to the right, so no label sits on a neighbour's band. */
+       others to the right, so no label sits on a neighbor's band. */
     const side = total > 1 ? (k === 0 ? 'is-left' : 'is-right') : undefined;
     return { f, x: deadlineX(f.deadline), dx, fan, side };
   });

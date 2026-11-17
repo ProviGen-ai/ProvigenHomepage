@@ -22,7 +22,7 @@ export const site = {
     /* The homepage section: the /how-it-works page was removed (founder, 3 Oct 2026, late). */
     { href: '/#how-it-works', label: 'How it works' },
     { href: '/#team', label: 'Team' },
-    { href: '/writings', label: 'Blog' },
+    { href: '/blog', label: 'Blog' },
     /* Careers hidden for now (founder, 14 Oct 2026); the page stays at /careers. */
     // { href: '/careers', label: 'Careers' },
   ],
@@ -31,7 +31,7 @@ export const site = {
   /** The founder's footer, 4 Oct 2026: Home, Writings, Contact, Careers, then LinkedIn (no Email link: Contact is the way in). */
   footerNav: [
     { href: '/', label: 'Home' },
-    { href: '/writings', label: 'Blog' },
+    { href: '/blog', label: 'Blog' },
     { href: '/contact', label: 'Contact' },
     /* Careers hidden for now (founder, 14 Oct 2026). */
     // { href: '/careers', label: 'Careers' },

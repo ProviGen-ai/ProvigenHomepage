@@ -5,7 +5,7 @@ import { useStage } from './ProblemScroll';
 import { BEATS, PATH_FROM, PATH_TO, lerpStops } from './timeline';
 
 /*
- * The living dawn gradient behind the landscape. Pinned: colour rises out of
+ * The living dawn gradient behind the landscape. Pinned: color rises out of
  * the paper while the notes are written, peaks on the turn and over the ridge
  * while the path crosses it, then settles toward B as the solution lands.
  * Flow: a fixed field, faded in from the top by CSS.

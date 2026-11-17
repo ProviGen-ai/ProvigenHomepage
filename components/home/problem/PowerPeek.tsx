@@ -231,7 +231,7 @@ export default function PowerPeek() {
   useEffect(() => () => clearTimeout(timer.current), []);
 
   /* The figure: the whole grid (ten columns of three values, every link
-     between neighbours) from the start; the protocol through the first kNow
+     between neighbors) from the start; the protocol through the first kNow
      columns, its newest step drawing in, with the two other ways it could
      have gone from there dashed. */
   const W = 272;

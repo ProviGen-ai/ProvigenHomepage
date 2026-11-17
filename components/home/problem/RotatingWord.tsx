@@ -47,7 +47,7 @@ export default function RotatingWord({
     if (!cycling) return;
     const tick = setInterval(() => {
       setShown(false);
-      // Not cancelled by a pause: a word already lifting out still lands, so
+      // Not canceled by a pause: a word already lifting out still lands, so
       // the slot is never left empty.
       setTimeout(() => {
         setIndex((i) => (i + 1) % words.length);

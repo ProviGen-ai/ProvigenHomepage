@@ -7,7 +7,7 @@ import './Build.css';
 /*
  * Section 4a · How it works. The head (eyebrow, title), then Fig. 02: the
  * loop, drawn straight on the section's white (client island,
- * build/Loop.tsx; section and figure are one colour since 3 Oct 2026). A comet
+ * build/Loop.tsx; section and figure are one color since 3 Oct 2026). A comet
  * circles Design, Implement, Run, Measure, Revise, each station a small
  * instrument at work; every lap is one experiment, logged beside the ring as
  * kept or reverted, with a best-so-far line that only steps up. Under the

@@ -15,7 +15,7 @@
  *
  * Two themes share the primitives: PLATE (the film's green-black ground, glow
  * by additive light) and PAPER (ink on the page, glow by a soft tinted halo).
- * Every colour is a function of alpha, so a draw call says how loud it is.
+ * Every color is a function of alpha, so a draw call says how loud it is.
  */
 
 export type Rgba = (alpha: number) => string;
@@ -133,7 +133,7 @@ export function rng(seed: number) {
  * smeared over both. A grid puts them back on whole pixels of the backing
  * store (`px` is store px per logical px, PlateFrame.px; usePlate sizes the
  * store at the screen's DPR, so these are device pixels): `at` for a baseline or an edge,
- * `mid` for the centre line of a stroke `w` logical px wide, `w` for a stroke
+ * `mid` for the center line of a stroke `w` logical px wide, `w` for a stroke
  * width in whole device px (never under one). Only straight horizontal and
  * vertical marks are snapped; arcs and curves stay smooth.
  */
@@ -159,7 +159,7 @@ export function grid(px: number): Grid {
 
 /**
  * Fill the frame with the theme ground. Draw it first, every frame: additive
- * light then adds onto the real ground colour, not onto transparent black.
+ * light then adds onto the real ground color, not onto transparent black.
  */
 export function ground(ctx: Ctx, theme: Theme, w: number, h: number) {
   ctx.fillStyle = theme.ground;
@@ -458,7 +458,7 @@ export function strike(ctx: Ctx, x: number, y: number, w: number, color: string,
 /**
  * A figure drawn straight on a white section, with no panel of its own: the
  * paper theme (ink structure, teal light) on #fff. Orange itself is 2.3:1 on
- * white, too faint for a mark, so the warn colour is orange deepened halfway
+ * white, too faint for a mark, so the warn color is orange deepened halfway
  * to amber-ink (3.6:1); orange text stays AMBER_INK.
  */
 export const WHITE_GROUND = '#ffffff';

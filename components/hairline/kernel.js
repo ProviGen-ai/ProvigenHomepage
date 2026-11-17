@@ -9,7 +9,7 @@
  * package's src/core, unchanged, and a figure should not need to read it.
  *
  * Every figure is drawn in a 400 × 320 viewBox. World space is x/y on the
- * ground and z up. Plates are filled with the ground colour and painted back
+ * ground and z up. Plates are filled with the ground color and painted back
  * to front, so a nearer one covers a farther one: append in that order. At
  * the default camera, Cam(45, 0.5, S), +x runs down to the right and +y down
  * to the left, so the corner with the largest x and y is nearest the viewer:
@@ -17,8 +17,8 @@
  *
  * Camera
  *   Cam(azDeg, k, S)                       a camera: azimuth in degrees, k = sin(elevation) (0.5 is the 2:1 view), S = scale
- *   fit(C, points, cx, cy)                 centres the box of [x, y, z] points on (cx, cy); call it once, before proj
- *                                          it only centres, it never scales: choose S by trying values, with the most extreme pose in points.
+ *   fit(C, points, cx, cy)                 centers the box of [x, y, z] points on (cx, cy); call it once, before proj
+ *                                          it only centers, it never scales: choose S by trying values, with the most extreme pose in points.
  *                                          The six figures use S 1.42 to 2.12; the boxes they fit come out 230 to 310 wide and 180 to 245 tall
  *   proj(C)                                returns P(x, y, z), which gives [sx, sy]
  *   unproj(C, sx, sy, z)                   the world [x, y] under a screen point, on the plane at height z
@@ -76,8 +76,8 @@
  *   inject(root)
  *
  * Classes, on path, polygon, ellipse and line. They are the whole palette; a
- * figure sets no colour, width or fill of its own.
- *     (none)   filled with the ground colour, medium stroke
+ * figure sets no color, width or fill of its own.
+ *     (none)   filled with the ground color, medium stroke
  *     sil      the silhouette's stroke        hi    the bright stroke: the only highlight
  *     lo       the dim stroke                 nf    no fill        fo   fill only, no stroke
  *     dash     a dashed guide
@@ -535,7 +535,7 @@ var HL = (() => {
       `${SVG}{position:absolute;inset:0;width:100%;height:100%;display:block}`,
       // Riffle's live region: read, not seen
       `:where([data-hairline]>[data-hairline-live]){position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}`,
-      // the drawing: plates are filled with the plate colour and painted back to front
+      // the drawing: plates are filled with the plate color and painted back to front
       `${SVG} :where(path,polygon,ellipse,line){fill:var(--hl-plate);stroke:var(--hl-mid);stroke-width:var(--hl-sw);vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round;transition:stroke 260ms ${EASE}}`,
       `${SVG} :where(.nf){fill:none}`,
       `${SVG} :where(.fo){stroke:none}`,

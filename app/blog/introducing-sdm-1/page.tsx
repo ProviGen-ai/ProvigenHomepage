@@ -37,8 +37,8 @@ import {
   showRace,
   showTry,
 } from "@/content/release";
-import "../../writings/writings.css";
-import "../../writings/introducing-model-name/release.css";
+import "../writings.css";
+import "../_release-v1/release.css";
 
 /*
  * COMPARISON PAGE (13 Nov 2026): the release page with the founder's

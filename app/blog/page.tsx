@@ -12,7 +12,7 @@ import './writings.css';
 export const metadata: Metadata = pageMetadata({
   title: 'Blog',
   description: 'Field notes on steering biology.',
-  path: '/writings',
+  path: '/blog',
 });
 
 const i = (n: number) => ({ '--i': n }) as CSSProperties;
@@ -60,6 +60,8 @@ export default function WritingsIndex() {
         </div>
       </section>
 
+      {/* Only when there is something to list: the field notes are off the live site for now (14 Oct 2026). */}
+      {earlier.length > 0 ? (
       <section className="w-earlier" aria-labelledby="w-earlier-title">
         <div className="s-wrap">
           {/* "More writing" since 3 Oct 2026 (R22): the newest essay is listed here too. */}
@@ -84,6 +86,7 @@ export default function WritingsIndex() {
           </ol>
         </div>
       </section>
+      ) : null}
     </main>
   );
 }

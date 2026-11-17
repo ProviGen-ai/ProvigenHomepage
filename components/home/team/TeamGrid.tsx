@@ -71,14 +71,14 @@ export default function TeamGrid({
 }) {
   const [active, setActive] = useState<Active>(null);
   // Each popup's left edge relative to its member, measured on open. Kept after
-  // closing so the popup fades out where it was; until then CSS centres it.
+  // closing so the popup fades out where it was; until then CSS centers it.
   const [offsets, setOffsets] = useState<Record<number, number>>({});
   const members = useRef<(HTMLDivElement | null)[]>([]);
   const pointer = useRef('mouse');
   const { reduced, paused } = useMotion();
   const smooth = !reduced && !paused;
 
-  /** Centre the popup over the person, clamped inside the viewport. */
+  /** Center the popup over the person, clamped inside the viewport. */
   const place = useCallback((n: number) => {
     const member = members.current[n];
     const pop = member?.querySelector<HTMLElement>('.tm-pop');
@@ -102,7 +102,7 @@ export default function TeamGrid({
     setActive((a) => (a && a.n === n && vias.includes(a.via) ? null : a));
 
   // While someone is open: Escape closes, a tap outside every member closes,
-  // and a resize re-centres the popup.
+  // and a resize re-centers the popup.
   const openIndex = active?.n ?? null;
   useEffect(() => {
     if (openIndex === null) return;

@@ -75,7 +75,7 @@ export const build = {
      * Fig. 03 once the Horizon plate (old Fig. 02) left with "Why it matters".
      */
     /** The canvas's text alternative (it is one image to assistive tech). */
-    alt: 'The loop. A signal travels a ring of five stations, Design, Implement, Run, Measure and Revise; each lap is one experiment, numbered at the centre. An experiment log fills row by row: each change, its signal drawn as a bar, and whether it was kept or reverted. A best-so-far line steps up with every kept change.',
+    alt: 'The loop. A signal travels a ring of five stations, Design, Implement, Run, Measure and Revise; each lap is one experiment, numbered at the center. An experiment log fills row by row: each change, its signal drawn as a bar, and whether it was kept or reverted. A best-so-far line steps up with every kept change.',
     label: 'The loop, step by step',
     /** Described by every step button; the headings themselves stay the step names. */
     hint: 'Select a step to hold the figure there.',

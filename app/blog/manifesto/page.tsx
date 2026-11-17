@@ -8,7 +8,7 @@ import '../writings.css';
 export const metadata: Metadata = pageMetadata({
   title: plain(essay.title),
   description: essay.dek,
-  path: '/writings/manifesto',
+  path: '/blog/manifesto',
   type: 'article',
   image: essayImage('manifesto', plain(essay.title)),
 });

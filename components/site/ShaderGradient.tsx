@@ -5,14 +5,14 @@ import { clsx } from 'clsx';
 import { useMotion } from '@/components/motion/MotionProvider';
 
 /**
- * Living gradient field: domain-warped noise mixing the brand colours over
+ * Living gradient field: domain-warped noise mixing the brand colors over
  * paper, with film grain baked into the shader. Renders at reduced resolution
  * (it is soft by design). It stops requesting frames off screen and on hidden
  * tabs; with motion off it draws a single still frame (and redraws only when
  * intensity or focus change). Falls back to a static CSS gradient when WebGL
  * is unavailable.
  *
- * `intensity` (0..1) scales how much colour rises out of the paper; sections
+ * `intensity` (0..1) scales how much color rises out of the paper; sections
  * can drive it from scroll progress. `focus` moves the brightest glow.
  */
 export type ShaderPalette = 'dawn' | 'lab' | 'ember';
@@ -79,7 +79,7 @@ export default function ShaderGradient({
 }: {
   palette?: ShaderPalette;
   intensity?: number;
-  /** Glow centre in UV space (0..1, origin bottom left). */
+  /** Glow center in UV space (0..1, origin bottom left). */
   focus?: [number, number];
   className?: string;
   followPointer?: boolean;

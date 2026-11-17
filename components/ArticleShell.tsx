@@ -6,7 +6,7 @@ import Toc, { ReadingProgress, type TocEntry } from '@/components/writings/Toc';
 import WritingVisual from '@/components/writings/WritingVisual';
 import { nextWriting, writings, type WritingCard } from '@/content/writings';
 import { SITE_URL } from '@/lib/site-env';
-import '@/app/writings/writings.css';
+import '@/app/blog/writings.css';
 
 /*
  * v3 long-form shell for /writings/*. Server component; the table of contents
@@ -14,7 +14,7 @@ import '@/app/writings/writings.css';
  *
  * Hero: mono category · date · reading time, a big serif title (one italic
  * word), the dek and the byline, on a quiet dawn glow with grain. Body: a
- * centred EB Garamond reading column (~720px) with a sticky mono contents
+ * centered EB Garamond reading column (~720px) with a sticky mono contents
  * rail on wide screens and a collapsed "Contents" disclosure on narrow ones.
  * Then the references ledger and a "Next" card that walks the writings ledger.
  * Pages own their sections; the shell owns the frame.
@@ -23,7 +23,7 @@ import '@/app/writings/writings.css';
 export type ArticleToc = TocEntry;
 /**
  * `label` may carry <em>. `href` is optional: provenance with no live
- * destination stays plain text. `group` starts a new labelled group when it
+ * destination stays plain text. `group` starts a new labeled group when it
  * changes. `n` sets the number (and the #ref-n anchor in-text citations use);
  * it defaults to the position. `showUrl` prints the address under the label
  * instead of linking the label itself (full bibliographic citations).
@@ -51,8 +51,6 @@ type Props = {
   /** May contain one <em>. */
   title: string;
   dek: string;
-  /** Keep the dek for search and link previews but leave it off the page (the use cases, 13 Nov 2026). */
-  hideDek?: boolean;
   /** Status chip under the dek (e.g. an ambition label). */
   banner?: string;
   meta: ArticleMeta;
@@ -78,7 +76,6 @@ export default function ArticleShell({
   eyebrow,
   title,
   dek,
-  hideDek = false,
   banner,
   meta,
   toc,
@@ -101,9 +98,9 @@ export default function ArticleShell({
     datePublished: meta.date,
     author: { '@type': 'Organization', name: 'ProviGen', url: `${SITE_URL}/` },
     publisher: { '@id': `${SITE_URL}/#organization` },
-    mainEntityOfPage: `${SITE_URL}${card?.href ?? `/writings/${slug}`}`,
+    mainEntityOfPage: `${SITE_URL}${card?.href ?? `/blog/${slug}`}`,
     /* The use-case pages have no share card of their own yet; the site's stands in. */
-    image: card && !card.href.startsWith('/writings/') ? `${SITE_URL}/og.png` : `${SITE_URL}/og/${slug}.png`,
+    image: card && !card.href.startsWith('/blog/') ? `${SITE_URL}/og.png` : `${SITE_URL}/og/${slug}.png`,
   };
 
   return (
@@ -125,7 +122,7 @@ export default function ArticleShell({
           <h1 id="w-title" className="w-hero-title">
             <Html as="span" html={title} />
           </h1>
-          {hideDek ? null : <p className="w-hero-dek">{dek}</p>}
+          <p className="w-hero-dek">{dek}</p>
           {banner && (
             <p className="s-status s-status--ambition w-hero-banner">
               {banner}
@@ -164,11 +161,11 @@ export default function ArticleShell({
               </p>
             )}
             <p className="w-return">
-              <a href="/writings">
+              <a href="/blog">
                 <span className="w-return-arrow" aria-hidden="true">
                   <ArrowIcon />
                 </span>
-                All writings
+                All posts
               </a>
             </p>
           </article>
@@ -187,7 +184,7 @@ function References({
   items: ArticleReference[];
   label: string;
 }) {
-  /* Consecutive references with the same group form one labelled list. */
+  /* Consecutive references with the same group form one labeled list. */
   const runs: { group?: string; refs: (ArticleReference & { n: number })[] }[] =
     [];
   items.forEach((ref, i) => {
@@ -252,8 +249,8 @@ function NextCard({ card }: { card: WritingCard }) {
           <h2 id="w-next-title" className="w-next-label">
             Next
           </h2>
-          <a className="w-next-all" href="/writings">
-            All writings
+          <a className="w-next-all" href="/blog">
+            All posts
             <ArrowIcon />
           </a>
         </div>

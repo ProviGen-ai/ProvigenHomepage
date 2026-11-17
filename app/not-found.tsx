@@ -71,8 +71,8 @@ export default function NotFound() {
               Back to the start
               <ArrowIcon />
             </a>
-            <a className="s-btn nf-btn-ghost" href="/writings">
-              Read the writings
+            <a className="s-btn nf-btn-ghost" href="/blog">
+              Read the blog
             </a>
           </div>
         </div>

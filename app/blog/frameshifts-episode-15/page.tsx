@@ -10,7 +10,7 @@ import '../writings.css';
 export const metadata: Metadata = pageMetadata({
   title: plain(post.title),
   description: post.dek,
-  path: `/writings/${post.slug}`,
+  path: `/blog/${post.slug}`,
   type: 'article',
   image: essayImage(post.slug, plain(post.title)),
 });

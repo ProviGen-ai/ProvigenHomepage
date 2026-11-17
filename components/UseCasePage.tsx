@@ -16,7 +16,6 @@ export default function UseCasePage({ page }: { page: UseCase }) {
       eyebrow="Use case"
       title={page.title}
       dek={page.dek}
-      hideDek
       meta={{
         date: card?.date ?? '2026-06-08',
         dateLabel: card?.dateLabel ?? '8 June 2026',

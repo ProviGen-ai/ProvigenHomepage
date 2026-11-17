@@ -8,7 +8,7 @@ import './Hero.css';
 /*
  * Section 1 · Opening. Since 8 Oct 2026 (founder) the close's lab footage
  * plays behind it with the close's effect (blurred, laid over the field in
- * overlay; Join.tsx), in the opening's colours: paper, with mint and teal light
+ * overlay; Join.tsx), in the opening's colors: paper, with mint and teal light
  * from the top left and sand from the right. Provenance in IMAGE_PROVENANCE.md.
  * The line is in the display face. The backers moved down into the Team
  * section (founder, 2 Oct 2026).

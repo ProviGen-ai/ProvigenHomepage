@@ -14,7 +14,7 @@ export const metadata: Metadata = pageMetadata({
   title: 'Closed-loop experimental campaigns in practice',
   description:
     'A practical account of closed-loop design, delayed measurements, and adaptive experimental decisions.',
-  path: '/writings/closed-loop-optimization',
+  path: '/blog/closed-loop-optimization',
   type: 'article',
   image: essayImage('closed-loop-optimization', 'Closed-loop experimental campaigns in practice.'),
 });
@@ -88,7 +88,7 @@ export default function CampaignArticle() {
       slug="closed-loop-optimization"
       eyebrow="Field note"
       title="Closed-loop experimental campaigns in <em>practice</em>."
-      dek="How assay optimisation, therapeutic design and media formulation become closed-loop projects that learn from each round."
+      dek="How assay optimization, therapeutic design and media formulation become closed-loop projects that learn from each round."
       meta={{
         date: '2026-04-13',
         dateLabel: '13 April 2026',

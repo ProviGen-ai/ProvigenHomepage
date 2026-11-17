@@ -2,30 +2,30 @@
  * The simulation behind the field note's Fig. 01 (BoSim.tsx): twenty
  * experiments planned up front against twenty chosen one at a time, on the
  * Branin–Hoo function, the standard two-dimensional test function for global
- * optimisers (Dixon & Szegő 1978; definition as in Surjanovic & Bingham,
+ * optimizers (Dixon & Szegő 1978; definition as in Surjanovic & Bingham,
  * Virtual Library of Simulation Experiments):
  *
  *   f(x1, x2) = (x2 − b·x1² + c·x1 − r)² + s·(1 − t)·cos(x1) + s
  *   b = 5.1 / 4π², c = 5 / π, r = 6, s = 10, t = 1 / 8π
  *   x1 ∈ [−5, 10], x2 ∈ [0, 15]
  *
- * minimised. Three global minima, f* = 0.397887, at (−π, 12.275),
+ * minimized. Three global minima, f* = 0.397887, at (−π, 12.275),
  * (π, 2.275) and (9.42478, 2.475); the largest value, 308.13, is in the
  * corner (−5, 0).
  *
  * Planned up front: a maximin Latin hypercube of N = 20 points (the best of
  * LHS_TRIES random Latin hypercubes by smallest pairwise distance), run in
  * the order it was drawn. Chosen one at a time: a maximin Latin hypercube of
- * N_START = 3 points, then 17 points, each the maximiser of expected
+ * N_START = 3 points, then 17 points, each the maximizer of expected
  * improvement under a Gaussian-process model of everything measured so far.
  * Every measurement carries noise proportional to its value (NOISE, a 5 %
  * coefficient of variation; see NOISE), drawn from the seed; the planned
  * design never looks at its measurements, so only the model sees the noise.
  *
  * The model, refitted after every measurement:
- *   - inputs scaled to [0, 1]², log measurements standardised (mean 0, sd 1);
+ *   - inputs scaled to [0, 1]², log measurements standardized (mean 0, sd 1);
  *   - Matérn 5/2 kernel with one lengthscale per input, signal variance 1;
- *   - the noise term is the known measurement noise in standardised units;
+ *   - the noise term is the known measurement noise in standardized units;
  *   - lengthscales by maximum a posteriori on a 10 × 10 log grid (LENGTHS)
  *     under a weak log-normal prior (median LS_PRIOR_MEDIAN, log sd 1).
  *     Measured 3 Oct 2026 over 120 seeds: plain marginal likelihood put a
@@ -40,8 +40,8 @@
  *     this noise, plain EI re-measured within 0.3 units of an earlier point
  *     in 22 % of its picks and augmented EI in 6 % (8 % over the
  *     calibration's 200), for the same outcomes; plain EI's repeats stacked
- *     dots in the figure. ξ = 0.01; maximised on a 48 × 48 lattice of cell
- *     centres, then refined by a pattern search from the best three cells.
+ *     dots in the figure. ξ = 0.01; maximized on a 48 × 48 lattice of cell
+ *     centers, then refined by a pattern search from the best three cells.
  *
  * Nothing here is fitted to Branin: the prior, the grid and the lattice are
  * generic, and the same code would run on any function of two inputs. On
@@ -193,9 +193,9 @@ const matern = (r: number) => {
 export const LENGTHS = Array.from({ length: 10 }, (_, i) => 0.06 * (2 / 0.06) ** (i / 9));
 export const LS_PRIOR_MEDIAN = 0.3;
 const LS_PRIOR_LOG_SD = 1;
-/** Kept in the kernel's diagonal on top of the noise, for a stable factorisation. */
+/** Kept in the kernel's diagonal on top of the noise, for a stable factorization. */
 const JITTER = 1e-8;
-/** Expected-improvement margin, in standardised units. */
+/** Expected-improvement margin, in standardized units. */
 const XI = 0.01;
 /** The acquisition lattice. */
 const ACQ = 48;
@@ -204,10 +204,10 @@ export type Model = {
   n: number;
   /** Inputs, [u1, u2, …]. */
   x: Float64Array;
-  /** Standardisation of the measurements. */
+  /** Standardization of the measurements. */
   mean: number;
   sd: number;
-  /** Measurement noise sd, in standardised units. */
+  /** Measurement noise sd, in standardized units. */
   noise: number;
   /** Inverse lengthscales. */
   il1: number;
@@ -313,7 +313,7 @@ export function fit(x: Float64Array, y: Float64Array, n: number, noiseSd = NOISE
 }
 
 /**
- * Posterior mean and sd of the model at (u1, u2), in standardised units
+ * Posterior mean and sd of the model at (u1, u2), in standardized units
  * (the sd of the underlying function, without the measurement noise).
  */
 export function predict(m: Model, u1: number, u2: number, out: { mu: number; sd: number }) {
@@ -360,7 +360,7 @@ function erfc(x: number) {
 const INV_SQRT2 = 1 / Math.SQRT2;
 const INV_SQRT2PI = 1 / Math.sqrt(2 * Math.PI);
 
-/** Expected improvement below `incumbent` (minimisation), standardised units. */
+/** Expected improvement below `incumbent` (minimization), standardized units. */
 export function expectedImprovement(mu: number, sd: number, incumbent: number) {
   const gain = incumbent - mu - XI;
   if (sd < 1e-9) return Math.max(gain, 0);
@@ -388,14 +388,14 @@ export function incumbentOf(m: Model) {
 
 /**
  * Augmented expected improvement (Huang et al. 2006) at a point where the
- * model predicts (mu, sd), standardised units: expected improvement below
+ * model predicts (mu, sd), standardized units: expected improvement below
  * the incumbent, scaled by 1 − σnoise / √(sd² + σnoise²).
  */
 export const augmentedEI = (m: Model, mu: number, sd: number, incumbent: number) =>
   expectedImprovement(mu, sd, incumbent) * (1 - m.noise / Math.sqrt(sd * sd + m.noise * m.noise));
 
 /**
- * The next experiment: the maximiser over the unit square of augmented
+ * The next experiment: the maximizer over the unit square of augmented
  * expected improvement, counted from incumbentOf(m).
  */
 export function nextExperiment(m: Model): [number, number] {

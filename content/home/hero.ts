@@ -21,9 +21,9 @@ export const hero = {
   primary: { href: '/contact', label: 'Contact us' },
   /**
    * The opening film. Since 8 Oct 2026 (founder) it is the close's lab footage
-   * (content/home/join.ts), with the same treatment: grey and blurred at encode
+   * (content/home/join.ts), with the same treatment: gray and blurred at encode
    * time, laid over the field in overlay so it plays only in the opening's own
-   * colours (Hero.css). It replaces the generated liquid-handling loop
+   * colors (Hero.css). It replaces the generated liquid-handling loop
    * (hero-loop, still in /assets/v3). VideoBackdrop expects
    * /assets/v3/<name>-1920.webm|mp4 and <name>-1280.webm|mp4 (phones), plus a
    * poster still.

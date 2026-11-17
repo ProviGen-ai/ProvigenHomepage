@@ -132,13 +132,13 @@ export const episode = {
         },
         {
           type: 'p',
-          text: `Where automation has been used most, he says, the workflow stays the same. Some pharma companies and contract research organisations program a screening workflow once and run it across very large screens&nbsp;${t('23:39')}. Research is different:`,
+          text: `Where automation has been used most, he says, the workflow stays the same. Some pharma companies and contract research organizations program a screening workflow once and run it across very large screens&nbsp;${t('23:39')}. Research is different:`,
         },
         {
           type: 'quote',
           speaker: 'Lucas Mair',
           start: '25:08',
-          text: 'For this kind of labour, that has always-changing workflows, laboratory automation didn’t lend itself at all. It was simply not feasible, from a time-investment perspective, to really build systems that support that strongly.',
+          text: 'For this kind of labor, that has always-changing workflows, laboratory automation didn’t lend itself at all. It was simply not feasible, from a time-investment perspective, to really build systems that support that strongly.',
         },
         {
           type: 'p',
@@ -232,7 +232,7 @@ export const episode = {
     { start: '14:23', title: 'The bottleneck is running experiments' },
     { start: '18:18', title: 'Why labs stay manual: funding and incentives' },
     { start: '22:54', title: 'Automation built for one repeated workflow' },
-    { start: '25:22', title: 'Friction, utilisation, access and trust' },
+    { start: '25:22', title: 'Friction, utilization, access and trust' },
     { start: '34:39', title: 'Walk-away time and what can be automated, step by step' },
     { start: '57:58', title: 'From predicting proteins to programming experiments' },
     { start: '1:06:56', title: 'How language models learn biology' },

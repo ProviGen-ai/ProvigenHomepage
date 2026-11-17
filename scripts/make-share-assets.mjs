@@ -1613,7 +1613,7 @@ async function main() {
         }
         type = await discoverType(
           chrome,
-          orderedWritings[0]?.href ?? '/writings',
+          orderedWritings[0]?.href ?? '/blog',
         );
         const r = type.roles;
         const name = (x) =>

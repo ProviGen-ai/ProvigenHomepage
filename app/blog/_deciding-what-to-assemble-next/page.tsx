@@ -2,15 +2,15 @@ import type { Metadata } from 'next';
 import { essayImage, pageMetadata } from '@/lib/site-env';
 import ArticleShell from '@/components/ArticleShell';
 import { Html, plain } from '@/components/Html';
-import { antibodyDiscovery as note } from '@/content/writings/antibody-discovery';
+import { decidingWhatToAssembleNext as note } from '@/content/writings/deciding-what-to-assemble-next';
 import '../writings.css';
 
 export const metadata: Metadata = pageMetadata({
   title: plain(note.title),
   description: note.dek,
-  path: '/writings/antibody-discovery',
+  path: '/blog/deciding-what-to-assemble-next',
   type: 'article',
-  image: essayImage('antibody-discovery', plain(note.title)),
+  image: essayImage('deciding-what-to-assemble-next', plain(note.title)),
 });
 
 const formatDate = (iso: string) =>
@@ -22,12 +22,14 @@ const formatDate = (iso: string) =>
   });
 
 /*
- * Field note rewritten from the old use-case page (4 October 2026). Text only:
- * no figure component, and no new visual kind. Status chips are inline in the
- * prose, as in "The bottleneck moved"; the antibody-specific modelling has no
- * status and is written as how the loop applies. Byline carries no role.
+ * Field note, 4 October 2026, rewritten from the old use-case page on DNA
+ * assembly (provenance and the list of cuts are in the content file).
+ * Paragraph-only body: no figure component, no new visual. Capability
+ * statuses are stated in words (the chips came off on 4 Oct 2026, founder);
+ * everything specific to DNA assembly is written as how a decision loop
+ * applies, and the closing section says so.
  */
-export default function AntibodyDiscoveryNote() {
+export default function DecidingWhatToAssembleNextNote() {
   return (
     <ArticleShell
       slug={note.slug}
@@ -39,17 +41,13 @@ export default function AntibodyDiscoveryNote() {
         dateLabel: formatDate(note.date),
         readingMinutes: note.readingMinutes,
       }}
-      toc={note.sections.map((s) => ({ id: s.id, title: s.title }))}
+      toc={note.sections.map((section) => ({ id: section.id, title: section.title }))}
       tocLabel="In this field note"
       references={note.references}
       referencesLabel="References and credits"
     >
       {note.sections.map((section) => (
-        <section
-          key={section.id}
-          id={section.id}
-          aria-labelledby={`${section.id}-h`}
-        >
+        <section key={section.id} id={section.id} aria-labelledby={`${section.id}-h`}>
           <Html as="h2" id={`${section.id}-h`} html={section.title} />
           {section.paragraphs.map((paragraph) => (
             <Html as="p" key={paragraph} html={paragraph} />
