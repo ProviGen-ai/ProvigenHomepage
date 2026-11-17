@@ -148,10 +148,14 @@ export default function GetAccess({ modelName }: { modelName: string }) {
           Shown only once: copy it now and keep it private. It works{" "}
           {issued.trial_calls} times right away.
         </p>
+        {/* Was "A confirmation link is on its way to that address." (the user, 17 Nov 2026): while SES is in its
+            sandbox only @provigen.ai addresses receive it, so the page no longer promises a link that is already on
+            its way. Put the sentence back once AWS grants production access. */}
         <p className="r-access-note r-access-note--mail">
-          A confirmation link is on its way to that address. Opening it gives
-          the full token: {issued.daily_limit ?? 50} calls a day (the count
-          resets at 00:00 UTC), {issued.total_limit ?? 500} in total.
+          A confirmation link will follow to that address in the coming days.
+          Opening it gives the full token: {issued.daily_limit ?? 50} calls a
+          day (the count resets at 00:00 UTC), {issued.total_limit ?? 500} in
+          total.
         </p>
         <div className="r-access-snippet">
           <div className="r-access-tabs" role="tablist" aria-label="Example">
