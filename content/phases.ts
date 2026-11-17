@@ -24,7 +24,7 @@ export const phases = [
     title: 'Programmable therapeutic cells',
     strip: 'Programmable therapeutic cells',
     summary:
-      'Develop tools biology does not yet have, including the ability to program therapeutic cells that recognise damaged tissue, remove what harms it and restore function. An ambition, not a capability.',
+      'Develop tools biology does not yet have, including the ability to program therapeutic cells that recognize damaged tissue, remove what harms it and restore function. An ambition, not a capability.',
     status: 'Research ambition',
   },
 ] as const;

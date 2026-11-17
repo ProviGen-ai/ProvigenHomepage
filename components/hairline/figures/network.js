@@ -5,7 +5,7 @@
  * one, and at rest each stands higher than the one before, on a curve that
  * compounds, so the field climbs to node 20, which holds the bright rim and a
  * 3 × 3 dot mark on its lid. The node under the
- * pointer rises and lifts its neighbours, the farther the less, each on its
+ * pointer rises and lifts its neighbors, the farther the less, each on its
  * own spring. The slider is the reach of the rise, in nodes.
  *
  * The pattern: a continuous field, as in Terrain, but the nodes stand at
@@ -22,7 +22,7 @@ const {
 const NX = 5, NY = 4, CELL = 22, FOOT = 15, M = 7, PB = 5, LIFT = 18, LAYER = 6;
 const EX = NX * CELL, EY = NY * CELL;
 
-/** The share of the lift at u reaches from the pointer: 1 → .5 at 40% → .1 at the reach and beyond, so neighbours share it. */
+/** The share of the lift at u reaches from the pointer: 1 → .5 at 40% → .1 at the reach and beyond, so neighbors share it. */
 const falloff = (u) => (u <= 0 ? 1 : u <= 0.4 ? 1 - (u / 0.4) * 0.5 : u <= 1 ? 0.5 - ((u - 0.4) / 0.6) * 0.4 : 0.1);
 
 /** Node n's rest height: a compounding ramp, so each later node starts higher than the one before, and by more. */
@@ -155,7 +155,7 @@ function mount({ stage, svg, read }, value) {
 
 export default ({
   name: "network",
-  means: "Twenty nodes, each starting higher than the one before; the node under the pointer rises and lifts its neighbours.",
+  means: "Twenty nodes, each starting higher than the one before; the node under the pointer rises and lifts its neighbors.",
   rules: [1, 3, 5, 9],
   range: [1.4, 2.2, 3.4],
   mount,

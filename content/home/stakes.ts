@@ -11,7 +11,7 @@
  *              its experiments (thesis).
  *   point 1    Biotech drugs now outnumber chemical drugs in development (fact).
  *   point 2    Cells are becoming medicines (fact).
- *   point 3    The lab, not thinking, sets the pace (fact, modelled).
+ *   point 3    The lab, not thinking, sets the pace (fact, modeled).
  *   ladder     The hero's promise, better decisions, applied to bigger
  *              problems: Now, Next · Planned, Research ambition. The ladder's
  *              line is the section's only graphic (Stakes.tsx).
@@ -32,8 +32,8 @@
  *   cells. Always "conditionally", always plural, no product names, no "cure".
  *   2006 (mouse cells) is not mentioned, so no causal "twenty years" either.
  * - Hebenstreit, Convalexius et al., Scientific Reports 2026 (peer-reviewed;
- *   scoping review, expert survey and a modelled example): physical lab tasks
- *   accelerate less than cognitive ones, and in the modelled example the lab's
+ *   scoping review, expert survey and a modeled example): physical lab tasks
+ *   accelerate less than cognitive ones, and in the modeled example the lab's
  *   own time constants become the dominant limit. The line is the fact bank's
  *   wording; the label discloses that our founding engineer is a co-author. No factors.
  *
@@ -104,7 +104,7 @@ export const stakes = {
           text: `Hebenstreit, Convalexius et al., Scientific Reports\u00a02026${DOT}${PEER}, co-authored by our founding engineer`,
           href: 'https://doi.org/10.1038/s41598-025-32583-w',
         },
-        { text: ': in a modelled example, the lab’s own time becomes the main limit.' },
+        { text: ': in a modeled example, the lab’s own time becomes the main limit.' },
       ],
     },
   ] satisfies readonly Point[],

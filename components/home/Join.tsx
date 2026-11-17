@@ -11,7 +11,7 @@ import './Join.css';
  * (founder); careers has its own page. Behind it, the founder's lab footage
  * (his plate-handling clip since 8 Oct 2026; content/home/join.ts), blurred
  * and laid over the field in overlay so it only plays in the dawn's own
- * colours, faded out at both ends.
+ * colors, faded out at both ends.
  */
 export default function Join() {
   return (

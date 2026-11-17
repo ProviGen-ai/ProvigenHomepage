@@ -7,10 +7,10 @@
  *
  *   mean  its estimate of the function, in the function's units (the model
  *         works in log units; exp of its posterior mean);
- *   sd    how unsure it is, standardised (1 = it knows nothing there);
+ *   sd    how unsure it is, standardized (1 = it knows nothing there);
  *   aim   augmented expected improvement, as a share of its largest value on
  *         the lattice: where the next experiment is worth most. The pick
- *         itself is the refined maximiser (nextExperiment), so it lands at
+ *         itself is the refined maximizer (nextExperiment), so it lands at
  *         the lattice's brightest place or between its nodes.
  *
  * Computed lazily, one step at a time (about 1 ms each), and kept per run.

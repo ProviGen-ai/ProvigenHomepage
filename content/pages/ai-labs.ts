@@ -28,7 +28,7 @@ export const aiLabs = {
   meta: {
     title: 'For AI labs',
     description:
-      'For AI labs building models of biology, from protein prediction to virtual cells and DNA and RNA: ProviGen turns intent into executable, optimised protocols that generate high-quality data. Planned for ProviGen’s next phase.',
+      'For AI labs building models of biology, from protein prediction to virtual cells and DNA and RNA: ProviGen turns intent into executable, optimized protocols that generate high-quality data. Planned for ProviGen’s next phase.',
   },
   hero: {
     title: { lead: 'Models propose.', em: 'Experiments decide' },
@@ -45,7 +45,7 @@ export const aiLabs = {
     label: 'The idea',
     lines: [
       'The infrastructure exists. Decisions remain manual.',
-      'ProviGen is the middle layer: it turns high-level intent, from a model or a scientist, into executable, optimised protocols that generate high-quality data.',
+      'ProviGen is the middle layer: it turns high-level intent, from a model or a scientist, into executable, optimized protocols that generate high-quality data.',
     ],
   },
   /** One case, briefly (founder: BindCraft and a thousand binders). Hypothetical; no outcome figures. */

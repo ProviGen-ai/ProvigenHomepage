@@ -25,24 +25,33 @@ export const retired: [source: string, destination: string][] = [
    * field note. /demo (v1's Bayesian-optimisation demo) lands on the field
    * note's live simulation. More specific sources first.
    */
-  ['/blog/closed-loop-optimization', '/writings/closed-loop-optimization'],
+  /* /blog/closed-loop-optimization is the field note's own URL again since Writings became Blog (14 Nov 2026). */
   /* The old site's use-case pages and manifesto, now essays (4 Oct 2026). */
   /* Off the live site from 14 Oct 2026; since 27 Oct 2026 the old pages are back at
      these URLs (app/use-cases), so they no longer redirect.
   ['/use-cases/dna-assembly', '/writings'],
   ['/use-cases/antibody-discovery', '/writings'],
   */
-  ['/use-cases', '/writings'],
-  ['/manifesto', '/writings/manifesto'],
+  ['/use-cases', '/blog'],
+  ['/manifesto', '/blog/manifesto'],
   /* Taken off the site on 4 Oct 2026 (founder): the long game archived, the bottleneck essay deleted. */
-  ['/writings/making-human-renewal-programmable', '/writings'],
-  ['/writings/the-bottleneck-moved', '/writings'],
+  ['/writings/making-human-renewal-programmable', '/blog'],
+  ['/writings/the-bottleneck-moved', '/blog'],
   /* Taken off the site on 8 Oct 2026 (founder); archived in ../output/provigen-website-removed-2026-10-08/. */
-  ['/writings/three-papers-lab-in-the-loop', '/writings'],
-  ['/writings/as-fast-as-its-experiments', '/writings'],
-  ['/blog/:slug', '/writings'],
-  ['/blog', '/writings'],
-  ['/demo', '/writings/closed-loop-optimization#simulation'],
+  ['/writings/three-papers-lab-in-the-loop', '/blog'],
+  ['/writings/as-fast-as-its-experiments', '/blog'],
+  /* Writings became Blog (founder, 14 Nov 2026): every /writings URL lands on its /blog twin. Listed one by one,
+     since the static deploys match sources exactly. The v1 catch-alls /blog and /blog/:slug -> /writings are gone:
+     /blog is the index now. */
+  ['/writings', '/blog'],
+  ['/writings/closed-loop-optimization', '/blog/closed-loop-optimization'],
+  ['/writings/frameshifts-episode-15', '/blog/frameshifts-episode-15'],
+  ['/writings/manifesto', '/blog/manifesto'],
+  ['/writings/cheap-thought-costly-evidence', '/blog/cheap-thought-costly-evidence'],
+  ['/writings/deciding-what-to-assemble-next', '/blog/deciding-what-to-assemble-next'],
+  ['/writings/antibody-discovery', '/blog/antibody-discovery'],
+  ['/writings/introducing-model-name', '/blog/introducing-model-name'],
+  ['/demo', '/blog/closed-loop-optimization#simulation'],
   /* The Start-here doors (founder, 7 Oct 2026): the Investors door was removed,
      and the Frontier labs door became AI Labs. */
   ['/investors', '/contact'],

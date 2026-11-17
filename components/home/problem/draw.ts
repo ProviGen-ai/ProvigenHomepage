@@ -8,7 +8,7 @@
  *   muddies the crest. Every segment's alpha is its depth fade times a density
  *   term: a row fades by how close it runs to the line already drawn in front
  *   of it (where the surface turns away), so grazing flanks never bundle into
- *   a dark band. Segments are quantised into a handful of Path2D strokes, and
+ *   a dark band. Segments are quantized into a handful of Path2D strokes, and
  *   runs that share a stroke continue one subpath (no caps doubling at joints).
  * - Ink is structure. The only light is what is happening: the A → B path
  *   (teal, glowStroke) with a comet head while it draws, then a pulse that
@@ -232,7 +232,7 @@ export function pointOn(scene: Scene, p: Pt, t: number, lift = 0) {
 
 /* ---------- the wireframe ---------- */
 
-/** Alpha levels the mesh is quantised into, and the loudest a mesh line gets. */
+/** Alpha levels the mesh is quantized into, and the loudest a mesh line gets. */
 const LEVELS = 14;
 const ROW_ALPHA = 0.3;
 const COL_ALPHA = 0.15;

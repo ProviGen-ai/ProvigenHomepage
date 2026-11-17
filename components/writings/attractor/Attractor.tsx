@@ -42,10 +42,10 @@ import './Attractor.css';
 /*
  * A live figure: the toggle-switch model in model.ts, simulated in the browser
  * and drawn by draw.ts. One cycle (about 10 s): rest at A, a push on Y, relax,
- * hold (colours and counts), fade, then a new seed. Runs only while the
+ * hold (colors and counts), fade, then a new seed. Runs only while the
  * Figure's motion gate is open (in view, tab visible, not paused, no reduced
  * motion). Otherwise it shows a still: the same cycle computed off-screen,
- * every path faint and every end state coloured. Slider and "Run again" work
+ * every path faint and every end state colored. Slider and "Run again" work
  * in both modes; screen readers hear a result only after they use them.
  */
 

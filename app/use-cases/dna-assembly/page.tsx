@@ -3,7 +3,7 @@ import { pageMetadata } from '@/lib/site-env';
 import { plain } from '@/components/Html';
 import UseCasePage from '@/components/UseCasePage';
 import { dnaAssembly as page } from '@/content/use-cases';
-import '@/app/writings/writings.css';
+import '@/app/blog/writings.css';
 
 export const metadata: Metadata = pageMetadata({
   title: plain(page.title),

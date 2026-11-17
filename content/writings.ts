@@ -44,7 +44,7 @@ export const writings: WritingCard[] = [
     /* Lucas Mair on the Frameshifts podcast, read for the company (4 Oct
        2026): the episode embedded behind one click, quotes with their times. */
     slug: 'frameshifts-episode-15',
-    href: '/writings/frameshifts-episode-15',
+    href: '/blog/frameshifts-episode-15',
     title: 'Biology is a steering <em>problem</em>.',
     dek: 'Our co-founder and CTO Lucas Mair on the Frameshifts podcast. Our reading: biology is a steering problem, the experiment is the bottleneck, and that is where lab-in-the-loop AI comes in.',
     date: '2026-08-31',
@@ -54,7 +54,7 @@ export const writings: WritingCard[] = [
     featured: true,
     visual: 'episode',
     poster: '/assets/writings/frameshifts-episode-15/poster-1280.webp',
-    provenance: 'Episode thumbnail by Frameshifts, in our colours',
+    provenance: 'Episode thumbnail by Frameshifts, in our colors',
     cta: {
       text: 'Have a process where each round is costly and the next one is hard to choose?',
       label: 'Contact us',
@@ -65,7 +65,7 @@ export const writings: WritingCard[] = [
     /* The founder's data-room manifesto, published verbatim with citations
        on his call (4 Oct 2026). */
     slug: 'manifesto',
-    href: '/writings/manifesto',
+    href: '/blog/manifesto',
     title: 'The <em>Manifesto</em>.',
     dek: 'Biotech is entering a new era. Lab-in-the-loop is becoming the new operating model for biotechnology.',
     date: '2026-09-25',
@@ -87,7 +87,7 @@ export const writings: WritingCard[] = [
   /* Field note off the live site for now (founder, 14 Oct 2026); website-fork keeps it.
     {
       slug: 'deciding-what-to-assemble-next',
-      href: '/writings/deciding-what-to-assemble-next',
+      href: '/blog/deciding-what-to-assemble-next',
       title: 'Deciding what to <em>assemble</em> next.',
       dek: 'Much of plasmid construction can run on automation. The decisions between the stages (ratios, cycles, which colonies to carry forward) are still made by hand, and that is where a decision loop earns its place.',
       date: '2026-06-08',
@@ -102,7 +102,7 @@ export const writings: WritingCard[] = [
   /* Field note off the live site for now (founder, 14 Oct 2026); website-fork keeps it.
     {
       slug: 'antibody-discovery',
-      href: '/writings/antibody-discovery',
+      href: '/blog/antibody-discovery',
       title: 'Which antibody to test <em>next</em>.',
       dek: 'An antibody program narrows a large pool gate by gate, under several properties at once. A note on how a decision loop chooses the next batch, and what a published lab-in-the-loop campaign by others actually shows.',
       date: '2026-06-08',
@@ -118,7 +118,7 @@ export const writings: WritingCard[] = [
      the website-fork branch keeps it.
     {
       slug: 'cheap-thought-costly-evidence',
-      href: '/writings/cheap-thought-costly-evidence',
+      href: '/blog/cheap-thought-costly-evidence',
       title: 'Cheap thought, costly <em>evidence</em>.',
       dek: 'Six dated forecasts for AI in experimental biology, each with a probability and the observation that would prove us wrong.',
       date: '2026-10-01',
@@ -160,7 +160,7 @@ export const writings: WritingCard[] = [
   },
   {
     slug: 'closed-loop-optimization',
-    href: '/writings/closed-loop-optimization',
+    href: '/blog/closed-loop-optimization',
     title: 'Closed-loop experimental campaigns in <em>practice</em>.',
     dek: 'How a lab learns between rounds, from assays to media, with peer-reviewed evidence and the data that arrives last.',
     date: '2026-04-13',

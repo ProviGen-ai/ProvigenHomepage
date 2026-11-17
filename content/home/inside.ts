@@ -44,7 +44,7 @@ export const inside = {
 /*
  * Captions for the film, from the voice-over timeline of the v10 cut
  * (vo-cues.json). The voice reads "Provigen" and "titer"; the captions keep the
- * brand spelling and the on-screen "titre".
+ * brand spelling and the on-screen "titer".
  */
 export const filmCaptions: [start: number, end: number, text: string][] = [
   [0.2, 3.82, 'Same protocol. Same cells. Different result.'],
@@ -54,10 +54,10 @@ export const filmCaptions: [start: number, end: number, text: string][] = [
   [16.13, 20.13, 'and turn process development into one closed loop.'],
   [20.47, 24.76, 'First, we map your workflow and find where the variance comes from:'],
   [24.96, 29.89, 'donors, reagent lots, plate position, timing, noise.'],
-  [30.23, 31.87, 'Then we optimise.'],
+  [30.23, 31.87, 'Then we optimize.'],
   [32.21, 35.54, 'Every batch is chosen based on previous results,'],
   [35.74, 39.22, 'for robustness and for the targets you set:'],
-  [39.42, 43.49, 'yield, purity, titre, cost, cell identity.'],
+  [39.42, 43.49, 'yield, purity, titer, cost, cell identity.'],
   [43.83, 47.87, 'This opens up the ability to adapt the protocols in real time.'],
   [48.21, 51.06, 'Your scientists approve every batch.'],
   [51.4, 53.34, 'You keep the hardened protocol,'],
@@ -69,6 +69,6 @@ export const filmCaptions: [start: number, end: number, text: string][] = [
 /**
  * The transcript's paragraphs (14 Oct 2026), as the index of the caption that
  * opens each one after the first: the problem · what ProviGen does · mapping
- * the variance · optimising · what you keep · the mission.
+ * the variance · optimizing · what you keep · the mission.
  */
 export const transcriptBreaks = [2, 5, 7, 12, 15];

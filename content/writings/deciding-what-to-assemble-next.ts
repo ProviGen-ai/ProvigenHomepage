@@ -30,7 +30,7 @@
  * - "teams accept suboptimal outcomes", "decisions are based on fixed
  *   defaults, SOPs, or operator intuition": never a verdict on the reader's
  *   lab. Rewritten as the cost of another troubleshooting round.
- * - the generic method ladder (DoE, Bayesian optimisation, active learning,
+ * - the generic method ladder (DoE, Bayesian optimization, active learning,
  *   "what counts as a sample"): /writings/closed-loop-optimization already
  *   carries it, and is linked once instead.
  * - research@provigen.ai: not a live address. The close links /contact.
@@ -113,7 +113,7 @@ export const decidingWhatToAssembleNext: FieldNote = {
   category: 'Field note',
   readingMinutes: 7,
   disclaimer:
-    'The workflow here is described generically, as public protocols describe it; no laboratory’s setup is being described, and nothing in this note is a ProviGen result. ProviGen capabilities carry their status as set by our engineering team in September 2026: protocol compilation runs for supported workflows, instrument integration runs per instrument, recording and decision-making run, and automated scheduling and execution are in development. The six decision points are written as how a decision loop applies to this workflow, not as features we run for DNA assembly today. Third-party findings are labelled by type and attributed.',
+    'The workflow here is described generically, as public protocols describe it; no laboratory’s setup is being described, and nothing in this note is a ProviGen result. ProviGen capabilities carry their status as set by our engineering team in September 2026: protocol compilation runs for supported workflows, instrument integration runs per instrument, recording and decision-making run, and automated scheduling and execution are in development. The six decision points are written as how a decision loop applies to this workflow, not as features we run for DNA assembly today. Third-party findings are labeled by type and attributed.',
   sections: [
     {
       id: 'pipeline',
@@ -131,7 +131,7 @@ export const decidingWhatToAssembleNext: FieldNote = {
         'That boundary is where we work, and the shape of it is lab-in-the-loop: the laboratory stays in the loop, and so do its scientists. Each stage already leaves a record (dispensed volumes, device logs, colony counts, screening results, sequencing outcomes) and it stays in the laboratory that made it. What we add turns it into the next set of conditions.',
         '<strong>Compile.</strong> <em>Running for supported workflows.</em> Proposed conditions become versioned, executable protocols for a named instrument set: layouts, controls, replicates, timing. <strong>Integrate.</strong> <em>Running per instrument.</em> Liquid handlers, cyclers, readers and arms are driven through vendor APIs and open frameworks, on hardware a laboratory already has. <strong>Record.</strong> <em>Running.</em> Every result is stored with its conditions, protocol version, device logs and deviations, so a finding can be told apart from an artefact.',
         '<strong>Schedule.</strong> <em>In development.</em> Ordering runs across shared instruments, with incubation windows respected and a failed step caught before its result reaches the model, is being built; today a scientist approves a batch before it runs. <strong>Review.</strong> <em>Running.</em> Scientists set the targets, approve the batch, override a recommendation and say which deviations matter.',
-        'The method underneath (design of experiments, Bayesian optimisation, active learning, what counts as one sample) is set out in <a href="/writings/closed-loop-optimization">Closed-loop experimental campaigns in practice</a>.',
+        'The method underneath (design of experiments, Bayesian optimization, active learning, what counts as one sample) is set out in <a href="/blog/closed-loop-optimization">Closed-loop experimental campaigns in practice</a>.',
       ],
     },
     {
@@ -164,7 +164,7 @@ export const decidingWhatToAssembleNext: FieldNote = {
         'Not all of this has to be learned from your own plates. Potapov and colleagues at New England Biolabs profiled four-base overhang ligation fidelity with T4 DNA ligase, covering all 256 possible overhangs and the mismatched combinations between them, read out by long-read sequencing (ACS Synthetic Biology, 2018; peer-reviewed wet-lab data). Some pairs ligate efficiently, some mismatched pairs ligate well enough to cause trouble, and some barely at all. The profile predicted the fidelity of ten-fragment Golden Gate assemblies, and the authors used it to build a cassette from up to 24 fragments.',
         'A published matrix is a prior, not an answer: it was measured with one ligase at defined temperatures, and your reaction has its own parts and lots. What it buys is a first design that avoids junctions already known to behave badly; later runs refine it.',
         'Fragment count is the main driver of difficulty, and the reason is arithmetic: every extra junction is another opportunity for a poor pair, and hierarchical builds compound it.',
-        'The space is also too large to walk, and a new construct can behave unlike its neighbours. That is the case for a model: generalising from the assemblies a project has run to constructs never built. Golden Braid, Gibson assembly and BASIC differ in enzymes, junctions and how levels are built, not in the shape of the decision.',
+        'The space is also too large to walk, and a new construct can behave unlike its neighbors. That is the case for a model: generalizing from the assemblies a project has run to constructs never built. Golden Braid, Gibson assembly and BASIC differ in enzymes, junctions and how levels are built, not in the shape of the decision.',
       ],
     },
     {
@@ -214,7 +214,7 @@ export const decidingWhatToAssembleNext: FieldNote = {
     },
     {
       label: 'ProviGen field note · Closed-loop experimental campaigns in <em>practice</em>',
-      href: '/writings/closed-loop-optimization',
+      href: '/blog/closed-loop-optimization',
       note: 'Internal. The method this note assumes rather than restates: closed-loop design, measurements that arrive late, several objectives at once.',
     },
     {

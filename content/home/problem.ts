@@ -8,7 +8,7 @@
  * no source line; `^` marks an exponent and is set as a superscript; its arrow
  * opens a card that plays 1^10 … 10^10; the 3^11 line was cut for it); results from other labs do not carry over to yours
  * (swap 2, no LLM name-drop; its last word cycles through what ProviGen
- * optimises, components/home/problem/RotatingWord.tsx); nobody can test them
+ * optimizes, components/home/problem/RotatingWord.tsx); nobody can test them
  * all, but you can learn which parameters matter most (turn); ProviGen helps you
  * get to your target faster (solution, the founder's words of 4 Oct 2026,
  * "exponentially" cut on his word of 8 Oct 2026; before it, "ProviGen is AI
@@ -41,7 +41,7 @@ export const problem = {
       /** `ownLine`: the first N lines stand on a line of their own (13 Oct 2026), so this fact never
           outgrows the statement and the column keeps its width while the word cycles. */
       ownLine: 1,
-      /** The cycling word: what ProviGen optimises. The first is the default (reduced motion, screen readers). */
+      /** The cycling word: what ProviGen optimizes. The first is the default (reduced motion, screen readers). */
       rotate: {
         interval: 1300,
         words: [

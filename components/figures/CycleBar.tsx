@@ -171,7 +171,7 @@ type Geo = {
 };
 
 const X = (g: { x0: number; P: number }, day: number) => g.x0 + day * g.P;
-const GAP = 3; // between a phase span and its neighbour
+const GAP = 3; // between a phase span and its neighbor
 
 const capWidth = (ctx: Ctx, s: string, size: number, track: number) =>
   measure(ctx, s, size) + Math.max(0, s.length - 1) * size * track;
@@ -229,7 +229,7 @@ function geometry(ctx: Ctx, w: number, narrow: boolean): Geo {
   const readout: [number, number] = narrow
     ? [at(RUN_DAYS) - rw, r2 + 40]
     : [Math.min(at(RUN_DAYS) + 28, w - 14 - rw), r2 + 4];
-  // the bracket under the eight physical days, its label centred below it
+  // the bracket under the eight physical days, its label centered below it
   const floorY = r2 + base.floorDy;
   const fw = capWidth(ctx, LABEL_FLOOR, cap, track);
   const floorLabel: [number, number] = [Math.round(at(RUN_DAYS / 2) - fw / 2), floorY + 16];
@@ -749,7 +749,7 @@ function drawCycle(ctx: Ctx, g: Geo, t: number) {
   /*
    * The constraint: an orange bracket under the eight physical days. Orange
    * marks a limit, not live light, so it is drawn plainly over the ground
-   * (additive light would push it toward gold); only the travelling end
+   * (additive light would push it toward gold); only the traveling end
    * carries a halo.
    */
   const fp = easeInOut((t - T_FLOOR) / 0.7);
@@ -811,7 +811,7 @@ export default function CycleBar() {
         <canvas
           ref={canvasRef}
           role="img"
-          aria-label="A ten-day cycle on a ruler of days 01 to 10, run twice. The upper run is the cycle as it is: two days of thinking, then culture, handling and measurement. In the lower run the thinking is instantaneous: the two thinking days funnel into a single flash at the origin, and every later phase boundary moves two days earlier, so the same physical phases end on day 08: cycle 10 to 8 days. The eight physical days are bracketed as the constraint. A dashed row shows those eight days rearranged into three parallel lanes, labelled change the experiment: dashed is a goal, not a result."
+          aria-label="A ten-day cycle on a ruler of days 01 to 10, run twice. The upper run is the cycle as it is: two days of thinking, then culture, handling and measurement. In the lower run the thinking is instantaneous: the two thinking days funnel into a single flash at the origin, and every later phase boundary moves two days earlier, so the same physical phases end on day 08: cycle 10 to 8 days. The eight physical days are bracketed as the constraint. A dashed row shows those eight days rearranged into three parallel lanes, labeled change the experiment: dashed is a goal, not a result."
         />
       </div>
       <div className="pl-controls">

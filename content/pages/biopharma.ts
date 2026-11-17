@@ -103,7 +103,7 @@ export const biopharma = {
       reference: 'Your process today',
       inTarget: 'in target',
     },
-    alt: 'A chart of particle size for the eighteen conditions tested in each of three rounds, against a target band of 80 to 100 nanometres and a dashed line for the process as it runs today, at 131. In round 1 no condition is in target, in round 2 four are, in round 3 fourteen.',
+    alt: 'A chart of particle size for the eighteen conditions tested in each of three rounds, against a target band of 80 to 100 nanometers and a dashed line for the process as it runs today, at 131. In round 1 no condition is in target, in round 2 four are, in round 3 fourteen.',
   },
 
   /**
@@ -161,7 +161,7 @@ export const biopharma = {
     id: 'case-study',
     label: 'A case study',
     kicker: 'Case study',
-    head: { lead: 'An enzymatic assay,', em: 'optimised with an industry partner' },
+    head: { lead: 'An enzymatic assay,', em: 'optimized with an industry partner' },
     samples: {
       rows: [
         { label: 'Design of experiments', figure: '~200 samples', n: 200 },
@@ -176,7 +176,7 @@ export const biopharma = {
     ],
   },
 
-  /** "With partners today" (three anonymised partner rows) removed on the founder's word, 8 Oct 2026, evening; archived in output/provigen-website-removed-2026-10-08/. */
+  /** "With partners today" (three anonymized partner rows) removed on the founder's word, 8 Oct 2026, evening; archived in output/provigen-website-removed-2026-10-08/. */
   evidence: {
     id: 'evidence',
     label: 'Evidence',
@@ -203,7 +203,7 @@ export const biopharma = {
       {
         figure: '81',
         unit: 'experiments where DoE used 132',
-        line: 'Bayesian optimisation against a classical design, for a 14-component cell medium, both run in the lab.',
+        line: 'Bayesian optimization against a classical design, for a 14-component cell medium, both run in the lab.',
         cite: 'Cosenza Z et al., Biotechnology and Bioengineering 119, 2447–2458 (2022)',
         href: 'https://doi.org/10.1002/bit.28132',
         kind: 'Peer-reviewed · wet lab',

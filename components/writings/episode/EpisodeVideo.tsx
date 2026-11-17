@@ -66,7 +66,7 @@ export default function EpisodeVideo({
     };
     /* Times anywhere on the page (EpisodeTime, and t() in content strings) are
        plain YouTube links with data-episode-t; one listener plays them here.
-       Modified clicks (new tab, new window) keep the link's own behaviour. */
+       Modified clicks (new tab, new window) keep the link's own behavior. */
     const onClick = (event: MouseEvent) => {
       if (event.defaultPrevented || event.button !== 0) return;
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;

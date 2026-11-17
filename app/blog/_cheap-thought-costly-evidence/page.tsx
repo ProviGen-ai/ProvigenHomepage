@@ -16,7 +16,7 @@ import '../writings.css';
 export const metadata: Metadata = pageMetadata({
   title: article.metaTitle,
   description: article.dek,
-  path: '/writings/cheap-thought-costly-evidence',
+  path: '/blog/cheap-thought-costly-evidence',
   type: 'article',
   image: essayImage('cheap-thought-costly-evidence', article.metaTitle),
 });

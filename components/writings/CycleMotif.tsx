@@ -15,7 +15,7 @@ import { useEffect, useId, useRef } from 'react';
  * their readout on the paper → mint → teal ramp. Learning is the quarter
  * where the loop tightens: a ring contracts onto the next, smaller lap, so
  * every round starts closer to the answer and its readouts come out darker.
- * After four rounds the loop closes on the answer at the centre, which lights
+ * After four rounds the loop closes on the answer at the center, which lights
  * orange; then the plate clears and a new campaign starts. The words are the
  * four stations and nothing else. Drawn, not data: four rounds, three
  * experiments each, no numbers.
@@ -48,7 +48,7 @@ const ORANGE_DEEP = '#b67a20';
 /** Readout per round, outer to inner: each round reads darker (better). */
 const READOUT = ['#b2d8c7', '#86c0b6', '#5aa1a3', '#2f7477'];
 
-/** One ring per round, outer to inner; the loop closes on the centre after the last. */
+/** One ring per round, outer to inner; the loop closes on the center after the last. */
 const RADII = [116, 82, 56, 34];
 const ROUNDS = RADII.length;
 /** Where each round's three experiments sit on its lap (fraction of a lap from Decide). */
@@ -97,7 +97,7 @@ function mix(a: string, b: string, u: number) {
 /**
  * Radius at progress p (laps from the first Decide): a lap holds its ring
  * through Decide, Run and Observe and tightens onto the next ring between
- * Learn and the next Decide; the last lap tightens onto the centre.
+ * Learn and the next Decide; the last lap tightens onto the center.
  */
 function radius(p: number) {
   if (p >= ROUNDS) return 0;
@@ -150,7 +150,7 @@ function scene(t: number): Scene {
     : 0;
   const s: Scene = {};
 
-  /* laps travelled: the current one bright, the earlier ones receding */
+  /* laps traveled: the current one bright, the earlier ones receding */
   for (let i = 0; i < ROUNDS; i++) {
     const age = cur - i;
     const alpha = p <= i ? 0 : age <= 0 ? 0.9 : age === 1 ? 0.5 : 0.3;
@@ -417,7 +417,7 @@ export default function CycleMotif() {
         ))}
         <circle {...at('ghost')} cx={CX} cy={CY} stroke={TEAL} {...hair} />
 
-        {/* the loop travelled so far */}
+        {/* the loop traveled so far */}
         {RADII.map((r, i) => (
           <path
             key={r}
@@ -430,7 +430,7 @@ export default function CycleMotif() {
           />
         ))}
 
-        {/* the answer at the centre */}
+        {/* the answer at the center */}
         <circle
           {...at('ans.unknown')}
           cx={CX}

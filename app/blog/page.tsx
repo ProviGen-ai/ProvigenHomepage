@@ -10,9 +10,9 @@ import { orderedWritings, type WritingCard } from '@/content/writings';
 import './writings.css';
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Writings',
-  description: 'Field notes on building the AI that steers biology.',
-  path: '/writings',
+  title: 'Blog',
+  description: 'Field notes on steering biology.',
+  path: '/blog',
 });
 
 const i = (n: number) => ({ '--i': n }) as CSSProperties;
@@ -33,15 +33,16 @@ export default function WritingsIndex() {
         </div>
         <div className="w-index-wash" aria-hidden="true" />
         <div className="s-wrap w-index-hero-inner">
-          <h1 className="s-display w-index-title">
+          {/* Founder, 14 Nov 2026: no "Blog" heading on the page; the line itself is the title, set small. */}
+          <h1 className="s-display w-index-title w-index-title--line">
             <span className="s-line">
-              <span>Writings</span>
+              <span>{'Field notes on steering\u00a0biology.'}</span>
             </span>
           </h1>
+          {/* The dek, now the title above.
           <p className="s-lede w-index-dek">
-            {/* No-break spaces keep the category phrase on one line. */}
-            {'Writing on building the\u00a0AI\u00a0that\u00a0steers\u00a0biology.'}
-          </p>
+            {'Field notes on steering\u00a0biology.'}
+          </p> */}
         </div>
       </header>
 

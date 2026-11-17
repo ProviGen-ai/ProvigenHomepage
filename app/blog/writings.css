@@ -712,6 +712,11 @@ a.w-tl-col:focus-visible .w-tl-label {
   margin-top: 0;
   max-width: none;
 }
+/* The line as the index's title (founder, 14 Nov 2026): smaller than a display headline, so it does not dominate. */
+.w-index-hero .w-index-title--line {
+  font-size: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+  line-height: 1.1;
+}
 .w-index-hero .w-index-dek {
   margin-top: 1.5rem;
   max-width: 36ch;

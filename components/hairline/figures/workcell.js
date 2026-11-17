@@ -2,7 +2,7 @@
  * Workcell: a lab bench with four instruments in a row, a liquid handler, a
  * plate reader, an incubator and a bioreactor. The instrument under the
  * pointer opens: the head lowers to a plate, the drawer slides out, the door
- * swings, the lid lifts. Its neighbours open less, staggered outwards from it.
+ * swings, the lid lifts. Its neighbors open less, staggered outwards from it.
  * At rest the reader's drawer is half out, bright. The slider is how far the
  * chosen instrument opens, in percent.
  *
@@ -180,7 +180,7 @@ function mount({ stage, svg, read }, value) {
 
 export default ({
   name: "workcell",
-  means: "Four lab instruments on a bench: the one under the pointer opens, and its neighbours open a little less, in turn.",
+  means: "Four lab instruments on a bench: the one under the pointer opens, and its neighbors open a little less, in turn.",
   rules: [1, 2, 5, 6],
   range: [60, 80, 100],
   mount,

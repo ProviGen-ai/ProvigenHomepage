@@ -33,7 +33,7 @@ export function SubpageHero({
   title: SubpageTitle;
   dek: string;
   palette?: ShaderPalette;
-  /** The glow's centre in the field's UV space (origin bottom left). */
+  /** The glow's center in the field's UV space (origin bottom left). */
   focus?: [number, number];
   /** A figure beside the line on wide screens, under it on narrow ones (/ai-labs, 8 Oct 2026). */
   figure?: ReactNode;

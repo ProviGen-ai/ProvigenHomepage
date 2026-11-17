@@ -33,8 +33,8 @@ write(
   `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>ProviGen · Writings</title>
-    <link>${site}/writings</link>
+    <title>ProviGen · Blog</title>
+    <link>${site}/blog</link>
     <atom:link href="${site}/feed.xml" rel="self" type="application/rss+xml" />
     <description>Field notes on building the AI that steers biology.</description>
     <language>en</language>
@@ -54,7 +54,7 @@ write(
 );
 
 // '/careers', '/biopharma' and '/ai-labs' are left out while nothing links to them (14 Oct 2026).
-const pages = ['/', /* '/biopharma', '/ai-labs', '/careers', */ '/writings', '/contact'];
+const pages = ['/', /* '/biopharma', '/ai-labs', '/careers', */ '/blog', '/contact'];
 const urls = indexable
   ? [
       ...pages.map((path) => ({ loc: `${site}${path}` })),

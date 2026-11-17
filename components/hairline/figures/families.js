@@ -19,7 +19,7 @@ const {
 
 const PITCH = 25, NI = 4, XE = NI * PITCH, WH = 3, WT = 2, FL = 1, PB = 6, STEP = 45;
 const PICK = 24, FAM = 19, CAP = 0.5, REST_AT = 9; // REST_AT: the plate lifted at rest, tray 3 slot 2
-/** The trays, back to front: their span across the plinth (centres 37.5 apart, so each row stands between the columns of the one behind), and the lean each item keeps at rest. */
+/** The trays, back to front: their span across the plinth (centers 37.5 apart, so each row stands between the columns of the one behind), and the lean each item keeps at rest. */
 const TRAYS = [
   { name: "mamm", y0: 0, y1: 28, rest: [0.5, 2.5, 1, 0] },
   { name: "bact", y0: 40.5, y1: 62.5, rest: [1.5, 5, 3, 1] },

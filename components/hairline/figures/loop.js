@@ -15,10 +15,10 @@ const {
 const NAMES = ["decide", "run", "observe", "learn", "choose"];
 const TX0 = 40, TX1 = 150, TY0 = 50, TY1 = 86, TR = 18, BW = 6, STEP = 45, REACH = 30;
 const XA = TX0 + TR, XB = TX1 - TR, YM = (TY0 + TY1) / 2, LS = XB - XA, LA = Math.PI * TR, LOOP = 2 * (LS + LA);
-/** Each station's stop, as a distance along the track's centre line, in station order; on the bends, a little aside so nothing stands over the carrier. */
+/** Each station's stop, as a distance along the track's center line, in station order; on the bends, a little aside so nothing stands over the carrier. */
 const DOCK = [2 * LS + 1.625 * LA, 68 - XA, 117 - XA, LS + 0.875 * LA, LS + LA + XB - 97];
 
-/** The point on the centre line at distance s, and the way the track runs there: far straight, near bend, near straight, far bend. */
+/** The point on the center line at distance s, and the way the track runs there: far straight, near bend, near straight, far bend. */
 function along(s) {
   s = ((s % LOOP) + LOOP) % LOOP;
   if (s < LS) return [XA + s, TY0, 0];
@@ -66,7 +66,7 @@ function mount({ stage, svg, read }, value) {
 
   const g = mk("g", {}, svg);
   put(solid(g), prism(P, front, plin, rrect(-5.8, -1.8, 193.8, 125.8, 63.8, 14), -7, 0));
-  // the track, flat on the plinth: its centre line as a guide, its two edges, and a stop line at each station
+  // the track, flat on the plinth: its center line as a guide, its two edges, and a stop line at each station
   const flat = (ring, cls) => mk("path", { d: poly(ringAt(P, ring, 0)), class: cls }, g);
   flat(rrect(TX0, TY0, TX1, TY1, TR, 14), "nf dash");
   flat(rrect(TX0 - BW, TY0 - BW, TX1 + BW, TY1 + BW, TR + BW, 14), "nf");
