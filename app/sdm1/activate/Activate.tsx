@@ -75,9 +75,13 @@ export default function Activate() {
         <p className="r-access-label">Your token</p>
         <div className="r-access-token">
           <code>{full.token}</code>
+          {/* The usual copy symbol instead of the word (the user, 17 Nov 2026): two sheets, and a tick once the
+              token is on the clipboard. The label stays for a screen reader. */}
           <button
             type="button"
-            className="r-access-copy"
+            className="r-act-copy"
+            aria-label={copied ? "Token copied" : "Copy the token"}
+            title={copied ? "Copied" : "Copy"}
             onClick={async () => {
               try {
                 await navigator.clipboard.writeText(full.token);
@@ -88,14 +92,24 @@ export default function Activate() {
               }
             }}
           >
-            {copied ? "Copied" : "Copy"}
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              {copied ? (
+                <path d="M5 12.5 L10 17.5 L19 7" />
+              ) : (
+                <>
+                  <rect x="9" y="9" width="11" height="11" rx="1.5" />
+                  <path d="M15 5.5 A1.5 1.5 0 0 0 13.5 4 H5.5 A1.5 1.5 0 0 0 4 5.5 V13.5 A1.5 1.5 0 0 0 5.5 15" />
+                </>
+              )}
+            </svg>
           </button>
         </div>
+        {/* Was followed by "It replaces the token from the form; a new link replaces this one." (the user,
+            17 Nov 2026: leave that out). */}
         <p className="r-access-note">
           Shown only once: copy it now and keep it private. {full.daily_limit}{" "}
           calls a day (the count resets at 00:00 UTC), {full.total_limit} in
-          total. It replaces the token from the form; a new link replaces this
-          one.
+          total.
         </p>
       </div>
     );

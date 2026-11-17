@@ -8,7 +8,9 @@
   padding-block: clamp(3rem, 2rem + 6vw, 7rem);
 }
 .r-act-wrap {
-  max-width: 34rem;
+  /* The token on one line (the user, 17 Nov 2026): the card is as wide as it needs to be for the whole string,
+     capped to the screen. Was 34rem, which broke it in two. */
+  max-width: min(46rem, calc(100vw - 2rem));
 }
 .r-act-kicker {
   margin: 0 0 0.75rem;
@@ -54,19 +56,37 @@
 .r-act .r-access-token code {
   flex: 1;
   min-width: 0;
-  overflow-wrap: anywhere;
+  /* One line, scrolling inside its own box on a narrow screen rather than wrapping (the user, 17 Nov 2026). */
+  white-space: nowrap;
+  overflow-x: auto;
   font-family: var(--f-mono);
   font-size: 0.85rem;
 }
-.r-act .r-access-copy {
-  font-family: var(--f-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  padding: 0.35rem 0.6rem;
+/* The copy symbol (the user, 17 Nov 2026): two sheets, a tick once copied. Was a button reading "Copy". */
+.r-act-copy {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
   border: 1px solid color-mix(in oklab, var(--c-ink) 25%, transparent);
   background: transparent;
   color: var(--c-ink);
   cursor: pointer;
+}
+.r-act-copy svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.r-act-copy:hover {
+  border-color: var(--c-teal-ink);
+  color: var(--c-teal-ink);
 }
 .r-act .r-access-note {
   margin: 0;
