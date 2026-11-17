@@ -5530,3 +5530,24 @@ body:has(.r-launch--v2 .r-launch-more:empty) .s-footer {
     display: none;
   }
 }
+
+/* The card once a token has been issued (the user's screenshot, 17 Nov 2026: it is not big enough after Get access
+   has been clicked). The form fits in 36rem, the example that follows does not: its lines were cut off at the card's
+   right edge. With a token in it the card is wider, its body no longer held to the form's 34rem, and the example can
+   never push the card wider than the screen — it scrolls inside its own box instead. */
+.r-access-card:has(.r-access--issued) {
+  width: min(54rem, calc(100vw - 2rem));
+}
+.r-access-card:has(.r-access--issued) .r-access {
+  max-width: none;
+}
+.r-access--issued,
+.r-access-snippet {
+  min-width: 0;
+}
+.r-access-snippet pre {
+  max-width: 100%;
+}
+.r-access-token code {
+  overflow-wrap: anywhere;
+}
