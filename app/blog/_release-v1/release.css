@@ -5521,3 +5521,12 @@ body:has(.r-launch--v2 .r-launch-more:empty) .s-footer {
     text-wrap: balance;
   }
 }
+
+/* On a phone the sentence is off (the user, 17 Nov 2026): under 900px the "Try SDM-1" button, which hangs below the
+   text column rather than sitting in its flow, runs into it. The tree is already hidden at this width, and the lede
+   above says the same thing in full, so the line goes rather than the two overlapping. */
+@media (max-width: 900px) {
+  .r-hero-side .r-launch-name {
+    display: none;
+  }
+}
