@@ -1957,5 +1957,9 @@
   "copy_added": {
     "note": "The comparison page's copy over `copy` (16 Nov 2026); the original page keeps `copy`.",
     "cta_text": "Join the list to be among the first labs to run their next campaign with SDM-1, or tell us about a campaign you are planning."
+  },
+  "cube_demo": {
+    "holds": true,
+    "note": "The user, 17 Nov 2026: the cube race ships. The 9 recorded runs in content/release/cube-runs/estimate/ are three seeds x three methods, every one against the model (none 'mock'), which the page's own gate checks as well."
   }
 }
