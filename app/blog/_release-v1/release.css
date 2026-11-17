@@ -5551,3 +5551,13 @@ body:has(.r-launch--v2 .r-launch-more:empty) .s-footer {
 .r-access-token code {
   overflow-wrap: anywhere;
 }
+
+/* The address a token was issued to, named in the confirmation line (the user, 17 Nov 2026): set as code, so it reads
+   as the exact string that was submitted. */
+.r-access-mail {
+  padding: 0.05em 0.3em;
+  background: color-mix(in oklab, var(--c-ink) 7%, var(--c-paper));
+  font-family: var(--f-mono);
+  font-size: 0.86em;
+  overflow-wrap: anywhere;
+}

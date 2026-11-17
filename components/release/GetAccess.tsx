@@ -19,7 +19,9 @@ const TRIAL_CALLS = 20;
 
 /* A trial token at once (the user, 17 Nov 2026): it works `trial_calls` times, and the link emailed to the address
    turns it into the full one on /sdm1/activate. Was { token, daily_limit, total_limit }. */
-type Issued = { token: string; tier: "trial" | "full"; trial_calls: number; daily_limit?: number; total_limit?: number };
+/* `email` is the address the token was issued to (the user, 17 Nov 2026: the page names it), kept here because
+   the field itself is cleared on success. */
+type Issued = { email: string; token: string; tier: "trial" | "full"; trial_calls: number; daily_limit?: number; total_limit?: number };
 
 /* Without names (16 Nov 2026, the API's names became optional, the user's decision; agent-002's example): the API
    calls the parameters x1, x2 by position, and the category labels are neutral. Was temperature and catalyst. */
@@ -111,6 +113,7 @@ export default function GetAccess({ modelName }: { modelName: string }) {
         (Partial<Issued> & { error?: string; message?: string }) | null;
       if (response.status === 201 && typeof body?.token === "string") {
         setIssued({
+          email,
           token: body.token,
           tier: body.tier === "full" ? "full" : "trial",
           trial_calls: body.trial_calls ?? 20,
@@ -152,10 +155,10 @@ export default function GetAccess({ modelName }: { modelName: string }) {
             sandbox only @provigen.ai addresses receive it, so the page no longer promises a link that is already on
             its way. Put the sentence back once AWS grants production access. */}
         <p className="r-access-note r-access-note--mail">
-          A confirmation link will follow to that address in the coming days.
-          Opening it gives the full token: {issued.daily_limit ?? 50} calls a
-          day (the count resets at 00:00 UTC), {issued.total_limit ?? 500} in
-          total.
+          A confirmation link will follow in the coming days to the address{" "}
+          <code className="r-access-mail">{issued.email}</code>. Opening it
+          gives the full token: {issued.daily_limit ?? 50} calls a day (the
+          count resets at 00:00 UTC), {issued.total_limit ?? 500} in total.
         </p>
         <div className="r-access-snippet">
           <div className="r-access-tabs" role="tablist" aria-label="Example">

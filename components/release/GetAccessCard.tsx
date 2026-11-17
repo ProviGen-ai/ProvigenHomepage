@@ -6,9 +6,11 @@ import GetAccess from "./GetAccess";
 
 /*
  * "Try SDM-1" opens the Get access form as a card over the page (founder, 16 Nov 2026: the form moved from the call to
- * action to the click on "Try SDM-1" at the top). A native modal <dialog>: Escape, the close button or a click on the
- * backdrop closes it, and focus returns to the button. The form keeps its state while the card is closed, so an issued
- * token stays visible if the card is opened again during the visit.
+ * action to the click on "Try SDM-1" at the top). A native modal <dialog>: the close button at its corner closes it,
+ * and focus returns to the trigger. A click on the backdrop does not (the user, 17 Nov 2026): the card can hold a
+ * token shown only once, and a stray click beside it used to take that away. Escape still closes it, which a modal
+ * dialog owes a keyboard. The form keeps its state while the card is closed, so an issued token stays visible if the
+ * card is opened again during the visit.
  */
 export default function GetAccessCard({
   modelName,
@@ -37,17 +39,6 @@ export default function GetAccessCard({
         ref={dialog}
         className="r-access-card"
         aria-labelledby={title}
-        onClick={(e) => {
-          /* A click on the backdrop lands on the dialog itself, outside the card's box. */
-          if (e.target !== dialog.current) return;
-          const box = dialog.current.getBoundingClientRect();
-          const inside =
-            e.clientX >= box.left &&
-            e.clientX <= box.right &&
-            e.clientY >= box.top &&
-            e.clientY <= box.bottom;
-          if (!inside) dialog.current.close();
-        }}
       >
         <div className="r-access-card-head">
           <h2 id={title}>Get access</h2>
