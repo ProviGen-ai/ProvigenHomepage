@@ -147,9 +147,12 @@ export default function GetAccess({ modelName }: { modelName: string }) {
         </div>
         {/* Was "Shown only once: copy it now and keep it private. 50 calls a day (the count resets at 00:00 UTC), 500
             in total." (the user, 17 Nov 2026: a trial token first, the full one from the emailed link). */}
+        {/* Was "It works {trial_calls} times right away." (the user, 17 Nov 2026, from the model team): the trial
+            budget belongs to the address, not to the token, and a repeat request mints a new token on the same
+            budget. The 201 always reports the limit, never what is left, so the page states the limit as a limit. */}
         <p className="r-access-note">
-          Shown only once: copy it now and keep it private. It works{" "}
-          {issued.trial_calls} times right away.
+          Shown only once: copy it now and keep it private. Each address has up
+          to {issued.trial_calls} calls until it is confirmed.
         </p>
         {/* Was "A confirmation link is on its way to that address." (the user, 17 Nov 2026): while SES is in its
             sandbox only @provigen.ai addresses receive it, so the page no longer promises a link that is already on
