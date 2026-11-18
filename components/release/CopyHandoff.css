@@ -1,0 +1,22 @@
+/* The "Copy for an agent" button (the user, 18 Nov 2026). A quiet text button, not a second icon: two copy icons
+   side by side say nothing about which one does what. Used on the release page's access card and on the activation
+   page, so it carries its own styling rather than depending on either page's sheet. */
+.r-handoff {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--c-teal-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+.r-handoff:hover {
+  text-decoration-thickness: 2px;
+}
+.r-handoff:focus-visible {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 2px;
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import CopyHandoff from "@/components/release/CopyHandoff";
 
 /*
  * The magic link's activation (the user, 17 Nov 2026): the email links to /sdm1/activate#<code>, so the code sits in
@@ -110,6 +111,12 @@ export default function Activate() {
           Shown only once: copy it now and keep it private. {full.daily_limit}{" "}
           calls a day (the count resets at 00:00 UTC), {full.total_limit} in
           total.
+        </p>
+        {/* This page showed a token and nothing else: no address, no documentation, so an agent given it had
+            nowhere to call (the user, 18 Nov 2026). */}
+        <p className="r-access-note">
+          Handing it to an agent? <CopyHandoff token={full.token} /> — the token
+          with the API address and the documentation.
         </p>
       </div>
     );

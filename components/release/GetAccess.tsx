@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { API_BASE } from "@/content/sdm1/handoff";
+import CopyHandoff from "./CopyHandoff";
 
 /*
  * "Get access" (16 Nov 2026, the user's flow, agent-002's design section 10): an email and two boxes give a personal
@@ -12,7 +14,7 @@ import { useState } from "react";
  * must change whenever this wording does.
  */
 
-const API = "https://api.provigen.ai/v1/propose";
+const API = `${API_BASE}/v1/propose`;
 /* What an unconfirmed token is worth (the user, 17 Nov 2026); AWS sends the real number with the token, and this is
    the figure the consent text states. */
 const TRIAL_CALLS = 20;
@@ -166,6 +168,12 @@ export default function GetAccess({ modelName }: { modelName: string }) {
         <p className="r-access-note">
           Shown only once: copy it now and keep it private. Each address has up
           to {issued.trial_calls} calls until it is confirmed.
+        </p>
+        {/* A token names neither its host nor the documentation, so an agent handed one alone has nothing to call
+            (the user, 18 Nov 2026). This copies the token with the address and the contract link. */}
+        <p className="r-access-note">
+          Handing it to an agent? <CopyHandoff token={issued.token} /> — the
+          token with the API address and the documentation.
         </p>
         {/* Was "A confirmation link is on its way to that address." (the user, 17 Nov 2026): while SES is in its
             sandbox only @provigen.ai addresses receive it, so the page no longer promises a link that is already on

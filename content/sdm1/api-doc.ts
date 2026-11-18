@@ -153,7 +153,9 @@ for _ in range(10):
         {
           kind: 'text',
           text:
-            'Every row carries a value key, with a number or null. Leaving the key out is refused by the service in a way that is hard to act on.',
+            /* Was '... is refused by the service in a way that is hard to act on.' (18 Nov 2026): it answered 503
+               high_demand, which reads as "retry" and never succeeded. agent-002 made it a plain 400 naming the row. */
+            'Every row carries a value key, with a number or null. Leaving the key out answers 400 naming the row, for example "history[0]: value is required: a number, or null for a failed run"; it is a stop, not something to retry.',
         },
       ],
     },
