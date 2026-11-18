@@ -52,6 +52,10 @@ export const retired: [source: string, destination: string][] = [
   ['/writings/antibody-discovery', '/blog/antibody-discovery'],
   /* The release's working name while it was drafted (17 Nov 2026); it is published as /blog/introducing-sdm-1. */
   ['/writings/introducing-model-name', '/blog/introducing-sdm-1'],
+  /* /sdm1 (the user, 18 Nov 2026): the short name for the model, and where the API's own 401 and 403 bodies send a
+     caller who needs a token. /sdm1/api and /sdm1/activate are real pages; only the bare path redirects, to the
+     release article, which carries the Get access form. */
+  ['/sdm1', '/blog/introducing-sdm-1'],
   ['/demo', '/blog/closed-loop-optimization#simulation'],
   /* The Start-here doors (founder, 7 Oct 2026): the Investors door was removed,
      and the Frontier labs door became AI Labs. */
