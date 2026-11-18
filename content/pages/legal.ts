@@ -116,7 +116,10 @@ export const privacy: LegalDocument = {
     /* API access (founder, 17 Nov 2026): what the SDM-1 access form collects, so the form can refer here and carry
        less itself. The same facts as the form's "Data protection information" (components/release/GetAccess.tsx),
        a DRAFT with it: retention undecided; AWS region and IP handling as agent-002 checked them on 16 Nov 2026.
-       Change both together. */
+       Change both together, with one exception on the user's call (18 Nov 2026): the blocked-request paragraph below
+       is here only. The form still says the IP address is processed "solely" to limit token requests, which the
+       firewall's log made inaccurate; changing the form would bump CONSENT_VERSION, and the user chose not to. So the
+       two differ on purpose, and the form is the weaker wording of the two. */
     {
       title: 'API Access',
       id: 'api-access',
@@ -136,7 +139,16 @@ export const privacy: LegalDocument = {
         ],
         /* Was 'Your IP address is used only to limit ... It is not stored as such, only as a keyed hash in rate-limit
            records that are deleted automatically.' (founder, 17 Nov 2026: more formal; stated positively) */
-        'The IP address is processed solely to limit the number of token requests per network. For this purpose, it is stored exclusively as a keyed hash value in rate-limit records, which are deleted automatically.',
+        /* Was 'The IP address is processed solely to limit the number of token requests per network. For this purpose,
+           it is stored exclusively as a keyed hash value in rate-limit records, which are deleted automatically.'
+           (the user, 18 Nov 2026): 'solely' and 'exclusively' became inaccurate when the API's firewall began keeping
+           blocked requests, so they are now scoped to the rate-limiting purpose and the second purpose is named in the
+           sentence after. The user chose to leave the form's consent text and CONSENT_VERSION unchanged. */
+        'The IP address is processed to limit the number of token requests per network. For that purpose, it is stored only as a keyed hash value in rate-limit records, which are deleted automatically.',
+        /* The firewall's blocked-request log (agent-002, 18 Nov 2026). It mirrors the Server Logs section above: the
+           same lawful basis and the same 30 days. A visitor of this website is not affected, because such a request
+           reaches the API from the host's address and the forwarded visitor address is redacted in these records. */
+        'Where a request to the API is blocked for exceeding the limits, the source IP address of that request is stored for 30 days for the purpose of detecting and investigating misuse (Art. 6(1)(f) GDPR). The address forwarded for the per-visitor limits is not stored in these records.',
         /* Was 'Issuing the token and enforcing its limits is based on Art. 6(1)(b) GDPR (contract). ...' (founder,
            17 Nov 2026: more formal) */
         'The issuance of the token, the sending of a confirmation link to the address given, and the enforcement of the token\u2019s limits are based on Art. 6(1)(b) GDPR (performance of a contract). The limitation of token requests per network to prevent misuse is based on Art. 6(1)(f) GDPR (legitimate interest). The storage of submitted data for the operation and benchmarking of the model, and contact regarding a potential collaboration subject to opt-in, are based on consent pursuant to Art. 6(1)(a) GDPR, which may be withdrawn at any time with effect for the future.',
