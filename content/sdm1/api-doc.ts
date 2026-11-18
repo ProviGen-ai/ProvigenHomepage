@@ -37,6 +37,10 @@ export const apiDoc: { title: string; lede: string; updated: string; sections: S
           text: `The base URL is ${BASE}. Every call carries a token from the Get access form on the release page, as a Bearer header. Keep the token in an environment variable; it belongs in neither a command line nor a file an agent can read back.`,
         },
         {
+          kind: 'text',
+          text: `Two routes need no token, for an agent that has been handed one and nothing else: ${BASE}/ answers a JSON index of the endpoints and the limits, and ${BASE}/llms.txt is the short version of this page, with a first call to copy. Either one is enough to get oriented without leaving the API's own host.`,
+        },
+        {
           kind: 'code',
           lang: 'bash',
           caption: 'Is the service up? (do not poll this: it counts toward the per-token limit)',
@@ -292,8 +296,9 @@ for _ in range(10):
           rows: [
             ['200', '{"proposals": …, "model": …, "version": …}', 'Run them, append the results, call again.'],
             ['400', '{"error": "invalid_request", "message": …}', 'Stop. The message names the field or the limit. Fix the request; the same body fails again.'],
-            ['401', '{"message": "Unauthorized"}', 'Stop. No Authorization header.'],
-            ['403', 'the gateway\'s own body', 'Stop. The token is unknown, retired or revoked. A replaced token can keep working for about 5 minutes.'],
+            ['401', '{"error": "unauthorized", "message": …, "docs": …}', 'Stop. No Authorization header. The message says where to get a token.'],
+            ['403', '{"error": "forbidden", "message": …, "docs": …}', 'Stop. The token is unknown, retired or revoked. A replaced token can keep working for about 5 minutes.'],
+            ['404', '{"error": "not_found", "message": …, "docs": …}', 'Stop. There is no such route. The message points at the index.'],
             ['429', '{"error": "rate_limited", "retry_after_s": N}', 'Wait for Retry-After, then send the same call.'],
             ['429', '{"error": "quota_exceeded", "message": …}', 'With retry_after_s, wait for it. Without, stop: the budget is spent.'],
             ['503', '{"error": "high_demand", "retry_after_s": N}', 'Wait for Retry-After and send the same call again.'],
@@ -304,6 +309,10 @@ for _ in range(10):
           kind: 'text',
           text:
             'The rule for an agent running unattended: 429 and 503 are waits, with the header saying how long. A 4xx without a Retry-After is a stop, never a retry.',
+        },
+        {
+          kind: 'text',
+          text: `Every error body carries a docs field pointing at this contract, so an agent that meets an answer it does not know can fetch the whole of it from the answer itself.`,
         },
       ],
     },
