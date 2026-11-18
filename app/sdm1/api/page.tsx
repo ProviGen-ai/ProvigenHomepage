@@ -10,7 +10,8 @@ import './api.css';
  * fields, the limits, the answers, the mistakes.
  */
 export const metadata: Metadata = pageMetadata({
-  title: `${apiDoc.title} | ProviGen`,
+  /* The brand comes from app/layout.tsx's title template ('%s | ProviGen'); naming it here doubles it. */
+  title: apiDoc.title,
   description: apiDoc.lede,
   path: '/sdm1/api',
 });

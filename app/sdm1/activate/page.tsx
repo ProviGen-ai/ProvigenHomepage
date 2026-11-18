@@ -8,7 +8,8 @@ import './activate.css';
  * click. Kept out of search engines, and no referrer is sent, so the link's fragment cannot leak through one.
  */
 export const metadata: Metadata = {
-  title: 'Activate your SDM-1 token | ProviGen',
+  /* The brand comes from app/layout.tsx's title template ('%s | ProviGen'); naming it here doubles it. */
+  title: 'Activate your SDM-1 token',
   description: 'Activate the personal SDM-1 API token sent to your email address.',
   robots: { index: false, follow: false },
   referrer: 'no-referrer',
