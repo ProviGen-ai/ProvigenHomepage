@@ -134,6 +134,36 @@
   }
 }
 
+/* Troubleshooting as questions and answers (the user, 18 Nov 2026). The question is set in the display face at prose
+   size so it reads as a heading without being one, and each pair is divided by the same hairline as the field list,
+   so the two blocks sit on one grid. */
+.w-prose .r-api-faq {
+  display: grid;
+  gap: 0;
+  margin-block: 2rem;
+  border-top: 1px solid var(--c-ink);
+}
+.w-prose .r-api-faq > div {
+  padding-block: 1.1rem;
+  border-bottom: 1px solid var(--c-line);
+}
+.w-prose .r-api-faq dt {
+  margin: 0 0 0.4rem;
+  font-family: var(--f-display);
+  font-size: 1rem;
+  line-height: 1.35;
+  color: var(--c-ink);
+  text-wrap: balance;
+}
+.w-prose .r-api-faq dd {
+  margin: 0;
+  font-family: var(--f-serif);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--c-ink);
+  text-wrap: pretty;
+}
+
 /* The answers table uses the site's table type; only the status column is set apart. */
 .w-prose .r-api-table td:first-child {
   white-space: nowrap;

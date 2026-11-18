@@ -16,7 +16,10 @@ export type Block =
   | { kind: 'code'; lang: 'bash' | 'python' | 'json'; code: string; caption?: string }
   | { kind: 'list'; items: string[] }
   | { kind: 'fields'; head?: [string, string, string]; rows: { name: string; type: string; note: string }[] }
-  | { kind: 'table'; head: [string, string, string]; rows: [string, string, string][] };
+  | { kind: 'table'; head: [string, string, string]; rows: [string, string, string][] }
+  /* A question with its answer (the user, 18 Nov 2026: the Troubleshooting list read as too obscure). Each question
+     states a symptom in the form it is met, so the section can be scanned for one. */
+  | { kind: 'faq'; rows: { q: string; a: string }[] };
 
 export type Section = { id: string; heading: string; blocks: Block[] };
 
@@ -348,17 +351,44 @@ for _ in range(10):
       id: 'mistakes',
       heading: 'Troubleshooting',
       blocks: [
+        /* The same eight facts the list carried, each under the question that leads a caller to it. */
         {
-          kind: 'list',
-          items: [
-            'A repeated request without new results returns the same batch, the answer being deterministic.',
-            'A failed run omitted from the history is proposed again. Such a run is recorded with value null.',
-            'A row that carries values and omits value is refused. Every row carries value.',
-            'goal is required alongside objectives, where it is ignored.',
-            'Unknown keys anywhere in the body are refused with 400.',
-            'Unnamed parameters are addressed as x1, x2, … in history, and unnamed objectives as y1, y2, …',
-            'A value outside [low, high] is refused, as is a fraction for an integer parameter: an integer parameter takes 2.0 and refuses 2.5.',
-            'Repeated calls to /v1/status count toward the limit of 10 calls a minute.',
+          kind: 'faq',
+          rows: [
+            {
+              q: 'Why does a repeated request return the same settings?',
+              a: 'The service is deterministic, so an unchanged request produces an unchanged response. Further settings are proposed for a request whose history carries the values observed in the meantime.',
+            },
+            {
+              q: 'Why is a setting that has already been evaluated proposed a second time?',
+              a: 'A run absent from the history is unknown to the service. A run that failed is recorded with value null, which marks the setting as evaluated and withholds it from later proposals.',
+            },
+            {
+              q: 'What causes the message history[0]: value is required?',
+              a: 'A row of the history states params and omits value. Every row carries value: a number for a completed run, and null for a failed one.',
+            },
+            {
+              q: 'Is goal required alongside objectives?',
+              a: 'goal is required in every request. Where objectives is present, each objective carries its own direction and the top-level goal is disregarded.',
+            },
+            {
+              q: 'How is a key outside the schema handled?',
+              a: 'The request is refused with status 400. This applies at every level of the body.',
+            },
+            {
+              q: 'How are parameters addressed when the entries of space carry no name?',
+              a: 'Parameters are addressed as x1, x2 and onward, in the order space gives them, and objectives as y1, y2 and onward. The same identifiers address them in the params object of a history row.',
+            },
+            {
+              q: 'Which parameter values are refused?',
+              a: 'A value outside the interval given by low and high is refused. An integer parameter accepts a whole number, written either as 2 or as 2.0, and refuses 2.5.',
+            },
+            {
+              q: 'Do calls to /v1/status count toward the rate limit?',
+              /* Scoped to /v1/status, as the list it replaces was: whether /v1/usage is counted as well has not been
+                 confirmed with the model team, and an unverified limit is the costliest kind of error in a doc. */
+              a: 'Repeated calls to /v1/status count toward the limit of 10 calls a minute.',
+            },
           ],
         },
       ],

@@ -55,6 +55,18 @@ function Piece({ block }: { block: Block }) {
         ))}
       </dl>
     );
+  /* The question carries the weight, so it is the term of the list and the answer its description. */
+  if (block.kind === 'faq')
+    return (
+      <dl className="r-api-faq">
+        {block.rows.map((row) => (
+          <div key={row.q}>
+            <dt>{row.q}</dt>
+            <dd>{row.a}</dd>
+          </div>
+        ))}
+      </dl>
+    );
   /* Tables use the site's own scroller and table type, so they read as the articles' tables do. */
   return (
     <div className="p-writings-table-scroll">

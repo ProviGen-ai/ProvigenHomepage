@@ -26,6 +26,8 @@ const block = (b) => {
   if (b.kind === 'list') return `${b.items.map((i) => `- ${i}`).join('\n')}\n`;
   if (b.kind === 'code')
     return `${b.caption ? `${b.caption}:\n\n` : ''}\`\`\`${b.lang}\n${b.code}\n\`\`\`\n`;
+  /* Each question as its own heading, one level under the section's, so an agent can address a single answer. */
+  if (b.kind === 'faq') return `${b.rows.map((r) => `### ${r.q}\n\n${r.a}`).join('\n\n')}\n`;
   if (b.kind === 'fields')
     return `| ${(b.head ?? ['Field', '', 'Rule']).join(' | ')} |\n| --- | --- | --- |\n${b.rows
       .map((r) => `| \`${r.name}\` | ${r.type} | ${r.note.replaceAll('|', '\\|')} |`)
