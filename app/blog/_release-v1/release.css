@@ -1817,6 +1817,16 @@
   .r-tree {
     display: none;
   }
+  /* The single line above was for the tree's empty corner, and the tree is gone from here down, so the title has
+     only to fit. It did not (the user, 18 Nov 2026: text overflowing on a Galaxy S8, 360px wide): the size is
+     clamp(3rem, 1.8rem + 6vw, 6.5rem), which holds about 50px at that width, and seventeen characters of the
+     display face at 50px are wider than the screen. The sibling above had the same treatment at this breakpoint
+     already; the title was missed. Wrapping begins only where a line is too long, so the single line stays
+     wherever it still fits. */
+  .r-hero-text .r-launch-title {
+    white-space: normal;
+    text-wrap: balance;
+  }
 }
 
 /* The model sentence in bold (comparison page, founder 14 Nov 2026): the display face has no bold, so the
