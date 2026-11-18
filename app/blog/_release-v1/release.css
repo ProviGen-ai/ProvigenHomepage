@@ -1538,6 +1538,16 @@
   white-space: nowrap;
   color: var(--c-teal-ink);
 }
+/* The line is kept whole only while it has the room. On a 360px screen the card holds 280px and this line measures
+   296px in the display face at 24px, so its end was cut off: the page clips what runs past it rather than scrolling
+   (the user, 18 Nov 2026: the use case card out of bounds on a phone). Below 901px the claim is no longer sized to
+   its column, which is where the line beside it already gives up one line for the same reason. */
+@media (max-width: 900px) {
+  .r-cfe-punch {
+    white-space: normal;
+    text-wrap: balance;
+  }
+}
 .r-cfe-stage {
   fill: var(--c-ink);
   opacity: 0.035;
@@ -2053,6 +2063,15 @@ body:has(.r-launch--v2) .s-footer {
   background-size: 40px 40px, 40px 40px, 8px 8px, 8px 8px;
   -webkit-mask-image: radial-gradient(closest-side ellipse at 50% 50%, #000 35%, rgb(0 0 0 / 55%) 62%, rgb(0 0 0 / 18%) 82%, transparent 100%);
   mask-image: radial-gradient(closest-side ellipse at 50% 50%, #000 35%, rgb(0 0 0 / 55%) 62%, rgb(0 0 0 / 18%) 82%, transparent 100%);
+}
+/* The fade needs room beside the plot to reach nothing in, and on a phone there is none: at 360px the plot sits
+   40px from each screen edge while this box reaches 96px past it, so the grid met the edge still about a third
+   opaque and ended in the hard vertical line the mask exists to avoid, on both sides (the user, 18 Nov 2026: the
+   plot partially cut off). Held inside the room that is actually there, the dissolve completes on screen. */
+@media (max-width: 900px) {
+  .r-launch--v2 .r-cfe-plot::before {
+    inset: -4rem -1.5rem;
+  }
 }
 @media (max-width: 1100px) {
   .r-launch-fields--airy .r-field .r-piece.r-field-tile {
