@@ -15,7 +15,7 @@ export type Block =
   | { kind: 'text'; text: string }
   | { kind: 'code'; lang: 'bash' | 'python' | 'json'; code: string; caption?: string }
   | { kind: 'list'; items: string[] }
-  | { kind: 'fields'; rows: { name: string; type: string; note: string }[] }
+  | { kind: 'fields'; head?: [string, string, string]; rows: { name: string; type: string; note: string }[] }
   | { kind: 'table'; head: [string, string, string]; rows: [string, string, string][] };
 
 export type Section = { id: string; heading: string; blocks: Block[] };
@@ -24,42 +24,69 @@ export const BASE = 'https://api.provigen.ai';
 
 export const apiDoc: { title: string; lede: string; updated: string; sections: Section[] } = {
   title: 'SDM-1 API',
-  lede:
-    'SDM-1 proposes which experiments to run next. Send the parameter space and every result so far; it answers with the settings to try next. One endpoint, one header, no SDK.',
-  updated: '2026-11-17',
+  /* A subtitle, so one line (the user, 18 Nov 2026). What it dropped opens the Overview below, and agent-002 uses
+     this string verbatim in the API's own GET / and /llms.txt. */
+  lede: 'Proposes the next settings to evaluate, from a parameter space and the values observed so far.',
+  updated: '2026-11-18',
   sections: [
     {
       id: 'start',
-      heading: 'Start here',
+      heading: 'Overview',
       blocks: [
+        /* One declarative sentence, then the facts as a table (the user, 18 Nov 2026: the two paragraphs this
+           replaces read as rambling rather than as documentation). */
         {
           kind: 'text',
-          text: `The base URL is ${BASE}. Every call carries a token from the Get access form on the release page, as a Bearer header. Keep the token in an environment variable; it belongs in neither a command line nor a file an agent can read back.`,
+          text:
+            'A request states the parameter space and every setting already evaluated with its observed value. The response returns the next settings to evaluate.',
         },
         {
-          kind: 'text',
-          text: `Two routes need no token, for an agent that has been handed one and nothing else: ${BASE}/ answers a JSON index of the endpoints and the limits, and ${BASE}/llms.txt is the short version of this page, with a first call to copy. Either one is enough to get oriented without leaving the API's own host.`,
+          kind: 'fields',
+          head: ['Item', 'Kind', 'Notes'],
+          rows: [
+            { name: BASE, type: 'base url', note: 'All paths are relative to it. The service answers over HTTPS only.' },
+            {
+              name: 'POST /v1/propose',
+              type: 'endpoint',
+              note: 'The single endpoint of the optimization loop. GET /v1/status and GET /v1/usage report service state and token consumption.',
+            },
+            {
+              name: 'Authorization: Bearer <token>',
+              type: 'required header',
+              note: 'On every call to /v1. Tokens are issued by the Get access form on the release page and are held in an environment variable.',
+            },
+            {
+              name: 'Content-Type: application/json',
+              type: 'required header',
+              note: 'On POST /v1/propose. The response is JSON in all cases, including errors.',
+            },
+            {
+              name: 'GET / and GET /llms.txt',
+              type: 'no token',
+              note: 'A JSON index of the endpoints and limits, and an abridged form of this page carrying a first call. Both are served from the API host, so an agent holding only a token can begin from either.',
+            },
+          ],
         },
         {
           kind: 'code',
           lang: 'bash',
-          caption: 'Is the service up? (do not poll this: it counts toward the per-token limit)',
+          caption: 'Service status; each call counts toward the per-token limit',
           code: `curl ${BASE}/v1/status -H "Authorization: Bearer $SDM1_TOKEN"
 # {"state":"ok"}`,
         },
         {
           kind: 'code',
           lang: 'bash',
-          caption: 'Propose four experiments in a two-parameter space, from one result',
+          caption: 'Four settings proposed in a two-parameter space, from one observed value',
           code: `curl ${BASE}/v1/propose \\
   -H "Authorization: Bearer $SDM1_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
     "space": [
-      {"type": "continuous", "low": 20, "high": 80},
-      {"type": "categorical", "choices": ["c0", "c1", "c2"]}
+      {"name": "temperature", "type": "continuous", "low": 20, "high": 80},
+      {"name": "catalyst", "type": "categorical", "choices": ["c0", "c1", "c2"]}
     ],
-    "history": [{"params": {"x1": 45, "x2": "c1"}, "value": 0.62}],
+    "history": [{"params": {"temperature": 45, "catalyst": "c1"}, "value": 0.62}],
     "batch": 4,
     "goal": "maximize"
   }'`,
@@ -67,41 +94,41 @@ export const apiDoc: { title: string; lede: string; updated: string; sections: S
         {
           kind: 'code',
           lang: 'json',
-          caption: 'The answer',
+          caption: 'Response',
           code: `{
   "proposals": [
-    {"params": {"x1": 71.4, "x2": "c0"}},
-    {"params": {"x1": 23.8, "x2": "c1"}},
-    {"params": {"x1": 56.1, "x2": "c2"}},
-    {"params": {"x1": 79.2, "x2": "c0"}}
+    {"params": {"temperature": 71.4, "catalyst": "c0"}},
+    {"params": {"temperature": 23.8, "catalyst": "c1"}},
+    {"params": {"temperature": 56.1, "catalyst": "c2"}},
+    {"params": {"temperature": 79.2, "catalyst": "c0"}}
   ],
   "model": "sdm-1",
-  "version": "<served model id>"
+  "version": "sdm-1-3f9a0c2b7d41"
 }`,
         },
       ],
     },
     {
       id: 'loop',
-      heading: 'The loop',
+      heading: 'The optimization loop',
       blocks: [
         {
           kind: 'text',
           text:
-            'A campaign is a loop: propose, run the experiments, append what they measured, propose again. Three properties decide how an agent must drive it.',
+            'A campaign proceeds as a loop: propose, run the experiments, append the measured results, propose again. Three properties of the service determine how that loop is implemented.',
         },
         {
           kind: 'list',
           items: [
-            'It is stateless. The service remembers nothing between calls, so every call carries the whole history.',
-            'It is deterministic. The seed is a hash of the request, so an unchanged request returns the same proposals. Asking again without adding results loops on one batch.',
-            'History is the whole truth. Every proposal you ran belongs in it, including the ones that failed.',
+            'It is stateless. Every call carries the whole history, which is the only state the service works from.',
+            'It is deterministic. An unchanged request returns the same proposals, and a repeated request without new results returns the same batch.',
+            'The history is authoritative. It contains every proposal that was run, including those that failed.',
           ],
         },
         {
           kind: 'code',
           lang: 'python',
-          caption: 'A campaign loop; run_experiment is yours',
+          caption: 'A campaign loop; run_experiment is supplied by the caller',
           code: `import os, requests
 
 TOKEN = os.environ["SDM1_TOKEN"]
@@ -127,7 +154,7 @@ for _ in range(10):
         {
           kind: 'text',
           text:
-            'A first call with an empty history is allowed, and gives a starting design. For a design without a model, ask for method "doe-lhs", which ignores the history and takes a batch of up to 32.',
+            'A first call with an empty history is permitted and returns a starting design. For a design without a model, method "doe-lhs" ignores the history and accepts a batch of up to 32.',
         },
       ],
     },
@@ -138,12 +165,12 @@ for _ in range(10):
         {
           kind: 'text',
           text:
-            'A run that failed goes into the history with value null. That means tried and infeasible: the point is never proposed again, and it teaches the model where the campaign breaks down. A run you have not measured yet does not belong in the history at all.',
+            'A failed run is recorded in the history with value null. The value marks the setting as attempted and infeasible: the model excludes the point from further proposals and uses it to locate the boundaries of the feasible region. The history contains measured runs and failed runs; a run still in progress is submitted once an outcome is available.',
         },
         {
           kind: 'code',
           lang: 'json',
-          caption: 'Two results and a failure',
+          caption: 'Two measured results and one failed run',
           code: `"history": [
   {"params": {"temperature": 45, "catalyst": "c1"}, "value": 0.62},
   {"params": {"temperature": 72, "catalyst": "c0"}, "value": 0.81},
@@ -155,52 +182,52 @@ for _ in range(10):
           text:
             /* Was '... is refused by the service in a way that is hard to act on.' (18 Nov 2026): it answered 503
                high_demand, which reads as "retry" and never succeeded. agent-002 made it a plain 400 naming the row. */
-            'Every row carries a value key, with a number or null. Leaving the key out answers 400 naming the row, for example "history[0]: value is required: a number, or null for a failed run"; it is a stop, not something to retry.',
+            'Every row carries a value key, with a number or null. Leaving the key out answers 400 naming the row, for example "history[0]: value is required: a number, or null for a failed run". The request requires correction before it is sent again.',
         },
       ],
     },
     {
       id: 'request',
-      heading: 'The request',
+      heading: 'Request parameters',
       blocks: [
         {
           kind: 'text',
           text:
-            'POST /v1/propose takes a JSON object of at most 256 KB. Unknown keys are refused with 400 anywhere in the body, so "seed", "n", "bounds" and the like fail rather than being ignored.',
+            'POST /v1/propose takes a JSON object of at most 256 KB. Unknown keys anywhere in the body are refused with 400, including "seed", "n" and "bounds".',
         },
         {
           kind: 'fields',
           rows: [
             { name: 'space', type: 'required', note: '1 to 24 parameters. Each is {"type": "continuous", "low", "high", "log"?}, {"type": "integer", "low", "high"} or {"type": "categorical", "choices": [...]}. "name" is optional and must be unique; unnamed parameters are x1, x2, … by position. For log, low must be above 0. Categorical choices are distinct strings.' },
             { name: 'history', type: 'required', note: 'Up to 200 rows of {"params", "value", "values"?}. May be empty. params names exactly every parameter, numbers within [low, high], whole numbers for integer parameters, the exact string for categorical. value is a finite number, or null for a failed run.' },
-            { name: 'batch', type: 'required', note: 'How many experiments to propose: 1 to 8, or 1 to 32 for method "doe-lhs".' },
+            { name: 'batch', type: 'required', note: 'How many settings to propose: 1 to 8, or 1 to 32 for method "doe-lhs".' },
             { name: 'goal', type: 'required', note: '"maximize" or "minimize". Required even alongside objectives, where it is ignored.' },
             { name: 'objectives', type: 'optional', note: '1 to 24 entries of {"name"?, "goal", "reference"?} for several measured outcomes. Unnamed ones are y1, y2, … Each history row then carries "values": {objective: number or null}, and still carries "value".' },
             { name: 'method', type: 'optional', note: '"sdm-1" (default), "bayesian-optimisation" (at most 2 objectives) or "doe-lhs" (a Latin hypercube; the history is ignored).' },
-            { name: 'noise', type: 'optional', note: 'The standard deviation of a repeat measurement, finite and at least 0. One objective only, and used by sdm-1 alone.' },
+            { name: 'noise', type: 'optional', note: 'The standard deviation of a repeat measurement, finite and at least 0. A single objective only.' },
             { name: 'mode', type: 'optional', note: '"weighted" (default: the objectives signed by their goal and summed) or "pareto" (at least two objectives; reference on all of them or none).' },
           ],
         },
         {
           kind: 'text',
           text:
-            'The answer is {"proposals": [{"params": {...}}, …], "model": …, "version": …}. Proposal params carry the names from the request, or x1, x2, … for unnamed parameters.',
+            'The answer is {"proposals": [{"params": {...}}, …], "model": …, "version": …}. Proposal params carry the names from the request, or x1, x2, … for unnamed parameters. version is an opaque identifier of the served model and changes whenever the model changes: the same request with the same version returns the same proposals, which is what makes a campaign reproducible.',
         },
       ],
     },
     {
       id: 'objectives',
-      heading: 'Several outcomes',
+      heading: 'Multiple objectives',
       blocks: [
         {
           kind: 'text',
           text:
-            'Name what you measure under objectives and give each one a goal. Each history row then carries values for them, and still carries value: a number when anything was read, null when the whole run failed.',
+            'Each measured outcome is named under objectives with a goal of its own. Each history row then carries values for them, and still carries value: a number when anything was read, null when the whole run failed.',
         },
         {
           kind: 'code',
           lang: 'json',
-          caption: 'Yield up, cost down, as one weighted search',
+          caption: 'Two objectives, maximized and minimized, as one weighted search',
           code: `{
   "space": [
     {"name": "temperature", "type": "continuous", "low": 20, "high": 80},
@@ -223,7 +250,7 @@ for _ in range(10):
         {
           kind: 'text',
           text:
-            'For a front rather than one weighted answer, set mode to "pareto" with at least two objectives.',
+            'With mode set to "pareto" and at least two objectives, the answer is a Pareto front.',
         },
       ],
     },
@@ -231,12 +258,12 @@ for _ in range(10):
       /* The route agent-002 is building (the user, 17 Nov 2026: an agent must be able to see what its token has
          left). The shapes are theirs; this section is held back until the route is deployed. */
       id: 'usage',
-      heading: 'What the token has left',
+      heading: 'Usage and quota',
       blocks: [
         {
           kind: 'text',
           text:
-            'Ask the token about itself. The call does not count against the budget it reports, though it does count toward the ten calls a minute. An agent pacing a campaign should read it before it starts and every so often as it runs.',
+            'GET /v1/usage reports what the token has consumed and what remains. The call counts toward the limit of ten calls a minute and leaves the budget it reports untouched. An agent managing its own rate reads it before a campaign and at intervals during one.',
         },
         {
           kind: 'code',
@@ -268,7 +295,7 @@ for _ in range(10):
         {
           kind: 'text',
           text:
-            'The route reports a personal token. A campaign driven through this site\u2019s own pages asks nothing of it and gets 403 forbidden.',
+            'The route reports on a personal token only. A request made with an environment secret, as this site\u2019s own pages do, receives 403 forbidden.',
         },
       ],
     },
@@ -280,71 +307,70 @@ for _ in range(10):
           kind: 'list',
           items: [
             'Parameters: 24. History: 200 rows. Batch: 8, or 32 for doe-lhs. Body: 256 KB.',
-            'Calls: 10 a minute per token. A trial token draws on 20 calls for the address it was issued to; a confirmed token has 50 a day, resetting at 00:00 UTC, and 500 in total.',
-            'Time: the service answers within about 54 seconds. Set a client timeout of at least 60 seconds, and do not send a second copy of a call that is still pending.',
-            'A request predicted to run past the time limit is refused at once with 400 and an estimate. Send fewer parameters, less history or a smaller batch; retrying it unchanged fails again.',
-            'Cost grows with parameters times history times batch, and with the number of objectives: about 0.1 s for two parameters, up to roughly 22 s for 24 parameters, 200 rows and a batch of 8.',
+            'Calls: 10 per minute per token. A trial token is allowed 20 calls, counted against the address it was issued to; a confirmed token is allowed 50 per day, resetting at 00:00 UTC, and 500 in total.',
+            'Time: the service responds within approximately 54 seconds, and a larger request takes longer. A client timeout of at least 60 seconds is required, and a pending call completes before another is sent.',
+            'A request predicted to exceed the time limit is refused immediately with 400 and an estimate. Such a request succeeds with fewer parameters, less history or a smaller batch; an unchanged request fails again.',
           ],
         },
       ],
     },
     {
       id: 'errors',
-      heading: 'Answers, and what to do',
+      heading: 'Responses and error handling',
       blocks: [
         {
           kind: 'table',
-          head: ['Status', 'Body', 'What to do'],
+          head: ['Status', 'Body', 'Handling'],
           rows: [
-            ['200', '{"proposals": …, "model": …, "version": …}', 'Run them, append the results, call again.'],
-            ['400', '{"error": "invalid_request", "message": …}', 'Stop. The message names the field or the limit. Fix the request; the same body fails again.'],
-            ['401', '{"error": "unauthorized", "message": …, "docs": …}', 'Stop. No Authorization header. The message says where to get a token.'],
-            ['403', '{"error": "forbidden", "message": …, "docs": …}', 'Stop. The token is unknown, retired or revoked. A replaced token can keep working for about 5 minutes.'],
-            ['404', '{"error": "not_found", "message": …, "docs": …}', 'Stop. There is no such route. The message points at the index.'],
-            ['429', '{"error": "rate_limited", "retry_after_s": N}', 'Wait for Retry-After, then send the same call.'],
-            ['429', '{"error": "quota_exceeded", "message": …}', 'With retry_after_s, wait for it. Without, stop: the budget is spent.'],
-            ['503', '{"error": "high_demand", "retry_after_s": N}', 'Wait for Retry-After and send the same call again.'],
-            ['503', '{"error": "paused", "retry_after_s": 60}', 'The model is paused. Wait and send it again.'],
+            ['200', '{"proposals": …, "model": …, "version": …}', 'The proposals are returned. Their measured results are appended to the history for the following call.'],
+            ['400', '{"error": "invalid_request", "message": …}', 'The request is invalid. The message names the field or the limit; an unchanged body fails again.'],
+            ['401', '{"error": "unauthorized", "message": …, "docs": …}', 'No Authorization header was sent. The message states where a token is obtained.'],
+            ['403', '{"error": "forbidden", "message": …, "docs": …}', 'The token is unknown, retired or revoked. A replaced token remains valid for approximately 5 minutes.'],
+            ['404', '{"error": "not_found", "message": …, "docs": …}', 'The route does not exist. The message states the index from which to start.'],
+            ['429', '{"error": "rate_limited", "retry_after_s": N}', 'The per-minute limit is reached. The same call succeeds after the Retry-After interval.'],
+            ['429', '{"error": "quota_exceeded", "message": …}', 'The budget is exhausted. Where retry_after_s is present, the call succeeds after that interval.'],
+            ['503', '{"error": "high_demand", "retry_after_s": N}', 'The service is under load. The same call succeeds after the Retry-After interval.'],
+            ['503', '{"error": "paused", "retry_after_s": 60}', 'The model is paused. The same call succeeds once service resumes.'],
           ],
         },
         {
           kind: 'text',
           text:
-            'The rule for an agent running unattended: 429 and 503 are waits, with the header saying how long. A 4xx without a Retry-After is a stop, never a retry.',
+            'For unattended operation: 429 and 503 indicate a wait, the Retry-After header stating its length. Every other 4xx is final and requires correction of the request before it is sent again.',
         },
         {
           kind: 'text',
-          text: `Every error body carries a docs field pointing at this contract, so an agent that meets an answer it does not know can fetch the whole of it from the answer itself.`,
+          text: `Every error body carries a docs field pointing at this contract, so an agent meeting an unfamiliar answer can fetch the whole of it from the answer itself.`,
         },
       ],
     },
     {
       id: 'mistakes',
-      heading: 'What goes wrong first',
+      heading: 'Troubleshooting',
       blocks: [
         {
           kind: 'list',
           items: [
-            'Re-asking without adding results. The answer is deterministic, so the same batch comes back.',
-            'Leaving a failed run out of the history. It gets proposed again. Send it with value null.',
-            'Leaving the value key off a row that carries values. Every row needs value.',
-            'Dropping goal because objectives are given. It is required either way.',
-            'Inventing keys. Unknown keys anywhere are refused with 400.',
-            'Using names in history for unnamed parameters. Those are x1, x2, … and objectives are y1, y2, …',
-            'A value outside [low, high], or a fraction for an integer parameter. 2.0 passes, 2.5 does not.',
-            'Polling /v1/status in a loop. It counts toward the 10 a minute.',
+            'A repeated request without new results returns the same batch, the answer being deterministic.',
+            'A failed run omitted from the history is proposed again. Such a run is recorded with value null.',
+            'A row that carries values and omits value is refused. Every row carries value.',
+            'goal is required alongside objectives, where it is ignored.',
+            'Unknown keys anywhere in the body are refused with 400.',
+            'Unnamed parameters are addressed as x1, x2, … in history, and unnamed objectives as y1, y2, …',
+            'A value outside [low, high] is refused, as is a fraction for an integer parameter: an integer parameter takes 2.0 and refuses 2.5.',
+            'Repeated calls to /v1/status count toward the limit of 10 calls a minute.',
           ],
         },
       ],
     },
     {
       id: 'token',
-      heading: 'Getting a token',
+      heading: 'Authentication',
       blocks: [
         {
           kind: 'text',
           text:
-            'The Get access form on the release page issues one. It works at once, for up to 20 calls on the address it was issued to, and a confirmation link sent to that address raises it to 50 calls a day and 500 in total. The token routes themselves are not open to tokens.',
+            'Tokens are issued by the Get access form on the release page. A token is valid immediately and permits up to 20 calls, counted against the address it was issued to. Opening the confirmation link sent to that address raises the allowance to 50 calls per day, resetting at 00:00 UTC, and 500 calls in total.',
         },
       ],
     },

@@ -70,7 +70,11 @@ export type SdmPath = 'status' | 'propose' | 'preview' | 'tokens' | 'activate';
 // export const CONSENT_VERSION = '2026-11-16-draft9';
 /* Email confirmation (the user, 17 Nov 2026): the token works 20 times at once, and the consent text now says that a
    confirmation link is emailed and that the full token comes from it. */
-export const CONSENT_VERSION = '2026-11-17-draft10';
+// export const CONSENT_VERSION = '2026-11-17-draft10';
+/* "Submitted data requires no cleartext labels for parameters or outcomes." removed from the consent text (the user,
+   18 Nov 2026). The sentence granted nothing; the commitment it alluded to stands in the privacy policy. The version
+   moves because the wording moved: a stored consent record must name the text that was actually agreed to. */
+export const CONSENT_VERSION = '2026-11-18-draft11';
 
 /** The public limits, as lib/sdm/contract.ts PUBLIC_LIMITS (scripts/check-sdm-proxy.mjs keeps them equal). */
 export const LIMITS = { maxParams: 24, maxHistory: 200, maxBatch: 8, maxDesign: 32, maxBodyBytes: 256 * 1024 } as const;

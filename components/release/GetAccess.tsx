@@ -172,8 +172,8 @@ export default function GetAccess({ modelName }: { modelName: string }) {
         {/* A token names neither its host nor the documentation, so an agent handed one alone has nothing to call
             (the user, 18 Nov 2026). This copies the token with the address and the contract link. */}
         <p className="r-access-note">
-          Handing it to an agent? <CopyHandoff token={issued.token} /> — the
-          token with the API address and the documentation.
+          For use by an agent: <CopyHandoff token={issued.token} /> — the token
+          together with the API address and the documentation.
         </p>
         {/* Was "A confirmation link is on its way to that address." (the user, 17 Nov 2026): while SES is in its
             sandbox only @provigen.ai addresses receive it, so the page no longer promises a link that is already on
@@ -247,10 +247,14 @@ export default function GetAccess({ modelName }: { modelName: string }) {
           I agree to use this token solely to evaluate {modelName}.
           {/* The consent on its own line (founder, 16 Nov 2026). */}
           {/* The confirmation added (the user, 17 Nov 2026), so CONSENT_VERSION becomes 2026-11-17-draft10. */}
+          {/* Was followed by "Submitted data requires no cleartext labels for parameters or outcomes." (the user,
+              18 Nov 2026: removed). It stated that the model needs no names, which is an inference about what the
+              model was trained on, and the sentence granted nothing and promised nothing. The commitment itself is
+              unaffected and still stands in the privacy policy, which says the data is stored with the names of
+              parameters and outcomes replaced by position numbers. CONSENT_VERSION becomes 2026-11-18-draft11. */}
           <br />I consent to ProviGen storing the data submitted with this token
-          and using it to operate and benchmark {modelName}. Submitted data
-          requires no cleartext labels for parameters or outcomes. ProviGen
-          retains the email address to which the token is issued and sends a
+          and using it to operate and benchmark {modelName}. ProviGen retains
+          the email address to which the token is issued and sends a
           confirmation link to it; until the address is confirmed, the token is
           limited to {TRIAL_CALLS} calls.
           {/* Further details are set out in the <a href="/privacy">privacy policy</a>. (founder, 16 Nov 2026: no link
@@ -298,13 +302,15 @@ export default function GetAccess({ modelName }: { modelName: string }) {
                 token (...), stored with parameter and outcome names replaced by position numbers; and the number of
                 calls made with the token. Your IP address is used only to limit token requests per network." (founder, 17 Nov 2026: more formal) */}
             {/* Was "Your email address; your consent choices and the version of this text; the data submitted with your token (parameter ranges, settings and measured outcomes), stored with the names of parameters and outcomes replaced by position numbers; and the number of calls made with your token. Your IP address is processed solely to limit the number of token requests per network." (founder, 17 Nov 2026: impersonal, without "you") */}
+            {/* Was "..., stored with the names of parameters and outcomes replaced by position numbers; ..." (the
+                user, 18 Nov 2026): removed here as in the consent text and the privacy policy, for the same reason.
+                The practice is unchanged; the description of it is what goes. */}
             <dd>
               Email address; consent choices and the version of this text; data
               submitted with the token (parameter ranges, settings and measured
-              outcomes), stored with the names of parameters and outcomes
-              replaced by position numbers; and the number of calls made with
-              the token. The IP address is processed solely to limit the number
-              of token requests per network.
+              outcomes); and the number of calls made with the token. The IP
+              address is processed solely to limit the number of token requests
+              per network.
               {/* "and linked to your email address" (founder, 16 Nov 2026: removed) */}
               {/* ": it is never stored as such, only as a monthly changing keyed hash that is deleted automatically
                   within a few days." (founder, 16 Nov 2026: removed) */}

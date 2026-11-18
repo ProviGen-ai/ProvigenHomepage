@@ -134,7 +134,13 @@ export const privacy: LegalDocument = {
           'the consent choices and the version of the consent text agreed to',
           /* The confirmation link (the user, 17 Nov 2026). */
           'whether the address has been confirmed through the link sent to it',
-          'the data submitted with the token (parameter ranges, settings and measured outcomes), stored with the names of parameters and outcomes replaced by position numbers',
+          /* Was '..., stored with the names of parameters and outcomes replaced by position numbers' (the user,
+             18 Nov 2026: removed here as it was removed from the consent text). The practice is unchanged and still
+             applied; what goes is the description of it. It was a safeguard, not a category of data: Art. 13 requires
+             the categories and the purposes, Art. 32 requires the measure to be implemented rather than published,
+             and a parameter name such as "temperature" is not personal data. The category below is unchanged, so
+             nothing that must be disclosed has been dropped. */
+          'the data submitted with the token (parameter ranges, settings and measured outcomes)',
           'the number of calls made with the token',
         ],
         /* Was 'Your IP address is used only to limit ... It is not stored as such, only as a keyed hash in rate-limit

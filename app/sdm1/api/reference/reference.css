@@ -1,0 +1,109 @@
+/* The reference page (the user, 18 Nov 2026). Swagger UI brings its own stylesheet, which is loud next to this site,
+   so the page's own header is set in the site's type and Swagger's canvas is toned down underneath it: its white card
+   background and drop shadows removed, its fonts replaced by ours, its link and method colours brought closer to the
+   site's. The widget's own layout is left alone — fighting it would break on its next version. */
+.r-ref-page {
+  padding-block: clamp(2.5rem, 2rem + 4vw, 5rem) clamp(4rem, 3rem + 6vw, 8rem);
+}
+.r-ref-head {
+  max-width: 54rem;
+}
+.r-ref-title {
+  margin: 0;
+  text-wrap: balance;
+  font-family: var(--f-display);
+  font-size: clamp(2.2rem, 1.8rem + 2.4vw, 3.4rem);
+  font-weight: 200;
+  font-synthesis: none;
+  letter-spacing: var(--d-track-l);
+  line-height: 1.05;
+  color: var(--c-ink);
+}
+.r-ref-lede {
+  margin: 1rem 0 0;
+  max-width: 46rem;
+  text-wrap: pretty;
+  font-family: var(--f-serif);
+  font-size: clamp(1.1rem, 1.02rem + 0.35vw, 1.3rem);
+  line-height: 1.55;
+  color: var(--c-muted);
+}
+.r-ref-lede a,
+.r-ref-failed a,
+.r-ref-loading a {
+  color: var(--c-teal-ink);
+}
+.r-ref-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 1.5rem 0 0;
+  font-family: var(--f-mono);
+  font-size: 0.78rem;
+  color: var(--c-muted);
+}
+.r-ref-meta a {
+  color: var(--c-teal-ink);
+}
+.r-ref-meta code {
+  font-family: var(--f-mono);
+}
+.r-ref-loading,
+.r-ref-failed {
+  margin: 2rem 0 0;
+  font-family: var(--f-serif);
+  color: var(--c-muted);
+}
+
+/* Swagger's canvas, under our header. */
+.r-ref-mount {
+  margin-top: 2rem;
+}
+.r-ref-mount .swagger-ui {
+  font-family: var(--f-sans);
+}
+.r-ref-mount .swagger-ui .info,
+.r-ref-mount .swagger-ui .scheme-container {
+  display: none; /* The document's title and description repeat our header; there are no auth schemes to pick. */
+}
+.r-ref-mount .swagger-ui .wrapper {
+  padding: 0;
+  max-width: none;
+}
+.r-ref-mount .swagger-ui .opblock {
+  margin-bottom: 1rem;
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid var(--c-line-2);
+  background: var(--c-paper);
+}
+.r-ref-mount .swagger-ui .opblock .opblock-summary {
+  border-radius: 0;
+}
+.r-ref-mount .swagger-ui .opblock-tag {
+  font-family: var(--f-display);
+  font-weight: 300;
+  border-bottom-color: var(--c-line-2);
+}
+.r-ref-mount .swagger-ui .model-box,
+.r-ref-mount .swagger-ui section.models {
+  border-radius: 0;
+  border-color: var(--c-line-2);
+  background: var(--c-paper);
+}
+.r-ref-mount .swagger-ui .btn {
+  border-radius: 0;
+}
+.r-ref-mount .swagger-ui code,
+.r-ref-mount .swagger-ui pre,
+.r-ref-mount .swagger-ui .microlight {
+  font-family: var(--f-mono);
+}
+/* Nothing on this page submits a request, so any leftover affordance is removed rather than left to be clicked. */
+.r-ref-mount .swagger-ui .try-out,
+.r-ref-mount .swagger-ui .execute-wrapper,
+.r-ref-mount .swagger-ui .btn-group .execute {
+  display: none;
+}

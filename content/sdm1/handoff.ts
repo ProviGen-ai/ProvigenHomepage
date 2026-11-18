@@ -16,4 +16,4 @@ export const handoff = (token: string) =>
   `SDM-1 API token: ${token}
 Base URL: ${API_BASE}  (start at ${API_START})
 Contract: ${API_CONTRACT}
-Keep the token in an environment variable, never in code or chat logs.`;
+The token is held in an environment variable.`;

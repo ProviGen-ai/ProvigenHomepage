@@ -27,7 +27,7 @@ const block = (b) => {
   if (b.kind === 'code')
     return `${b.caption ? `${b.caption}:\n\n` : ''}\`\`\`${b.lang}\n${b.code}\n\`\`\`\n`;
   if (b.kind === 'fields')
-    return `| Field | | Rule |\n| --- | --- | --- |\n${b.rows
+    return `| ${(b.head ?? ['Field', '', 'Rule']).join(' | ')} |\n| --- | --- | --- |\n${b.rows
       .map((r) => `| \`${r.name}\` | ${r.type} | ${r.note.replaceAll('|', '\\|')} |`)
       .join('\n')}\n`;
   if (b.kind === 'table')
@@ -57,6 +57,7 @@ const llms = `# ProviGen
 
 - [The whole contract, as one file](${SITE}/sdm1/api.md): endpoint, request, answers, limits, errors.
 - [The same, as a page](${PAGE})
+- [Every schema, from the OpenAPI document](${PAGE}/reference), also as [openapi.json](${SITE}/sdm1/openapi.json)
 - [What SDM-1 is](${SITE}/blog/introducing-sdm-1): benchmarks, a published lab campaign, how to try it.
 
 The service is stateless and deterministic: every call carries the whole history, and an unchanged request returns

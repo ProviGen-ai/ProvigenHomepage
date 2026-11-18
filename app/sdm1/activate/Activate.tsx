@@ -115,8 +115,8 @@ export default function Activate() {
         {/* This page showed a token and nothing else: no address, no documentation, so an agent given it had
             nowhere to call (the user, 18 Nov 2026). */}
         <p className="r-access-note">
-          Handing it to an agent? <CopyHandoff token={full.token} /> — the token
-          with the API address and the documentation.
+          For use by an agent: <CopyHandoff token={full.token} /> — the token
+          together with the API address and the documentation.
         </p>
       </div>
     );

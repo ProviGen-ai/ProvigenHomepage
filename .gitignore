@@ -49,3 +49,9 @@ next-env.d.ts
 # generated before every build (scripts/make-api-doc.mjs), from content/sdm1/api-doc.ts
 /public/llms.txt
 /public/sdm1/api.md
+
+# copied before every build (scripts/fetch-openapi.mjs): the API's OpenAPI document and Swagger UI's own files.
+# content/sdm1/openapi.json is the committed fallback and IS tracked.
+/public/sdm1/openapi.json
+/public/sdm1/swagger-ui-bundle.js
+/public/sdm1/swagger-ui.css
