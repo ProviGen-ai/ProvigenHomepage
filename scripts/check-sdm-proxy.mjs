@@ -212,7 +212,8 @@ console.error = quiet;
       headers: { 'Content-Type': 'application/json', ...(cookie ? { cookie } : {}), ...(ip ? { 'x-real-ip': ip } : {}) },
       body: typeof body === 'string' ? body : JSON.stringify(body),
     });
-  const issued = res(201, { token: 'sdm1_abc', tier: 'trial', trial_calls: 20, extra: 'not for the browser' });
+  /* A factory, not one Response: a body reads only once, and several checks below share this answer. */
+  const issued = () => res(201, { token: 'sdm1_abc', tier: 'trial', trial_calls: 20, extra: 'not for the browser' });
   const ok = await call(tok({ email: ` ${EMAIL} `, consent: true, contact_opt_in: true }), ENV, issued, 'tokens');
   const sent = ok.seen[0];
   const sentBody = sent ? JSON.parse(sent.init.body) : {};
@@ -267,6 +268,152 @@ console.error = quiet;
   check('tokens: nothing logged contains the email or a token', !logged.some((l) => l.includes(EMAIL) || l.includes('sdm1_')), logged.join(' | '));
 }
 
+
+/* 5b-ii. The registration notice (the user, 18 Nov 2026): a new token is mailed to SDM_NOTIFY_TO through Resend.
+   Its own fake, because this path now calls two hosts: AWS, then Resend. */
+{
+  const EMAIL = 'someone@example.org';
+  const NOTIFY_ENV = { ...ENV, RESEND_API_KEY: 'resend-key-do-not-leak', SDM_NOTIFY_TO: 'dev@provigen.ai' };
+  const tok = (body) =>
+    new Request('https://provigen.ai/api/sdm1/v1/tokens', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', cookie: 'sdm_preview=preview-token', 'x-real-ip': '203.0.113.9' },
+      body: JSON.stringify(body),
+    });
+  /** AWS answers `aws`, api.resend.com answers `resend` (or throws when 'throw'). Each answer is a function, because
+      a Response body reads only once and these fakes serve several calls. */
+  const hosts = (awsAnswer, resendAnswer) => {
+    const seen = [];
+    return {
+      seen,
+      fetchImpl: async (url, init) => {
+        seen.push({ url, init });
+        const answer = String(url).includes('api.resend.com') ? resendAnswer : awsAnswer;
+        if (answer === 'throw') throw new Error('network');
+        return typeof answer === 'function' ? answer() : answer;
+      },
+    };
+  };
+  const issued = () => res(201, { token: 'sdm1_abc', tier: 'trial', trial_calls: 20 });
+  const mailed = () => res(200, { id: 'mail-1' });
+  const quiet3 = console.error;
+  console.error = () => {};
+
+  const fake = hosts(issued, mailed);
+  const response = await lib.handleSdm(tok({ email: ` ${EMAIL} `, consent: true, contact_opt_in: true }), NOTIFY_ENV, 'tokens', fake.fetchImpl);
+  const body = await response.json();
+  const mail = fake.seen.find((c) => String(c.url).includes('api.resend.com'));
+  const sent = mail ? JSON.parse(mail.init.body) : {};
+  check('notice: the token still answers 201', response.status === 201 && body.token === 'sdm1_abc');
+  check('notice: Resend is called once, after AWS', fake.seen.length === 2 && String(fake.seen[0].url).includes('aws.example') && !!mail);
+  check('notice: goes to SDM_NOTIFY_TO', Array.isArray(sent.to) && sent.to.length === 1 && sent.to[0] === 'dev@provigen.ai', JSON.stringify(sent.to));
+  check('notice: names the address in the subject and the body', sent.subject === `ProviGen · new API token · ${EMAIL}` && sent.text.includes(`Address:   ${EMAIL}`), sent.subject);
+  check('notice: the trimmed address, not the raw one', sent.text.includes(`Address:   ${EMAIL}\n`) && !sent.text.includes(` ${EMAIL} `));
+  check('notice: reports the tier and the opt-in', sent.text.includes('Tier:      trial') && sent.text.includes('Contact opt-in: yes'));
+  check('notice: never carries the token', !JSON.stringify(sent).includes('sdm1_abc'));
+  check('notice: the Resend key is the Bearer, and is not in the answer', mail?.init.headers.authorization === 'Bearer resend-key-do-not-leak' && !JSON.stringify(body).includes('resend-key'));
+
+  const optOut = hosts(issued, mailed);
+  await lib.handleSdm(tok({ email: EMAIL, consent: true }), NOTIFY_ENV, 'tokens', optOut.fetchImpl);
+  const optOutMail = JSON.parse(optOut.seen.find((c) => String(c.url).includes('api.resend.com')).init.body);
+  check('notice: an opt-out is reported as no', optOutMail.text.includes('Contact opt-in: no'));
+
+  /* The visitor's token must not depend on the mail getting out. */
+  for (const { name, answer } of [
+    { name: 'Resend refuses', answer: () => res(422, { message: 'no' }) },
+    { name: 'Resend is unreachable', answer: 'throw' },
+  ]) {
+    const broken = hosts(issued, answer);
+    const r = await lib.handleSdm(tok({ email: EMAIL, consent: true }), NOTIFY_ENV, 'tokens', broken.fetchImpl);
+    const b = await r.json();
+    check(`notice: ${name}: the token is still issued`, r.status === 201 && b.token === 'sdm1_abc');
+  }
+
+  /* No key, and a refused request, send nothing. */
+  const noKey = hosts(issued, mailed);
+  await lib.handleSdm(tok({ email: EMAIL, consent: true }), { ...NOTIFY_ENV, RESEND_API_KEY: undefined }, 'tokens', noKey.fetchImpl);
+  check('notice: without RESEND_API_KEY nothing is sent', noKey.seen.length === 1);
+  const blank = hosts(issued, mailed);
+  await lib.handleSdm(tok({ email: EMAIL, consent: true }), { ...NOTIFY_ENV, SDM_NOTIFY_TO: '  ' }, 'tokens', blank.fetchImpl);
+  check('notice: an empty SDM_NOTIFY_TO sends nothing', blank.seen.length === 1);
+  const refused = hosts(() => res(400, { error: 'invalid_request' }), mailed);
+  await lib.handleSdm(tok({ email: EMAIL, consent: true }), NOTIFY_ENV, 'tokens', refused.fetchImpl);
+  check('notice: a refused request is not mailed', refused.seen.length === 1);
+  const invalid = hosts(issued, mailed);
+  await lib.handleSdm(tok({ email: 'not-an-email', consent: true }), NOTIFY_ENV, 'tokens', invalid.fetchImpl);
+  check('notice: a bad address reaches neither AWS nor Resend', invalid.seen.length === 0);
+  /* Development mails nothing, so a local test of the form is silent. */
+  const dev = hosts(issued, mailed);
+  await lib.handleSdm(tok({ email: EMAIL, consent: true }), { ...NOTIFY_ENV, NODE_ENV: 'development' }, 'tokens', dev.fetchImpl);
+  check('notice: development sends no mail', !dev.seen.some((c) => String(c.url).includes('api.resend.com')));
+  console.error = quiet3;
+}
+
+/* 5b-iii. The activation notice (the user, 18 Nov 2026): opening a confirmation link is mailed to SDM_NOTIFY_TO too.
+   The address is named only when AWS reports it, since the browser sends an opaque code and nothing else. */
+{
+  const CODE = 'abc123-XYZ_~.';
+  const WHO = 'activated@example.org';
+  const NOTIFY_ENV = { ...ENV, RESEND_API_KEY: 'resend-key-do-not-leak', SDM_NOTIFY_TO: 'dev@provigen.ai' };
+  const act = () =>
+    new Request('https://provigen.ai/api/sdm1/v1/activate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', cookie: 'sdm_preview=preview-token', 'x-real-ip': '203.0.113.9' },
+      body: JSON.stringify({ code: CODE }),
+    });
+  const hosts = (awsAnswer, resendAnswer) => {
+    const seen = [];
+    return {
+      seen,
+      fetchImpl: async (url, init) => {
+        seen.push({ url, init });
+        const answer = String(url).includes('api.resend.com') ? resendAnswer : awsAnswer;
+        if (answer === 'throw') throw new Error('network');
+        return typeof answer === 'function' ? answer() : answer;
+      },
+    };
+  };
+  const mailed = () => res(200, { id: 'mail-1' });
+  const quiet4 = console.error;
+  console.error = () => {};
+
+  /* AWS reports the address: the notice names it, and it still does not reach the browser. */
+  const named = hosts(() => res(200, { token: 'sdm1_full', daily_limit: 50, total_limit: 500, email: WHO }), mailed);
+  const r1 = await lib.handleSdm(act(), NOTIFY_ENV, 'activate', named.fetchImpl);
+  const b1 = await r1.json();
+  const mail1 = JSON.parse(named.seen.find((c) => String(c.url).includes('api.resend.com')).init.body);
+  check('activation notice: the full token still answers 200', r1.status === 200 && b1.token === 'sdm1_full' && b1.tier === 'full');
+  check('activation notice: names the address when AWS reports it', mail1.subject === `ProviGen · token activated · ${WHO}` && mail1.text.includes(`Address:   ${WHO}`), mail1.subject);
+  check('activation notice: reports the limits', mail1.text.includes('Limits:    50 calls a day, 500 in total'));
+  check('activation notice: never carries the token', !JSON.stringify(mail1).includes('sdm1_full'));
+  check('activation notice: the address is not passed to the browser', !('email' in b1), JSON.stringify(b1));
+  check('activation notice: goes to SDM_NOTIFY_TO', mail1.to.length === 1 && mail1.to[0] === 'dev@provigen.ai');
+
+  /* AWS reports no address: the notice is still sent and says so rather than inventing one. */
+  const unnamed = hosts(() => res(200, { token: 'sdm1_full', daily_limit: 50, total_limit: 500 }), mailed);
+  const r2 = await lib.handleSdm(act(), NOTIFY_ENV, 'activate', unnamed.fetchImpl);
+  const mail2 = JSON.parse(unnamed.seen.find((c) => String(c.url).includes('api.resend.com')).init.body);
+  check('activation notice: without an address it is still sent', r2.status === 200 && mail2.subject === 'ProviGen · token activated');
+  check('activation notice: says the address was not reported', mail2.text.includes('not reported by the API'));
+
+  /* A junk value in the email field is not passed on as an address. */
+  const junk = hosts(() => res(200, { token: 'sdm1_full', daily_limit: 50, total_limit: 500, email: 'not-an-address' }), mailed);
+  await lib.handleSdm(act(), NOTIFY_ENV, 'activate', junk.fetchImpl);
+  const mail3 = JSON.parse(junk.seen.find((c) => String(c.url).includes('api.resend.com')).init.body);
+  check('activation notice: a malformed address is ignored', mail3.subject === 'ProviGen · token activated' && !mail3.text.includes('not-an-address'));
+
+  /* A link that failed is not an activation. */
+  const expired = hosts(() => res(410, { error: 'link_expired' }), mailed);
+  const r4 = await lib.handleSdm(act(), NOTIFY_ENV, 'activate', expired.fetchImpl);
+  check('activation notice: an expired link is not mailed', r4.status === 410 && expired.seen.length === 1);
+
+  /* The visitor's token must not depend on the mail getting out. */
+  const broken = hosts(() => res(200, { token: 'sdm1_full', daily_limit: 50, total_limit: 500, email: WHO }), 'throw');
+  const r5 = await lib.handleSdm(act(), NOTIFY_ENV, 'activate', broken.fetchImpl);
+  const b5 = await r5.json();
+  check('activation notice: a failed send still activates', r5.status === 200 && b5.token === 'sdm1_full');
+  console.error = quiet4;
+}
 
 // 5c. Activation (the user, 17 Nov 2026): POST /v1/activate, the code from the magic link's fragment.
 {

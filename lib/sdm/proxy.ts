@@ -40,7 +40,8 @@
 export type SdmEnv = Record<string, string | undefined>;
 // export type SdmPath = 'status' | 'propose' | 'preview';
 /* 'tokens' (16 Nov 2026, the user's "Get access" flow, agent-002's design section 10): the page's form asks AWS for a
-   personal token; the visitor's email goes to AWS and nowhere else, and neither it nor the token is ever logged here. */
+   personal token. The visitor's email goes to AWS, and (the user, 18 Nov 2026) in a notice to NOTIFY_TO through
+   Resend; it is never logged here, and the token is never repeated anywhere. */
 /* 'activate' (the user, 17 Nov 2026): the magic link's page sends the code from the link here, and this route asks AWS
    to swap the trial token for the full one. The code travels in the link's fragment, so it never reaches a server log
    on the way; only this POST carries it. */
@@ -295,6 +296,97 @@ const TOKEN_BODY_BYTES = 2048;
 const TOKEN_UPSTREAM_MS = 15000;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/* Who hears about a new registration (the user, 18 Nov 2026), through Resend, as the contact form sends its mail
+   (lib/contact/handler.ts). RESEND_API_KEY is already set on the Vercel project for that form, so this route needs
+   no new secret; SDM_NOTIFY_TO overrides the address without a deploy. */
+const NOTIFY_TO = 'dev@provigen.ai';
+const NOTIFY_FROM = 'ProviGen website <website@provigen.ai>';
+const NOTIFY_MS = 5000;
+
+/** One notice to NOTIFY_TO through Resend. Never a token: an answer carries it once, to the browser that asked, and
+    it is not ours to repeat. Awaited, because a Vercel Node Function may be frozen as soon as it answers, so a
+    fire-and-forget send is simply lost; a tight timeout and a swallowed failure keep the visitor's own answer
+    independent of whether the mail got out. `what` names the notice in the log, never its contents. */
+async function sendNotice(
+  what: string,
+  subject: string,
+  lines: string[],
+  env: SdmEnv,
+  development: boolean,
+  fetchImpl: typeof fetch,
+): Promise<void> {
+  const to = (env.SDM_NOTIFY_TO ?? NOTIFY_TO).trim();
+  if (!to) return;
+  /* Development sends nothing: a local test of the form would otherwise mail on every attempt. */
+  if (development) {
+    console.log(`sdm1: a ${what} notice would go to ${to} in production.`);
+    return;
+  }
+  const key = env.RESEND_API_KEY;
+  if (!key) {
+    console.error(`sdm1: RESEND_API_KEY is not set; the ${what} notice was not sent.`);
+    return;
+  }
+  try {
+    const sent = await fetchImpl('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        from: env.SDM_NOTIFY_FROM || NOTIFY_FROM,
+        to: to.split(',').map((a) => a.trim()).filter(Boolean),
+        subject,
+        text: [...lines, '', '--', 'Sent by the SDM-1 access flow on provigen.ai'].join('\n'),
+      }),
+      signal: AbortSignal.timeout(NOTIFY_MS),
+    });
+    /* No address is repeated into the log on failure; the mail is the only place it belongs. */
+    if (!sent.ok) console.error(`sdm1: Resend answered ${sent.status} on the ${what} notice.`);
+  } catch (error) {
+    console.error(`sdm1: the ${what} notice could not be sent:`, error instanceof Error ? error.message : error);
+  }
+}
+
+/** Someone asked for a token (the user, 18 Nov 2026). */
+const notifyRegistration = (email: string, tier: string, contactOptIn: boolean, env: SdmEnv, development: boolean, fetchImpl: typeof fetch) =>
+  sendNotice(
+    'registration',
+    `ProviGen · new API token · ${email}`,
+    [
+      'Someone asked for an SDM-1 API token.',
+      '',
+      `Address:   ${email}`,
+      `Tier:      ${tier}`,
+      `Contact opt-in: ${contactOptIn ? 'yes' : 'no'}`,
+      `Time:      ${new Date().toISOString()}`,
+      '',
+      'The token itself is not included: it is shown once, in the browser that asked.',
+    ],
+    env,
+    development,
+    fetchImpl,
+  );
+
+/** Someone clicked their confirmation link and now holds a full token (the user, 18 Nov 2026).
+    The address is named only when AWS reports it: the browser sends an opaque code, so this route cannot know
+    whose link it was. The field is read if it is there and the notice stays correct when it is not. */
+const notifyActivation = (email: string | null, daily: number, total: number, env: SdmEnv, development: boolean, fetchImpl: typeof fetch) =>
+  sendNotice(
+    'activation',
+    email ? `ProviGen · token activated · ${email}` : 'ProviGen · token activated',
+    [
+      'A confirmation link was opened; the trial token is now a full one.',
+      '',
+      `Address:   ${email ?? 'not reported by the API for an activation'}`,
+      `Limits:    ${daily} calls a day, ${total} in total`,
+      `Time:      ${new Date().toISOString()}`,
+      '',
+      'The token itself is not included: it is shown once, in the browser that opened the link.',
+    ],
+    env,
+    development,
+    fetchImpl,
+  );
+
 /** The token request from the page's form: {email, consent: true, contact_opt_in}, or why it is refused. */
 export function tokenRequest(body: unknown): { email: string; contact_opt_in: boolean } | string {
   if (!isObject(body)) return 'The request must be a JSON object.';
@@ -306,7 +398,8 @@ export function tokenRequest(body: unknown): { email: string; contact_opt_in: bo
 }
 
 /** POST /api/sdm1/v1/tokens: checked here, forwarded to AWS POST /v1/tokens with the secret and the visitor's IP. The
-    answer carries the token once; nothing here stores or logs the email or the token. */
+    answer carries the token once; nothing here stores or logs the email or the token. On success the address goes out
+    once more, in the notice to NOTIFY_TO (notifyRegistration). */
 async function tokens(request: Request, env: SdmEnv, development: boolean, fetchImpl: typeof fetch): Promise<Response> {
   if (request.method !== 'POST') return json(405, { error: 'method_not_allowed' }, undefined, { Allow: 'POST' });
   const declared = Number(request.headers.get('content-length'));
@@ -354,7 +447,10 @@ async function tokens(request: Request, env: SdmEnv, development: boolean, fetch
   const s = upstream.status;
   /* Only the fields the page shows, so nothing else AWS might add reaches the browser. A trial token (the user,
      17 Nov 2026) works at once for `trial_calls` calls; the confirmation link turns it into the full one. */
-  if (s === 201 && typeof body?.token === 'string' && body.token.startsWith('sdm1_'))
+  if (s === 201 && typeof body?.token === 'string' && body.token.startsWith('sdm1_')) {
+    /* The user hears about every registration (18 Nov 2026). After the token is in hand, so that a Resend outage
+       costs the visitor nothing but a few seconds; notifyRegistration never throws. */
+    await notifyRegistration(checked.email, body.tier === 'full' ? 'full' : 'trial', checked.contact_opt_in, env, development, fetchImpl);
     return json(201, {
       token: body.token,
       tier: body.tier === 'full' ? 'full' : 'trial',
@@ -362,6 +458,7 @@ async function tokens(request: Request, env: SdmEnv, development: boolean, fetch
       ...(isNumber(body.daily_limit) ? { daily_limit: body.daily_limit } : {}),
       ...(isNumber(body.total_limit) ? { total_limit: body.total_limit } : {}),
     });
+  }
   /* The 409 for an address that already had a token is gone (the user, 17 Nov 2026): every accepted request gets the
      same answer, so the form says nothing about which addresses are known. Was:
   if (s === 409 && body?.error === 'already_issued')
@@ -442,13 +539,15 @@ async function activate(request: Request, env: SdmEnv, development: boolean, fet
   }
   const s = upstream.status;
   /* Only the fields the page shows, so nothing else AWS might add reaches the browser. */
-  if (s === 200 && typeof body?.token === 'string' && body.token.startsWith('sdm1_'))
-    return json(200, {
-      token: body.token,
-      tier: 'full',
-      daily_limit: isNumber(body.daily_limit) ? body.daily_limit : 50,
-      total_limit: isNumber(body.total_limit) ? body.total_limit : 500,
-    });
+  if (s === 200 && typeof body?.token === 'string' && body.token.startsWith('sdm1_')) {
+    const daily = isNumber(body.daily_limit) ? body.daily_limit : 50;
+    const total = isNumber(body.total_limit) ? body.total_limit : 500;
+    /* The user hears about every activation (18 Nov 2026). `email` is used for the notice only, and deliberately
+       not passed on below: the page has no use for it, and the browser already knows the address it typed. */
+    const who = typeof body.email === 'string' && EMAIL.test(body.email) ? body.email : null;
+    await notifyActivation(who, daily, total, env, development, fetchImpl);
+    return json(200, { token: body.token, tier: 'full', daily_limit: daily, total_limit: total });
+  }
   if (s === 410 || (s === 404 && body?.error === 'link_expired'))
     return json(410, { error: 'link_expired', message: 'This link has been used already or has expired. Please ask for a new one.' });
   if (s === 400) return json(400, { error: 'invalid_request', message: 'This activation link is not valid.' });
