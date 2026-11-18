@@ -6,8 +6,9 @@
     "node": ">=22.13.0"
   },
   "scripts": {
+    "predev": "node --experimental-strip-types --no-warnings scripts/make-api-doc.mjs",
     "dev": "vinext dev",
-    "prebuild": "node --experimental-strip-types --no-warnings scripts/make-public-files.mjs",
+    "prebuild": "node --experimental-strip-types --no-warnings scripts/make-public-files.mjs && node --experimental-strip-types --no-warnings scripts/make-api-doc.mjs",
     "build": "vinext build",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "lint": "oxlint",

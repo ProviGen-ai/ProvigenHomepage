@@ -45,3 +45,7 @@ next-env.d.ts
 /public/feed.xml
 /public/robots.txt
 /public/sitemap.xml
+
+# generated before every build (scripts/make-api-doc.mjs), from content/sdm1/api-doc.ts
+/public/llms.txt
+/public/sdm1/api.md

@@ -54,7 +54,8 @@ write(
 );
 
 // '/careers', '/biopharma' and '/ai-labs' are left out while nothing links to them (14 Oct 2026).
-const pages = ['/', /* '/biopharma', '/ai-labs', '/careers', */ '/blog', '/contact'];
+// '/sdm1/api' is the API documentation: listed so a crawler, and an agent that searches, can find it.
+const pages = ['/', /* '/biopharma', '/ai-labs', '/careers', */ '/blog', '/contact', '/sdm1/api'];
 const urls = indexable
   ? [
       ...pages.map((path) => ({ loc: `${site}${path}` })),
