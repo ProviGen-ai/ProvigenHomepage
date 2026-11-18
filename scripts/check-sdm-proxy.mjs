@@ -176,6 +176,47 @@ for (const { name, body } of cases) {
   check('no secret configured: 503, AWS not called', unset.response.status === 503 && unset.seen.length === 0);
 }
 
+/* 4b. No header but X-SDM-Client-IP may carry the visitor's address (the user, 18 Nov 2026). The privacy policy
+   states that the firewall's blocked-request log cannot hold a website visitor's own address: the API's log keeps
+   every header it is sent except the redacted ones, so that claim is only true while this route builds its outgoing
+   headers from scratch instead of passing the browser's along. Spreading the incoming headers into one of the
+   fetches below would make a published policy false, which a test should catch rather than a reader. */
+{
+  const VISITOR = '198.51.100.23';
+  /* Every address-bearing header a proxy might plausibly forward, plus two that should not travel either. */
+  const leaky = {
+    'x-real-ip': VISITOR,
+    'x-forwarded-for': `${VISITOR}, 10.0.0.1`,
+    forwarded: `for=${VISITOR};proto=https`,
+    'cf-connecting-ip': VISITOR,
+    'true-client-ip': VISITOR,
+    'x-vercel-forwarded-for': VISITOR,
+    'x-forwarded-host': 'provigen.ai',
+    referer: 'https://provigen.ai/blog/introducing-sdm-1',
+  };
+  const allowed = ['authorization', 'content-type', 'x-sdm-client-ip'];
+  const routes = [
+    ['propose', 'https://provigen.ai/api/sdm1/v1/propose', 'POST', JSON.stringify(GOOD)],
+    ['status', 'https://provigen.ai/api/sdm1/v1/status', 'GET', undefined],
+    ['tokens', 'https://provigen.ai/api/sdm1/v1/tokens', 'POST', JSON.stringify({ email: 'probe@example.org', consent: true })],
+    ['activate', 'https://provigen.ai/api/sdm1/v1/activate', 'POST', JSON.stringify({ code: 'abc123' })],
+  ];
+  for (const [path, url, method, body] of routes) {
+    const request = new Request(url, {
+      method,
+      headers: { 'Content-Type': 'application/json', cookie: 'sdm_preview=preview-token; other=value', ...leaky },
+      body,
+    });
+    const r = await call(request, ENV, res(200, { proposals: [], model: 'sdm-1', version: '1', token: 'sdm1_x', tier: 'trial' }), path);
+    const headers = r.seen[0]?.init.headers ?? {};
+    const names = Object.keys(headers).map((h) => h.toLowerCase());
+    check(`${path}: sends no header beyond the secret, the type and the visitor address`, names.every((n) => allowed.includes(n)), names.join(', '));
+    const carrying = Object.entries(headers).filter(([, v]) => String(v).includes(VISITOR)).map(([k]) => k.toLowerCase());
+    check(`${path}: only X-SDM-Client-IP carries the visitor address`, carrying.length === 1 && carrying[0] === 'x-sdm-client-ip', carrying.join(', '));
+    check(`${path}: the preview cookie does not travel to AWS`, !JSON.stringify(headers).includes('sdm_preview'));
+  }
+}
+
 // 5. Mapping AWS's answers.
 const mapping = [
   ['400 passes through with its message', res(400, { error: 'invalid_request', message: 'batch above 8' }), 400, 'invalid_request', null],
