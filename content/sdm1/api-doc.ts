@@ -312,7 +312,11 @@ for _ in range(10):
             'Parameters: 24. History: 200 rows. Batch: 8, or 32 for doe-lhs. Body: 256 KB.',
             'Calls: 10 per minute per token. A trial token is allowed 20 calls, counted against the address it was issued to; a confirmed token is allowed 50 per day, resetting at 00:00 UTC, and 500 in total.',
             'Time: the service responds within approximately 54 seconds, and a larger request takes longer. A client timeout of at least 60 seconds is required, and a pending call completes before another is sent.',
-            'A request predicted to exceed the time limit is refused immediately with 400 and an estimate. Such a request succeeds with fewer parameters, less history or a smaller batch; an unchanged request fails again.',
+            /* Was "with 400 and an estimate" (20 Nov 2026): the served contract gives none. Its 400 reads "the
+               message names the field or the limit", and the Error schema carries error, message, retry_after_s and
+               docs only, retry_after_s being present when the same call later succeeds, which this refusal is not.
+               Read from api.provigen.ai/openapi.json rather than taken from a report. */
+            'A request predicted to exceed the time limit is refused immediately with 400, naming the limit. Such a request succeeds with fewer parameters, less history or a smaller batch; an unchanged request fails again.',
           ],
         },
       ],
