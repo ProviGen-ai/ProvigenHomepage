@@ -2714,6 +2714,16 @@ body:has(.r-launch--v2) .s-footer {
     transform: scale(0.36);
   }
 }
+/* The three lanes keep their share of the row, whatever their names measure (the user, 20 Nov 2026: text overlapping
+   in the cube demo on a phone). A lane is itself a grid, and its single track was sized by its content: in the demo's
+   card on a 360px screen the lanes are 72px, while "Optimization" alone measures 79px at 0.95rem, so the track grew
+   past its lane and carried the cube and the count with it, into the lane beside it. The track is now held to the
+   lane, and the name set small enough that its longest word fits inside one. */
+@media (max-width: 600px) {
+  .r-race-lane {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 /* The prose wrapper's figure margins stay off the race and its plot (they doubled the space around the plot). */
 .r-show-panel figure.r-race,
 .r-show-panel figure.r-race-plot {
@@ -2732,6 +2742,14 @@ body:has(.r-launch--v2) .s-footer {
 }
 .r-race-text .r-race-name {
   font-size: 0.95rem;
+}
+/* Small enough that the longest word fits a lane (the user, 20 Nov 2026). A lane holds 72px in the demo's card on a
+   360px screen, and "Optimization" measures 79px at 0.95rem, so the name stood out over the lanes on either side of
+   it; at 0.78rem it measures 65px. It belongs here, after the size it overrides. */
+@media (max-width: 600px) {
+  .r-race-text .r-race-name {
+    font-size: 0.78rem;
+  }
 }
 /* The same distance below the tab titles as the protein expression showcase, whose plot keeps the prose figure
    margin (founder, 14 Nov 2026). */
@@ -2913,7 +2931,11 @@ body:has(.r-launch--v2) .s-footer {
 }
 .r-try .r-try-actions--under {
   /* grid-template-columns: repeat(3, minmax(0, 1fr)); */
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* grid-template-columns: repeat(2, minmax(0, 1fr)); (the user, 20 Nov 2026: text out of bounds in the landscape
+     demo on a phone.) Two fixed columns take whatever width they are given, and in the demo's card on a 360px screen
+     that is 85px each, where "Show previous points" measures 180px. A column is now asked for 12rem at least, and the
+     second is dropped once both no longer fit: two columns of 208px at the plot's width, as before, one below it. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
   max-width: calc(400px + 1.4rem);
   margin-top: 0.5rem;
   padding-left: 1.4rem;
@@ -2921,11 +2943,12 @@ body:has(.r-launch--v2) .s-footer {
 .r-try .r-try-actions--under .r-try-new {
   grid-column: 1 / -1;
 }
-/* Keep both toggles on one line at the plot's width. */
+/* Both toggles sit on one line wherever the column holds their words, which at the plot's width it does (184px of
+   room for a 180px label). `white-space: nowrap` was here to insist on it; in the card on a phone it made the label
+   run over its neighbour and off the card instead, so the line now gives way where there is no room for it. */
 .r-try .r-try-actions--under .r-try-toggle {
   gap: 0.5rem;
   padding-inline: 0.75rem;
-  white-space: nowrap;
 }
 
 /* Try it: Run experiments as a small button over the plot of points (founder, 14 Nov 2026), centred on the canvas
@@ -3134,6 +3157,11 @@ p.r-race-flag {
   align-items: start;
   /* width: min(26rem, calc(100vw - 2rem)); */
   width: min(33rem, calc(100vw - 2rem));
+  /* The card is as tall as its facts, and on a phone that is taller than the room under the name it belongs to: it
+     ran past the bottom of the screen, where a fixed card cannot be scrolled into view (the user, 20 Nov 2026).
+     BenchmarkInfo.tsx gives it the height that side of the name actually has; the rest scrolls inside the card. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 0.85rem 0.95rem;
   border: 1px solid var(--c-line-3);
   background: var(--c-paper);
@@ -3175,11 +3203,15 @@ p.r-race-flag {
 }
 /* On a phone the picture goes above the text. */
 @media (max-width: 30rem) {
+  /* `1fr` alone is sized by what it holds, and a row of four pictures holds more than the card is wide: the card's
+     text was laid out at 365px inside a 328px card and ran off the screen (the user, 20 Nov 2026: the chemistry
+     benchmark's hover text out of bounds). minmax(0, …) keeps the column inside the card whatever goes in it. */
   .r-bench-card {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .r-bench-card .r-bench-pic {
     width: 7rem;
+    max-width: 100%;
   }
 }
 .r-bench-pic {
@@ -3261,9 +3293,12 @@ p.r-race-flag {
   display: grid;
   gap: 0.6rem;
 }
+/* The pictures in a row rather than a column on a phone, where the card is already one column tall. One row held
+   them when a card carried two; chemistry and life science now carry four, and four at 7rem need 477px (the user,
+   20 Nov 2026). Two to a row fit any card inside 360px and keep each picture at its own size. */
 @media (max-width: 30rem) {
   .r-bench-pics {
-    grid-auto-flow: column;
+    grid-template-columns: repeat(2, minmax(0, 7rem));
     justify-content: start;
   }
 }
@@ -3551,6 +3586,23 @@ p.r-race-flag {
 .r-race-info-gap {
   display: block;
   height: 0.55rem;
+}
+/* One method to a line on a phone (the user, 20 Nov 2026: text overlapping in the cube demo). Three columns beside
+   each other leave 36px apiece in the demo's card on a 360px screen, and "Optimization" measures 82px there, so each
+   name lay across the count beside it. Stacked, each name has the box's full 132px, and the hairline that divided
+   the columns divides the rows instead. */
+@media (max-width: 600px) {
+  .r-race-info-stats dl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .r-race-info-stats dl > div + div::before {
+    top: -0.2rem;
+    right: 0;
+    bottom: auto;
+    left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--c-line);
+  }
 }
 
 /* The n and Difference heads set apart from the methods' heads (founder, 16 Nov 2026: those columns looked like

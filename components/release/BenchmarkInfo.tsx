@@ -1875,6 +1875,7 @@ export default function BenchmarkInfo({
     left: number;
     top?: number;
     bottom?: number;
+    maxHeight?: number;
   } | null>(null);
   /* Clicked open (founder, 16 Nov 2026): the card stays, and takes clicks (its links), until a click outside it. */
   const [pinned, setPinned] = useState(false);
@@ -1882,6 +1883,14 @@ export default function BenchmarkInfo({
     const box = anchor.current?.getBoundingClientRect();
     if (!box) return;
     const width = Math.min(528, window.innerWidth - 32);
+    /* The side of the name the card opens on, and how tall it may be there (the user, 20 Nov 2026: on a phone the
+       card ran off the bottom of the screen, where nothing can scroll a fixed card into view). It opens below the
+       name as before and turns upward only once it is on the page and does not fit below, so on a wide screen,
+       where it does fit, nothing moves. release.css scrolls whatever is left over inside the card. */
+    const below = window.innerHeight - box.bottom - 24;
+    const above = box.top - 24;
+    const wants = card.current?.scrollHeight ?? 0;
+    const openUp = up || (wants > below && above > below);
     setAt({
       left: Math.max(
         16,
@@ -1890,7 +1899,8 @@ export default function BenchmarkInfo({
           window.innerWidth - 16 - width,
         ),
       ),
-      ...(up
+      maxHeight: Math.max(160, openUp ? above : below),
+      ...(openUp
         ? { bottom: window.innerHeight - box.top + 8 }
         : { top: box.bottom + 8 }),
     });
@@ -1905,6 +1915,8 @@ export default function BenchmarkInfo({
      clicked card had to stay open). */
   useEffect(() => {
     if (!at) return;
+    /* Once more now the card is on the page, where its height can be read and the side it opens on settled. */
+    place();
     window.addEventListener("scroll", place, { passive: true, capture: true });
     window.addEventListener("resize", place);
     return () => {
@@ -1962,7 +1974,12 @@ export default function BenchmarkInfo({
               className={
                 pinned ? "r-bench-card r-bench-card--pinned" : "r-bench-card"
               }
-              style={{ left: at.left, top: at.top, bottom: at.bottom }}
+              style={{
+                left: at.left,
+                top: at.top,
+                bottom: at.bottom,
+                maxHeight: at.maxHeight,
+              }}
             >
               <Picture />
               <span className="r-bench-card-text">
