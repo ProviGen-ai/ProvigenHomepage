@@ -37,7 +37,11 @@ rmSync(out, { recursive: true, force: true });
 const statics = join(out, 'static');
 cpSync(dist, statics, {
   recursive: true,
-  filter: (src) => !/(?:^|[\\/])(?:_headers|vinext-client-entry-manifest\.json)$/.test(src),
+  /* `preview/` is left out (20 Nov 2026): app/preview/[slug] is a dev-only route for reviewing one homepage
+     section in isolation. vinext 1.4.6 requires generateStaticParams to list at least one slug and prerenders
+     what it lists, so the build now produces a page for it; dropping it here keeps it off the site, as returning
+     an empty array used to. */
+  filter: (src) => !/(?:^|[\\/])(?:_headers|vinext-client-entry-manifest\.json|preview)$/.test(src),
 });
 
 // Clean URLs: every page.html is served at /page (index.html at its folder).
