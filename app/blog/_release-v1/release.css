@@ -5134,6 +5134,18 @@ button.r-launch-cta-link {
   .r-cube-door .r-piece {
     display: block;
   }
+  /* The grid behind each cube goes (the user, 20 Nov 2026: on a phone the cube visuals overlap each other and the
+     text below them). .r-cube-paper::before draws it with inset -4rem -3rem, so around a 106.7px cube it is a
+     202.7 by 234.7px box — more than twice the cube on both axes. That suits the desktop layout, where the two
+     cubes are absolutely positioned at opposite edges with open space around them; here they drop into the flow
+     2.5rem apart, which puts their centres 124px apart vertically. Measured at 360, 390, 414 and 768px: the two
+     grids overlapped each other by 48.3 by 110.7px, and the upper one covered the fields list below it by 182 by
+     23.4px ("Software infrastructure", "Database tuning"). Shrinking the inset does not resolve it — the grids
+     only clear each other below about 8.6px of vertical reach, which leaves no grid to speak of. So the
+     decoration is dropped where there is no room for it, and the cube itself is untouched. */
+  .r-cube-door .r-cube-paper::before {
+    content: none;
+  }
 }
 .r-access-card.r-cube-card {
   width: min(64rem, calc(100vw - 2rem));
