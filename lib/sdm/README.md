@@ -34,11 +34,20 @@ The route only adds what has to sit before AWS. The user decided on
     pre-filter's: the objective names are data in the same body, so no schema
     can express it and AWS answers `values must name every objective
     (missing …, unknown …)`.
-  - `components/release/cube/solve.ts` still sends the pre-2.0.0 shape
-    (`LegacyProposeRequest` in `contract.ts`). Only `scripts/record-cube.mjs`
-    sends it, and only with `SDM_RECORD_API` set; the published page replays
-    the committed runs and calls nothing. Re-recording against a 2.0.0 service
-    needs a weight per objective, which is the user's decision.
+  - `components/release/cube/solve.ts` sends 2.0.0 as well (the user,
+    20 Nov 2026: the cube keeps the weighting it has). `discover` has one
+    objective, so it sends `goal` with `value`; `solveWith`, `solveDirect` and
+    `solveEstimate` send `objectives` with `values`, weighted mode, weight 1
+    on each — which is what the service combined them with before 2.0.0, so
+    what the model optimizes is unchanged. Only `scripts/record-cube.mjs`
+    sends any of it, and only with `SDM_RECORD_API` set; the published page
+    replays the committed runs and calls nothing.
+  - Checking that by hand is not enough: replaying the 29 committed runs
+    captures 1,886 request bodies, and doing so caught a stray
+    `goal: 'maximize'` left beside `solveDirect`'s objectives that invalidated
+    1,200 of them. If these shapes change again, capture the bodies and
+    validate them against `content/sdm1/openapi.json` rather than reading the
+    diff.
 - **Status mapping:**
   - 200 and 400 pass through as they are.
   - 429 `rate_limited` passes through as 429.
