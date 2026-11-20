@@ -311,17 +311,20 @@ for _ in range(10):
           items: [
             'Parameters: 24. History: 200 rows. Batch: 8, or 32 for doe-lhs. Body: 256 KB.',
             'Calls: 10 per minute per token. A trial token is allowed 20 calls, counted against the address it was issued to; a confirmed token is allowed 50 per day, resetting at 00:00 UTC, and 500 in total.',
-            /* Was "Time: the service responds within approximately 54 seconds, and a larger request takes longer. A
-               client timeout..." (the user, 20 Nov 2026: "54 secs is oddly specific", then leave the figure out and
-               state only the client timeout). The server's own deadline is no longer given a number here; the bullet
-               below still says a request predicted to exceed the time limit is refused, without one. The 60 stays
-               above whatever that deadline is, so a caller never aborts while the service is still answering. */
-            'Time: a client timeout of at least 60 seconds is required, and a pending call completes before another is sent.',
-            /* Was "with 400 and an estimate" (20 Nov 2026): the served contract gives none. Its 400 reads "the
-               message names the field or the limit", and the Error schema carries error, message, retry_after_s and
-               docs only, retry_after_s being present when the same call later succeeds, which this refusal is not.
-               Read from api.provigen.ai/openapi.json rather than taken from a report. */
-            'A request predicted to exceed the time limit is refused immediately with 400, naming the limit. Such a request succeeds with fewer parameters, less history or a smaller batch; an unchanged request fails again.',
+            /* One bullet for the time budget (the user, 20 Nov 2026: the refusal bullet read as partly redundant
+               with this one). It was: the figure for the service's own response time went first — "approximately 54
+               seconds, and a larger request takes longer" — as oddly specific for an approximation, leaving only the
+               client timeout; that left "the time limit" in the bullet after it with nothing to refer back to, and
+               the two bullets saying the same budget twice. The waiting and the refusal are the two ends of one
+               rule, so they are stated together, and "the service's own limit" is introduced where it is used.
+               The 60 stays above whatever the server's deadline is, so a caller never aborts while the service is
+               still answering.
+
+               On the refusal: it was "with 400 and an estimate", which the served contract gives none of. Its 400
+               reads "the message names the field or the limit", and the Error schema carries error, message,
+               retry_after_s and docs only, retry_after_s being present when the same call later succeeds, which
+               this refusal is not. Read from api.provigen.ai/openapi.json rather than taken from a report. */
+            "Time: a client timeout of at least 60 seconds is required, and a pending call completes before another is sent. A request that would run past the service's own limit is refused at once with 400, naming the limit; such a request succeeds with fewer parameters, less history or a smaller batch, and fails again unchanged.",
           ],
         },
       ],
