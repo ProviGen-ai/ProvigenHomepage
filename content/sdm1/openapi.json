@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "SDM-1 API",
-    "version": "2.0.0",
-    "description": "Proposes the next settings to evaluate, from a parameter space and the values observed so far.\n\nThe service is stateless and deterministic: every call carries the whole history, and an unchanged request returns the same proposals.\n\n**The loop.** A call carries the parameter space, every result obtained so far as `history`, and the number of\nsettings wanted as `batch`. After evaluation, the results are appended to `history` for the next call. A request\nwithout new results returns the same batch.\n\n**One objective or several.** A request takes one of two forms.\n\n- One objective: the request carries `goal`, and every history row carries `value`, a number or null. Every method\n  serves this form, and `noise` is optional.\n- Two or more objectives: the request carries `objectives` in place of `goal`, and every history row carries\n  `values`, an object naming every objective, each a number or null. A single objective is sent in the first form.\n\n**Weights and trade-offs.** With two or more objectives, `mode` is `weighted` (the default) or `pareto`.\n\n- In `weighted`, every objective carries a `weight` greater than 0: the worth of one unit of that objective against\n  one unit of the others. A request without a weight on every objective is refused with 400.\n- In `pareto`, the objectives carry no weight, and the proposals follow every trade-off between them. A\n  `reference` per objective, the worst value still worth having, is optional, for every objective or for none.\n- A request that cannot state a trade-off uses `pareto`.\n- `bayesian-optimisation` takes two objectives at most in this form; `sdm-1` and `doe-lhs` take up to\n  24.\n\n**Failed and partial runs.** A run without any result is a failed run: `\"value\": null` with one objective;\n`\"values\": null`, or every objective null, with several. The setting counts as tried and infeasible and is excluded\nfrom later proposals. A row with some objectives null counts for the objectives it reports, and the null ones are\nunmeasured.\n\n**Retries.** 429 and 503 carry `Retry-After`; the same call succeeds after that interval. Any other 4xx requires a\ncorrected request or a new token. Clients set a timeout of 60 seconds.\n\n**Tokens.** Tokens are issued at [https://provigen.ai/sdm1](https://provigen.ai/sdm1). A trial token serves 20 calls at once; the\nlink sent by email raises the allowance to 50 calls a day and 500 in total. Each token is limited\nto 10 requests a minute.\n\nThe whole contract as one Markdown file, for agents: [https://provigen.ai/sdm1/api.md](https://provigen.ai/sdm1/api.md). The index for agents is\n[https://api.provigen.ai/llms.txt](https://api.provigen.ai/llms.txt).",
+    "version": "2.0.1",
+    "description": "Proposes the next settings to evaluate, from a parameter space and the values observed so far.\n\nThe service is stateless and deterministic: every call carries the whole history, and an unchanged request returns the same proposals.\n\n**The loop.** A call carries the parameter space, every result obtained so far as `history`, and the number of\nsettings wanted as `batch`. After evaluation, the results are appended to `history` for the next call. A request\nwithout new results returns the same batch.\n\n**One objective or several.** A request takes one of two forms.\n\n- One objective: the request carries `goal`, and every history row carries `value`, a number or null. `noise` is\n  optional.\n- Two or more objectives: the request carries `objectives` in place of `goal`, and every history row carries\n  `values`, an object naming every objective, each a number or null. A single objective is sent in the first form.\n\n**Weights and trade-offs.** With two or more objectives, `mode` is `weighted` (the default) or `pareto`.\n\n- In `weighted`, every objective carries a `weight` greater than 0: the worth of one unit of that objective against\n  one unit of the others. A request without a weight on every objective is refused with 400.\n- In `pareto`, the objectives carry no weight, and the proposals follow every trade-off between them. A\n  `reference` per objective, the worst value still worth having, is optional, for every objective or for none.\n- A request that cannot state a trade-off uses `pareto`.\n\n**Failed and partial runs.** A run without any result is a failed run: `\"value\": null` with one objective;\n`\"values\": null`, or every objective null, with several. The setting counts as tried and infeasible and is excluded\nfrom later proposals. A row with some objectives null counts for the objectives it reports, and the null ones are\nunmeasured.\n\n**Retries.** 429 and 503 carry `Retry-After`; the same call succeeds after that interval. Any other 4xx requires a\ncorrected request or a new token. Clients set a timeout of 60 seconds.\n\n**Tokens.** Tokens are issued at [https://provigen.ai/sdm1](https://provigen.ai/sdm1). A trial token serves 20 calls at once; the\nlink sent by email raises the allowance to 50 calls a day and 500 in total. Each token is limited\nto 10 requests a minute.\n\nThe whole contract as one Markdown file, for agents: [https://provigen.ai/sdm1/api.md](https://provigen.ai/sdm1/api.md). The index for agents is\n[https://api.provigen.ai/llms.txt](https://api.provigen.ai/llms.txt).",
     "contact": {
       "name": "ProviGen",
       "url": "https://provigen.ai"
@@ -207,30 +207,6 @@
                       }
                     ],
                     "batch": 2
-                  }
-                },
-                "design": {
-                  "summary": "A first design, before any result",
-                  "value": {
-                    "space": [
-                      {
-                        "name": "ph",
-                        "type": "continuous",
-                        "low": 5.5,
-                        "high": 8.5
-                      },
-                      {
-                        "name": "inducer_mM",
-                        "type": "continuous",
-                        "low": 0.01,
-                        "high": 1,
-                        "log": true
-                      }
-                    ],
-                    "history": [],
-                    "batch": 8,
-                    "goal": "maximize",
-                    "method": "doe-lhs"
                   }
                 }
               }
@@ -683,8 +659,8 @@
           "batch": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 32,
-            "description": "The number of settings to propose: 1 to 8, or to 32 for method 'doe-lhs'."
+            "maximum": 8,
+            "description": "The number of settings to propose: 1 to 8."
           },
           "goal": {
             "enum": [
@@ -694,35 +670,14 @@
             "description": "Whether a larger or a smaller `value` is better."
           },
           "method": {
-            "enum": [
-              "sdm-1",
-              "bayesian-optimisation",
-              "doe-lhs"
-            ],
+            "type": "string",
             "default": "sdm-1",
-            "description": "Every method serves one objective. 'doe-lhs' draws a Latin hypercube from the space alone."
+            "description": "Left unset; the default is 'sdm-1'."
           },
           "noise": {
             "type": "number",
             "minimum": 0,
             "description": "How much repeated measurements of the same setting vary, as a standard deviation in the units of `value`; finite and at least 0, with 0 for exact."
-          }
-        },
-        "if": {
-          "properties": {
-            "method": {
-              "const": "doe-lhs"
-            }
-          },
-          "required": [
-            "method"
-          ]
-        },
-        "else": {
-          "properties": {
-            "batch": {
-              "maximum": 8
-            }
           }
         }
       },
@@ -757,8 +712,8 @@
           "batch": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 32,
-            "description": "The number of settings to propose: 1 to 8, or to 32 for method 'doe-lhs'."
+            "maximum": 8,
+            "description": "The number of settings to propose: 1 to 8."
           },
           "objectives": {
             "type": "array",
@@ -770,13 +725,9 @@
             "description": "Two or more objectives; one objective is sent as `goal`."
           },
           "method": {
-            "enum": [
-              "sdm-1",
-              "bayesian-optimisation",
-              "doe-lhs"
-            ],
+            "type": "string",
             "default": "sdm-1",
-            "description": "'bayesian-optimisation' takes two objectives; 'sdm-1' and 'doe-lhs' take up to 24. 'doe-lhs' draws a Latin hypercube from the space alone."
+            "description": "Left unset; the default is 'sdm-1'."
           },
           "mode": {
             "enum": [
@@ -788,44 +739,6 @@
           }
         },
         "allOf": [
-          {
-            "if": {
-              "properties": {
-                "method": {
-                  "const": "doe-lhs"
-                }
-              },
-              "required": [
-                "method"
-              ]
-            },
-            "else": {
-              "properties": {
-                "batch": {
-                  "maximum": 8
-                }
-              }
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "method": {
-                  "const": "bayesian-optimisation"
-                }
-              },
-              "required": [
-                "method"
-              ]
-            },
-            "then": {
-              "properties": {
-                "objectives": {
-                  "maxItems": 2
-                }
-              }
-            }
-          },
           {
             "if": {
               "properties": {
@@ -1087,7 +1000,7 @@
           },
           "model": {
             "type": "string",
-            "description": "the method that ran"
+            "description": "the model that answered"
           },
           "version": {
             "type": "string",
@@ -1095,7 +1008,7 @@
             "examples": [
               "sdm-1-3f9a0c2b7d41"
             ],
-            "description": "an opaque identifier of the served model, the method and a hash; it changes whenever the model changes"
+            "description": "an opaque identifier of the served model and a hash; it changes whenever the model changes"
           }
         }
       },
