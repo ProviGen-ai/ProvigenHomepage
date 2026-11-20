@@ -121,35 +121,6 @@ export type ProposeRequest = OneObjectiveRequest | ObjectivesRequest;
 /** True when the body is the two-or-more form. Narrows for the page and the mock. */
 export const hasObjectives = (r: ProposeRequest): r is ObjectivesRequest => 'objectives' in r;
 
-/**
- * The body as it was before request 2.0.0: `goal` always present, `objectives`
- * optional from one entry, and every row carrying `value` with `values`
- * beside it. A 2.0.0 service refuses this shape.
- *
- * It survives here for one caller: the cube's recording script
- * (`scripts/record-cube.mjs` through `components/release/cube/solve.ts`),
- * which is the only thing in the repo that sends it. The published page never
- * does — it replays the committed recordings
- * (`components/release/cube/runs.ts`) and makes no calls at all, so nothing a
- * visitor sees depends on this type.
- *
- * Its multi-objective phases cannot be translated to 2.0.0 without a
- * decision: they send `goal` and `objectives` together with both `value` and
- * `values` in every row, and before 2.0.0 the objectives drove the search
- * while the top-level `goal` was disregarded. Reproducing that under 2.0.0
- * means mode `weighted` with a weight on every objective, and the cube states
- * no weights — a weight of 1 across quantities in different units is exactly
- * what the user rejected on 20 Nov 2026. So the weights are the user's to
- * choose, and until they do, re-recording the cube against a 2.0.0 service
- * answers 400. The committed recordings are unaffected.
- */
-export type LegacyObservation = { params: Settings; value: number | null; values?: Record<string, number | null> };
-export type LegacyProposeRequest = ProposeCommon & {
-  history: LegacyObservation[];
-  goal: 'maximize' | 'minimize';
-  objectives?: { name: string; goal: 'maximize' | 'minimize' }[];
-  noise?: number;
-};
 
 export type Method = 'sdm-1' | 'bayesian-optimisation' | 'doe-lhs';
 

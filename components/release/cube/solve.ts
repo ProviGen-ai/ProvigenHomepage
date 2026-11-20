@@ -1,9 +1,18 @@
-/* The cube's solver sends the pre-2.0.0 body (see LegacyProposeRequest in lib/sdm/contract.ts): its
-   multi-objective phases carry `goal` and `objectives` together, which request 2.0.0 refuses. Only
-   scripts/record-cube.mjs sends it, and only when SDM_RECORD_API is set; the published page replays the
-   committed runs and makes no calls. Re-recording against a 2.0.0 service needs a weight on every objective,
-   which is the user's decision (20 Nov 2026), so the shape is named rather than quietly changed. */
-import type { LegacyObservation, LegacyProposeRequest, Method, Param, ProposeResponse, Settings } from '@/lib/sdm/contract';
+/* The cube's solver speaks request 2.0.0 (the user, 20 Nov 2026, through agent-004). Each phase sends the form
+   its objectives call for: `discover` has one, so `goal` with `value`; the rest have several, so `objectives`
+   with `values`, in the default weighted mode with weight 1 on each. Weight 1 is not a default standing in for a
+   decision — it is what the service combined these objectives with before 2.0.0, so what the model optimizes is
+   unchanged in every phase. Only scripts/record-cube.mjs sends any of this, and only with SDM_RECORD_API set; the
+   published page replays the committed runs and calls nothing. */
+import type {
+  Method,
+  ObjectivesObservation,
+  Observation,
+  Param,
+  ProposeRequest,
+  ProposeResponse,
+  Settings,
+} from '@/lib/sdm/contract';
 import {
   MOVES,
   applyMove,
@@ -49,7 +58,7 @@ import {
  */
 
 /** Where proposals come from: the model while recording, a recorded run on the page. */
-export type Ask = (request: LegacyProposeRequest) => Promise<ProposeResponse>;
+export type Ask = (request: ProposeRequest) => Promise<ProposeResponse>;
 
 export type Block = { moves: Move[]; support: number; label: string };
 
@@ -89,7 +98,7 @@ export async function discover(
   wait: () => Promise<void>,
   cancelled: () => boolean,
 ): Promise<Block[]> {
-  const history: LegacyObservation[] = [];
+  const history: Observation[] = [];
   const found = new Map<string, Block>();
   let experiments = 0;
   let best: number | null = null;
@@ -100,15 +109,18 @@ export async function discover(
       space: DISCOVER_SPACE,
       history,
       batch: config.batch,
+      /* One objective, so request 2.0.0's one-outcome form (20 Nov 2026). It was `goal` with
+         `objectives: [{name: 'pieces_moved', goal: 'minimize'}]` beside it, which 2.0.0 refuses twice over: both
+         forms at once, and `objectives` below two. The search is unchanged: that objective's value and `value`
+         were the same number, and a lone objective's name only ever labelled `values`. */
       goal: 'minimize',
-      objectives: [{ name: 'pieces_moved', goal: 'minimize' }],
     });
     let improved: Move[] | null = null;
     for (const { params } of answer.proposals) {
       const moves = commutator(read(params, 'a', 'a_depth', 3), read(params, 'b', 'b_depth', 2));
       const moved = support(moves);
       /* A sequence that moves nothing is not a building block: a failed run. */
-      history.push({ params, value: moved === 0 ? null : moved, values: { pieces_moved: moved === 0 ? null : moved } });
+      history.push({ params, value: moved === 0 ? null : moved });
       experiments += 1;
       if (moved === 0) continue;
       const key = moves.join(' ');
@@ -157,7 +169,7 @@ export async function solveWith(
     ...slots('x', 2),
   ];
   let cube = start;
-  let history: LegacyObservation[] = [];
+  let history: ObjectivesObservation[] = [];
   let experiments = 0;
   let lastStep: SolveEvent['last'];
   const report = (extra: Partial<SolveEvent> = {}) =>
@@ -171,12 +183,15 @@ export async function solveWith(
       space,
       history,
       batch: config.batch,
-      goal: 'maximize',
+      /* Request 2.0.0's two-or-more form (20 Nov 2026): `goal` is gone, and the default weighted mode needs a
+         weight on every objective. Weight 1 each, which is what the service combined these with before 2.0.0 and
+         is also the cube's own sum: total() adds the four deltas unweighted, so `value` was their plain sum. The
+         search is therefore unchanged. */
       objectives: [
-        { name: 'corners_placed', goal: 'maximize' },
-        { name: 'corners_oriented', goal: 'maximize' },
-        { name: 'edges_placed', goal: 'maximize' },
-        { name: 'edges_oriented', goal: 'maximize' },
+        { name: 'corners_placed', goal: 'maximize', weight: 1 },
+        { name: 'corners_oriented', goal: 'maximize', weight: 1 },
+        { name: 'edges_placed', goal: 'maximize', weight: 1 },
+        { name: 'edges_oriented', goal: 'maximize', weight: 1 },
       ],
     });
     const before = outcomes(cube);
@@ -194,7 +209,7 @@ export async function solveWith(
         edges_oriented: after.edgesOriented - before.edgesOriented,
       };
       const gain = total(after) - total(before);
-      history.push({ params, value: gain, values });
+      history.push({ params, values });
       experiments += 1;
       if (!best || gain > best.gain) best = { moves, gain, last: { setup, block: choice, symmetry, gain } };
     }
@@ -269,7 +284,7 @@ export async function solveDirect(
   cancelled: () => boolean,
 ) {
   let cube = start;
-  let history: LegacyObservation[] = [];
+  let history: ObjectivesObservation[] = [];
   let experiments = 0;
   let moves = 0;
   const report = (extra: Partial<DirectEvent> = {}) =>
@@ -283,15 +298,22 @@ export async function solveDirect(
       space: DIRECT_SPACE,
       history,
       batch: config.batch,
-      goal: 'maximize',
+      /* `goal: 'maximize'` stood here beside `objectives` below. Request 2.0.0 refuses a body carrying both, and
+         the untrimmed-body capture on 20 Nov 2026 caught it: 1,200 of the 1,886 requests the replayed runs emit
+         come from this phase, and every one of them was invalid until this line went. */
       /* The race (14 Nov 2026): the same campaign, the same results, for each method. */
       ...(config.method ? { method: config.method } : {}),
       /* Solved pieces first (14 Nov 2026, for a cube that gets fully solved): until then the objectives were
          solved_pieces_kept and closer, and a move was played whenever closeness rose by more than twice the solved
          pieces it broke, so a cube could drift away from solved while its closeness went up. */
+      /* Weight 1 on each (20 Nov 2026): exactly what the service combined solved_pieces and closer with before
+         2.0.0, so the search is unchanged. Note that the cube's own `value` below is 100 * solved + gain, which is
+         a different quantity: `gain` spans every piece where `closer` spans only those not already solved. Sending
+         that combined score as one objective instead would therefore change what the model optimizes, and the
+         cube's own ranking (lexicographic on solved, then closer) uses neither. */
       objectives: [
-        { name: 'solved_pieces', goal: 'maximize' },
-        { name: 'closer', goal: 'maximize' },
+        { name: 'solved_pieces', goal: 'maximize', weight: 1 },
+        { name: 'closer', goal: 'maximize', weight: 1 },
       ],
     });
     const before = pieceStates(cube);
@@ -317,7 +339,7 @@ export async function solveDirect(
       /* The change in solved pieces, then how much closer the others got: one value for the record, solved first. */
       const solved = solvedAfter.size - solvedBefore.length;
       const value = SOLVED_WEIGHT * solved + gain;
-      history.push({ params, value, values: { solved_pieces: solved, closer } });
+      history.push({ params, values: { solved_pieces: solved, closer } });
       experiments += 1;
       // if (!best || value > best.value) best = { moves: seq, value };
       if (!best || solved > best.solved || (solved === best.solved && closer > best.closer))
@@ -402,12 +424,19 @@ export const movesFor = (c: EstimateSetup, p: Settings): Move[] => {
   }
   return out;
 };
+/* One row of an estimate run, kept in the cube's own terms (20 Nov 2026). It used to be a request row carrying
+   `value` with `values` beside it; request 2.0.0 lets a row carry one or the other, and which it is depends on
+   `config.score`, so the readout is stored and the request's rows are built from it at call time. */
+type EstimateRow = { params: Settings; readout: Readout };
+/* The score this window ranks by, and the one a score-'one' request sends: the cube's own combined estimate,
+   exactly the number `value` carried before 2.0.0, so the same 100 rows are kept. */
+const estimateScore = (r: Readout) => r[0] + r[1] / 100;
 /* Whole sequences keep one history for the run: past 200 experiments, the 100 best and the 100 latest are sent. */
-const windowed = (history: LegacyObservation[]) => {
+const windowed = (history: EstimateRow[]) => {
   if (history.length <= 200) return history;
   const keep = new Set(
     history
-      .map((h, i) => [h.value ?? Infinity, i] as const)
+      .map((h, i) => [estimateScore(h.readout), i] as const)
       .sort((a, b) => a[0] - b[0] || a[1] - b[1])
       .slice(0, 100)
       .map(([, i]) => i),
@@ -446,7 +475,7 @@ export async function solveEstimate(
   cancelled: () => boolean,
 ) {
   let cube = start;
-  let history: LegacyObservation[] = [];
+  let history: EstimateRow[] = [];
   let experiments = 0;
   let moves = 0;
   /* Whole sequences: the best sequence so far (the cube on show is the scramble with it applied). */
@@ -460,22 +489,37 @@ export async function solveEstimate(
     if (now[0] === 0) return report({ done: 'solved' });
     await wait();
     if (cancelled()) return;
-    const answer = await ask({
+    /* The two forms of request 2.0.0, built as whole bodies (20 Nov 2026): spreading a conditional into one
+       object leaves `goal` and `objectives` both optional, which satisfies neither form. Weight 1 on each
+       objective is what the service combined these two with before 2.0.0, so the search is unchanged; the cube's
+       own combined estimate weights them 1 and 0.01 instead, and sending that as one objective would be a
+       different search. */
+    const rows = config.whole ? windowed(history) : history;
+    const common = {
       // space: estimateSpace(config.choices),
       space: spaceFor(config),
-      history: config.whole ? windowed(history) : history,
       batch: config.batch,
-      goal: 'minimize',
       ...(config.method ? { method: config.method } : {}),
-      ...(config.score === 'one'
-        ? {}
+    };
+    const answer = await ask(
+      config.score === 'one'
+        ? {
+            ...common,
+            goal: 'minimize',
+            history: rows.map(({ params, readout }) => ({ params, value: estimateScore(readout) })),
+          }
         : {
+            ...common,
             objectives: [
-              { name: 'moves_left', goal: 'minimize' },
-              { name: 'cubie_distance', goal: 'minimize' },
+              { name: 'moves_left', goal: 'minimize', weight: 1 },
+              { name: 'cubie_distance', goal: 'minimize', weight: 1 },
             ],
-          }),
-    });
+            history: rows.map(({ params, readout }) => ({
+              params,
+              values: { moves_left: readout[0], cubie_distance: readout[1] },
+            })),
+          },
+    );
     let best: { moves: Move[]; readout: Readout; after: Cube; at: number } | undefined;
     const roundLeft: number[] = [];
     const roundSolved: number[] = [];
@@ -498,11 +542,7 @@ export async function solveEstimate(
       roundLeft.push(readout[0]);
       roundSolved.push(piecesSolved(after));
       /* One value for the record, the estimate first; the two results as they are. */
-      history.push(
-        config.score === 'one'
-          ? { params, value: readout[0] + readout[1] / 100 }
-          : { params, value: readout[0] + readout[1] / 100, values: { moves_left: readout[0], cubie_distance: readout[1] } },
-      );
+      history.push({ params, readout });
       experiments += 1;
       if (!best || lower(readout, best.readout)) best = { moves: seq, readout, after, at: experiments };
     }
