@@ -384,8 +384,9 @@ const notifyActivation = (email: string | null, daily: number, total: number, en
       `Address:   ${email ?? 'not reported by the API for an activation'}`,
       `Limits:    ${daily} calls a day, ${total} in total`,
       `Time:      ${new Date().toISOString()}`,
+      /* Was followed by (the user, 20 Nov 2026, as on the registration notice above: take it out):
       '',
-      'The token itself is not included: it is shown once, in the browser that opened the link.',
+      'The token itself is not included: it is shown once, in the browser that opened the link.', */
     ],
     env,
     development,
