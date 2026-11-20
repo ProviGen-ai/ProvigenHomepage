@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { API_BASE } from "@/content/sdm1/handoff";
+import { API_BASE, API_DOCS, API_DOCS_REQUEST } from "@/content/sdm1/handoff";
 import CopyHandoff from "./CopyHandoff";
 
 /*
@@ -37,8 +37,16 @@ const EXAMPLE = {
   goal: "maximize",
 };
 
+/* The two comment lines (the user, 20 Nov 2026): a snippet copied out of this card carried no way back to the
+   documentation, so whoever pasted it had the call but not the contract. Both languages take # as a comment, so the
+   same two lines serve curl and Python. The URLs come from content/sdm1/handoff.ts, which the agent block also
+   reads, so the card names one set of addresses. */
+const DOCS_COMMENT = `# SDM-1 documentation: ${API_DOCS}
+# Every request parameter, with its limits: ${API_DOCS_REQUEST}`;
+
 export const curl = (token: string) =>
-  `curl ${API} \\
+  `${DOCS_COMMENT}
+curl ${API} \\
   -H "Authorization: Bearer ${token}" \\
   -H "Content-Type: application/json" \\
   -d '${JSON.stringify(EXAMPLE)}'`;
@@ -60,7 +68,8 @@ const pyDict = (o: Record<string, unknown>) =>
     .join("\n")}\n    }`;
 
 export const python = (token: string) =>
-  `import requests
+  `${DOCS_COMMENT}
+import requests
 
 answer = requests.post(
     "${API}",
@@ -170,11 +179,14 @@ export default function GetAccess({ modelName }: { modelName: string }) {
           to {issued.trial_calls} calls until it is confirmed.
         </p>
         {/* A token names neither its host nor the documentation, so an agent handed one alone has nothing to call
-            (the user, 18 Nov 2026). This copies the token with the address and the contract link. */}
-        <p className="r-access-note">
-          For use by an agent: <CopyHandoff token={issued.token} /> — the token
-          together with the API address and the documentation.
-        </p>
+            (the user, 18 Nov 2026). The block carries the token with the address and the contract link.
+            Was a sentence with a "Copy for an agent" link inside it (the user, 20 Nov 2026: two copy fields
+            instead of a text section), so the field below states its own name and shows what it copies:
+            <p className="r-access-note">
+              For use by an agent: <CopyHandoff token={issued.token} /> — the token
+              together with the API address and the documentation.
+            </p> */}
+        <CopyHandoff token={issued.token} />
         {/* Was "A confirmation link is on its way to that address." (the user, 17 Nov 2026): while SES is in its
             sandbox only @provigen.ai addresses receive it, so the page no longer promises a link that is already on
             its way. Put the sentence back once AWS grants production access. */}

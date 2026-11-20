@@ -113,11 +113,14 @@ export default function Activate() {
           total.
         </p>
         {/* This page showed a token and nothing else: no address, no documentation, so an agent given it had
-            nowhere to call (the user, 18 Nov 2026). */}
-        <p className="r-access-note">
-          For use by an agent: <CopyHandoff token={full.token} /> — the token
-          together with the API address and the documentation.
-        </p>
+            nowhere to call (the user, 18 Nov 2026).
+            Was a sentence with a "Copy for an agent" link inside it (the user, 20 Nov 2026: two copy fields
+            instead of a text section), so the field below states its own name and shows what it copies:
+            <p className="r-access-note">
+              For use by an agent: <CopyHandoff token={full.token} /> — the token
+              together with the API address and the documentation.
+            </p> */}
+        <CopyHandoff token={full.token} />
       </div>
     );
 

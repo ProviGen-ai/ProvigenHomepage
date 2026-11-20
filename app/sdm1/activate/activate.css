@@ -49,6 +49,11 @@
   align-items: center;
   width: 100%;
   box-sizing: border-box;
+  /* The box is a grid item of .r-act, and a grid item's automatic minimum size is its content's min-content width.
+     A nowrap token measures 302px, so the box insisted on 371px and hung 75px off the right of a 360px screen
+     instead of scrolling inside itself as the line below intends (found 20 Nov 2026 while measuring the field
+     beside it; it had been so since 17 Nov). Saying 0 lets the width: 100% above actually hold. */
+  min-width: 0;
   padding: 0.6rem 0.8rem;
   border: 1px solid color-mix(in oklab, var(--c-ink) 25%, transparent);
   background: var(--c-paper);
@@ -87,6 +92,21 @@
 .r-act-copy:hover {
   border-color: var(--c-teal-ink);
   color: var(--c-teal-ink);
+}
+/* The Agent setup field (components/release/CopyHandoff.css) carries the release card's measurements, and this card
+   differs in two of them (the user, 20 Nov 2026): its own token box is plain paper against a tinted card, where the
+   release card's is the tinted one, and its copy symbol is a shade larger. Both fields on this page therefore match
+   each other rather than the other page. */
+.r-act .r-handoff-box {
+  background: var(--c-paper);
+}
+.r-act .r-handoff-copy {
+  width: 2rem;
+  height: 2rem;
+}
+.r-act .r-handoff-copy svg {
+  width: 15px;
+  height: 15px;
 }
 .r-act .r-access-note {
   margin: 0;

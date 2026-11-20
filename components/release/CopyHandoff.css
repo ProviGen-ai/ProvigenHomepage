@@ -1,6 +1,89 @@
-/* The "Copy for an agent" button (the user, 18 Nov 2026). A quiet text button, not a second icon: two copy icons
-   side by side say nothing about which one does what. Used on the release page's access card and on the activation
-   page, so it carries its own styling rather than depending on either page's sheet. */
+/* The "Agent setup" field (the user, 20 Nov 2026: two copy fields rather than a sentence with a link in it). It
+   repeats the shape of the token's own field on both pages, because it is the second of the two and they read as a
+   pair. Used on the release page's access card and on the activation page, so it carries its own styling rather
+   than depending on either page's sheet; the label and the box are deliberately the same measurements as
+   .r-access-label and .r-access-token in app/blog/_release-v1/release.css and app/sdm1/activate/activate.css. Keep
+   the three in step. */
+.r-handoff-field {
+  display: grid;
+  gap: 0.35rem;
+  width: 100%;
+  margin: 0;
+  /* Both cards lay their rows out in a grid, and a grid item's automatic minimum size is its content's min-content
+     width. Measured at 360px before this line: the block's longest line is 584px, so the field refused to go below
+     652px and took the card's whole column with it — the token above it went from 262px to 652px and ran off the
+     screen. The field and the box below each say 0 so the column stays the card's width. */
+  min-width: 0;
+}
+.r-handoff-label {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+}
+.r-handoff-box {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid color-mix(in oklab, var(--c-ink) 25%, transparent);
+  background: color-mix(in oklab, var(--c-paper), #fffdf8 50%);
+}
+.r-handoff-box code {
+  flex: 1;
+  min-width: 0;
+  /* The four lines as written, wrapping within each line on a narrow screen. The token's own field scrolls sideways
+     instead, because a token is one string one reads off; this block is four labelled lines, and a line hidden off
+     the right edge of a box is a line nobody knows is there. The newlines are kept, so what the button copies is
+     the block as written either way. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: var(--f-mono);
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+/* The release card's own measurements (.r-access-copy): 1.9rem with a 14px symbol. The activation page's token
+   button is a shade larger, so app/sdm1/activate/activate.css nudges this one to match it there; a copy symbol that
+   is 1.6px off the one above it is the sort of thing the eye catches without naming. */
+.r-handoff-copy {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  border: 1px solid color-mix(in oklab, var(--c-ink) 25%, transparent);
+  background: transparent;
+  color: var(--c-ink);
+  cursor: pointer;
+}
+.r-handoff-copy svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.r-handoff-copy:hover {
+  border-color: var(--c-teal-ink);
+  color: var(--c-teal-ink);
+}
+.r-handoff-copy:focus-visible {
+  outline: 2px solid var(--c-teal-ink);
+  outline-offset: 2px;
+}
+
+/* The "Copy for an agent" text button this replaced (the user, 18 Nov 2026). A quiet text button, not a second
+   icon: two copy icons side by side say nothing about which one does what. That reasoning held while the block was
+   hidden behind a link; now that the block is shown as a field of its own, the icon belongs to it the way the
+   token's icon belongs to the token.
 .r-handoff {
   display: inline;
   padding: 0;
@@ -20,3 +103,4 @@
   outline: 2px solid var(--c-teal-ink);
   outline-offset: 2px;
 }
+*/
