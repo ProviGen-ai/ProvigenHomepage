@@ -362,8 +362,9 @@ const notifyRegistration = (email: string, tier: string, contactOptIn: boolean, 
       `Tier:      ${tier}`,
       `Contact opt-in: ${contactOptIn ? 'yes' : 'no'}`,
       `Time:      ${new Date().toISOString()}`,
+      /* Was followed by (the user, 20 Nov 2026: take it out):
       '',
-      'The token itself is not included: it is shown once, in the browser that asked.',
+      'The token itself is not included: it is shown once, in the browser that asked.', */
     ],
     env,
     development,
