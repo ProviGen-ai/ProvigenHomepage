@@ -1,6 +1,7 @@
 import {
   PUBLIC_LIMITS,
   SdmUnavailable,
+  hasObjectives,
   type ProposeRequest,
   type ProposeResponse,
   type Status,
@@ -75,11 +76,13 @@ export async function propose(request: ProposeRequest, source: 'visitor' | 'demo
     throw new SdmUnavailable('limit', 'You have used the experiments for this visit. Reload the page to start again.');
   if (inFlight) await inFlight.catch(() => undefined);
 
-  const body: ProposeRequest = {
-    ...request,
-    history: request.history.slice(-PUBLIC_LIMITS.maxHistory),
-    batch: Math.min(request.batch, request.method === 'doe-lhs' ? PUBLIC_LIMITS.maxDesign : PUBLIC_LIMITS.maxBatch),
-  };
+  /* The two forms of request 2.0.0 are clamped separately (20 Nov 2026): spreading the union and overwriting
+     `history` loses the discriminant, so each form is narrowed first and keeps its own row type. A one-objective
+     body then cannot end up holding `values` rows, nor the reverse. The clamps themselves are the same for both. */
+  const batch = Math.min(request.batch, request.method === 'doe-lhs' ? PUBLIC_LIMITS.maxDesign : PUBLIC_LIMITS.maxBatch);
+  const body: ProposeRequest = hasObjectives(request)
+    ? { ...request, history: request.history.slice(-PUBLIC_LIMITS.maxHistory), batch }
+    : { ...request, history: request.history.slice(-PUBLIC_LIMITS.maxHistory), batch };
   calls[source] += 1;
 
   const run = (async () => {

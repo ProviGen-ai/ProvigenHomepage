@@ -1,3 +1,4 @@
+import { hasObjectives } from './contract';
 import type { Param, ProposeRequest, ProposeResponse, Settings, Status } from './contract';
 
 /*
@@ -75,10 +76,19 @@ export async function mockPropose(request: ProposeRequest): Promise<ProposeRespo
   if (forced === 'ratelimit') return { status: 429, retry_after_s: 20 };
 
   if (request.method === 'doe-lhs') return { proposals: latin(request).map((params) => ({ params })), model: 'mock', version: '0' };
-  const scored = request.history.filter((o) => o.value !== null);
-  const best = scored.length
-    ? scored.reduce((a, b) => ((request.goal === 'maximize' ? (b.value as number) > (a.value as number) : (b.value as number) < (a.value as number)) ? b : a))
-    : undefined;
+  /* Both forms of request 2.0.0 (20 Nov 2026). The stand-in needs one number per row to find a best row to sit
+     near, so the two-or-more form is reduced to the first objective it reports: enough to steer the mock, and it
+     never claims to be the model's own trade-off. A row whose values is null, or whose first objective is null,
+     counts as failed here exactly as a null value does. */
+  const scored = hasObjectives(request)
+    ? request.history.flatMap((o) => {
+        const first = request.objectives[0];
+        const key = first.name ?? 'y1';
+        const v = o.values?.[key];
+        return typeof v === 'number' ? [{ params: o.params, value: v, goal: first.goal }] : [];
+      })
+    : request.history.flatMap((o) => (o.value === null ? [] : [{ params: o.params, value: o.value, goal: request.goal }]));
+  const best = scored.length ? scored.reduce((a, b) => ((a.goal === 'maximize' ? b.value > a.value : b.value < a.value) ? b : a)) : undefined;
   const proposals = Array.from({ length: request.batch }, (_, i) => {
     const params: Settings = {};
     for (const p of request.space) params[p.name] = best && i % 2 === 1 ? nearby(p, best.params[p.name]) : randomValue(p);

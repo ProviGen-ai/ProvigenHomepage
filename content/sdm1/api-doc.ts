@@ -25,12 +25,35 @@ export type Section = { id: string; heading: string; blocks: Block[] };
 
 export const BASE = 'https://api.provigen.ai';
 
+/*
+ * The few rules an agent must not get wrong, for the llms.txt index (scripts/make-api-doc.mjs).
+ *
+ * They lived in that script as a hardcoded string, which put a statement of the request's shape outside this
+ * module and let it rot: it read "A failed run belongs in the history with `"value": null`.", which request 2.0.0
+ * makes half a rule, since a run with several objectives fails as `"values": null`.
+ *
+ * The alternative considered on 20 Nov 2026 was to generate this from content/sdm1/openapi.json, which
+ * scripts/fetch-openapi.mjs replaces from the live API. That was rejected: the generated llms.txt would then
+ * describe whatever is deployed while api.md beside it describes this module, so during a deploy window the two
+ * files an agent reads together would disagree. Keeping one source is the principle this file already states.
+ */
+export const ESSENTIALS = [
+  'The service is stateless and deterministic: every call carries the whole history, and an unchanged request returns the same proposals.',
+  'A request takes one of two forms: `goal` with `"value"` in every history row for one measured outcome, or `objectives` with `"values"` for two or more. Sending both is refused.',
+  'A failed run belongs in the history, as `"value": null` with one objective and as `"values": null` with two or more.',
+];
+
 export const apiDoc: { title: string; lede: string; updated: string; sections: Section[] } = {
   title: 'SDM-1 API',
   /* A subtitle, so one line (the user, 18 Nov 2026). What it dropped opens the Overview below, and agent-002 uses
      this string verbatim in the API's own GET / and /llms.txt. */
   lede: 'Proposes the next settings to evaluate, from a parameter space and the values observed so far.',
-  updated: '2026-11-18',
+  /* Request 2.0.0 (the user, 20 Nov 2026). The breaking change: a request now takes one of two forms, `goal` with
+     `value` in every row for one measured outcome, or `objectives` with `values` for two or more, and the two are
+     exclusive. A single named objective is gone, `mode` and `noise` each belong to one form, and weighted mode
+     requires a weight on every objective. Every field note, message and limit below was read from the deployed
+     document at api.provigen.ai/openapi.json and from the served messages, never from a summary of them. */
+  updated: '2026-11-20',
   sections: [
     {
       id: 'start',
@@ -168,24 +191,46 @@ for _ in range(10):
         {
           kind: 'text',
           text:
-            'A failed run is recorded in the history with value null. The value marks the setting as attempted and infeasible: the model excludes the point from further proposals and uses it to locate the boundaries of the feasible region. The history contains measured runs and failed runs; a run still in progress is submitted once an outcome is available.',
+            'A failed run is recorded in the history as null: with one objective, value null; with two or more, values null. The record marks the setting as attempted and infeasible: the model excludes the point from further proposals and uses it to locate the boundaries of the feasible region. The history contains measured runs and failed runs; a run still in progress is submitted once an outcome is available.',
         },
         {
           kind: 'code',
           lang: 'json',
-          caption: 'Two measured results and one failed run',
+          caption: 'Two measured results and one failed run, with one objective',
           code: `"history": [
   {"params": {"temperature": 45, "catalyst": "c1"}, "value": 0.62},
   {"params": {"temperature": 72, "catalyst": "c0"}, "value": 0.81},
   {"params": {"temperature": 79, "catalyst": "c2"}, "value": null}
 ]`,
         },
+        /* Two separate cases, stated separately and each in the positive (the user's rule for this section, 20 Nov
+           2026). A relayed summary of request 2.0.0 collapsed them into one sentence, which inverted the all-null
+           case: it read as though any null meant "not measured", so a wholly failed run would have been filed as a
+           partial success. The distinction is the service's, and the guide states it in the service's terms. */
+        {
+          kind: 'text',
+          text:
+            'With two or more objectives there are two distinct cases. A row reporting some objectives and leaving others null counts for the objectives it reports, and those left null count as not measured. A row where every objective is null, and a row whose values is null, are failed runs.',
+        },
+        {
+          kind: 'code',
+          lang: 'json',
+          caption: 'A full result, a partial one and a failed run, with two objectives',
+          code: `"history": [
+  {"params": {"temperature": 35, "time_min": 30},
+   "values": {"yield": 0.62, "cost": 0.22}},
+  {"params": {"temperature": 50, "time_min": 60},
+   "values": {"yield": 0.71, "cost": null}},
+  {"params": {"temperature": 70, "time_min": 90}, "values": null}
+]`,
+        },
         {
           kind: 'text',
           text:
             /* Was '... is refused by the service in a way that is hard to act on.' (18 Nov 2026): it answered 503
-               high_demand, which reads as "retry" and never succeeded. agent-002 made it a plain 400 naming the row. */
-            'Every row carries a value key, with a number or null. Leaving the key out answers 400 naming the row, for example "history[0]: value is required: a number, or null for a failed run". The request requires correction before it is sent again.',
+               high_demand, which reads as "retry" and never succeeded. agent-002 made it a plain 400 naming the row.
+               Both messages below are the served strings, read from the deployed contract. */
+            'Every row carries the key its form requires, with a number or null. Leaving the key out answers 400 naming the row: "history[0]: value is required: a number, or null for a failed run" with one objective, and "history[0]: values is required: an object naming every objective, or null for a failed run" with two or more. The request requires correction before it is sent again.',
         },
       ],
     },
@@ -198,17 +243,24 @@ for _ in range(10):
           text:
             'POST /v1/propose takes a JSON object of at most 256 KB. Unknown keys anywhere in the body are refused with 400, including "seed", "n" and "bounds".',
         },
+        /* The shape of request 2.0.0, stated before the field table, because every row below depends on which of the
+           two forms a request is in (the user, 20 Nov 2026). */
+        {
+          kind: 'text',
+          text:
+            'A request takes one of two forms. One measured outcome per run carries goal, and every history row carries value. Two or more carry objectives, and every history row carries values. The forms are exclusive: a request carrying goal together with objectives is refused with 400, as is one carrying neither.',
+        },
         {
           kind: 'fields',
           rows: [
             { name: 'space', type: 'required', note: '1 to 24 parameters. Each is {"type": "continuous", "low", "high", "log"?}, {"type": "integer", "low", "high"} or {"type": "categorical", "choices": [...]}. "name" is optional and must be unique; unnamed parameters are x1, x2, … by position. For log, low must be above 0. Categorical choices are distinct strings.' },
-            { name: 'history', type: 'required', note: 'Up to 200 rows of {"params", "value", "values"?}. May be empty. params names exactly every parameter, numbers within [low, high], whole numbers for integer parameters, the exact string for categorical. value is a finite number, or null for a failed run.' },
+            { name: 'history', type: 'required', note: 'Up to 200 rows, every run so far with failed runs included. May be empty. params names exactly every parameter, numbers within [low, high], whole numbers for integer parameters, the exact string for categorical. Each row then carries value with one objective, or values with two or more.' },
             { name: 'batch', type: 'required', note: 'How many settings to propose: 1 to 8, or 1 to 32 for method "doe-lhs".' },
-            { name: 'goal', type: 'required', note: '"maximize" or "minimize". Required even alongside objectives, where it is ignored.' },
-            { name: 'objectives', type: 'optional', note: '1 to 24 entries of {"name"?, "goal", "reference"?} for several measured outcomes. Unnamed ones are y1, y2, … Each history row then carries "values": {objective: number or null}, and still carries "value".' },
-            { name: 'method', type: 'optional', note: '"sdm-1" (default), "bayesian-optimisation" (at most 2 objectives) or "doe-lhs" (a Latin hypercube; the history is ignored).' },
-            { name: 'noise', type: 'optional', note: 'The standard deviation of a repeat measurement, finite and at least 0. A single objective only.' },
-            { name: 'mode', type: 'optional', note: '"weighted" (default: the objectives signed by their goal and summed) or "pareto" (at least two objectives; reference on all of them or none).' },
+            { name: 'goal', type: 'one objective', note: '"maximize" or "minimize", the direction for the value in every history row. Present for one measured outcome, and refused alongside objectives.' },
+            { name: 'objectives', type: 'two or more', note: '2 to 24 entries of {"name"?, "goal", "weight"?, "reference"?}. Unnamed ones are y1, y2, … by position, and names are unique. Every history row then carries values. One measured outcome is sent as goal.' },
+            { name: 'method', type: 'optional', note: '"sdm-1" (default), "bayesian-optimisation" or "doe-lhs" (a Latin hypercube; the history is ignored). Every method serves one objective; with objectives, "bayesian-optimisation" takes two, and "sdm-1" and "doe-lhs" take up to 24.' },
+            { name: 'noise', type: 'one objective', note: 'How much repeated measurements of the same setting vary, as a standard deviation in the units of value; finite and at least 0, with 0 for exact. Present with goal, and refused alongside objectives.' },
+            { name: 'mode', type: 'two or more', note: '"weighted" (default) or "pareto". Present with objectives, and refused alongside goal.' },
           ],
         },
         {
@@ -225,7 +277,12 @@ for _ in range(10):
         {
           kind: 'text',
           text:
-            'Each measured outcome is named under objectives with a goal of its own. Each history row then carries values for them, and still carries value: a number when anything was read, null when the whole run failed.',
+            'Two or more measured outcomes are listed under objectives, each with a goal of its own. Every history row then carries values, an object naming every objective, each a number or null. One measured outcome is sent as goal, with value in every row.',
+        },
+        {
+          kind: 'text',
+          text:
+            'Mode weighted is the default, and there every objective carries a weight above 0: the worth of one unit of that objective against one unit of the others. A weight left out is refused with 400 and the message names the objective, because the trade-off between quantities in different units is stated by the request alone. Mode pareto proposes along every trade-off between the objectives; there weight is refused, and reference, the worst value still worth having, is given for every objective or for none.',
         },
         {
           kind: 'code',
@@ -234,26 +291,54 @@ for _ in range(10):
           code: `{
   "space": [
     {"name": "temperature", "type": "continuous", "low": 20, "high": 80},
-    {"name": "steps", "type": "integer", "low": 1, "high": 6}
+    {"name": "time_min", "type": "integer", "low": 5, "high": 120}
   ],
   "objectives": [
-    {"name": "yield", "goal": "maximize"},
-    {"name": "cost", "goal": "minimize"}
+    {"name": "yield", "goal": "maximize", "weight": 10},
+    {"name": "cost", "goal": "minimize", "weight": 1}
   ],
-  "goal": "maximize",
   "history": [
-    {"params": {"temperature": 45, "steps": 3},
-     "values": {"yield": 0.62, "cost": 18.0}, "value": 0.62},
-    {"params": {"temperature": 79, "steps": 6},
-     "values": {"yield": null, "cost": null}, "value": null}
+    {"params": {"temperature": 35, "time_min": 30},
+     "values": {"yield": 0.62, "cost": 0.22}},
+    {"params": {"temperature": 50, "time_min": 60},
+     "values": {"yield": 0.71, "cost": null}},
+    {"params": {"temperature": 70, "time_min": 90}, "values": null}
   ],
-  "batch": 4
+  "batch": 2
 }`,
         },
         {
+          kind: 'code',
+          lang: 'json',
+          caption: 'The same two objectives along every trade-off, each with a reference',
+          code: `{
+  "space": [
+    {"name": "temperature", "type": "continuous", "low": 20, "high": 80},
+    {"name": "pressure_bar", "type": "continuous", "low": 1, "high": 10}
+  ],
+  "objectives": [
+    {"name": "yield", "goal": "maximize", "reference": 0},
+    {"name": "cost", "goal": "minimize", "reference": 10}
+  ],
+  "mode": "pareto",
+  "history": [
+    {"params": {"temperature": 30, "pressure_bar": 8},
+     "values": {"yield": 0.5, "cost": 4.0}},
+    {"params": {"temperature": 70, "pressure_bar": 2},
+     "values": {"yield": 0.9, "cost": 7.5}}
+  ],
+  "batch": 2
+}`,
+        },
+        /* The one rule of the request that the schema cannot carry, so the guide states it in prose (established by
+           probing the deployed schema and the served validator, 20 Nov 2026). The objective names are instance data
+           in the same request and `values` is typed as additionalProperties with no required keys, so neither an
+           omitted name nor an invented one is catchable by the schema. Both are accepted by the schema and refused
+           by the service. A caller validating locally would otherwise meet this only as a 400 in production. */
+        {
           kind: 'text',
           text:
-            'With mode set to "pareto" and at least two objectives, the answer is a Pareto front.',
+            'values names every objective of the request. A name left out, and a name that is not among the objectives, are each refused with 400, the message listing both sets: "history[0]: values must name every objective (missing …, unknown …); null marks an objective not measured". This rule is enforced by the service and cannot be expressed in the schema, since the names are given elsewhere in the same request: a request that validates against the schema alone can still be refused on this ground.',
         },
       ],
     },
@@ -373,15 +458,35 @@ for _ in range(10):
             },
             {
               q: 'Why is a setting that has already been evaluated proposed a second time?',
-              a: 'A run absent from the history is unknown to the service. A run that failed is recorded with value null, which marks the setting as evaluated and withholds it from later proposals.',
+              a: 'A run absent from the history is unknown to the service. A run that failed is recorded as value null with one objective, or as values null with two or more, which marks the setting as evaluated and withholds it from later proposals.',
             },
             {
-              q: 'What causes the message history[0]: value is required?',
-              a: 'A row of the history states params and omits value. Every row carries value: a number for a completed run, and null for a failed one.',
+              q: 'What causes the message history[0]: value is required, or values is required?',
+              a: 'A row of the history states params and omits the key its form requires. With one objective every row carries value: a number for a completed run, and null for a failed one. With two or more every row carries values: an object naming every objective, and null for a failed run.',
+            },
+            /* Replaces 'What causes the message history[0]: values must name every objective?' being absent (20 Nov
+               2026): the schema accepts both an omitted and an invented objective name, so this 400 is the first
+               place a caller meets the rule. The answer names both halves, because the relay that described request
+               2.0.0 covered only the value-versus-values split. */
+            {
+              q: 'What causes the message history[0]: values must name every objective?',
+              a: 'The row’s values omits an objective of the request, or names something that is not among them; the message lists the missing names and the unknown ones. Every objective appears as a key, and an objective that was not measured appears with null. A request validated against the schema alone passes this check, because the names are given elsewhere in the same request.',
+            },
+            /* Was 'Is goal required alongside objectives?' — 'goal is required in every request. Where objectives is
+               present, each objective carries its own direction and the top-level goal is disregarded.' Request
+               2.0.0 inverts this answer outright: the two are now exclusive, so the question is rewritten rather
+               than patched (the user, 20 Nov 2026). */
+            {
+              q: 'Is goal sent alongside objectives?',
+              a: 'A request carries one of the two: goal for one measured outcome, or objectives for two or more. A request carrying both is refused with 400, the message reading "Send goal for one objective or objectives for two or more, not both." A request carrying neither is refused on the same ground.',
             },
             {
-              q: 'Is goal required alongside objectives?',
-              a: 'goal is required in every request. Where objectives is present, each objective carries its own direction and the top-level goal is disregarded.',
+              q: 'What causes the message weight is required in mode weighted?',
+              a: 'An objective carries no weight while the default mode is in force. Every objective carries a weight above 0, stating the worth of one unit of that objective against one unit of the others. A request that states no such trade-off uses mode pareto, where weight is refused and reference is given for every objective or for none.',
+            },
+            {
+              q: 'What causes the message mode applies with objectives only, or noise applies with goal only?',
+              a: 'mode belongs to a request carrying objectives and noise to one carrying goal. Each is refused in the other form.',
             },
             {
               q: 'How is a key outside the schema handled?',

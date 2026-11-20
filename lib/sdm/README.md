@@ -18,6 +18,27 @@ The route only adds what has to sit before AWS. The user decided on
 - **Public limits:** the same in every environment (24 parameters, 200
   observations, batch 8, design 32), plus a 256 KB body limit. Bad requests
   never reach AWS.
+- **Request 2.0.0** (20 Nov 2026): a propose body takes one of two exclusive
+  forms, and `invalid()` in `proxy.ts` enforces both because a pre-filter that
+  refuses a valid body is as wrong as one that forwards an invalid one.
+  - One measured outcome: `goal`, and `value` in every history row. `noise`
+    belongs here.
+  - Two or more: `objectives` (2 to 24), and `values` in every row — an object
+    naming every objective, each a number or null. `mode` belongs here:
+    `weighted` is the default and needs a `weight` above 0 on every objective;
+    `pareto` refuses `weight` and takes `reference` on every objective or on
+    none.
+  - A body carrying both forms, or neither, is refused. A single *named*
+    objective is gone: one outcome is sent as `goal`.
+  - Which names `values` must carry is the service's rule, not the
+    pre-filter's: the objective names are data in the same body, so no schema
+    can express it and AWS answers `values must name every objective
+    (missing …, unknown …)`.
+  - `components/release/cube/solve.ts` still sends the pre-2.0.0 shape
+    (`LegacyProposeRequest` in `contract.ts`). Only `scripts/record-cube.mjs`
+    sends it, and only with `SDM_RECORD_API` set; the published page replays
+    the committed runs and calls nothing. Re-recording against a 2.0.0 service
+    needs a weight per objective, which is the user's decision.
 - **Status mapping:**
   - 200 and 400 pass through as they are.
   - 429 `rate_limited` passes through as 429.

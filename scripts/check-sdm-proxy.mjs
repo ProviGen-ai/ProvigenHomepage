@@ -152,8 +152,82 @@ for (const { name, body } of cases) {
   check('sdm-1 batch 8 is allowed', atLimit.response.status === 200);
   const noisy = await call(post({ ...GOOD, noise: 0.05 }), ENV, res(200, { proposals: [], model: 'sdm-1', version: '1' }));
   check('noise 0.05 is allowed and forwarded', noisy.response.status === 200 && JSON.parse(noisy.seen[0].init.body).noise === 0.05);
-  const exact = await call(post({ ...GOOD, noise: 0, objectives: [{ name: 'a', goal: 'maximize' }] }), ENV, res(200, { proposals: [], model: 'sdm-1', version: '1' }));
-  check('noise 0 with one objective is allowed', exact.response.status === 200);
+  const exact = await call(post({ ...GOOD, noise: 0 }), ENV, res(200, { proposals: [], model: 'sdm-1', version: '1' }));
+  check('noise 0 is allowed', exact.response.status === 200);
+}
+
+/* 3b. Request 2.0.0: the two exclusive forms (the user, 20 Nov 2026).
+   This block replaces one case that asserted the opposite — `noise: 0` together with a single named objective,
+   which 2.0.0 refuses three times over: both forms present, `objectives` below two, and `noise` outside the
+   one-objective form. The pre-filter has to refuse what AWS refuses and forward what AWS accepts, so each rule is
+   checked for its refusal and every valid body is checked for reaching AWS at all. */
+{
+  const SEVERAL = {
+    space: [{ name: 'a', type: 'continuous', low: 0, high: 1 }],
+    objectives: [
+      { name: 'yield', goal: 'maximize', weight: 10 },
+      { name: 'cost', goal: 'minimize', weight: 1 },
+    ],
+    history: [{ params: { a: 0.5 }, values: { yield: 0.6, cost: 0.2 } }],
+    batch: 1,
+    method: 'sdm-1',
+  };
+  const pareto = (objectives) => ({ ...SEVERAL, mode: 'pareto', objectives });
+  const run = async (body) => (await call(post(body), ENV, res(200, { proposals: [], model: 'sdm-1', version: '1' }))).response.status;
+  const forwards = async (name, body) => check(name, (await run(body)) === 200);
+  const refuses = async (name, body) => check(name, (await run(body)) === 400);
+
+  await forwards('two weighted objectives are forwarded', SEVERAL);
+  await forwards('a partial row is forwarded', { ...SEVERAL, history: [{ params: { a: 0.5 }, values: { yield: 0.6, cost: null } }] });
+  await forwards('values null is forwarded', { ...SEVERAL, history: [{ params: { a: 0.5 }, values: null }] });
+  await forwards('an empty history is forwarded', { ...SEVERAL, history: [] });
+  await refuses('goal with objectives is refused', { ...SEVERAL, goal: 'maximize' });
+  await refuses('neither goal nor objectives is refused', { space: SEVERAL.space, history: [], batch: 1 });
+  await refuses('one objective is refused', { ...SEVERAL, objectives: [SEVERAL.objectives[0]] });
+  await refuses('a missing weight is refused', {
+    ...SEVERAL,
+    objectives: [{ name: 'yield', goal: 'maximize' }, { name: 'cost', goal: 'minimize' }],
+  });
+  await refuses('weight 0 is refused', {
+    ...SEVERAL,
+    objectives: [{ name: 'yield', goal: 'maximize', weight: 0 }, { name: 'cost', goal: 'minimize', weight: 1 }],
+  });
+  await forwards('pareto without weights is forwarded', pareto([{ name: 'yield', goal: 'maximize' }, { name: 'cost', goal: 'minimize' }]));
+  await refuses('a weight in pareto is refused', pareto(SEVERAL.objectives));
+  await refuses('a reference on one of two is refused', pareto([{ name: 'yield', goal: 'maximize', reference: 0 }, { name: 'cost', goal: 'minimize' }]));
+  await forwards(
+    'a reference on both is forwarded',
+    pareto([{ name: 'yield', goal: 'maximize', reference: 0 }, { name: 'cost', goal: 'minimize', reference: 10 }]),
+  );
+  await refuses('a reference outside pareto is refused', {
+    ...SEVERAL,
+    objectives: [{ name: 'yield', goal: 'maximize', weight: 1, reference: 0 }, { name: 'cost', goal: 'minimize', weight: 1 }],
+  });
+  await refuses('mode with goal is refused', { ...GOOD, mode: 'pareto' });
+  await refuses('noise with objectives is refused', { ...SEVERAL, noise: 0.1 });
+  await refuses('value in a values row is refused', {
+    ...SEVERAL,
+    history: [{ params: { a: 0.5 }, values: { yield: 0.6, cost: 0.2 }, value: 0.6 }],
+  });
+  await refuses('values in a value row is refused', { ...GOOD, history: [{ params: { a: 0.5 }, value: 1, values: { y1: 1 } }] });
+  await refuses('a row without values is refused', { ...SEVERAL, history: [{ params: { a: 0.5 } }] });
+  await refuses('duplicate objective names are refused', {
+    ...SEVERAL,
+    objectives: [{ name: 'y', goal: 'maximize', weight: 1 }, { name: 'y', goal: 'minimize', weight: 1 }],
+  });
+  await refuses('bayesian-optimisation with three objectives is refused', {
+    ...SEVERAL,
+    method: 'bayesian-optimisation',
+    objectives: [...SEVERAL.objectives, { name: 'time', goal: 'minimize', weight: 1 }],
+  });
+  await forwards('bayesian-optimisation with two objectives is forwarded', { ...SEVERAL, method: 'bayesian-optimisation' });
+  /* Unnamed objectives are y1, y2, ... by position, so a body with no names is valid and the service names the
+     keys `values` must carry. The pre-filter leaves that rule to the service. */
+  await forwards('unnamed objectives are forwarded', {
+    ...SEVERAL,
+    objectives: [{ goal: 'maximize', weight: 1 }, { goal: 'minimize', weight: 1 }],
+    history: [{ params: { a: 0.5 }, values: { y1: 0.6, y2: 0.2 } }],
+  });
 }
 
 // 4. Forwarding.

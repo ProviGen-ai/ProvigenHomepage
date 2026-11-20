@@ -1,4 +1,9 @@
-import type { Method, Observation, Param, ProposeRequest, ProposeResponse, Settings } from '@/lib/sdm/contract';
+/* The cube's solver sends the pre-2.0.0 body (see LegacyProposeRequest in lib/sdm/contract.ts): its
+   multi-objective phases carry `goal` and `objectives` together, which request 2.0.0 refuses. Only
+   scripts/record-cube.mjs sends it, and only when SDM_RECORD_API is set; the published page replays the
+   committed runs and makes no calls. Re-recording against a 2.0.0 service needs a weight on every objective,
+   which is the user's decision (20 Nov 2026), so the shape is named rather than quietly changed. */
+import type { LegacyObservation, LegacyProposeRequest, Method, Param, ProposeResponse, Settings } from '@/lib/sdm/contract';
 import {
   MOVES,
   applyMove,
@@ -44,7 +49,7 @@ import {
  */
 
 /** Where proposals come from: the model while recording, a recorded run on the page. */
-export type Ask = (request: ProposeRequest) => Promise<ProposeResponse>;
+export type Ask = (request: LegacyProposeRequest) => Promise<ProposeResponse>;
 
 export type Block = { moves: Move[]; support: number; label: string };
 
@@ -84,7 +89,7 @@ export async function discover(
   wait: () => Promise<void>,
   cancelled: () => boolean,
 ): Promise<Block[]> {
-  const history: Observation[] = [];
+  const history: LegacyObservation[] = [];
   const found = new Map<string, Block>();
   let experiments = 0;
   let best: number | null = null;
@@ -152,7 +157,7 @@ export async function solveWith(
     ...slots('x', 2),
   ];
   let cube = start;
-  let history: Observation[] = [];
+  let history: LegacyObservation[] = [];
   let experiments = 0;
   let lastStep: SolveEvent['last'];
   const report = (extra: Partial<SolveEvent> = {}) =>
@@ -264,7 +269,7 @@ export async function solveDirect(
   cancelled: () => boolean,
 ) {
   let cube = start;
-  let history: Observation[] = [];
+  let history: LegacyObservation[] = [];
   let experiments = 0;
   let moves = 0;
   const report = (extra: Partial<DirectEvent> = {}) =>
@@ -398,7 +403,7 @@ export const movesFor = (c: EstimateSetup, p: Settings): Move[] => {
   return out;
 };
 /* Whole sequences keep one history for the run: past 200 experiments, the 100 best and the 100 latest are sent. */
-const windowed = (history: Observation[]) => {
+const windowed = (history: LegacyObservation[]) => {
   if (history.length <= 200) return history;
   const keep = new Set(
     history
@@ -441,7 +446,7 @@ export async function solveEstimate(
   cancelled: () => boolean,
 ) {
   let cube = start;
-  let history: Observation[] = [];
+  let history: LegacyObservation[] = [];
   let experiments = 0;
   let moves = 0;
   /* Whole sequences: the best sequence so far (the cube on show is the scramble with it applied). */

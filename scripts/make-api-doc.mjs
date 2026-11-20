@@ -13,7 +13,7 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { apiDoc, BASE } from '../content/sdm1/api-doc.ts';
+import { apiDoc, BASE, ESSENTIALS } from '../content/sdm1/api-doc.ts';
 import { SITE_URL } from '../lib/site-env.ts';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -49,8 +49,9 @@ const markdown = [
   ...apiDoc.sections.flatMap((s) => [`## ${s.heading}`, '', ...s.blocks.map(block), '']),
 ].join('\n');
 
-/* The index an agent finds first: what this is, where the whole contract is, and the one rule it must not get wrong.
-   llmstxt.org's layout, as the Oracle API serves it. */
+/* The index an agent finds first: what this is, where the whole contract is, and the rules it must not get wrong.
+   llmstxt.org's layout, as the Oracle API serves it. The rules come from ESSENTIALS in content/sdm1/api-doc.ts, so
+   the index and the contract beside it cannot disagree; they used to be written out here (the user, 20 Nov 2026). */
 const llms = `# ProviGen
 
 > ${apiDoc.lede}
@@ -62,8 +63,7 @@ const llms = `# ProviGen
 - [Every schema, from the OpenAPI document](${PAGE}/reference), also as [openapi.json](${SITE}/sdm1/openapi.json)
 - [What SDM-1 is](${SITE}/blog/introducing-sdm-1): benchmarks, a published lab campaign, how to try it.
 
-The service is stateless and deterministic: every call carries the whole history, and an unchanged request returns
-the same proposals. A failed run belongs in the history with \`"value": null\`.
+${ESSENTIALS.join('\n\n')}
 `;
 
 mkdirSync(join(ROOT, 'public', 'sdm1'), { recursive: true });

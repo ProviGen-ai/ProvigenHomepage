@@ -133,7 +133,13 @@ const isNumber = (v: unknown): v is number => typeof v === 'number' && Number.is
 /** Why a propose body breaks the public limits, or null when it is fine. */
 export function invalid(body: unknown): string | null {
   if (!isObject(body)) return 'The request must be a JSON object.';
-  const { space, history, batch, goal, method, objectives, noise } = body;
+  const { space, history, batch, goal, method, objectives, noise, mode } = body;
+  /* Request 2.0.0 (the user, 20 Nov 2026): one of two exclusive forms. This pre-filter exists so a body breaking
+     the public limits never reaches AWS, so it must refuse what AWS refuses and accept what AWS accepts — before
+     2.0.0 it required `goal` on every body and `value` on every row, which would now refuse every valid
+     two-or-more request. The page itself only ever sends the one-objective form; the route is reachable in
+     development and through the preview cookie, so the check is written for both. */
+  const several = objectives !== undefined;
   if (!Array.isArray(space) || space.length === 0) return 'space must be a non-empty list of parameters.';
   if (space.length > LIMITS.maxParams) return `space has more than ${LIMITS.maxParams} parameters.`;
   for (const p of space) {
@@ -148,20 +154,57 @@ export function invalid(body: unknown): string | null {
   if (!Array.isArray(history)) return 'history must be a list.';
   if (history.length > LIMITS.maxHistory) return `history has more than ${LIMITS.maxHistory} observations.`;
   for (const o of history) {
-    if (!isObject(o) || !isObject(o.params) || !(o.value === null || isNumber(o.value))) return 'Every observation needs params and a numeric or null value.';
+    if (!isObject(o) || !isObject(o.params)) return 'Every observation needs params.';
+    if (several) {
+      /* `values`: an object of numbers or null, or null for a failed run. Which names it must carry is the
+         service's rule, not this filter's: the objective names are data in the same body, and AWS answers
+         "values must name every objective (missing …, unknown …)". */
+      if (o.values === undefined) return 'Every observation needs values when objectives is sent.';
+      if (!(o.values === null || (isObject(o.values) && Object.values(o.values).every((v) => v === null || isNumber(v)))))
+        return 'values must be an object of finite numbers or null, or null.';
+      if (o.value !== undefined) return 'An observation sent with objectives carries values alone.';
+    } else {
+      if (!(o.value === null || isNumber(o.value))) return 'Every observation needs a numeric or null value.';
+      if (o.values !== undefined) return 'values applies with objectives only.';
+    }
   }
   if (method !== undefined && !METHODS.includes(method as string)) return 'Unknown method.';
   const max = method === 'doe-lhs' ? LIMITS.maxDesign : LIMITS.maxBatch;
   if (!Number.isInteger(batch) || (batch as number) < 1 || (batch as number) > max) return `batch must be a whole number from 1 to ${max}.`;
-  if (!GOALS.includes(goal as string)) return 'goal must be maximize or minimize.';
-  if (objectives !== undefined) {
-    if (!Array.isArray(objectives) || objectives.length > LIMITS.maxParams) return 'objectives must be a short list.';
-    if (!objectives.every((o) => isObject(o) && typeof o.name === 'string' && GOALS.includes(o.goal as string)))
-      return 'Every objective needs a name and a goal.';
+  /* The two forms are exclusive, and exactly one is present. */
+  if (several && goal !== undefined) return 'Send goal for one objective or objectives for two or more.';
+  if (!several && goal === undefined) return 'Send goal for one objective or objectives for two or more.';
+  if (several) {
+    if (!Array.isArray(objectives) || objectives.length < 2 || objectives.length > LIMITS.maxParams)
+      return `objectives must be a list of 2 to ${LIMITS.maxParams}; one objective is sent as goal.`;
+    if (!objectives.every((o) => isObject(o) && GOALS.includes(o.goal as string))) return 'Every objective needs a goal.';
+    const named = objectives.map((o) => (isObject(o) && typeof o.name === 'string' ? o.name : null)).filter((n): n is string => n !== null);
+    if (new Set(named).size !== named.length) return 'objectives have duplicate names.';
+    if (mode !== undefined && mode !== 'weighted' && mode !== 'pareto') return 'mode must be weighted or pareto.';
+    const pareto = mode === 'pareto';
+    for (const o of objectives as Record<string, unknown>[]) {
+      if (pareto) {
+        if (o.weight !== undefined) return 'weight applies in mode weighted only.';
+      } else {
+        if (!isNumber(o.weight) || (o.weight as number) <= 0)
+          return 'Every objective needs a weight above 0 in mode weighted (the default); a request without a stated trade-off uses mode pareto.';
+        if (o.reference !== undefined) return 'A reference applies in mode pareto only.';
+      }
+    }
+    if (pareto) {
+      const withReference = (objectives as Record<string, unknown>[]).filter((o) => o.reference !== undefined);
+      if (withReference.length !== 0 && withReference.length !== objectives.length) return 'Give a reference for every objective or for none.';
+      if (!withReference.every((o) => isNumber(o.reference))) return 'reference must be a finite number.';
+    }
+    if (method === 'bayesian-optimisation' && objectives.length > 2)
+      return "method 'bayesian-optimisation' takes two objectives at most.";
+  } else {
+    if (!GOALS.includes(goal as string)) return 'goal must be maximize or minimize.';
+    if (mode !== undefined) return 'mode applies with objectives only; one objective is sent as goal.';
   }
   if (noise !== undefined) {
+    if (several) return 'noise applies with goal only (one objective).';
     if (!isNumber(noise) || noise < 0) return 'noise must be a finite number, 0 or more.';
-    if (Array.isArray(objectives) && objectives.length > 1) return 'noise applies to one objective only.';
   }
   return null;
 }

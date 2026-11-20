@@ -42,21 +42,36 @@ export type ParamValue = number | string;
 export type Settings = Record<string, ParamValue>;
 
 /**
- * One experiment run so far: its settings and what was measured (null: the
- * run failed). With several objectives, `values` carries each by name and
- * `value` their combined score for servers that read only one.
+ * One experiment run so far with one measured outcome: its settings and what
+ * was measured (null: the run failed).
  */
-export type Observation = { params: Settings; value: number | null; values?: Record<string, number | null> };
+export type Observation = { params: Settings; value: number | null };
 
-export type ProposeRequest = {
+/**
+ * One run with two or more measured outcomes (request 2.0.0). `values` names
+ * every objective of the request, each a number or null. Two separate cases:
+ * some objectives null means those were not measured and the row still counts
+ * for the rest; every objective null, or `values` null, is a failed run.
+ */
+export type ObjectivesObservation = { params: Settings; values: Record<string, number | null> | null };
+
+/**
+ * One of several measured outcomes. `name` is optional (unnamed objectives are
+ * y1, y2, ... by position) and names are unique. `weight` is required in mode
+ * `weighted` and refused in `pareto`; `reference` is the reverse, and goes on
+ * every objective or on none.
+ */
+export type Objective = {
+  name?: string;
+  goal: 'maximize' | 'minimize';
+  weight?: number;
+  reference?: number;
+};
+
+type ProposeCommon = {
   space: Param[];
-  history: Observation[];
   /** How many proposals to return at once. */
   batch: number;
-  /** The goal for `value`. */
-  goal: 'maximize' | 'minimize';
-  /** Several outcomes, each with its own goal, keyed into Observation.values. */
-  objectives?: { name: string; goal: 'maximize' | 'minimize' }[];
   /**
    * Who proposes (default the model). The server maps these onto the
    * BiofoundryDemo methods: sdm-1 -> gamma, bayesian-optimisation -> alpha
@@ -66,11 +81,73 @@ export type ProposeRequest = {
    * runs an optimiser of its own.
    */
   method?: Method;
+};
+
+/** The form for one measured outcome: `goal`, and `value` in every row. */
+export type OneObjectiveRequest = ProposeCommon & {
+  history: Observation[];
+  /** The goal for `value`. */
+  goal: 'maximize' | 'minimize';
   /**
    * How much a repeated measurement of `value` varies: its standard deviation, in `value`'s units; 0 = exact.
-   * Leave it out when unknown (the model then learns it from repeats). One objective only. Used by sdm-1,
-   * ignored by bayesian-optimisation and doe-lhs (API 1.1.0, agreed with agent-002, 13 Nov 2026).
+   * Leave it out when unknown (the model then learns it from repeats). Used by sdm-1, ignored by
+   * bayesian-optimisation and doe-lhs (agreed with agent-002, 13 Nov 2026). This form only: `noise` alongside
+   * `objectives` is refused with 400.
    */
+  noise?: number;
+};
+
+/** The form for two or more: `objectives`, and `values` in every row. */
+export type ObjectivesRequest = ProposeCommon & {
+  history: ObjectivesObservation[];
+  /** 2 to 24 outcomes. One outcome is sent as `goal` instead. */
+  objectives: Objective[];
+  /** `weighted` (default, every objective weighted) or `pareto`. This form only. */
+  mode?: 'weighted' | 'pareto';
+};
+
+/**
+ * The body of POST /v1/propose, in request 2.0.0 (the user, 20 Nov 2026): one
+ * of two exclusive forms. A body carrying both `goal` and `objectives`, or
+ * neither, is refused with 400. Narrow with `'objectives' in request`.
+ *
+ * Before 2.0.0 this was one object: `goal` always required, `objectives`
+ * optional from 1 entry, and every row carrying `value` with `values`
+ * alongside it. A single named objective is gone; the name only ever labelled
+ * `values`, and `value` carries a lone outcome.
+ */
+export type ProposeRequest = OneObjectiveRequest | ObjectivesRequest;
+
+/** True when the body is the two-or-more form. Narrows for the page and the mock. */
+export const hasObjectives = (r: ProposeRequest): r is ObjectivesRequest => 'objectives' in r;
+
+/**
+ * The body as it was before request 2.0.0: `goal` always present, `objectives`
+ * optional from one entry, and every row carrying `value` with `values`
+ * beside it. A 2.0.0 service refuses this shape.
+ *
+ * It survives here for one caller: the cube's recording script
+ * (`scripts/record-cube.mjs` through `components/release/cube/solve.ts`),
+ * which is the only thing in the repo that sends it. The published page never
+ * does — it replays the committed recordings
+ * (`components/release/cube/runs.ts`) and makes no calls at all, so nothing a
+ * visitor sees depends on this type.
+ *
+ * Its multi-objective phases cannot be translated to 2.0.0 without a
+ * decision: they send `goal` and `objectives` together with both `value` and
+ * `values` in every row, and before 2.0.0 the objectives drove the search
+ * while the top-level `goal` was disregarded. Reproducing that under 2.0.0
+ * means mode `weighted` with a weight on every objective, and the cube states
+ * no weights — a weight of 1 across quantities in different units is exactly
+ * what the user rejected on 20 Nov 2026. So the weights are the user's to
+ * choose, and until they do, re-recording the cube against a 2.0.0 service
+ * answers 400. The committed recordings are unaffected.
+ */
+export type LegacyObservation = { params: Settings; value: number | null; values?: Record<string, number | null> };
+export type LegacyProposeRequest = ProposeCommon & {
+  history: LegacyObservation[];
+  goal: 'maximize' | 'minimize';
+  objectives?: { name: string; goal: 'maximize' | 'minimize' }[];
   noise?: number;
 };
 
