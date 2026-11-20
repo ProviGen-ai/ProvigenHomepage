@@ -180,7 +180,10 @@ for _ in range(10):
         {
           kind: 'text',
           text:
-            'A first call with an empty history is permitted and returns a starting design. For a design without a model, method "doe-lhs" ignores the history and accepts a batch of up to 32.',
+            /* Was followed by 'For a design without a model, method "doe-lhs" ignores the history and accepts a
+               batch of up to 32.' (the user, 20 Nov 2026: the alternative methods are served but not advertised,
+               so nothing public states that one can call them). */
+            'A first call with an empty history is permitted and returns a starting design.',
         },
       ],
     },
@@ -255,10 +258,22 @@ for _ in range(10):
           rows: [
             { name: 'space', type: 'required', note: '1 to 24 parameters. Each is {"type": "continuous", "low", "high", "log"?}, {"type": "integer", "low", "high"} or {"type": "categorical", "choices": [...]}. "name" is optional and must be unique; unnamed parameters are x1, x2, … by position. For log, low must be above 0. Categorical choices are distinct strings.' },
             { name: 'history', type: 'required', note: 'Up to 200 rows, every run so far with failed runs included. May be empty. params names exactly every parameter, numbers within [low, high], whole numbers for integer parameters, the exact string for categorical. Each row then carries value with one objective, or values with two or more.' },
-            { name: 'batch', type: 'required', note: 'How many settings to propose: 1 to 8, or 1 to 32 for method "doe-lhs".' },
+            /* Was '1 to 8, or 1 to 32 for method "doe-lhs"' (the user, 20 Nov 2026): the exception named a method
+               this page no longer documents. The served contract still allows 32 for it, so this says less than the
+               contract rather than something different, which is the rule for this page. */
+            { name: 'batch', type: 'required', note: 'How many settings to propose: 1 to 8.' },
             { name: 'goal', type: 'one objective', note: '"maximize" or "minimize", the direction for the value in every history row. Present for one measured outcome, and refused alongside objectives.' },
             { name: 'objectives', type: 'two or more', note: '2 to 24 entries of {"name"?, "goal", "weight"?, "reference"?}. Unnamed ones are y1, y2, … by position, and names are unique. Every history row then carries values. One measured outcome is sent as goal.' },
-            { name: 'method', type: 'optional', note: '"sdm-1" (default), "bayesian-optimisation" or "doe-lhs" (a Latin hypercube; the history is ignored). Every method serves one objective; with objectives, "bayesian-optimisation" takes two, and "sdm-1" and "doe-lhs" take up to 24.' },
+            /* The `method` row is gone (the user, 20 Nov 2026). It read: '"sdm-1" (default),
+               "bayesian-optimisation" or "doe-lhs" (a Latin hypercube; the history is ignored). Every method serves
+               one objective; with objectives, "bayesian-optimisation" takes two, and "sdm-1" and "doe-lhs" take up
+               to 24.' All three are served and were verified live on 20 Nov 2026, each as its own model with its
+               own version; the two alternatives are deliberately not advertised, so no public page says a caller
+               may ask for them. They stay named in the code: Method in lib/sdm/contract.ts, and the cube's
+               recording script, which asks for each of them by name to race them.
+
+               Dropping the field from this table leaves the request table without it; a request that omits it gets
+               sdm-1, which is what every documented example sends. */
             { name: 'noise', type: 'one objective', note: 'How much repeated measurements of the same setting vary, as a standard deviation in the units of value; finite and at least 0, with 0 for exact. Present with goal, and refused alongside objectives.' },
             { name: 'mode', type: 'two or more', note: '"weighted" (default) or "pareto". Present with objectives, and refused alongside goal.' },
           ],
@@ -394,7 +409,9 @@ for _ in range(10):
         {
           kind: 'list',
           items: [
-            'Parameters: 24. History: 200 rows. Batch: 8, or 32 for doe-lhs. Body: 256 KB.',
+            /* Was 'Batch: 8, or 32 for doe-lhs.' (the user, 20 Nov 2026), for the same reason as the batch row
+               above: the exception named a method this page does not document. */
+            'Parameters: 24. History: 200 rows. Batch: 8. Body: 256 KB.',
             'Calls: 10 per minute per token. A trial token is allowed 20 calls, counted against the address it was issued to; a confirmed token is allowed 50 per day, resetting at 00:00 UTC, and 500 in total.',
             /* One bullet for the time budget (the user, 20 Nov 2026: the refusal bullet read as partly redundant
                with this one). It was: the figure for the service's own response time went first — "approximately 54
