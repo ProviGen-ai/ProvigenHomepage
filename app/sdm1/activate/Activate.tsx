@@ -52,6 +52,10 @@ export default function Activate() {
   useEffect(() => {
     if (!code) return;
     let dropped = false;
+    /* The button waits for this answer, so the wait has an end: after four seconds the page stops asking and offers
+       the button, which is what it does with any answer it cannot read. */
+    const giveUp = new AbortController();
+    const timer = setTimeout(() => giveUp.abort(), 4000);
     void (async () => {
       let state: Link = "unknown";
       try {
@@ -59,6 +63,7 @@ export default function Activate() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ code, check: true }),
+          signal: giveUp.signal,
         });
         const body = (await response.json().catch(() => null)) as { state?: string } | null;
         if (response.ok && (body?.state === "used" || body?.state === "expired" || body?.state === "unused"))
@@ -66,10 +71,12 @@ export default function Activate() {
       } catch {
         state = "unknown";
       }
+      clearTimeout(timer);
       if (!dropped) setLooked({ code, state });
     })();
     return () => {
       dropped = true;
+      clearTimeout(timer);
     };
   }, [code]);
 
@@ -173,6 +180,15 @@ export default function Activate() {
     return (
       <div className="r-act">
         <p className="r-act-lead">{SPENT[link]}</p>
+      </div>
+    );
+
+  /* The button is held back until the link's worth is known. On a link that was already spent it appeared for an
+     instant and was then taken away, which read as an offer withdrawn (the user, 22 Nov 2026). */
+  if (code && link === "checking")
+    return (
+      <div className="r-act">
+        <p className="r-act-lead">Checking your link…</p>
       </div>
     );
 
