@@ -533,13 +533,20 @@ async function tokens(request: Request, env: SdmEnv, development: boolean, fetch
   return highDemand(s === 429 ? retrySeconds(upstream, body, 30) : 30, 'Access is not available right now. Please try again in a few minutes.');
 }
 
-/** The activation code from the link's fragment: a short opaque string, or why it is refused. */
-export function activateRequest(body: unknown): string | { error: string } {
+/** The activation code from the link's fragment, with whether this is a look at the link rather than a use: a short
+    opaque string, or why it is refused. `check` is the activation page's question on load and spends nothing;
+    without it the call activates, as it always did. */
+export function activateRequest(body: unknown): { code: string; check: boolean } | { error: string } {
   if (!isObject(body)) return { error: 'The request must be a JSON object.' };
   const code = typeof body.code === 'string' ? body.code.trim() : '';
   if (!code || code.length > 256 || !/^[A-Za-z0-9._~-]+$/.test(code)) return { error: 'This activation link is not valid.' };
-  return code;
+  if (body.check !== undefined && typeof body.check !== 'boolean') return { error: 'This activation link is not valid.' };
+  return { code, check: body.check === true };
 }
+
+/** What AWS reports about a link that was only looked at. Anything else becomes `unknown`, and the page then offers
+    the button as it did before. */
+const LINK_STATES = new Set(['unused', 'used', 'expired']);
 
 /** POST /api/sdm1/v1/activate: the activation page's click, forwarded to AWS POST /v1/tokens/activate with the secret
     and the visitor's IP. The full token comes back once; nothing here stores or logs the code or the token. */
@@ -556,7 +563,8 @@ async function activate(request: Request, env: SdmEnv, development: boolean, fet
     return json(400, { error: 'invalid_request', message: 'The request is not valid JSON.' });
   }
   const checked = activateRequest(parsed);
-  if (typeof checked !== 'string') return json(400, { error: 'invalid_request', message: checked.error });
+  if ('error' in checked) return json(400, { error: 'invalid_request', message: checked.error });
+  const { code, check } = checked;
 
   const base = (env.SDM_API_BASE ?? '').replace(/\/+$/, '');
   const secret = env.SDM_API_SECRET ?? '';
@@ -572,10 +580,16 @@ async function activate(request: Request, env: SdmEnv, development: boolean, fet
     upstream = await fetchImpl(`${base}/v1/tokens/activate`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${secret}`, 'Content-Type': 'application/json', ...(ip ? { 'X-SDM-Client-IP': ip } : {}) },
-      body: JSON.stringify({ code: checked }),
+      body: JSON.stringify(check ? { code, check: true } : { code }),
       signal: AbortSignal.timeout(TOKEN_UPSTREAM_MS),
     });
   } catch {
+    /* A check that cannot reach AWS leaves the button standing, as every other unreadable answer does; only a real
+       activation reports that the service is away. */
+    if (check) {
+      console.error('sdm1: the activation check did not reach AWS; the page keeps the button.');
+      return json(200, { state: 'unknown' });
+    }
     return highDemand(10, 'Activation is not available right now. Please try again in a few minutes.');
   }
   const text = await upstream.text().catch(() => '');
@@ -587,6 +601,17 @@ async function activate(request: Request, env: SdmEnv, development: boolean, fet
     body = null;
   }
   const s = upstream.status;
+  /* A look at the link, answered before anything else so that a check can never be mistaken for an activation and
+     never reaches notifyActivation: were AWS ever to answer a check with a token, that token would belong to a
+     visitor who had not pressed anything, and would be shown to nobody. The page asks this on load, so an answer it
+     cannot read must leave the button standing: every state outside the three AWS names becomes `unknown`, and a
+     refusal, a rate limit or a pause is `unknown` too (the user, 22 Nov 2026: a second visit says the token is
+     already activated). AWS keeps this call off the activations' budget and writes nothing. */
+  if (check) {
+    const state = s === 200 && typeof body?.state === 'string' && LINK_STATES.has(body.state) ? body.state : 'unknown';
+    if (state === 'unknown') console.error(`sdm1: the activation check answered ${s}; the page keeps the button.`);
+    return json(200, { state });
+  }
   /* Only the fields the page shows, so nothing else AWS might add reaches the browser. */
   if (s === 200 && typeof body?.token === 'string' && body.token.startsWith('sdm1_')) {
     const daily = isNumber(body.daily_limit) ? body.daily_limit : 50;
@@ -597,8 +622,17 @@ async function activate(request: Request, env: SdmEnv, development: boolean, fet
     await notifyActivation(who, daily, total, env, development, fetchImpl);
     return json(200, { token: body.token, tier: 'full', daily_limit: daily, total_limit: total });
   }
+  /* A link that was already used, which AWS separates from an expired one since 22 Nov 2026 and answers until the
+     link would have expired. Before that change a second press came back 410, so this arm simply never ran. */
+  if (s === 409 && body?.error === 'link_used')
+    return json(409, {
+      error: 'link_used',
+      message: 'This token has already been activated. To replace a lost token, ask for a new link on the Get access form.',
+    });
+  /* Was "This link has been used already or has expired. Please ask for a new one." (22 Nov 2026): a used link has
+     its own 409 since AWS told the two apart, so this sentence no longer has to cover both. */
   if (s === 410 || (s === 404 && body?.error === 'link_expired'))
-    return json(410, { error: 'link_expired', message: 'This link has been used already or has expired. Please ask for a new one.' });
+    return json(410, { error: 'link_expired', message: 'This link has expired, or a newer link replaced it. Please ask for a new one.' });
   if (s === 400) return json(400, { error: 'invalid_request', message: 'This activation link is not valid.' });
   if (s === 429 && body?.error === 'rate_limited') {
     const wait = retrySeconds(upstream, body, 3600);

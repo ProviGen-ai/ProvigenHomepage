@@ -164,8 +164,33 @@ single use, a newer link voiding the older one).
   `POST /v1/tokens/activate` with this environment's secret and the visitor's
   IP. The browser never calls AWS.
 - **Answers:** 200 passes on `token`, `tier`, `daily_limit`, `total_limit`;
-  410 (or 404 `link_expired`) becomes 410 `link_expired`; 400, 429 and 503
-  pass as above; everything else becomes 503.
+  409 `link_used` passes as 409; 410 (or 404 `link_expired`) becomes 410
+  `link_expired`; 400, 429 and 503 pass as above; everything else becomes 503.
+- **Already activated** (the user, 22 Nov 2026: opening a link a second time
+  should say the token is already activated rather than offer a button that
+  cannot work). Two parts, both added once AWS deployed its side on
+  22 Nov 2026 19:29 UTC:
+  - `POST /v1/tokens/activate {"code", "check": true}` answers
+    `200 {"state": "unused" | "used" | "expired"}`. AWS reads twice and writes
+    nothing: no single-use marking, no supersede, no clock, and the call sits
+    on its own per-visitor budget (120 an hour, 600 a day) so it never eats
+    into the 10 activations an hour. The page asks on load and shows the
+    button or the spent sentence.
+  - A press on a used link answers 409 `link_used`, until the link would have
+    expired at 48 h; after that it is 410 again.
+  - The route answers a check **before** the arm that reads a token, so a
+    check can never be mistaken for an activation and never reaches
+    `notifyActivation`. Were a check ever to come back carrying a token, that
+    token would belong to a visitor who pressed nothing and would be shown to
+    nobody; a test asserts it is dropped.
+  - Everything a check cannot be read from — an unnamed state, a 400, the
+    check budget's 429, a pause, a network error — becomes
+    `{"state": "unknown"}` and the page keeps the button. A question that
+    fails must never stand between a visitor and their token.
+  - **Order matters if this is ever rebuilt:** the page must not send
+    `check: true` to a deployment that ignores unknown fields, because the
+    call would then activate the link on load and the route would discard the
+    token. AWS ships first, the page second.
 - **The page** is `noindex` and sends no referrer, so the fragment cannot
   leak through one, and it clears the fragment once a token is shown.
 - **Same guards as tokens:** the kill switch and the draft gate apply, and the

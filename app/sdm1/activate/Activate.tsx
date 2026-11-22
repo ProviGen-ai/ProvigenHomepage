@@ -5,14 +5,28 @@ import CopyHandoff from "@/components/release/CopyHandoff";
 
 /*
  * The magic link's activation (the user, 17 Nov 2026): the email links to /sdm1/activate#<code>, so the code sits in
- * the URL fragment and never reaches a server in a GET. Nothing happens on load, because mail scanners and link
+ * the URL fragment and never reaches a server in a GET. Nothing is activated on load, because mail scanners and link
  * previewers fetch a link before anyone clicks it; one button activates, and only that click posts the code to this
  * site's own route (/api/sdm1/v1/activate), which alone talks to AWS.
+ *
+ * On load the page does ask what the link is worth (the user, 22 Nov 2026: opening a link a second time should say
+ * the token is already activated rather than offer a button that cannot work). That question is
+ * `{code, check: true}`, which AWS answers from two reads and writes nothing: it spends no link and sits on its own
+ * per-visitor budget, so the scanners this page is built around cost a visitor nothing. Any answer the route cannot
+ * read comes back as `unknown`, and then the button stands exactly as it did before: a failed question must never
+ * keep someone from their token.
  *
  * The full token is shown once, with a copy button, and is never stored in the browser.
  */
 
 type Full = { token: string; daily_limit: number; total_limit: number };
+/** What the link is worth, before anyone presses anything. `checking` and `unknown` both show the button. */
+type Link = "checking" | "unused" | "used" | "expired" | "unknown";
+
+const SPENT: Record<string, string> = {
+  used: "This token has already been activated. To replace a lost token, ask for a new link on the Get access form.",
+  expired: "This link has expired, or a newer link replaced it. Please ask for a new one.",
+};
 
 export default function Activate() {
   const [code, setCode] = useState<string | null>(null);
@@ -20,6 +34,11 @@ export default function Activate() {
   const [error, setError] = useState<string | null>(null);
   const [full, setFull] = useState<Full | null>(null);
   const [copied, setCopied] = useState(false);
+  /* Kept with the code it describes, so a new fragment is "checking" again without an effect writing state
+     synchronously on the way. */
+  const [looked, setLooked] = useState<{ code: string; state: Link } | null>(null);
+  const link: Link = code && looked?.code === code ? looked.state : "checking";
+  const setLink = (state: Link) => setLooked(code ? { code, state } : null);
 
   /* The fragment, read in the browser only. */
   useEffect(() => {
@@ -28,6 +47,31 @@ export default function Activate() {
     window.addEventListener("hashchange", read);
     return () => window.removeEventListener("hashchange", read);
   }, []);
+
+  /* What the link is worth, asked once per code. Nothing here is spent, and a failure leaves the button. */
+  useEffect(() => {
+    if (!code) return;
+    let dropped = false;
+    void (async () => {
+      let state: Link = "unknown";
+      try {
+        const response = await fetch("/api/sdm1/v1/activate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code, check: true }),
+        });
+        const body = (await response.json().catch(() => null)) as { state?: string } | null;
+        if (response.ok && (body?.state === "used" || body?.state === "expired" || body?.state === "unused"))
+          state = body.state;
+      } catch {
+        state = "unknown";
+      }
+      if (!dropped) setLooked({ code, state });
+    })();
+    return () => {
+      dropped = true;
+    };
+  }, [code]);
 
   async function activate() {
     if (sending || !code) return;
@@ -50,11 +94,11 @@ export default function Activate() {
         });
         /* The code is spent: take it out of the address bar so a reload cannot try it again. */
         window.history.replaceState(null, "", window.location.pathname);
+      } else if (response.status === 409) {
+        /* Pressed on a page that was already open when the link was spent elsewhere. */
+        setLink("used");
       } else if (response.status === 410) {
-        setError(
-          body?.message ??
-            "This link has been used already or has expired. Please ask for a new one.",
-        );
+        setLink("expired");
       } else if (response.status === 404) {
         setError("Activation is not open yet.");
       } else {
@@ -121,6 +165,14 @@ export default function Activate() {
               together with the API address and the documentation.
             </p> */}
         <CopyHandoff token={full.token} />
+      </div>
+    );
+
+  /* A link that is spent carries its own sentence and no button: there is nothing left to press. */
+  if (code && SPENT[link])
+    return (
+      <div className="r-act">
+        <p className="r-act-lead">{SPENT[link]}</p>
       </div>
     );
 

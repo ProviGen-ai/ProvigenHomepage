@@ -575,6 +575,46 @@ console.error = quiet;
     const r = await call(act({ code: CODE }), ENV, answer, 'activate');
     check(`activate: ${name}`, r.response.status === status && r.body?.error === error && !JSON.stringify(r.body).includes('sdm1_should_not_pass'), `${r.response.status} ${r.body?.error}`);
   }
+
+  /* A link that was already used, told apart from an expired one (the user, 22 Nov 2026). */
+  const used = await call(act({ code: CODE }), ENV, res(409, { error: 'link_used', message: 'from AWS' }), 'activate');
+  check('activate: 409 link_used passes as 409', used.response.status === 409 && used.body?.error === 'link_used');
+  check("activate: 409 carries this site's own sentence", typeof used.body?.message === 'string' && used.body.message.includes('already been activated') && used.body.message !== 'from AWS');
+  const other409 = await call(act({ code: CODE }), ENV, res(409, { error: 'something_else' }), 'activate');
+  check('activate: a 409 that is not link_used becomes 503', other409.response.status === 503 && other409.body?.error === 'high_demand');
+
+  /* The check: a look at the link, which spends nothing. */
+  const look = await call(act({ code: CODE, check: true }), ENV, () => res(200, { state: 'used', extra: 'not for the browser' }), 'activate');
+  check('check: forwarded with check true beside the code', JSON.parse(look.seen[0].init.body).check === true && JSON.parse(look.seen[0].init.body).code === CODE);
+  check('check: the state passes and nothing else does', look.response.status === 200 && look.body?.state === 'used' && !('extra' in look.body));
+  for (const state of ['unused', 'expired']) {
+    const r = await call(act({ code: CODE, check: true }), ENV, () => res(200, { state }), 'activate');
+    check(`check: ${state} passes`, r.response.status === 200 && r.body?.state === state);
+  }
+  /* Named fields rather than a tuple: destructuring a mixed tuple gives `name` the union type, and the lint then
+     refuses it inside a template. */
+  for (const { name, answer } of [
+    { name: 'a state AWS does not name', answer: res(200, { state: 'nonsense' }) },
+    { name: 'no state at all', answer: res(200, {}) },
+    { name: '400', answer: res(400, { error: 'invalid_request' }) },
+    { name: '429 on the check budget', answer: res(429, { error: 'rate_limited' }) },
+    { name: '503 paused', answer: res(503, { error: 'paused' }) },
+    { name: 'a network error', answer: 'throw' },
+  ]) {
+    const r = await call(act({ code: CODE, check: true }), ENV, answer, 'activate');
+    check(`check: ${name} becomes unknown, so the button stands`, r.response.status === 200 && r.body?.state === 'unknown', `${r.response.status} ${JSON.stringify(r.body)}`);
+  }
+  /* The failure that would cost someone their token: a check must never activate, whatever AWS answers. */
+  const tokenOnACheck = await call(act({ code: CODE, check: true }), ENV, full, 'activate');
+  check(
+    'check: a token in the answer is never passed on',
+    tokenOnACheck.response.status === 200 && tokenOnACheck.body?.state === 'unknown' && !JSON.stringify(tokenOnACheck.body).includes('sdm1_full'),
+    JSON.stringify(tokenOnACheck.body),
+  );
+  const notBool = await call(act({ code: CODE, check: 'yes' }), ENV, full, 'activate');
+  check('check: a check that is not a boolean is 400, AWS not called', notBool.response.status === 400 && notBool.seen.length === 0);
+  const plain = await call(act({ code: CODE, check: false }), ENV, full, 'activate');
+  check('check: false activates as before, and check is not forwarded', plain.response.status === 200 && plain.body?.token === 'sdm1_full' && !('check' in JSON.parse(plain.seen[0].init.body)));
   console.error = quiet3;
 }
 
