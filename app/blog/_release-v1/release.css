@@ -2751,6 +2751,24 @@ body:has(.r-launch--v2) .s-footer {
     font-size: 0.78rem;
   }
 }
+/* The cube is built from 46px stickers placed in 3D, so what it draws is a fixed 199.8px wide whatever its stage
+   measures, and only the scale on .r-cube-body resizes it. The phone scale in the 760px query above never reached
+   this variant: that rule is `.r-race-stage .r-cube-body`, which the later `.r-race-text .r-race-stage .r-cube-body`
+   outweighs, so the cube held 0.5 and drew 99.9px wide while a lane on a 360px screen is 72.3px. It overhung its
+   lane by 14.6px on the left and 13px on the right, overlapped the cube beside it by 19.7px, and covered the top
+   16.4px of its own name; it came clear only above about 460px (the user, 22 Nov 2026, with a photograph of a
+   phone). These two steps carry the specificity of the 0.5 they correct, so they hold on a phone and change
+   nothing above 470px. */
+@media (max-width: 470px) {
+  .r-race-text .r-race-stage .r-cube-body {
+    transform: scale(0.34);
+  }
+}
+@media (max-width: 355px) {
+  .r-race-text .r-race-stage .r-cube-body {
+    transform: scale(0.27);
+  }
+}
 /* The same distance below the tab titles as the protein expression showcase, whose plot keeps the prose figure
    margin (founder, 14 Nov 2026). */
 .r-show-panel .r-race-top {
