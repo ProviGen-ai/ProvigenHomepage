@@ -1886,11 +1886,26 @@ export default function BenchmarkInfo({
     /* The side of the name the card opens on, and how tall it may be there (the user, 20 Nov 2026: on a phone the
        card ran off the bottom of the screen, where nothing can scroll a fixed card into view). It opens below the
        name as before and turns upward only once it is on the page and does not fit below, so on a wide screen,
-       where it does fit, nothing moves. release.css scrolls whatever is left over inside the card. */
-    const below = window.innerHeight - box.bottom - 24;
-    const above = box.top - 24;
+       where it does fit, nothing moves. release.css scrolls whatever is left over inside the card.
+       The room above the name ends at the site header, not at the window (the user, 24 Nov 2026: a card was cut off
+       behind the header). .s-header is position: fixed and paints over the card, so a card measured against the
+       window put its first lines underneath it, out of reach: the card cannot be scrolled up to reveal them,
+       because what is hidden is outside the card rather than inside it. The header tucks away on scroll, and then
+       its box sits above the window and the whole window is free again. */
+    const head = document.querySelector(".s-header");
+    /* The header's band is kept clear whether or not it is on screen at this moment. The header tucks away when the
+       page is scrolled down and comes back on the way up, and it comes back without a scroll of its own: a card
+       placed while it was away, measured from where it then stood, ended up underneath it a moment later with no
+       second placement to correct it. Its height is read from the element rather than its box, since mid-slide the
+       box is somewhere above the window. */
+    const ceiling = head ? (head as HTMLElement).offsetHeight + 8 : 8;
+    /* A name can itself be under the header; the card still starts below it. */
+    const downTop = Math.max(ceiling, box.bottom + 8);
+    const below = window.innerHeight - downTop - 24;
+    const above = box.top - 8 - ceiling;
     const wants = card.current?.scrollHeight ?? 0;
     const openUp = up || (wants > below && above > below);
+    const room = Math.max(160, openUp ? above : below);
     setAt({
       left: Math.max(
         16,
@@ -1899,10 +1914,15 @@ export default function BenchmarkInfo({
           window.innerWidth - 16 - width,
         ),
       ),
-      maxHeight: Math.max(160, openUp ? above : below),
+      maxHeight: room,
       ...(openUp
-        ? { bottom: window.innerHeight - box.top + 8 }
-        : { top: box.bottom + 8 }),
+        ? /* Anchored by its foot, under the name, unless the room above is smaller than the smallest card the
+             floor above allows: then the foot would push its head under the header, so it hangs from the header
+             instead. */
+          above >= room
+          ? { bottom: window.innerHeight - box.top + 8 }
+          : { top: ceiling }
+        : { top: downTop }),
     });
   };
   const show = place;
